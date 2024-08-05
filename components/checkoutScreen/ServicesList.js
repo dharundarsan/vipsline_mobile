@@ -1,0 +1,256 @@
+import {ActivityIndicator, FlatList, ScrollView, ScrollViewBase, StyleSheet, Text, TextInput, View} from "react-native";
+import Colors from "../../constants/Colors";
+import textTheme from "../../constants/TextTheme";
+import {Ionicons} from '@expo/vector-icons';
+import PrimaryButton from "../../ui/PrimaryButton";
+import {useState} from "react";
+import ServiceItem from "./ServiceItem";
+import {useSelector, shallowEqual} from "react-redux";
+import {useMemo, useCallback, useReducer} from 'react';
+import React from "react";
+
+
+const ServicesList = React.memo(() => {
+    const [isFetching, setIsFetching] = useState(false);
+    const servicesData = useSelector(state => state.catalogue.services, shallowEqual);
+    const womenServicesData = servicesData.women;
+    const [filteredWomenServicesData, setFilteredWomenServicesData] = useState(womenServicesData);
+    const menServicesData = servicesData.men;
+    const [filteredMenServicesData, setFilteredMenServicesData] = useState(menServicesData);
+    const kidsServicesData = servicesData.kids
+    const [filteredKidsServicesData, setFilteredKidsServicesData] = useState(kidsServicesData);
+    const generalServicesData = servicesData.general;
+    const [filteredGeneralServicesData, setFilteredGeneralServicesData] = useState(generalServicesData);
+    const [tempSelectedItems, setTempSelectedItems] = useState([]);
+
+    const addToTempSelectedItems = (item) => {
+        setTempSelectedItems((prevState) => [...prevState, item]);
+    }
+
+    const filterServicesData = useCallback((filterValue) => {
+        const lowerCaseFilterValue = filterValue.toLowerCase();
+
+        // Filter function to apply on each category
+        const filterCategory = (categoryData) => {
+            return categoryData.reduce((acc, item) => {
+                const filteredResourceCategories = item.resource_categories.filter((category) => {
+                    return category.name.toLowerCase().includes(lowerCaseFilterValue) ||
+                        category.price.toString().includes(filterValue);
+                });
+
+                if (filteredResourceCategories.length > 0) {
+                    acc.push({
+                        ...item,
+                        resource_categories: filteredResourceCategories
+                    });
+                }
+
+                return acc;
+            }, []);
+        };
+
+        // Apply filtering to each category's data
+        const filteredWomen = filterCategory(womenServicesData);
+        const filteredMen = filterCategory(menServicesData);
+        const filteredKids = filterCategory(kidsServicesData);
+        const filteredGeneral = filterCategory(generalServicesData);
+
+        // Batch state updates to avoid multiple re-renders
+        setFilteredWomenServicesData(filteredWomen);
+        setFilteredMenServicesData(filteredMen);
+        setFilteredKidsServicesData(filteredKids);
+        setFilteredGeneralServicesData(filteredGeneral);
+    }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
+
+
+    return (
+        isFetching ?
+            <View style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <ActivityIndicator color={Colors.darkBlue} size={"large"}/>
+            </View>
+            :
+            <View style={styles.commonSelectTemplate}>
+                <View style={styles.headingAndSearchContainer}>
+                    <View style={styles.searchContainer}>
+                        <Ionicons name="search-sharp" style={styles.searchLogo} size={20} color={Colors.grey500}/>
+                        <TextInput style={[textTheme.bodyMedium, styles.searchTextInput]}
+                                   placeholder={"Search by service name or prices"}
+                                   onChangeText={filterServicesData}
+                                   placeholderTextColor={Colors.grey400}/>
+                        <PrimaryButton buttonStyle={styles.searchFilterButton}
+                                       pressableStyle={styles.searchFilterPressable}>
+                            <Ionicons name="filter" size={20} color={Colors.grey500}/>
+                        </PrimaryButton>
+                    </View>
+                </View>
+                <View>
+                    <View style={styles.flatListContainer}>
+                        <ScrollView fadingEdgeLength={75}>
+                            <FlatList data={filteredWomenServicesData}
+                                      scrollEnabled={false}
+                                      renderItem={({item}) => {
+                                          return <>
+                                              <View style={styles.parentCategoryAndGenderContainer}>
+                                                  <Text
+                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                  <View
+                                                      style={[styles.genderTextContainer, {borderColor: Colors.orange}]}>
+                                                      <Text
+                                                          style={[textTheme.labelMedium, styles.genderText]}>Women</Text>
+                                                  </View>
+                                              </View>
+                                              <FlatList data={item.resource_categories}
+                                                        renderItem={({item}) => {
+                                                            return <ServiceItem
+                                                                leftBarColor={Colors.orange}
+                                                                data={item}
+                                                                addToTempSelectedItems={addToTempSelectedItems}
+                                                                selected={tempSelectedItems.includes(item)}/>
+                                                        }}>
+                                              </FlatList>
+                                          </>
+                                      }}/>
+                            <FlatList data={filteredMenServicesData}
+                                      scrollEnabled={false}
+                                      renderItem={({item}) => {
+                                          return <>
+                                              <View style={styles.parentCategoryAndGenderContainer}>
+                                                  <Text
+                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                  <View
+                                                      style={[styles.genderTextContainer, {borderColor: Colors.blue}]}>
+                                                      <Text
+                                                          style={[textTheme.labelMedium, styles.genderText]}>Men</Text>
+                                                  </View>
+                                              </View>
+                                              <FlatList data={item.resource_categories}
+                                                        renderItem={({item}) => {
+                                                            return <ServiceItem
+                                                                leftBarColor={Colors.blue}
+                                                                data={item}
+                                                                addToTempSelectedItems={addToTempSelectedItems}
+                                                                selected={tempSelectedItems.includes(item)}/>
+                                                        }}>
+                                              </FlatList>
+                                          </>
+                                      }}/>
+                            <FlatList data={filteredKidsServicesData}
+                                      scrollEnabled={false}
+                                      renderItem={({item}) => {
+                                          return <>
+                                              <View style={styles.parentCategoryAndGenderContainer}>
+                                                  <Text
+                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                  <View
+                                                      style={[styles.genderTextContainer, {borderColor: Colors.purple}]}>
+                                                      <Text
+                                                          style={[textTheme.labelMedium, styles.genderText]}>Kids</Text>
+                                                  </View>
+                                              </View>
+                                              <FlatList data={item.resource_categories}
+                                                        renderItem={({item}) => {
+                                                            return <ServiceItem
+                                                                leftBarColor={Colors.purple}
+                                                                data={item}
+                                                                addToTempSelectedItems={addToTempSelectedItems}
+                                                                selected={tempSelectedItems.includes(item)}/>
+                                                        }}>
+                                              </FlatList>
+                                          </>
+                                      }}/>
+                            <FlatList data={filteredGeneralServicesData}
+                                      scrollEnabled={false}
+                                      renderItem={({item}) => {
+                                          return <>
+                                              <View style={styles.parentCategoryAndGenderContainer}>
+                                                  <Text
+                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                  <View
+                                                      style={[styles.genderTextContainer, {borderColor: Colors.brown}]}>
+                                                      <Text
+                                                          style={[textTheme.labelMedium, styles.genderText]}>General</Text>
+                                                  </View>
+                                              </View>
+                                              <FlatList data={item.resource_categories}
+                                                        renderItem={({item}) => {
+                                                            return <ServiceItem
+                                                                leftBarColor={Colors.brown}
+                                                                addToTempSelectedItems={addToTempSelectedItems}
+                                                                data={item}
+                                                                selected={tempSelectedItems.includes(item)}/>
+                                                        }}>
+                                              </FlatList>
+                                          </>
+                                      }}/>
+                        </ScrollView>
+                    </View>
+                </View>
+            </View>
+    );
+});
+
+const styles = StyleSheet.create({
+    commonSelectTemplate: {
+        flex: 1,
+    },
+    headingAndSearchContainer: {
+        padding: 15,
+    },
+    headingText: {
+        marginBottom: 10
+    },
+    searchContainer: {
+        flexDirection: "row",
+        backgroundColor: Colors.background,
+        borderRadius: 20,
+        borderColor: Colors.grey500,
+        borderWidth: 1
+    },
+    searchLogo: {
+        paddingVertical: 9,
+        paddingLeft: 9,
+    },
+    searchTextInput: {
+        fontSize: 15,
+        marginLeft: 10,
+        flex: 1,
+    },
+    searchFilterButton: {
+        borderLeftColor: Colors.grey500,
+        borderLeftWidth: 1,
+        backgroundColor: Colors.transparent,
+        borderRadius: 0,
+        borderBottomRightRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    searchFilterPressable: {
+        paddingHorizontal: 9,
+        paddingVertical: 9,
+    },
+    parentCategoryAndGenderContainer: {
+        marginHorizontal: 40,
+        marginVertical: 20,
+        flexDirection: "row",
+        // justifyContent:"center",
+        alignItems: "center",
+        gap: 15,
+    },
+    genderTextContainer: {
+        borderWidth: 2,
+        borderRadius: 7,
+    },
+    genderText: {
+        paddingVertical: 4,
+        paddingHorizontal: 8
+    },
+    parentCategoryText: {},
+    flatListContainer: {
+        marginBottom: 120,
+    }
+});
+
+export default ServicesList;
