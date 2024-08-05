@@ -1,5 +1,7 @@
 import {View, StyleSheet, Text} from "react-native";
 import Colors from "../../constants/Colors"
+import Divider from "../../ui/Divider";
+
 const radius = 38;
 
 export default function ClientCard(props) {
@@ -8,37 +10,39 @@ export default function ClientCard(props) {
     const email = props.email;
 
 
-    return (
-        <View style={styles.card}>
-            <View style={styles.innerContainer}>
-                <View style={styles.clientProfile}>
-                    <Text style={styles.text}>{name !== undefined ? name.at(0).toUpperCase() : "Z"}</Text>
-                </View>
+    return (<>
+            <View style={styles.card}>
+                <View style={styles.innerContainer}>
+                    <View style={styles.clientProfile}>
+                        <Text style={styles.text}>{name !== undefined ? name.at(0).toUpperCase() : "Z"}</Text>
+                    </View>
 
-                <View style={styles.clientDetailsContainer}>
-                    {
-                        props.name !== undefined ? <Text style={styles.name}>{name}</Text> : null
-                    }
-                    {
-                        props.phone !== undefined ? < Text style={styles.phone}>{phone}</Text> : null
-                    }
-                    {
-                        email !== undefined && email !== null && email.trim().length !== 0 ? <Text style={styles.email}>{email}</Text>: null
-                    }
+                    <View style={styles.clientDetailsContainer}>
+                        {
+                            props.name !== undefined ? <Text style={styles.name}>{name}</Text> : null
+                        }
+                        {
+                            props.phone !== undefined ? < Text style={styles.phone}>{phone}</Text> : null
+                        }
+                        {
+                            email !== undefined && email !== null && email.trim().length !== 0 ?
+                                <Text style={styles.email}>{email}</Text> : null
+                        }
 
-                    {/*<Text>{name}</Text>*/}
+                        {/*<Text>{name}</Text>*/}
+                    </View>
                 </View>
             </View>
-        </View>
+            <Divider/>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
     card: {
         width: '100%',
-        height: 86,
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.grey250,
+        paddingVertical:20,
+        paddingHorizontal:10,
         justifyContent: 'center',
     },
     clientProfile: {

@@ -1,7 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
-import * as Constants from "expo-constants";
-console.log(process.env.API_URI);
 
 const initialCatalogueState = {
     services: {

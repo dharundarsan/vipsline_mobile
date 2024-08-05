@@ -1,4 +1,4 @@
-import {Modal, StyleSheet, Text, View} from "react-native";
+import {FlatList, Modal, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {AntDesign, Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
@@ -8,8 +8,16 @@ import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import SearchBar from "../../ui/SearchBar";
 import Feather from '@expo/vector-icons/Feather';
+import {useSelector, useDispatch} from "react-redux";
+import ClientCard from "../clientSegmentScreen/ClientCard";
+import {loadClientsFromDb} from "../../store/clientSlice";
 
 const AddClientModal = (props) => {
+
+    const pageNo = useSelector(state => state.client.pageNo);
+    const clientsList = useSelector(state => state.client.clients);
+    const dispatch = useDispatch();
+
     return <Modal visible={props.isVisible} animationType={"slide"}>
         <View style={styles.closeAndHeadingContainer}>
             <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
@@ -23,13 +31,16 @@ const AddClientModal = (props) => {
         </View>
         <Divider/>
         <View style={styles.modalContent}>
-            <SearchBar placeholder={"Search by email or mobile"} searchContainerStyle={styles.searchContainerStyle} />
-            <Divider />
+            <SearchBar placeholder={"Search by email or mobile"} searchContainerStyle={styles.searchContainerStyle}/>
+            <Divider/>
             <PrimaryButton buttonStyle={styles.createClientButton} pressableStyle={styles.createClientPressable}>
-                <Feather name="plus" size={24} color={Colors.highlight} />
-                <Text style={[textTheme.titleMedium,styles.createClientText]} >Create new client</Text>
+                <Feather name="plus" size={24} color={Colors.highlight}/>
+                <Text style={[textTheme.titleMedium, styles.createClientText]}>Create new client</Text>
             </PrimaryButton>
             <Divider/>
+            <FlatList data={clientsList} onEndReachedThreshold={0.7} onEndReached={() => dispatch(loadClientsFromDb(pageNo))} renderItem={({item}) => {
+                return <ClientCard name={item.name} phone={item.mobile_1} email={item.username}/>
+            }}/>
         </View>
     </Modal>
 }
@@ -55,23 +66,24 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         textAlign: "center",
     },
-    modalContent:{
+    modalContent: {
+        flex:1,
     },
-    searchContainerStyle:{
-        marginVertical:15,
-        marginHorizontal:15,
+    searchContainerStyle: {
+        marginVertical: 15,
+        marginHorizontal: 15,
     },
-    createClientButton:{
-        backgroundColor:Colors.background,
+    createClientButton: {
+        backgroundColor: Colors.background,
     },
-    createClientPressable:{
-        flexDirection:"row",
-        justifyContent:"center",
-        gap:10,
-        paddingVertical:15,
+    createClientPressable: {
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 10,
+        paddingVertical: 15,
     },
-    createClientText:{
-        color:Colors.highlight,
+    createClientText: {
+        color: Colors.highlight,
 
     }
 });

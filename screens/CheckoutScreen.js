@@ -12,8 +12,11 @@ import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
     loadProductsDataFromDb,
-    loadServicesDataFromDb
+    loadServicesDataFromDb,
 } from '../store/catalogueSlice';
+import {
+    loadClientsFromDb
+} from '../store/clientSlice';
 import AddClientModal from "../components/checkoutScreen/AddClientModal";
 
 
@@ -30,6 +33,7 @@ const CheckoutScreen = () => {
         dispatch(loadProductsDataFromDb());
         dispatch(loadPackagesDataFromDb());
         dispatch(loadMembershipsDataFromDb());
+        dispatch(loadClientsFromDb(0));
     }, []);
 
     return (

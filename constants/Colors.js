@@ -29,7 +29,12 @@ const Colors = {
     blue:"#006ad3",
     purple:"#d42fb3",
     brown:"#a0616a",
-    darkGreen:"#0D774C"
+    darkGreen:"#0D774C",
+    lightGreen: "#e2f4f6",
+    totalClients: "#b5dabf",
+    activeClient: "#f9dedc",
+    inactiveClient: "#d5d7da",
+    churnClient: "#fff0d1",
+    allLeads: "#9ddde0",
 };
-
 export default Colors;
