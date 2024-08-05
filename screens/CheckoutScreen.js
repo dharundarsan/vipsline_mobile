@@ -1,4 +1,4 @@
-import {Pressable, StyleSheet, Text, View} from "react-native";
+import {Image, Pressable, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
@@ -6,7 +6,7 @@ import Cart from "../components/checkoutScreen/Cart";
 import AddClientButton from "../components/checkoutScreen/AddClientButton";
 import {useNavigation} from "@react-navigation/native";
 import title from "react-native-paper/src/components/Typography/v2/Title";
-import {useEffect, useLayoutEffect} from "react";
+import {useEffect, useLayoutEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {
     loadMembershipsDataFromDb,
@@ -14,11 +14,13 @@ import {
     loadProductsDataFromDb,
     loadServicesDataFromDb
 } from '../store/catalogueSlice';
+import AddClientModal from "../components/checkoutScreen/AddClientModal";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
 
     useEffect(() => {
         dispatch(loadServicesDataFromDb("women"));
@@ -28,15 +30,16 @@ const CheckoutScreen = () => {
         dispatch(loadProductsDataFromDb());
         dispatch(loadPackagesDataFromDb());
         dispatch(loadMembershipsDataFromDb());
-    }, [])
-    useLayoutEffect(() => {
-        navigation.setOptions({headerTitle: "Add to cart", headerTitleStyle: {color: Colors.darkBlue}});
-    }, [navigation]);
-
+    }, []);
 
     return (
         <View style={styles.checkoutScreen}>
-            <AddClientButton/>
+            <AddClientModal closeModal={() => {
+                setIsAddClientModalVisible(false)
+            }} isVisible={isAddClientModalVisible}/>
+            <AddClientButton onPress={() => {
+                setIsAddClientModalVisible(true)
+            }}/>
             <Cart/>
         </View>
     );

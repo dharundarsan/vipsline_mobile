@@ -12,7 +12,6 @@ function SignInHeader() {
             <Text style={styles.headerText}>
                 Beauty, Wellness and Fitness management platform
             </Text>
-            <View></View>
         </View>
     );
 }
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
     headerText: {
         color: Colors.grey400,
         fontWeight: "bold",
-        marginTop: 30,
+        marginTop: 16,
         marginBottom: 16,
     },
 });

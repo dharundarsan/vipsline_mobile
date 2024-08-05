@@ -5,11 +5,12 @@ import {Ionicons} from '@expo/vector-icons';
 import PrimaryButton from "../../ui/PrimaryButton";
 import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
-import {useEffect, useState, useLayoutEffect} from "react";
+import React, {useEffect, useState, useLayoutEffect} from "react";
 import ServiceItem from "./ServiceItem";
 import ProductItem from "./ProductItem";
 import axios from "axios";
 import {useSelector} from "react-redux";
+import SearchBar from "../../ui/SearchBar";
 
 const ProductsList = (props) => {
     const productsData = useSelector(state => state.catalogue.products.items);
@@ -53,19 +54,13 @@ const ProductsList = (props) => {
         <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>
                 <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
-                <View style={styles.searchContainer}>
-                    <Ionicons name="search-sharp" style={styles.searchLogo} size={20} color={Colors.grey400}/>
-                    <TextInput
-                        style={[textTheme.bodyMedium, styles.searchTextInput]}
-                        placeholder={"Search by service name or prices"}
-                        onChangeText={filterProductsData}
-                        placeholderTextColor={Colors.grey400}
-                    />
-                    <PrimaryButton buttonStyle={styles.searchFilterButton}
-                                   pressableStyle={styles.searchFilterPressable}>
-                        <Ionicons name="filter" size={20} color={Colors.grey900}/>
-                    </PrimaryButton>
-                </View>
+                <SearchBar filter={true}
+                           onPressFilter={() => {
+                               console.log("Filter pressed");
+                           }}
+                           onChangeText={() => {
+                           }}
+                           placeholder={"Search by product name or prices"}/>
             </View>
             <ScrollView style={styles.flatListContainer} fadingEdgeLength={75}>
                 {transformedData.map((item, index) => (
@@ -101,32 +96,6 @@ const styles = StyleSheet.create({
     },
     headingText: {
         marginBottom: 10
-    },
-    searchContainer: {
-        flexDirection: "row",
-        backgroundColor: Colors.background,
-        borderRadius: 8,
-        borderColor: Colors.grey600,
-        borderWidth: 1
-    },
-    searchLogo: {
-        paddingVertical: 9,
-        paddingLeft: 9,
-    },
-    searchTextInput: {
-        fontSize: 15,
-        marginLeft: 10,
-        flex: 1,
-    },
-    searchFilterButton: {
-        borderLeftColor: Colors.grey600,
-        borderLeftWidth: 1,
-        backgroundColor: Colors.transparent,
-        borderRadius: 0
-    },
-    searchFilterPressable: {
-        paddingHorizontal: 9,
-        paddingVertical: 9,
     },
     parentCategoryText: {
         marginHorizontal: 10,

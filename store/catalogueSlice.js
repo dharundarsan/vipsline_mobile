@@ -24,14 +24,14 @@ const initialCatalogueState = {
 export const loadServicesDataFromDb = (gender) => async (dispatch) => {
     try {
         const response = await axios.post(
-            process.env.API_URI + "/resourceCategory/getListOfAllServicesOfBusiness",
+            process.env.EXPO_PUBLIC_API_URI + "/resourceCategory/getListOfAllServicesOfBusiness",
             {
                 business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
                 gender: gender
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.AUTH_KEY}`
+                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
                 }
             }
         );
@@ -44,13 +44,13 @@ export const loadServicesDataFromDb = (gender) => async (dispatch) => {
 export const loadProductsDataFromDb = () => async (dispatch) => {
     try {
         const response = await axios.post(
-            process.env.API_URI + "/product/getAllProductsOfBusiness",
+            process.env.EXPO_PUBLIC_API_URI + "/product/getAllProductsOfBusiness",
             {
                 business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.AUTH_KEY}`
+                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
                 }
             }
         );
@@ -63,13 +63,13 @@ export const loadProductsDataFromDb = () => async (dispatch) => {
 export const loadMembershipsDataFromDb = () => async (dispatch) => {
     try {
         const response = await axios.post(
-            process.env.API_URI + "/membership/getListOfMembershipByBusiness",
+            process.env.EXPO_PUBLIC_API_URI + "/membership/getListOfMembershipByBusiness",
             {
                 business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.AUTH_KEY}`
+                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
                 }
             }
         );
@@ -82,14 +82,14 @@ export const loadMembershipsDataFromDb = () => async (dispatch) => {
 export const loadPackagesDataFromDb = () => async (dispatch) => {
     try {
         const response = await axios.post(
-            process.env.API_URI + "/package/getListOfPackagesByBusiness",
+            process.env.EXPO_PUBLIC_API_URI + "/package/getListOfPackagesByBusiness",
             {
                 business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
                 status: true
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.AUTH_KEY}`
+                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
                 }
             }
         );

@@ -5,13 +5,14 @@ import {Ionicons} from '@expo/vector-icons';
 import PrimaryButton from "../../ui/PrimaryButton";
 import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
-import {useEffect, useState, useLayoutEffect} from "react";
+import React, {useEffect, useState, useLayoutEffect} from "react";
 import ServiceItem from "./ServiceItem";
 import ProductItem from "./ProductItem";
 import axios from "axios";
 import MembershipItem from "./MembershipItem";
 import {useSelector} from "react-redux";
 import PackageItem from "./PackageItem";
+import SearchBar from "../../ui/SearchBar";
 
 const MembershipsAndPackagesList = (props) => {
     const data = useSelector(state => props.category === "memberships" ? state.catalogue.memberships.items : state.catalogue.packages.items);
@@ -51,15 +52,13 @@ const MembershipsAndPackagesList = (props) => {
             <View style={styles.headingAndSearchContainer}>
                 <Text
                     style={[textTheme.titleMedium, styles.headingText]}>Select {props.category === "packages" ? "Package" : "Membership"}</Text>
-                <View style={styles.searchContainer}>
-                    <Ionicons name="search-sharp" style={styles.searchLogo} size={20} color={Colors.grey400}/>
-                    <TextInput
-                        style={[textTheme.bodyMedium, styles.searchTextInput]}
-                        placeholder={"Search by name or prices"}
-                        onChangeText={filterData}
-                        placeholderTextColor={Colors.grey400}
-                    />
-                </View>
+                <SearchBar filter={true}
+                           onPressFilter={() => {
+                               console.log("Filter pressed");
+                           }}
+                           onChangeText={() => {
+                           }}
+                           placeholder={"Search by name or prices"}/>
             </View>
             <FlatList
                 data={filteredData}
@@ -88,26 +87,6 @@ const styles = StyleSheet.create({
     },
     headingText: {
         marginBottom: 10
-    },
-    searchContainer: {
-        flexDirection: "row",
-        backgroundColor: Colors.background,
-        borderRadius: 20,
-        borderColor: Colors.grey500,
-        borderWidth: 1
-    },
-    searchLogo: {
-        paddingVertical: 9,
-        paddingLeft: 9,
-    },
-    searchTextInput: {
-        fontSize: 15,
-        marginLeft: 10,
-        flex: 1,
-    },
-    searchFilterPressable: {
-        paddingHorizontal: 9,
-        paddingVertical: 9,
     },
     parentCategoryText: {
         marginHorizontal: 10,

@@ -1,67 +1,53 @@
-import {View, Text, TextInput, StyleSheet, Pressable} from "react-native";
+import {View, Text, TextInput, StyleSheet, Pressable, ActivityIndicator, KeyboardAvoidingView} from "react-native";
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {useState} from "react";
-import { Checkbox } from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
+import CheckBox from 'react-native-check-box'
+import findUser from "../../util/findUserApi";
 
 export default function EmailLogin() {
-    let responseUserMessage = '';
     const navigation = useNavigation();
     const platform = "BUSINESS";
 
-    let isUserFound = false;
+    /**
+     * use States ------------------------------------------------------------------------
+     */
 
-    const [checked, setChecked] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
 
-    const [isEmailClicked, setIsEmailClicked] = useState(true);
+    const [isEmailFocussed, setIsEmailFocussed] = useState(false);
+    const [isPasswordFocussed, setIsPasswordFocussed] = useState(false);
 
     const [password, setPassword] = useState("");
 
     const [email, setEmail] = useState("");
 
-    const [isEmailBlur, setIsEmailBlur] = useState(false);
-    const [isPasswordBlur, setIsPasswordBlur] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [isUserFound, setIsIsUserFound] = useState(true);
+
+    const [isPasswordValid, setIsPasswordValid] = useState(true);
 
     const BaseURL = 'https://gamma.vipsline.com/api/v1'
 
-
-    function emailOnPressHandler() {
-        setIsEmailClicked(true);
-    }
-
-
-    function PasswdOnPressHandler() {
-        setIsEmailClicked(false);
-    }
-
+    /**
+     * UI logics ---------------------------------------------------------------------------
+     */
 
     function forgetPasswordOnPressHandler() {
         navigation.navigate('ForgetPassword');
     }
 
-
-    async function findUser() {
-        let response = "something went wrong"
-        try {
-            response = await axios.post(BaseURL + '/user/findUser', {
-                platform: platform,
-                userName: email
-            })
-            responseUserMessage = response.data.message;
-
-        }
-        catch (error) {
-            console.log("user not found: " + error);
-        }
-
-        // console.log(response);
-        return responseUserMessage;
-    }
+    /** Authentication Logic
+     *
+     * @returns {Promise<string>}
+     */
 
     async function signInHandler() {
-        isUserFound = await findUser() === "user found";
+        setIsLoading(true);
+        setIsIsUserFound(await findUser(email, platform));
         let response = '';
         let isAuthenticationSuccessful = false;
         if (isUserFound) {
@@ -74,30 +60,60 @@ export default function EmailLogin() {
             }
             catch (error) {
                 console.log("could not authenticate with email: " + error);
+                setIsLoading(false);
+                setIsPasswordValid(false);
             }
-            isAuthenticationSuccessful = response.data.message === "User authenticated";
+            isAuthenticationSuccessful = response.data.message === undefined ?
+                                            "" :
+                                            response.data.message === "User authenticated";
         }
+
 
         if (isAuthenticationSuccessful) {
-            navigation.navigate('ForgetPassword');
+            setIsPasswordValid(true);
+            console.log("Signed In Successfully!!!");
         }
+        else {
+            setIsPasswordValid(false);
+        }
+        setIsLoading(false);
 
-
+        // console.log(email + " " + password + " " + isPasswordFocussed + " " + isPasswordValid);
 
     }
+
+    /**
+     * styles -------------------------------------------------------------------------------------
+     */
 
     const styles = StyleSheet.create({
         emailInput: {
             borderWidth: 2,
-            padding: 8,
+            paddingVertical: 8,
             borderRadius: 8,
-            borderColor: isEmailClicked ? Colors.highlight:  Colors.grey400,
+            borderColor:
+                isEmailFocussed ?
+                    isUserFound ?
+                        Colors.highlight :
+                        Colors.error :
+                    !isUserFound ?
+                        Colors.error :
+                        Colors.grey400,
+            paddingHorizontal: 12,
         },
         passwordInput: {
             borderWidth: 2,
-            padding: 8,
+            paddingVertical: 8,
             borderRadius: 8,
-            borderColor: !isEmailClicked ? Colors.highlight:  Colors.grey400,
+            borderColor:
+                isPasswordFocussed ?
+                    isPasswordValid ?
+                        Colors.highlight:
+                        Colors.error :
+                    !isPasswordValid ?
+                        Colors.error :
+                        Colors.grey400,
+            paddingHorizontal: 12,
         },
         emailContainer: {
             width: "85%",
@@ -108,46 +124,70 @@ export default function EmailLogin() {
             fontWeight: '500'
         },
         signInButton: {
-            width: '100%', backgroundColor: Colors.highlight,
+            width: '100%',
+            backgroundColor: Colors.highlight,
+            height: 45,
+            marginTop: 16
+        },
+        activityIndicator: {
+
         }
     })
+
+    /** UI part--------------------------------------------------------------------------------
+     *
+     */
 
     return (
         <View style={styles.emailContainer}>
                 <Text style={styles.inputLabel}>Email Address</Text>
                 <TextInput
-                placeholder="Email Address"
-                style={styles.emailInput}
-                onPress={emailOnPressHandler}
+                placeholder="Enter email Address"
+                style={[styles.emailInput]}
                 onChangeText={setEmail}
                 value={email}
-                onBlur={() => {
-                    setIsEmailBlur(true);
+                onFocus={() => {
+                    setIsEmailFocussed(true)
+                    setIsPasswordFocussed(false);
                 }}
 
                 />
-                <Text style={[styles.inputLabel, {marginTop: 16}]}>Password</Text>
+            {
+                !isUserFound ?
+                    <Text style={{color: Colors.error}}>Incorrect email</Text> :
+                    <Text></Text>
+
+            }
+                <Text style={[styles.inputLabel, {marginTop: 6}]}>Password</Text>
                 <TextInput
-                placeholder="Password"
+                placeholder="Enter password"
                 value={password}
                 style={styles.passwordInput}
-                onPress={PasswdOnPressHandler}
                 onChangeText={setPassword}
-                secureTextEntry={!checked}
-                onBlur={() => {
-                    setIsPasswordBlur(true);
+                secureTextEntry={!isChecked}
+                onFocus={() => {
+                    setIsPasswordFocussed(true)
+                    setIsEmailFocussed(false);
                 }}
                 />
-            <View style={{marginVertical: 8, width: '100%',flexDirection:'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            {
+                !isPasswordValid ?
+                    <Text style={{color: Colors.error}}>Incorrect password</Text> :
+                    <Text></Text>
+            }
+            <View style={{marginTop: 6, width: '100%',flexDirection:'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                <Checkbox
-                    status={checked ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                        setChecked(!checked);
+                <CheckBox
+                    onClick={() => {
+                        setIsChecked(!isChecked);
                     }}
+                    isChecked={isChecked}
+                    checkBoxColor={Colors.highlight}
+                    uncheckedCheckBoxColor={Colors.grey400}
+
 
                 />
-                    <Text>Show Password</Text>
+                    <Text style={{marginLeft: 6}}>Show Password</Text>
                 </View>
                 <Pressable
                     onPress={forgetPasswordOnPressHandler}
@@ -156,13 +196,16 @@ export default function EmailLogin() {
                 </Pressable>
             </View>
                 <PrimaryButton
-                    label='Sign in'
                     buttonStyle={styles.signInButton}
-                    textStyle={{color: Colors.onHighlight}}
-                    onPress={signInHandler}
-                />
+                    onPress={isLoading ? null : signInHandler}
+                >
+                    {
+                        !isLoading ?
+                            <Text style={{color: Colors.onHighlight, fontWeight: '600'}}>Sign in</Text> :
+                            <ActivityIndicator color={Colors.onHighlight} style={styles.activityIndicator}/>
+                    }
+
+                </PrimaryButton>
         </View>
     );
 }
-
-

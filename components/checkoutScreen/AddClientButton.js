@@ -4,14 +4,12 @@ import {FontAwesome6} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 
-const AddClientButton = () => {
-    const addClientHandler = () => {
-        console.log("Client added");
-    }
+const AddClientButton = (props) => {
 
-    return <PrimaryButton buttonStyle={styles.addClientButton} onPress={addClientHandler}>
+
+    return <PrimaryButton buttonStyle={styles.addClientButton} onPress={props.onPress}>
         <View style={styles.addClientButtonInnerContainer}>
-                <FontAwesome6 name="plus-square" size={25} color={Colors.highlight}/>
+            <FontAwesome6 name="plus-square" size={25} color={Colors.highlight}/>
             <Text style={[TextTheme.titleMedium, styles.addClientButtonText]}>Add Client</Text>
         </View>
     </PrimaryButton>

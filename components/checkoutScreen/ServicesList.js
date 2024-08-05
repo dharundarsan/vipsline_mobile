@@ -8,6 +8,7 @@ import ServiceItem from "./ServiceItem";
 import {useSelector, shallowEqual} from "react-redux";
 import {useMemo, useCallback, useReducer} from 'react';
 import React from "react";
+import SearchBar from "../../ui/SearchBar";
 
 
 const ServicesList = React.memo(() => {
@@ -75,16 +76,14 @@ const ServicesList = React.memo(() => {
             :
             <View style={styles.commonSelectTemplate}>
                 <View style={styles.headingAndSearchContainer}>
-                    <View style={styles.searchContainer}>
-                        <Ionicons name="search-sharp" style={styles.searchLogo} size={20} color={Colors.grey500}/>
-                        <TextInput style={[textTheme.bodyMedium, styles.searchTextInput]}
-                                   placeholder={"Search by service name or prices"}
-                                   onChangeText={filterServicesData}
-                                   placeholderTextColor={Colors.grey400}/>
-                        <PrimaryButton buttonStyle={styles.searchFilterButton}
-                                       pressableStyle={styles.searchFilterPressable}>
-                            <Ionicons name="filter" size={20} color={Colors.grey500}/>
-                        </PrimaryButton>
+                    <View style={styles.headingAndSearchContainer}>
+                        <SearchBar filter={true}
+                                   onPressFilter={() => {
+                                       console.log("Filter pressed");
+                                   }}
+                                   onChangeText={() => {
+                                   }}
+                                   placeholder={"Search by service name or prices"}/>
                     </View>
                 </View>
                 <View>
@@ -202,34 +201,6 @@ const styles = StyleSheet.create({
     },
     headingText: {
         marginBottom: 10
-    },
-    searchContainer: {
-        flexDirection: "row",
-        backgroundColor: Colors.background,
-        borderRadius: 20,
-        borderColor: Colors.grey500,
-        borderWidth: 1
-    },
-    searchLogo: {
-        paddingVertical: 9,
-        paddingLeft: 9,
-    },
-    searchTextInput: {
-        fontSize: 15,
-        marginLeft: 10,
-        flex: 1,
-    },
-    searchFilterButton: {
-        borderLeftColor: Colors.grey500,
-        borderLeftWidth: 1,
-        backgroundColor: Colors.transparent,
-        borderRadius: 0,
-        borderBottomRightRadius: 20,
-        borderTopRightRadius: 20,
-    },
-    searchFilterPressable: {
-        paddingHorizontal: 9,
-        paddingVertical: 9,
     },
     parentCategoryAndGenderContainer: {
         marginHorizontal: 40,
