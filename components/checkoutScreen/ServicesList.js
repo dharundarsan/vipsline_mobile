@@ -81,8 +81,7 @@ const ServicesList = React.memo(() => {
                                    onPressFilter={() => {
                                        console.log("Filter pressed");
                                    }}
-                                   onChangeText={() => {
-                                   }}
+                                   onChangeText={filterServicesData}
                                    placeholder={"Search by service name or prices"}/>
                     </View>
                 </View>

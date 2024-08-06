@@ -1,7 +1,8 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
+import Colors from "../constants/Colors";
 
-const Divider = ({color = 'gray', thickness = 1}) => {
+const Divider = ({color = Colors.grey400, thickness = 1}) => {
     return (
         <View style={[styles.divider, {backgroundColor: color, height: thickness}]}/>
     );

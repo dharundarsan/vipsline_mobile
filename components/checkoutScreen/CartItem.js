@@ -25,7 +25,7 @@ const CartItem = (props) => {
                     <Text style={[TextTheme.labelLarge, styles.itemQuantityText]}>1x</Text>
                     <View style={styles.amountContainer}>
                         <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
-                        <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.discounted_price}</Text>
+                        <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.discounted_price == null ? props.data.price : props.data.discounted_price}</Text>
                         <PrimaryButton buttonStyle={styles.editAmountButton}
                                        pressableStyle={styles.editAmountPressable}>
                             <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>

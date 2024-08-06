@@ -17,6 +17,8 @@ const ProductsList = (props) => {
     const [filteredProductsData, setFilteredProductsData] = useState(productsData);
     const [tempSelectedItems, setTempSelectedItems] = useState([]);
 
+
+
     const addToTempSelectedItems = (item) => {
         setTempSelectedItems((prevState) => [...prevState, item]);
     }
@@ -58,8 +60,7 @@ const ProductsList = (props) => {
                            onPressFilter={() => {
                                console.log("Filter pressed");
                            }}
-                           onChangeText={() => {
-                           }}
+                           onChangeText={filterProductsData}
                            placeholder={"Search by product name or prices"}/>
             </View>
             <ScrollView style={styles.flatListContainer} fadingEdgeLength={75}>

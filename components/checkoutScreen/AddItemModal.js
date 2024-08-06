@@ -1,5 +1,6 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {
+    BackHandler,
     FlatList,
     Modal,
     Pressable,
@@ -26,30 +27,18 @@ import ServicesList from "./ServicesList";
 import ProductsList from "./ProductsList";
 import MembershipsAndPackagesList from "./MembershipsAndPackagesList";
 import textTheme from "../../constants/TextTheme";
-import {capitalizeFirstLetter} from "../../util/Helpers";
+import {capitalizeFirstLetter, formatDate} from "../../util/Helpers";
+import AddCustomItemModal from "./AddCustomItemModal";
 
-const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-];
+
 const modalCategoryListData = [
     {id: "services", title: "SERVICES"},
     {id: "products", title: "PRODUCTS"},
-    {id: 2, title: "CUSTOM ITEM"},
+    {id: "customItem", title: "CUSTOM ITEM"},
     {id: "memberships", title: "MEMBERSHIP"},
     {id: 4, title: "PREPAID"},
     {id: "packages", title: "PACKAGES"},
-    {id: 6, title: "GIFT VOUCHER"},
+    // {id: 6, title: "GIFT VOUCHER"},
 ];
 
 const AddItemModal = (props) => {
@@ -58,13 +47,6 @@ const AddItemModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(Date.now());
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
-
-    const formattedDate =
-        new Date(selectedDate).getDate() +
-        " " +
-        months[new Date(selectedDate).getMonth()] +
-        " " +
-        new Date(selectedDate).getFullYear();
 
     const openDatePicker = () => {
         setIsDatePickerVisible(true);
@@ -119,7 +101,7 @@ const AddItemModal = (props) => {
             flexDirection: "row",
         },
         categoryListItemButton: {
-            backgroundColor: Colors.background,
+            backgroundColor: Colors.transparent,
             alignSelf: "auto",
         },
         categoryListItemPressable: {
@@ -147,7 +129,7 @@ const AddItemModal = (props) => {
                         onPress={openDatePicker}
                     >
                         <Text style={TextTheme.titleMedium}>
-                            {formattedDate}
+                            {formatDate(selectedDate)}
                         </Text>
                         <MaterialCommunityIcons
                             name="calendar-month-outline"
@@ -198,7 +180,7 @@ const AddItemModal = (props) => {
                                     color="black"
                                 />
                             </PrimaryButton>
-                            <Divider color={Colors.grey600}/>
+                            <Divider/>
                         </>
                     );
                 }}
@@ -210,9 +192,13 @@ const AddItemModal = (props) => {
     } else if (selectedCategory === "products") {
         content = <ProductsList/>
     } else if (selectedCategory === "memberships") {
-        content = <MembershipsAndPackagesList category={selectedCategory} />
+        content = <MembershipsAndPackagesList category={selectedCategory}/>
     } else if (selectedCategory === "packages") {
-        content = <MembershipsAndPackagesList category={selectedCategory} />
+        content = <MembershipsAndPackagesList category={selectedCategory}/>
+    } else if (selectedCategory === "customItem") {
+        content = <AddCustomItemModal isVisible={true} onCloseModal={() => {
+            setSelectedCategory(null)
+        }}/>
     }
 
     return (

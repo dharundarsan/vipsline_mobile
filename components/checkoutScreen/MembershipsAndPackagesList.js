@@ -13,6 +13,7 @@ import MembershipItem from "./MembershipItem";
 import {useSelector} from "react-redux";
 import PackageItem from "./PackageItem";
 import SearchBar from "../../ui/SearchBar";
+import EditMembershipModal from "./EditMembershipModal";
 
 const MembershipsAndPackagesList = (props) => {
     const data = useSelector(state => props.category === "memberships" ? state.catalogue.memberships.items : state.catalogue.packages.items);
@@ -27,28 +28,11 @@ const MembershipsAndPackagesList = (props) => {
 
     const filterData = (filterValue) => {
         const lowerCaseFilterValue = filterValue.toLowerCase();
-        const newFilteredData = data.map((categoryObj) => {
-            const filteredCategories = {};
-
-            Object.keys(categoryObj).forEach((category) => {
-                const filteredProducts = categoryObj[category].filter((product) => {
-                    return product.name.toLowerCase().includes(lowerCaseFilterValue) ||
-                        product.price.toString().includes(filterValue);
-                });
-
-                if (filteredProducts.length > 0) {
-                    filteredCategories[category] = filteredProducts;
-                }
-            });
-
-            return filteredCategories;
-        }).filter(categoryObj => Object.keys(categoryObj).length > 0);
-
-        setFilteredData(newFilteredData);
     };
 
     return (
-        <View style={styles.commonSelectTemplate}>
+        <>
+            <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>
                 <Text
                     style={[textTheme.titleMedium, styles.headingText]}>Select {props.category === "packages" ? "Package" : "Membership"}</Text>
@@ -56,8 +40,7 @@ const MembershipsAndPackagesList = (props) => {
                            onPressFilter={() => {
                                console.log("Filter pressed");
                            }}
-                           onChangeText={() => {
-                           }}
+                           onChangeText={filterData}
                            placeholder={"Search by name or prices"}/>
             </View>
             <FlatList
@@ -74,6 +57,8 @@ const MembershipsAndPackagesList = (props) => {
                 keyExtractor={(item) => item.id.toString()}
             />
         </View>
+        </>
+
 
     );
 };

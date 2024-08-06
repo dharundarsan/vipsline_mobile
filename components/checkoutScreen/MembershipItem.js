@@ -5,9 +5,16 @@ import textTheme from "../../constants/TextTheme";
 import {capitalizeFirstLetter} from "../../util/Helpers";
 import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import EditMembershipModal from "./EditMembershipModal";
+import React, {useState} from "react";
 
 const MembershipItem = (props) => {
     const dispatch = useDispatch();
+    const [isEditMembershipModalVisible, setIsEditMembershipModalVisible] = useState(false);
+
+    const closeEditMembershipModal = () => {
+        setIsEditMembershipModalVisible(false);
+    }
 
     const styles = StyleSheet.create({
         membershipItemButton: {
@@ -45,24 +52,28 @@ const MembershipItem = (props) => {
         priceText: {}
     })
 
-    return <PrimaryButton buttonStyle={styles.membershipItemButton} pressableStyle={styles.membershipItemPressable}
-                          onPress={() => {
-                              props.addToTempSelectedItems(props.data);
-                              dispatch(addItemToCart(props.data));
-                          }}>
-        <View style={styles.leftBar}></View>
-        <View style={styles.membershipItemInnerContainer}>
-            <Text style={[styles.nameText, textTheme.titleMedium]}>{capitalizeFirstLetter(props.data.name)}</Text>
-            <Text style={[styles.durationText, textTheme.labelLarge]}>Duration of
-                Membership: {props.data.duration} days</Text>
-            <Text
-                style={[styles.servicesAndProductsText, textTheme.labelLarge]}>Services: {props.data.total_services_count} •
-                Products: {props.data.total_product_count}</Text>
-            <Text style={[textTheme.titleMedium, styles.priceText]}>₹ {props.data.price}</Text>
-        </View>
-    </PrimaryButton>
-}
+    return <>
+        <EditMembershipModal isVisible={isEditMembershipModalVisible} onCloseModal={closeEditMembershipModal} data={props.data} />
+        <PrimaryButton buttonStyle={styles.membershipItemButton} pressableStyle={styles.membershipItemPressable}
+                       onPress={() => {
+                           // props.addToTempSelectedItems(props.data);
+                           // dispatch(addItemToCart(props.data));
+                           setIsEditMembershipModalVisible(true);
+                       }}>
+            <View style={styles.leftBar}></View>
+            <View style={styles.membershipItemInnerContainer}>
+                <Text style={[styles.nameText, textTheme.titleMedium]}>{capitalizeFirstLetter(props.data.name)}</Text>
+                <Text style={[styles.durationText, textTheme.labelLarge]}>Duration of
+                    Membership: {props.data.duration} days</Text>
+                <Text
+                    style={[styles.servicesAndProductsText, textTheme.labelLarge]}>Services: {props.data.total_services_count} •
+                    Products: {props.data.total_product_count}</Text>
+                <Text style={[textTheme.titleMedium, styles.priceText]}>₹ {props.data.price}</Text>
+            </View>
+        </PrimaryButton>
+    </>
 
+}
 
 
 export default MembershipItem;
