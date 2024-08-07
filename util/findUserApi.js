@@ -10,7 +10,7 @@ import axios from "axios";
  */
 
 export default async function findUser(email, platform) {
-    const BaseURL = 'https://gamma.vipsline.com/api/v1';
+    const BaseURL = process.env.EXPO_PUBLIC_API_URI;
     let isFound = false;
     let response = "something went wrong"
     try {

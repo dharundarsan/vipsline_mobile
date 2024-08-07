@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function authenticateWithOTPApi(mobileNumber, otp, platform) {
     let isAuthenticated = false;
-    const BaseURL = "https://gamma.vipsline.com/api/v1"
+    const BaseURL = process.env.EXPO_PUBLIC_API_URI
     let message = '';
     try {
         console.log(`${otp} ${mobileNumber} ${platform}`);

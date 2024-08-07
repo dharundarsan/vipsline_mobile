@@ -1,4 +1,4 @@
-import {Modal, View, Text, StyleSheet, useWindowDimensions, Dimensions, TouchableOpacity} from "react-native";
+import {Modal, View, Text, StyleSheet, TouchableOpacity, Touchable, Pressable} from "react-native";
 import Colors from "../../constants/Colors"
 import {RadioButton} from "react-native-paper";
 import {useEffect, useState} from "react";
@@ -7,13 +7,11 @@ const modalHeight = 150;
 
 export default function EntryModel(props) {
 
-    const [isChecked, setIsChecked] = useState(10);
+    const [checkedNumber, setCheckedNumber] = useState(10);
 
     useEffect(() => {
-        props.setMaxEntry(isChecked);
-    }, [isChecked]);
-
-
+        props.setMaxEntry(checkedNumber)
+    }, [checkedNumber]);
 
     return (
         <Modal
@@ -22,7 +20,7 @@ export default function EntryModel(props) {
             animationType="slide"
             transparent={true}
         >
-            <TouchableOpacity style={{flex:1, justifyContent:"center"}} onPress={()=>{
+            <TouchableOpacity activeOpacity={1} style={{flex:1, justifyContent:"center", backgroundColor:Colors.ripple}} onPress={()=>{
                 props.setIsModalVisible(false);
             }}>
 
@@ -31,9 +29,9 @@ export default function EntryModel(props) {
                 <Text>10</Text>
                 <RadioButton
                     value="first"
-                    status={ isChecked === 10 ? 'checked' : 'unchecked' }
+                    status={ checkedNumber === 10 ? 'checked' : 'unchecked' }
                     onPress={() => {
-                        setIsChecked(10);
+                        setCheckedNumber(10);
                         props.setIsModalVisible(false);
                     }}
                 />
@@ -42,9 +40,9 @@ export default function EntryModel(props) {
                     <Text>50</Text>
                 <RadioButton
                     value="second"
-                    status={ isChecked === 50 ? 'checked' : 'unchecked' }
+                    status={ checkedNumber === 50 ? 'checked' : 'unchecked' }
                     onPress={() => {
-                        setIsChecked(50)
+                        setCheckedNumber(50)
                         props.setIsModalVisible(false);
                     }}
                 />
@@ -53,9 +51,9 @@ export default function EntryModel(props) {
                     <Text>100</Text>
                 <RadioButton
                     value="third"
-                    status={ isChecked === 100 ? 'checked' : 'unchecked' }
+                    status={ checkedNumber === 100 ? 'checked' : 'unchecked' }
                     onPress={() => {
-                        setIsChecked(100)
+                        setCheckedNumber(100)
                         props.setIsModalVisible(false);
                     }}
                 />
@@ -72,7 +70,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: '70%',
         height: modalHeight,
-        backgroundColor: Colors.grey250,
+        backgroundColor: Colors.grey200,
         borderRadius: 24,
         margin: 'auto'
     },
@@ -81,5 +79,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         justifyContent: 'space-around',
-    }
+    },
 })

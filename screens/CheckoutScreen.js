@@ -15,15 +15,20 @@ import {
     loadServicesDataFromDb,
 } from '../store/catalogueSlice';
 import {
+    loadClientCountFromDb,
     loadClientsFromDb
 } from '../store/clientSlice';
 import AddClientModal from "../components/checkoutScreen/AddClientModal";
+import {
+ loadClientFiltersFromDb,
+} from "../store/clientFilterSlice";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
+
 
     useEffect(() => {
         dispatch(loadServicesDataFromDb("women"));
@@ -33,7 +38,9 @@ const CheckoutScreen = () => {
         dispatch(loadProductsDataFromDb());
         dispatch(loadPackagesDataFromDb());
         dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb(0));
+        dispatch(loadClientsFromDb());
+        dispatch(loadClientCountFromDb());
+        dispatch(loadClientFiltersFromDb(0, 10, "All"));
     }, []);
 
     return (
