@@ -10,6 +10,7 @@ const Divider = ({color = Colors.grey400, thickness = 1}) => {
 
 const styles = StyleSheet.create({
     divider: {
+        paddingVertical:1,
         width: '100%',
     },
 });

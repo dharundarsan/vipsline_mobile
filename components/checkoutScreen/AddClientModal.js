@@ -1,28 +1,29 @@
-import React, { useCallback } from "react";
-import { FlatList, Modal, StyleSheet, Text, View } from "react-native";
+import {FlatList, Modal, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Ionicons } from "@expo/vector-icons";
+import {AntDesign, Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
+import {capitalizeFirstLetter} from "../../util/Helpers";
+import React, {useState} from "react";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import SearchBar from "../../ui/SearchBar";
 import Feather from '@expo/vector-icons/Feather';
-import { useSelector, useDispatch } from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
-import { loadClientsFromDb } from "../../store/clientSlice";
+import {loadClientsFromDb} from "../../store/clientSlice";
+import CreateClientModal from "./CreateClientModal";
 
 const AddClientModal = (props) => {
-    const isFetching = useSelector(state => state.client.isFetching);
+
+    const pageNo = useSelector(state => state.client.pageNo);
     const clientsList = useSelector(state => state.client.clients);
+    const [isCreateClientModalVisible, setIsCreateClientModalVisible] = useState(false);
     const dispatch = useDispatch();
 
-    const loadMoreClients = useCallback(() => {
-        if (!isFetching) {
-            dispatch(loadClientsFromDb());
-        }
-    }, [dispatch, isFetching]);
-
-    return (
+    return <>
+        <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
+            setIsCreateClientModalVisible(false)
+        }}/>
         <Modal visible={props.isVisible} animationType={"slide"}>
             <View style={styles.closeAndHeadingContainer}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
@@ -36,22 +37,24 @@ const AddClientModal = (props) => {
             </View>
             <Divider/>
             <View style={styles.modalContent}>
-                <SearchBar placeholder={"Search by email or mobile"} searchContainerStyle={styles.searchContainerStyle}/>
+                <SearchBar placeholder={"Search by email or mobile"}
+                           searchContainerStyle={styles.searchContainerStyle}/>
                 <Divider/>
-                <PrimaryButton buttonStyle={styles.createClientButton} pressableStyle={styles.createClientPressable}>
+                <PrimaryButton buttonStyle={styles.createClientButton} pressableStyle={styles.createClientPressable}
+                               onPress={() => {
+                                   setIsCreateClientModalVisible(true)
+                               }}>
                     <Feather name="plus" size={24} color={Colors.highlight}/>
                     <Text style={[textTheme.titleMedium, styles.createClientText]}>Create new client</Text>
                 </PrimaryButton>
                 <Divider/>
-                <FlatList
-                    data={clientsList}
-                    onEndReachedThreshold={0.7}
-                    onEndReached={loadMoreClients}
-                    renderItem={({item}) => <ClientCard name={item.name} phone={item.mobile_1} email={item.username}/>}
-                />
+                <FlatList data={clientsList} onEndReachedThreshold={0.7}
+                          onEndReached={() => dispatch(loadClientsFromDb(pageNo))} renderItem={({item}) => {
+                    return <ClientCard name={item.name} phone={item.mobile_1} email={item.username}/>
+                }}/>
             </View>
         </Modal>
-    );
+    </>
 }
 
 const styles = StyleSheet.create({
@@ -93,6 +96,7 @@ const styles = StyleSheet.create({
     },
     createClientText: {
         color: Colors.highlight,
+
     }
 });
 

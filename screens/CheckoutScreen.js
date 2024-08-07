@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.background,
     },
+
 });
 
 export default CheckoutScreen;
