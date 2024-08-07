@@ -1,132 +1,137 @@
-import {
-    View,
-    Text,
-    StyleSheet,
-    ScrollView,
-    TextInput,
-    Image,
-    FlatList,
-    ActivityIndicator
-} from "react-native";
+import {View, Text, StyleSheet, Image, FlatList, ScrollView} from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
-import {useEffect, useState} from "react";
-import appliedFilter from "../components/clientSegmentScreen/chooseFilter";
+import React, {useState, useEffect} from "react";
+import appliedFilter, {clientFilterNames} from "../components/clientSegmentScreen/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
-import Ionicons from '@expo/vector-icons/Ionicons';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import ClientFiltersCategories from "../components/clientSegmentScreen/ClientFiltersCategories";
 import ClientCard from "../components/clientSegmentScreen/ClientCard";
-import axios from "axios";
-import AntDesign from '@expo/vector-icons/AntDesign';
+import SearchBar from "../ui/SearchBar";
+import {useDispatch, useSelector} from "react-redux";
+import AddClient from "../components/clientSegmentScreen/AddClient";
+import {decrementPageNumber, incrementPageNumber, loadClientFiltersFromDb} from "../store/clientFilterSlice";
+import {AntDesign, FontAwesome6} from "@expo/vector-icons";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
-import {Bullets} from "react-native-easy-content-loader";
 
 export default function ClientSegmentScreen() {
 
-    const [filterPressed, setFilterPressed] = useState(0);
+    const dispatch = useDispatch();
+    const [filterPressed, setFilterPressed] = useState("all_clients_count");
 
-    const clientCount = 22330;
+    const filterClientsList = useSelector(state => state.clientFilter.clients);
+    const isFetching = useSelector(state => state.clientFilter.isFetching);
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [fetchData, setFetchData] = useState();
-    const [maxEntry, setMaxEntry] = useState(10);
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [value, setValue] = useState("")
-    const [totalCount,setTotalCount] = useState(0);
+    const [maxEntry, setMaxEntry] = useState(10)
 
+
+    const clientCount = useSelector(state => state.client.clientCount)[0].all_clients_count;
+
+    const [totalCount, setTotalCount] = useState(0);
+    const [upperCount, setUpperCount] = useState(10);
     const [lowerCount, setLowerCount] = useState(1);
-    const [upperCount, setUpperCount] = useState(maxEntry);
+    const [pageNo, setPageNo] = useState(0);
 
+    const [isBackwardButtonDisabled, setIsBackwardButtonDisabled]  = useState(true);
+    const [isForwardButtonDisabled, setIsForwardButtonDisabled]  = useState(false);
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     useEffect(() => {
-        async function getClientListApi() {
-            const baseURL = `${process.env.EXPO_PUBLIC_API_URI}`
-            const api = `/client/getClientReportBySegmentForBusiness?pageNo=${0}&pageSize=${maxEntry}`;
-            setIsLoading(true);
-            const response = await axios.post(baseURL + api,
-                {
-                    business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
-                    fromDate: "",
-                    sortItem: "name",
-                    sortOrder: "asc",
-                    toDate: "",
-                    type: "All",
-                },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+        setTotalCount(clientCount);
+        dispatch(loadClientFiltersFromDb(pageNo, maxEntry, clientFilterNames(filterPressed)));
+    }, [totalCount, maxEntry, pageNo, filterPressed]);
 
-                    }
-                })
-            setIsLoading(false);
-            setFetchData(response.data.data);
-            length = response.data.data.length;
-            setTotalCount(response.data.data[length - 1].count);
+    function backwardButtonHandler(){
+        if(!isBackwardButtonDisabled) {
+            let lowerCountAfter = lowerCount - maxEntry;
+            let upperCountAfter = upperCount - maxEntry;
+            if (lowerCountAfter <= 1) {
+                setLowerCount(1);
+                setUpperCount(maxEntry);
+                setIsBackwardButtonDisabled(true);
+            }
+            else {
+                setLowerCount(lowerCountAfter);
+                setUpperCount(upperCountAfter);
+                dispatch(decrementPageNumber());
+                setIsBackwardButtonDisabled(false);
+            }
+
         }
-
-        getClientListApi().then();
-
-    }, [maxEntry, lowerCount, upperCount]);
-
-    function calculateUpperAndLowerCount() {
-
+    }
+    function forwardButtonHandler(){
+        if(!isForwardButtonDisabled) {
+            let lowerCountAfter = lowerCount + maxEntry;
+            let upperCountAfter = upperCount + maxEntry;
+            if(upperCountAfter > totalCount) {
+                setLowerCount(totalCount - maxEntry);
+                setUpperCount(totalCount);
+                setIsForwardButtonDisabled(true);
+                setIsBackwardButtonDisabled(false)
+            }
+            else {
+                setLowerCount(lowerCountAfter);
+                setUpperCount(upperCountAfter);
+                dispatch(incrementPageNumber());
+                setIsBackwardButtonDisabled(false);
+                setIsForwardButtonDisabled(false);
+            }
+        }
     }
 
-    function nextPageHandler(){
-
-    }
-
-    function prevPageHandler(){
-
-    }
+    //
+    // const loadMoreClients = useCallback(() => {
+    //     if (!isFetching) {
+    //
+    //     }
+    // }, [dispatch, isFetching, maxEntry]);
 
 
     function renderItem(itemData) {
         return (
             <ClientCard
-                name={itemData.item.firstName}
-                phone={itemData.item.mobile}
-                email={itemData.item.email}
+                name={itemData.item.name} phone={itemData.item.mobile} email={itemData.item.username}
             />
         );
     }
 
-    return (
-        <View style={{flex: 1, alignItems: "center" ,justifyContent: 'center'}}>
-        <ScrollView style={styles.clientSegment} bounces={false}>
+    const changeSelectedFilter = (filter) => {
+        console.log("change", filter);
 
+        setFilterPressed(filter);
+    }
+
+
+    return (
+        <ScrollView style={styles.scrollView}>
+        <View style={styles.clientSegment}>
             <EntryModel
-                setMaxEntry={setMaxEntry}
                 isModalVisible={isModalVisible}
                 setIsModalVisible={setIsModalVisible}
+                setMaxEntry={setMaxEntry}
+
             />
 
-            <View style={styles.addClientContainer}>
-                <PrimaryButton buttonStyle={styles.addClientButton}>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={styles.addTextContainer}>
-                            <Text style={styles.addText}>Add </Text>
-                        </View>
-                        <View style={styles.addSymbolContainer}>
-                            <FontAwesome6 name="add" size={14} color={Colors.darkBlue}/>
-                        </View>
-                    </View>
-                </PrimaryButton>
-            </View>
+            <AddClient/>
 
             <Divider color={Colors.grey250}/>
 
             <View style={styles.clientFilterContainer}>
-                <ClientFiltersCategories setFilterPressed={setFilterPressed} filterPressed={filterPressed}/>
+                <ClientFiltersCategories
+                    changeSelectedFilter={changeSelectedFilter}
+                    filterPressed={filterPressed}
+                />
             </View>
 
             <View style={styles.currentFilter}>
                 <View style={styles.descBullet}/>
                 <Text
-                    style={styles.descText}>{appliedFilter(filterPressed) + (filterPressed === 4 ? " (likely to be Inactive)" : "")}</Text>
+                    style={styles.descText}
+                >
+                    {appliedFilter(filterPressed) + (filterPressed === "churn_clients_count" ? " (likely to be Inactive)" : "")}
+                </Text>
             </View>
             <Text style={styles.filterDescText}>
                 {clientFilterDescriptionData[appliedFilter(filterPressed)]}
@@ -135,21 +140,20 @@ export default function ClientSegmentScreen() {
 
             <View style={styles.searchClientContainer}>
                 <View style={styles.textInputContainer}>
-                    <Ionicons name="search" size={24} color={Colors.grey250} style={styles.searchIcon}/>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Search by name email or mobile "
-                        placeholderTextColor={Colors.grey250}
-                        cursorColor={Colors.black}
-                        selectionColor={Colors.black}
-                        value={value}
-                        onChangeText={(text) => setValue(value)}
+                    <SearchBar
+                        placeholder={"search by mobile number name"}
+                        searchContainerStyle={styles.searchBarContainer}
                     />
                 </View>
+
                 <PrimaryButton
                     buttonStyle={styles.filterButton}
                 >
-                    <SimpleLineIcons name="equalizer" size={24} color={Colors.darkBlue} style={styles.filterIcon}/>
+                    <SimpleLineIcons
+                        name="equalizer"
+                        size={24}
+                        color={Colors.darkBlue}
+                        style={styles.filterIcon}/>
                 </PrimaryButton>
 
             </View>
@@ -161,18 +165,11 @@ export default function ClientSegmentScreen() {
                 </Text>
             </View>
 
-            <View style={styles.clientList}>
-                {
-                    !isLoading ?
-                        <FlatList
-                            data={fetchData}
-                            renderItem={renderItem}
-                            scrollEnabled={false}
-                        /> :
-                        // <ActivityIndicator/>
-                        <Bullets active listSize={maxEntry}/>
-                }
-            </View>
+            <FlatList
+                data={filterClientsList}
+                renderItem={renderItem}
+                scrollEnabled={false}
+            />
 
             <View style={styles.pagination}>
                 <PrimaryButton
@@ -180,26 +177,36 @@ export default function ClientSegmentScreen() {
                     buttonStyle={styles.entryButtonContainer}
                     onPress={() => setIsModalVisible(true)}
                 >
-                    <Text style={styles.entryText}>
-                        {maxEntry}
-                    </Text>
-                    <AntDesign name="caretdown" size={14} color="black"/>
+                    <View style={styles.buttonInnerContainer}>
+                        <Text style={styles.entryText}>
+                            {maxEntry}
+                        </Text>
+                        <AntDesign name="caretdown" size={14} color="black" style={{marginLeft: 16}}/>
+                    </View>
                 </PrimaryButton>
-                <View style={styles.paginationInnerContainer}>
-                <Text>
-                    {lowerCount} - {upperCount} of {totalCount}
-                </Text>
-                <PrimaryButton buttonStyle={styles.pageForwardButton}>
-                    <FontAwesome6 name="angle-left" size={24} color="black" />
-                </PrimaryButton>
-                <PrimaryButton buttonStyle={styles.pageBackwardButton}>
-                    <FontAwesome6 name="angle-right" size={24} color="black" />
-                </PrimaryButton>
-                </View>
-            </View>
 
-        </ScrollView>
+                <View style={styles.paginationInnerContainer}>
+                    <Text style={styles.pagingText}>
+                        {lowerCount} - {upperCount} of {totalCount}
+                    </Text>
+                    <PrimaryButton
+                        buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}
+                        onPress={backwardButtonHandler}
+                    >
+                        <FontAwesome6 name="angle-left" size={24} color="black" />
+                    </PrimaryButton>
+                    <PrimaryButton
+                        buttonStyle={[isForwardButtonDisabled ? [styles.pageForwardButton, styles.disabled] : [styles.pageForwardButton]]}
+                        onPress={forwardButtonHandler}
+                    >
+                        <FontAwesome6 name="angle-right" size={24} color="black" />
+                    </PrimaryButton>
+
+                </View>
+
+            </View>
         </View>
+        </ScrollView>
     );
 }
 
@@ -207,10 +214,9 @@ const styles = StyleSheet.create({
     clientSegment: {
         flex: 1,
         backgroundColor: 'white',
+        width: '100%',
     },
-    addClientContainer: {
-        alignItems: 'flex-end',
-    },
+
     clientFilterContainer: {
         marginTop: 20,
     },
@@ -223,7 +229,13 @@ const styles = StyleSheet.create({
     searchClientContainer: {
         marginTop: 20,
         flexDirection: 'row',
-        // borderWidth: 1
+        justifyContent: 'space-evenly'
+    },
+    searchBarContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 32,
     },
     clientCount: {
         height: 60,
@@ -235,44 +247,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
 
     },
-    clientList: {},
+    clientList: {
+        flex: 1,
+    },
     pagination: {
         height: 90,
         flexDirection: 'row',
-        justifyContent: 'space-around',
         alignItems: "center",
-    },
-
-
-    addClientButton: {
-        width: '25%',
-        height: 38,
-        margin: 20,
-        backgroundColor: Colors.white,
-        borderWidth: 1,
-        borderColor: Colors.highlight,
-    },
-    addTextContainer: {
-        width: 28,
-        height: 18
-    },
-    addText: {
-        fontSize: 13,
-        fontWeight: '700',
-        // ...Platform.select({
-        //     ios: {
-        //         paddingTop: 2,
-        //     }
-        // }),
-        includeFontPadding: false,
-        paddingTop: 2
-
-    },
-    addSymbolContainer: {
-        width: 20,
-        height: 20,
-        alignItems: "center",
-        justifyContent: "center"
+        justifyContent: 'space-between',
     },
     addSymbol: {},
 
@@ -294,26 +276,18 @@ const styles = StyleSheet.create({
         width: '75%'
     },
     textInputContainer: {
-        flexDirection: 'row',
-        width: '75%',
-        borderWidth: 1,
-        borderRadius: 32,
-        marginVertical: 12,
-        marginHorizontal: 10,
-        borderColor: Colors.grey250
+        width: '80%',
+        marginVertical: 15,
     },
-    searchIcon: {
-        marginVertical: 12,
-        marginHorizontal: 16
-    },
+
     filterIcon: {},
     filterButton: {
         backgroundColor: Colors.white,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: Colors.grey250,
-        marginVertical: 13,
-        marginHorizontal: 10,
+        marginVertical: 15,
+        marginRight: 8,
     },
     menuImage: {
         width: 24,
@@ -321,37 +295,46 @@ const styles = StyleSheet.create({
         marginLeft: 24
     },
     clientCountText: {
-        marginLeft: 8,
-        fontWeight: '500'
-    },
-    entryButton: {
-        flexDirection: 'row',
-        justifyContent:"flex-start",
-        gap:32,
-    },
-    entryButtonContainer: {
-        backgroundColor: Colors.white,
-        borderWidth: 1,
-        borderColor: Colors.grey250,
+        marginLeft: 8
     },
     entryText: {
-        fontWeight: '600'
+    },
+    entryButton: {
+
+    },
+    entryButtonContainer: {
+        borderWidth: 1,
+        borderColor: Colors.grey250,
+        marginLeft: 16,
+        backgroundColor: Colors.white,
     },
     paginationInnerContainer: {
         flexDirection: 'row',
-        gap: 16,
-        alignItems: 'center'
+        marginRight: 16,
+        alignItems: "center",
     },
     pageForwardButton: {
-        backgroundColor: Colors.white,
+        backgroundColor :Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
     },
     pageBackwardButton: {
-        backgroundColor: Colors.white,
+        backgroundColor :Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
+        marginHorizontal: 16
+    },
+    buttonInnerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: "center"
+    },
+    disabled: {
+        opacity: 0.4,
+    },
+    pagingText: {},
+    scrollView: {
+        backgroundColor: Colors.white
     }
-
 })
 

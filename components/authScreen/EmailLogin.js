@@ -30,7 +30,7 @@ export default function EmailLogin() {
 
     const [isPasswordValid, setIsPasswordValid] = useState(true);
 
-    const BaseURL = 'https://gamma.vipsline.com/api/v1'
+    const BaseURL = process.env.EXPO_PUBLIC_API_URI
 
     /**
      * UI logics ---------------------------------------------------------------------------

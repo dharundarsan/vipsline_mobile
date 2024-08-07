@@ -24,8 +24,8 @@ export const loadServicesDataFromDb = (gender) => async (dispatch) => {
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/resourceCategory/getListOfAllServicesOfBusiness",
             {
-                business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
-                gender: gender
+                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                gender: gender,
             },
             {
                 headers: {
@@ -44,7 +44,7 @@ export const loadProductsDataFromDb = () => async (dispatch) => {
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/product/getAllProductsOfBusiness",
             {
-                business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
+                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
             },
             {
                 headers: {
@@ -61,9 +61,9 @@ export const loadProductsDataFromDb = () => async (dispatch) => {
 export const loadMembershipsDataFromDb = () => async (dispatch) => {
     try {
         const response = await axios.post(
-            process.env.EXPO_PUBLIC_API_URI + "/membership/getListOfMembershipByBusiness",
+             process.env.EXPO_PUBLIC_API_URI + "/package/getListOfPackagesByBusiness",
             {
-                business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
+                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
             },
             {
                 headers: {
@@ -80,9 +80,9 @@ export const loadMembershipsDataFromDb = () => async (dispatch) => {
 export const loadPackagesDataFromDb = () => async (dispatch) => {
     try {
         const response = await axios.post(
-            process.env.EXPO_PUBLIC_API_URI + "/package/getListOfPackagesByBusiness",
+              process.env.EXPO_PUBLIC_API_URI + "/package/getListOfPackagesByBusiness",
             {
-                business_id: "9359e749-b190-40f4-9953-f0c24fd1a1db",
+                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
                 status: true
             },
             {

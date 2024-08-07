@@ -17,7 +17,7 @@ export default function MobileOtp() {
     const [isUserTyping, setIsUserTyping] = useState(false);
     const [isUserFound, setIsUserFound] = useState(true);
 
-    const BaseURL = 'https://gamma.vipsline.com/api/v1'
+    const BaseURL = process.env.EXPO_PUBLIC_API_URI
     const platform = "BUSINESS";
 
     let responseUserMessage = "";

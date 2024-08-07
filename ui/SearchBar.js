@@ -24,7 +24,9 @@ const SearchBar = (props) => {
         <TextInput style={[textTheme.bodyMedium, styles.searchTextInput]}
                    placeholder={props.placeholder}
                    onChangeText={props.onChangeText}
-                   placeholderTextColor={Colors.grey400}/>
+                   placeholderTextColor={Colors.grey400}
+                   cursorColor={Colors.black}
+        />
         {props.filter ? <PrimaryButton onPress={props.onFilterPress} buttonStyle={styles.searchFilterButton}
                                        pressableStyle={styles.searchFilterPressable}>
             <Ionicons name="filter" size={20} color={Colors.grey500}/>

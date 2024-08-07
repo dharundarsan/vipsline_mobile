@@ -15,24 +15,6 @@ function AuthScreen() {
     const navigate = useNavigation();
 
 
-
-    // async function getBooks() {
-    //     try {
-    //         const response = await axios.get(
-    //             "https://gamma.vipsline.com/api/v1/user/findUser"
-    //         );
-    //         console.log(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching data:', error);
-    //     }
-    // }
-    //
-    // getBooks().then(r => console.log(r.data));
-
-
-
-
-
     function signUpHandler() {
         console.log("signUpHandler");
     }
