@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     },
     addToCartButtonContainer: {
         marginHorizontal: 30,
-        marginTop:20,
+        marginTop: 20,
         marginBottom: 20,
     }
 })
