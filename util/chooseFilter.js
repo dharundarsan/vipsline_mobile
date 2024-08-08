@@ -24,8 +24,11 @@ export const clientFilterNames2 = (filterPressed) =>  {
     if(filterPressed === "Leads") { return "leads_clients_count" }
 }
 
-
-
-
-
+export const chooseFilterCount = (filterPressed, all, active, inactive, churn, leads) =>  {
+    if(filterPressed === "all_clients_count") { return  all}
+    if(filterPressed === "active_clients_count") { return active}
+    if(filterPressed === "inactive_clients_count") { return  inactive}
+    if(filterPressed === "churn_clients_count") { return  churn}
+    if(filterPressed === "leads_clients_count") { return  leads}
+}
 export default appliedFilter;

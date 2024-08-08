@@ -2,16 +2,21 @@ import {Modal, View, Text, StyleSheet, TouchableOpacity, Touchable, Pressable} f
 import Colors from "../../constants/Colors"
 import {RadioButton} from "react-native-paper";
 import {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {updateMaxEntry} from "../../store/clientFilterSlice";
 
 const modalHeight = 150;
 
 export default function EntryModel(props) {
 
+    const dispatch = useDispatch();
+
     const [checkedNumber, setCheckedNumber] = useState(10);
 
     useEffect(() => {
-        props.setMaxEntry(checkedNumber)
-    }, [checkedNumber]);
+        setCheckedNumber(10);
+    }, [props.filterPressed]);
+
 
     return (
         <Modal
@@ -33,6 +38,8 @@ export default function EntryModel(props) {
                     onPress={() => {
                         setCheckedNumber(10);
                         props.setIsModalVisible(false);
+                        dispatch(updateMaxEntry(10));
+
                     }}
                 />
                 </View>
@@ -44,6 +51,7 @@ export default function EntryModel(props) {
                     onPress={() => {
                         setCheckedNumber(50)
                         props.setIsModalVisible(false);
+                        dispatch(updateMaxEntry(50));
                     }}
                 />
                 </View>
@@ -55,6 +63,7 @@ export default function EntryModel(props) {
                     onPress={() => {
                         setCheckedNumber(100)
                         props.setIsModalVisible(false);
+                        dispatch(updateMaxEntry(100));
                     }}
                 />
                 </View>
