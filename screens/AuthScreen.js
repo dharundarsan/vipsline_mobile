@@ -10,7 +10,6 @@ import {useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
 
-
 function AuthScreen() {
     const navigate = useNavigation();
 

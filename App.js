@@ -14,6 +14,7 @@ import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
 import store from './store/store';
 import Colors from './constants/Colors';
 import {enableScreens} from "react-native-screens";
+import Toast from 'react-native-toast-message';
 
 // Drawer icon imports
 import calender_icon from "./assets/icons/drawerIcons/calendar.png";

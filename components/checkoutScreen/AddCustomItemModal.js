@@ -15,7 +15,7 @@ const AddCustomItemModal = (props) => {
     const [itemPrice, setItemPrice] = useState(0);
     const dispatch = useDispatch();
 
-    return <Modal visible={props.isVisible} onCancel={props.onCloseModal}>
+    return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Custom Item</Text>
             <PrimaryButton

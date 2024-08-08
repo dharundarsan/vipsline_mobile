@@ -1,4 +1,5 @@
 import axios from "axios";
+import {EXPO_PUBLIC_API_URI} from "@env";
 /**
  * Finds a user by email and platform using the VIPS Line API.
  * use await in front of the function call since for sending OTP takes time

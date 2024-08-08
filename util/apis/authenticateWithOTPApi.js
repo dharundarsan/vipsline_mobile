@@ -1,4 +1,5 @@
 import axios from "axios";
+import {EXPO_PUBLIC_API_URI} from "@env";
 
 export default async function authenticateWithOTPApi(mobileNumber, otp, platform) {
     let isAuthenticated = false;

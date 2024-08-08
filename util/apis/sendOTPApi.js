@@ -1,5 +1,7 @@
 import axios from "axios";
 import findUser from "./findUserApi";
+import {EXPO_PUBLIC_API_URI} from "@env";
+
 
 export default async function sendOTPApi(mobileNumber, platform) {
     let otpSend = false;
