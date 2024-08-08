@@ -131,11 +131,11 @@ const AddItemModal = (props) => {
                         <Text style={TextTheme.titleMedium}>
                             {formatDate(selectedDate)}
                         </Text>
-                        <MaterialCommunityIcons
-                            name="calendar-month-outline"
-                            size={24}
-                            color={Colors.darkBlue}
-                        />
+                            <MaterialCommunityIcons
+                                name="calendar-month-outline"
+                                size={24}
+                                color={Colors.darkBlue}
+                            />
                     </Pressable>
                     {isDatePickerVisible && (
                         <RNDateTimePicker

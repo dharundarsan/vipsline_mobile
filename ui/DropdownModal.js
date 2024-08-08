@@ -8,8 +8,8 @@ import Divider from "./Divider";
 
 const DropdownModal = (props) => {
     const [selectedValue, setSelectedValue] = useState();
-    return <Modal transparent={true} visible={props.isVisible} style={styles.dropdownModal}>
-        <TouchableOpacity style={styles.modalContent} onPress={props.onCloseModal}>
+    return <Modal transparent={true} animationType={"fade"} visible={props.isVisible} style={styles.dropdownModal}>
+        <TouchableOpacity style={styles.modalContent} onPress={props.onCloseModal} activeOpacity={1} >
             <FlatList style={styles.dropdownList} data={props.dropdownItems}  renderItem={({item}) => {
                 return <>
                     <PrimaryButton label={item} buttonStyle={styles.closeButton}

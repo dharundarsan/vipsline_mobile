@@ -5,7 +5,7 @@ import {useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
 import CheckBox from 'react-native-check-box'
-import findUser from "../../util/findUserApi";
+import findUser from "../../util/apis/findUserApi";
 
 export default function EmailLogin() {
     const navigation = useNavigation();
