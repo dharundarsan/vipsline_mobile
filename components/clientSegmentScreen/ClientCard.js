@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text} from "react-native";
+import {View, StyleSheet, Text, Pressable} from "react-native";
 import Colors from "../../constants/Colors"
 import Divider from "../../ui/Divider";
 
@@ -11,18 +11,25 @@ export default function ClientCard(props) {
 
 
     return (<>
-            <View style={styles.card}>
-                <View style={styles.innerContainer}>
-                    <View style={styles.clientProfile}>
-                        <Text style={styles.text}>{name !== undefined ? name.at(0).toUpperCase() : "Z"}</Text>
+            <Pressable
+                style={[styles.card, props.card]}
+                android_ripple={{color: Colors.ripple}}
+                onPress={props.onPress}
+            >
+                <View style={[styles.innerContainer]}>
+                    <View style={[styles.clientProfile, props.clientProfile]}>
+                        <Text
+                            style={[styles.text, props.avatarText]}>
+                            {name !== undefined ? name.at(0).toUpperCase() : "Z"}
+                        </Text>
                     </View>
 
-                    <View style={styles.clientDetailsContainer}>
+                    <View style={[styles.clientDetailsContainer, props.clientDetailsContainer]}>
                         {
-                            props.name !== undefined ? <Text style={styles.name}>{name}</Text> : null
+                            props.name !== undefined ? <Text style={[styles.name, props.nameText]}>{name}</Text> : null
                         }
                         {
-                            props.phone !== undefined ? < Text style={styles.phone}>{phone}</Text> : null
+                            props.phone !== undefined ? < Text style={[styles.phone, props.phoneText]}>{phone}</Text> : null
                         }
                         {
                             email !== undefined && email !== null && email.trim().length !== 0 ?
@@ -32,8 +39,13 @@ export default function ClientCard(props) {
                         {/*<Text>{name}</Text>*/}
                     </View>
                 </View>
-            </View>
-            <Divider/>
+            </Pressable>
+            {
+                props.divider ?
+                    <Divider/> :
+                    null
+            }
+
         </>
     );
 }

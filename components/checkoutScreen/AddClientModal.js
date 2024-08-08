@@ -50,7 +50,7 @@ const AddClientModal = (props) => {
                 <Divider/>
                 <FlatList data={clientsList} onEndReachedThreshold={0.7}
                           onEndReached={() => dispatch(loadClientsFromDb(pageNo))} renderItem={({item}) => {
-                    return <ClientCard name={item.name} phone={item.mobile_1} email={item.username}/>
+                    return <ClientCard name={item.name} phone={item.mobile_1} email={item.username} divider={true}/>
                 }}/>
             </View>
         </Modal>

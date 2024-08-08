@@ -2,107 +2,67 @@ import {View, Text, StyleSheet, Image, FlatList, ScrollView} from "react-native"
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
-import React, {useState, useEffect} from "react";
-import appliedFilter, {clientFilterNames} from "../components/clientSegmentScreen/chooseFilter";
+import React, {useState} from "react";
+import appliedFilter from "../util/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import ClientFiltersCategories from "../components/clientSegmentScreen/ClientFiltersCategories";
 import ClientCard from "../components/clientSegmentScreen/ClientCard";
 import SearchBar from "../ui/SearchBar";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import AddClient from "../components/clientSegmentScreen/AddClient";
-import {decrementPageNumber, incrementPageNumber, loadClientFiltersFromDb} from "../store/clientFilterSlice";
-import {AntDesign, FontAwesome6} from "@expo/vector-icons";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
+import Pagination from "../components/clientSegmentScreen/Pagination";
+import {Bullets} from "react-native-easy-content-loader";
+import ClientInfoModal from "../components/clientSegmentScreen/ClientInfoModal";
+
 
 export default function ClientSegmentScreen() {
-
-    const dispatch = useDispatch();
     const [filterPressed, setFilterPressed] = useState("all_clients_count");
 
     const filterClientsList = useSelector(state => state.clientFilter.clients);
     const isFetching = useSelector(state => state.clientFilter.isFetching);
 
-    const [maxEntry, setMaxEntry] = useState(10)
-
-
     const clientCount = useSelector(state => state.client.clientCount)[0].all_clients_count;
-
-    const [totalCount, setTotalCount] = useState(0);
-    const [upperCount, setUpperCount] = useState(10);
-    const [lowerCount, setLowerCount] = useState(1);
-    const [pageNo, setPageNo] = useState(0);
-
-    const [isBackwardButtonDisabled, setIsBackwardButtonDisabled]  = useState(true);
-    const [isForwardButtonDisabled, setIsForwardButtonDisabled]  = useState(false);
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    useEffect(() => {
-        setTotalCount(clientCount);
-        dispatch(loadClientFiltersFromDb(pageNo, maxEntry, clientFilterNames(filterPressed)));
-    }, [totalCount, maxEntry, pageNo, filterPressed]);
+    const maxEntry = useSelector(state => state.clientFilter.maxEntry);
 
-    function backwardButtonHandler(){
-        if(!isBackwardButtonDisabled) {
-            let lowerCountAfter = lowerCount - maxEntry;
-            let upperCountAfter = upperCount - maxEntry;
-            if (lowerCountAfter <= 1) {
-                setLowerCount(1);
-                setUpperCount(maxEntry);
-                setIsBackwardButtonDisabled(true);
-            }
-            else {
-                setLowerCount(lowerCountAfter);
-                setUpperCount(upperCountAfter);
-                dispatch(decrementPageNumber());
-                setIsBackwardButtonDisabled(false);
-            }
+    const [isClientInfoModalVisible,setIsClientInfoModalVisible ] = useState(false);
 
-        }
-    }
-    function forwardButtonHandler(){
-        if(!isForwardButtonDisabled) {
-            let lowerCountAfter = lowerCount + maxEntry;
-            let upperCountAfter = upperCount + maxEntry;
-            if(upperCountAfter > totalCount) {
-                setLowerCount(totalCount - maxEntry);
-                setUpperCount(totalCount);
-                setIsForwardButtonDisabled(true);
-                setIsBackwardButtonDisabled(false)
-            }
-            else {
-                setLowerCount(lowerCountAfter);
-                setUpperCount(upperCountAfter);
-                dispatch(incrementPageNumber());
-                setIsBackwardButtonDisabled(false);
-                setIsForwardButtonDisabled(false);
-            }
-        }
-    }
-
-    //
-    // const loadMoreClients = useCallback(() => {
-    //     if (!isFetching) {
-    //
-    //     }
-    // }, [dispatch, isFetching, maxEntry]);
-
+    const [clientName, setClientName] = useState("");
+    const [clientPhone, setClientPhone] = useState("");
 
     function renderItem(itemData) {
         return (
             <ClientCard
-                name={itemData.item.name} phone={itemData.item.mobile} email={itemData.item.username}
+                name={itemData.item.name}
+                phone={itemData.item.mobile}
+                email={itemData.item.username}
+                onPress={() => {
+                    clientInfoHandler();
+                    clientNamePhoneHandler(itemData.item.name, itemData.item.mobile);
+                }}
+                divider={true}
             />
         );
     }
 
-    const changeSelectedFilter = (filter) => {
-        console.log("change", filter);
-
-        setFilterPressed(filter);
+    function clientInfoHandler() {
+        console.log("clientInfoHandler");
+        setIsClientInfoModalVisible(true);
     }
 
+    function clientNamePhoneHandler(name, phone) {
+        setClientName(name);
+        setClientPhone(phone);
+    }
+
+    const changeSelectedFilter = (filter) => {
+        // console.log("change", filter);
+        setFilterPressed(filter);
+    }
 
     return (
         <ScrollView style={styles.scrollView}>
@@ -110,8 +70,14 @@ export default function ClientSegmentScreen() {
             <EntryModel
                 isModalVisible={isModalVisible}
                 setIsModalVisible={setIsModalVisible}
-                setMaxEntry={setMaxEntry}
+                filterPressed={filterPressed}
+            />
 
+            <ClientInfoModal
+                visible={isClientInfoModalVisible}
+                closeModal={() => setIsClientInfoModalVisible(false)}
+                name={clientName}
+                phone={clientPhone}
             />
 
             <AddClient/>
@@ -153,7 +119,8 @@ export default function ClientSegmentScreen() {
                         name="equalizer"
                         size={24}
                         color={Colors.darkBlue}
-                        style={styles.filterIcon}/>
+                        style={styles.filterIcon}
+                    />
                 </PrimaryButton>
 
             </View>
@@ -165,46 +132,30 @@ export default function ClientSegmentScreen() {
                 </Text>
             </View>
 
-            <FlatList
-                data={filterClientsList}
-                renderItem={renderItem}
-                scrollEnabled={false}
+            {
+                !isFetching ?
+                    <FlatList
+                        data={filterClientsList}
+                        renderItem={renderItem}
+                        scrollEnabled={false}
+                    /> :
+                    <Bullets
+                        tHeight={35}
+                        tWidth={"75%"}
+                        listSize={maxEntry}
+                        aSize={35}
+                        animationDuration={500}
+                        containerStyles={{paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: Colors.grey250}}
+                        avatarStyles={{marginLeft: 16}}
+                    />
+            }
+
+            <Pagination
+                filterPressed={filterPressed}
+                setIsModalVisible={setIsModalVisible}
             />
 
-            <View style={styles.pagination}>
-                <PrimaryButton
-                    pressableStyle={styles.entryButton}
-                    buttonStyle={styles.entryButtonContainer}
-                    onPress={() => setIsModalVisible(true)}
-                >
-                    <View style={styles.buttonInnerContainer}>
-                        <Text style={styles.entryText}>
-                            {maxEntry}
-                        </Text>
-                        <AntDesign name="caretdown" size={14} color="black" style={{marginLeft: 16}}/>
-                    </View>
-                </PrimaryButton>
 
-                <View style={styles.paginationInnerContainer}>
-                    <Text style={styles.pagingText}>
-                        {lowerCount} - {upperCount} of {totalCount}
-                    </Text>
-                    <PrimaryButton
-                        buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}
-                        onPress={backwardButtonHandler}
-                    >
-                        <FontAwesome6 name="angle-left" size={24} color="black" />
-                    </PrimaryButton>
-                    <PrimaryButton
-                        buttonStyle={[isForwardButtonDisabled ? [styles.pageForwardButton, styles.disabled] : [styles.pageForwardButton]]}
-                        onPress={forwardButtonHandler}
-                    >
-                        <FontAwesome6 name="angle-right" size={24} color="black" />
-                    </PrimaryButton>
-
-                </View>
-
-            </View>
         </View>
         </ScrollView>
     );
@@ -250,12 +201,7 @@ const styles = StyleSheet.create({
     clientList: {
         flex: 1,
     },
-    pagination: {
-        height: 90,
-        flexDirection: 'row',
-        alignItems: "center",
-        justifyContent: 'space-between',
-    },
+
     addSymbol: {},
 
     descBullet: {
@@ -297,42 +243,6 @@ const styles = StyleSheet.create({
     clientCountText: {
         marginLeft: 8
     },
-    entryText: {
-    },
-    entryButton: {
-
-    },
-    entryButtonContainer: {
-        borderWidth: 1,
-        borderColor: Colors.grey250,
-        marginLeft: 16,
-        backgroundColor: Colors.white,
-    },
-    paginationInnerContainer: {
-        flexDirection: 'row',
-        marginRight: 16,
-        alignItems: "center",
-    },
-    pageForwardButton: {
-        backgroundColor :Colors.white,
-        borderWidth: 1,
-        borderColor: Colors.grey250,
-    },
-    pageBackwardButton: {
-        backgroundColor :Colors.white,
-        borderWidth: 1,
-        borderColor: Colors.grey250,
-        marginHorizontal: 16
-    },
-    buttonInnerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: "center"
-    },
-    disabled: {
-        opacity: 0.4,
-    },
-    pagingText: {},
     scrollView: {
         backgroundColor: Colors.white
     }

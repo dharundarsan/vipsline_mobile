@@ -4,10 +4,11 @@ import axios from "axios";
 const initial = {
     clients: [],
     pageNo: 0,
+    maxEntry: 10,
     isFetching: false,
 }
 
-export const loadClientFiltersFromDb = (pageNo, pageSize, filter) => async (dispatch, getState) => {
+export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, getState) => {
     const { clientFilter } = getState();
     if (clientFilter.isFetching) return;
 
@@ -29,6 +30,10 @@ export const loadClientFiltersFromDb = (pageNo, pageSize, filter) => async (disp
                 }
             }
         );
+        // console.log( "current page number: "+ clientFilter.pageNo);
+        // console.log("current page size: " + pageSize);
+        // console.log("current max entry size: " + clientFilter.maxEntry);
+        // console.log(response.data.data);
         response.data.data.pop();
         dispatch(updateClientsList(response.data.data));
         dispatch(updateFetchingState(false));
@@ -61,10 +66,17 @@ export const clientFilterSlice = createSlice({
             if(page_no < 0) {
                 state.pageNo = 0;
             }
+            else {
+                // console.log("in the client filter screen")
+                state.pageNo--;
+            }
+        },
+        updateMaxEntry(state, action) {
+            state.maxEntry = action.payload;
         }
     }
 });
 
-export const { updateClientsList, updateFetchingState, decrementPageNumber, incrementPageNumber, resetClientFilter } = clientFilterSlice.actions;
+export const { updateClientsList, updateFetchingState, decrementPageNumber, incrementPageNumber, updateMaxEntry, resetClientFilter } = clientFilterSlice.actions;
 
 export default clientFilterSlice.reducer;
