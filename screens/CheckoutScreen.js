@@ -20,8 +20,9 @@ import {
 } from '../store/clientSlice';
 import AddClientModal from "../components/checkoutScreen/AddClientModal";
 import {
- loadClientFiltersFromDb,
+    loadClientFiltersFromDb,
 } from "../store/clientFilterSlice";
+import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
 
 
 const CheckoutScreen = () => {
@@ -40,7 +41,7 @@ const CheckoutScreen = () => {
         dispatch(loadMembershipsDataFromDb());
         dispatch(loadClientsFromDb());
         dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb( 10, "All"));
+        dispatch(loadClientFiltersFromDb(10, "All"));
     }, []);
 
     return (

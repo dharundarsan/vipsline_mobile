@@ -9,6 +9,8 @@ import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
 import {formatDate} from "../../util/Helpers";
+import {useDispatch} from "react-redux";
+import {loadClientCountFromDb} from "../../store/clientSlice";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -25,6 +27,8 @@ const CreateClientModal = (props) => {
     const [anniversaryDate, setAnniversaryDate] = useState(Date.now());
     const [isDobSelected, setIsDobSelected] = useState(false);
     const [isAnniversarySelected, setIsAnniversarySelected] = useState(false);
+
+    const dispatch = useDispatch();
 
     const firstNameRef = useRef(null);
     const lastNameRef = useRef(null);
@@ -82,6 +86,7 @@ const CreateClientModal = (props) => {
             });
             ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
             clearForm();
+            dispatch(loadClientCountFromDb());
             props.onCloseModal();
         } catch (e) {
             ToastAndroid.show(e, ToastAndroid.LONG)

@@ -3,6 +3,7 @@ import cartReducer from "./cartSlice";
 import catalogueReducer from "./catalogueSlice";
 import clientReducer from "./clientSlice";
 import clientFilterReducer from "./clientFilterSlice";
+import clientInfoReducer from "./clientInfoSlice";
 
 const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
         catalogue: catalogueReducer,
         client: clientReducer,
         clientFilter: clientFilterReducer,
+        clientInfo: clientInfoReducer,
     },
 });
 

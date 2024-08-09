@@ -3,7 +3,7 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {AntDesign, Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
 import {capitalizeFirstLetter} from "../../util/Helpers";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import SearchBar from "../../ui/SearchBar";
@@ -13,6 +13,7 @@ import ClientCard from "../clientSegmentScreen/ClientCard";
 import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
 import {SafeAreaView} from "react-native-safe-area-context";
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 const AddClientModal = (props) => {
 
@@ -20,6 +21,7 @@ const AddClientModal = (props) => {
     const clientsList = useSelector(state => state.client.clients);
     const [isCreateClientModalVisible, setIsCreateClientModalVisible] = useState(false);
     const dispatch = useDispatch();
+
 
     return <>
         <Modal visible={props.isVisible} animationType={"slide"}>
@@ -51,7 +53,12 @@ const AddClientModal = (props) => {
                 <Divider/>
                 <FlatList data={clientsList} onEndReachedThreshold={0.7}
                           onEndReached={() => dispatch(loadClientsFromDb(pageNo))} renderItem={({item}) => {
-                    return <ClientCard name={item.name} phone={item.mobile_1} email={item.username} divider={true}/>
+                    return <ClientCard clientId={item.id} name={item.name} phone={item.mobile_1} email={item.username}
+                                       divider={true}
+                                       onPress={(clientId) => {
+                                           props.closeModal();
+                                           dispatch(loadClientInfoFromDb(clientId));
+                                       }}/>
                 }}/>
             </View>
         </Modal>
