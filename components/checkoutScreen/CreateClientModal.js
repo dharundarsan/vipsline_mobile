@@ -1,4 +1,4 @@
-import {Modal, ScrollView, StyleSheet, Text, View, ToastAndroid} from "react-native";
+import {Modal, ScrollView, StyleSheet, Text, View, ToastAndroid, Platform} from "react-native";
 import CustomTextInput from "../../ui/CustomTextInput";
 import React, {useState, useRef, useEffect} from "react";
 import DropdownModal from "../../ui/DropdownModal";
@@ -9,7 +9,6 @@ import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
 import {formatDate} from "../../util/Helpers";
-import Toast from 'react-native-toast-message';
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -237,6 +236,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     closeAndHeadingContainer: {
+        marginTop: Platform.OS === "ios" ? 40 : 0,
         justifyContent: "center",
         alignItems: "center",
         height: 60,

@@ -9,10 +9,10 @@
     "plugins": [
       [
         "expo-build-properties", {
-          "android": {
-            "usesCleartextTraffic": true
-          }
+        "android": {
+          "usesCleartextTraffic": true
         }
+      }
       ]
     ],
     "splash": {
@@ -35,8 +35,6 @@
     },
     "extra": {
       "eas": {
-        "API_URI": "process.env.API_URI",
-        "API_KEY": "process.env.API_KEY",
         "projectId": "30ce7e4b-1125-4bfa-8087-ca869e132c68"
       }
     }

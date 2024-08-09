@@ -9,41 +9,52 @@ import {useDispatch} from "react-redux";
 const ProductItem = (props) => {
     const dispatch = useDispatch();
 
+
     const styles = StyleSheet.create({
         selectProductItemButton: {
-            // padding: 15,
-            elevation: 1,
-            marginHorizontal: 15,
+            borderWidth: 1,
+            borderColor: props.selected ? Colors.blue : Colors.grey400,
             borderRadius: 8,
+            marginHorizontal: 15,
             marginVertical: 5,
-            backgroundColor: Colors.background,
-            borderColor: Colors.blue,
-            borderWidth: props.selected ? 1 : 0,
+            backgroundColor: props.data.showAlert ? Colors.errorContainer : Colors.background,
         },
         selectProductItemPressable: {
             borderRadius: 8,
             paddingVertical: 15,
-            paddingHorizontal: 15,
-            gap: 5,
+            paddingHorizontal: 25,
+            gap: 7,
         },
         nameAndPriceContainer: {
             width: "100%",
             flexDirection: "row",
             justifyContent: "space-between"
         },
+        nameText:{
+            color: props.data.showAlert ? Colors.white : Colors.black,
+        },
         priceContainer: {
             flexDirection: "row",
             gap: 15,
         },
+        priceText:{
+             color: props.data.showAlert ? Colors.white : Colors.black,
+        },
         lineThroughPrice: {
             textDecorationLine: "line-through",
-            color: Colors.error
+            color: props.data.showAlert ? Colors.white : Colors.highlight
         },
-        barCodeText: {
+        bottomLineText: {
             alignSelf: "flex-start",
-            color: Colors.grey600
+            color: props.data.showAlert ? Colors.white : Colors.grey600
+        },
+        boldText: {
+            fontWeight: "bold",
+            color: props.data.showAlert ? Colors.white : Colors.black
         }
     });
+
+    console.log(props.data.barCode + props.data.available_quantity);
 
     return <PrimaryButton buttonStyle={styles.selectProductItemButton}
                           pressableStyle={styles.selectProductItemPressable}
@@ -53,19 +64,30 @@ const ProductItem = (props) => {
                           }}
     >
         <View style={styles.nameAndPriceContainer}>
-            <Text style={textTheme.bodyMedium}>{props.data.name}</Text>
+            <Text style={[textTheme.bodyMedium, styles.nameText]}>{props.data.name}</Text>
             <View style={styles.priceContainer}>
                 {
                     props.data.price === props.data.discounted_price ? <>
-                        <Text style={[textTheme.titleSmall,]}>{"₹ " + props.data.price}</Text>
+                        <Text style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + props.data.price}</Text>
                     </> : <>
                         <Text style={[textTheme.titleSmall, styles.lineThroughPrice]}>{"₹ " + props.data.price}</Text>
-                        <Text style={[textTheme.titleSmall,]}>{"₹ " + props.data.discounted_price}</Text>
+                        <Text style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + props.data.discounted_price}</Text>
                     </>
                 }
             </View>
         </View>
-        {props.data.barCode !== "" ? <Text style={styles.barCodeText}>{props.data.barCode}</Text> : null}
+        <Text style={styles.bottomLineText}>
+            {props.data.barCode !== "" ? props.data.barCode + " •" : null}
+            {props.data.available_quantity === 0
+                ? "NO STOCK"
+                : props.data.available_quantity > 0 ? (
+                    <>
+                        <Text style={styles.boldText}>{props.data.available_quantity}</Text> {" IN STOCK"}
+                    </>
+                ) : (
+                    "UNLIMITED STOCK"
+                )}
+        </Text>
     </PrimaryButton>
 
 }

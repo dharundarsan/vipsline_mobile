@@ -1,4 +1,4 @@
-import {KeyboardAvoidingView, Modal, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import {AntDesign, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import PrimaryButton from "../../ui/PrimaryButton";
 import React, {useState} from "react";
@@ -48,7 +48,7 @@ const EditMembershipModal = (props) => {
                 }}
             />
         )}
-        <Modal visible={props.isVisible} style={styles.editMembershipModal}>
+        <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"} >
             <View style={styles.headingAndCloseContainer}>
                 <Text style={[textTheme.titleLarge, styles.heading]}>{props.data.name}</Text>
                 <PrimaryButton
@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
+        marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
     },

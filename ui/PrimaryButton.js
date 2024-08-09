@@ -1,4 +1,4 @@
-import {Pressable, StyleSheet, Text, View} from "react-native";
+import {Pressable, StyleSheet, Text, View, Platform} from "react-native";
 import Colors from "../constants/Colors";
 import TextTheme from "../constants/TextTheme";
 import React from "react";
@@ -36,7 +36,7 @@ const PrimaryButton = (props) => {
             paddingVertical: 11,
             width: "100%",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
         },
         buttonLabel: {
             color: Colors.onButton,
@@ -46,9 +46,15 @@ const PrimaryButton = (props) => {
     return (
         <View style={[styles.primaryButton, props.buttonStyle]}>
             <Pressable
-                style={[styles.pressable, props.pressableStyle]}
+                style={({ pressed }) => [
+                    styles.pressable,
+                    props.pressableStyle,
+                    Platform.select({
+                        ios: { opacity: pressed ? 0.3 : 1},
+                    }),
+                ]}
                 onPress={props.onPress}
-                android_ripple={{color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)'}}
+                android_ripple={{ color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)' }}
             >
                 {props.children ? props.children :
                     <Text style={[TextTheme.titleSmall, styles.buttonLabel, props.textStyle]}>
