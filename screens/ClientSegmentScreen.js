@@ -75,6 +75,7 @@ export default function ClientSegmentScreen() {
 
             <ClientInfoModal
                 visible={isClientInfoModalVisible}
+                setVisible={setIsClientInfoModalVisible}
                 closeModal={() => setIsClientInfoModalVisible(false)}
                 name={clientName}
                 phone={clientPhone}

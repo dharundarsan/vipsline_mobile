@@ -1,7 +1,6 @@
 import {View, Text, StyleSheet, FlatList} from 'react-native';
 import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
-import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
 import {Entypo} from "@expo/vector-icons";
 import ItemCount from "../../ui/ItemCount";
@@ -34,7 +33,9 @@ export default function ClientInfoCategories(props) {
                     }
                     ]}
                 pressableStyle={styles.pressableStyle}
-                onPress={props.onPress}
+                onPress={ () => {
+                    props.onPress(itemData.item.id)
+                }}
             >
                 <View style={styles.innerContainer}>
                     <View style={{flexDirection: "row", alignItems: "center",}}>

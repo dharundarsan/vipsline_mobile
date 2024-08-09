@@ -22,6 +22,7 @@ export default function clientSalesInfo(props) {
                 buttonStyle={styles.statisticsButton}
                 textStyle={styles.buttonText}
                 rippleColor={Colors.white}
+                onPress={props.onPress}
             />
 
         </View>
