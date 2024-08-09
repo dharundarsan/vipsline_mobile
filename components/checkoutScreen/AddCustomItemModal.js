@@ -1,4 +1,4 @@
-import {Modal, StyleSheet, Text, TextInput, View} from "react-native";
+import {Modal, Platform, StyleSheet, Text, TextInput, View} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
+        marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
     },

@@ -20,8 +20,6 @@ const MembershipsAndPackagesList = (props) => {
     const [filteredData, setFilteredData] = useState(data);
     const [tempSelectedItems, setTempSelectedItems] = useState([]);
 
-    console.log(data);
-
     const addToTempSelectedItems = (item) => {
         setTempSelectedItems((prevState) => [...prevState, item]);
     }

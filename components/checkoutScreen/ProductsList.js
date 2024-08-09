@@ -18,7 +18,6 @@ const ProductsList = (props) => {
     const [tempSelectedItems, setTempSelectedItems] = useState([]);
 
 
-
     const addToTempSelectedItems = (item) => {
         setTempSelectedItems((prevState) => [...prevState, item]);
     }
@@ -30,8 +29,17 @@ const ProductsList = (props) => {
 
             Object.keys(categoryObj).forEach((category) => {
                 const filteredProducts = categoryObj[category].filter((product) => {
+                    // console.log(product.discounted_price);
+                    // if (product.discounted_price) {
+                    //     return product.name.toLowerCase().includes(lowerCaseFilterValue) ||
+                    //         product.price.toString().includes(filterValue);
+                    // } else {
+                    //     return product.name.toLowerCase().includes(lowerCaseFilterValue) ||
+                    //         product.price.toString().includes(filterValue) || product.discounted_price.toString().includes(filterValue);
+                    // }
                     return product.name.toLowerCase().includes(lowerCaseFilterValue) ||
-                        product.price.toString().includes(filterValue);
+                        product.price.toString().includes(filterValue) || product.discounted_price.toString().includes(filterValue);
+
                 });
 
                 if (filteredProducts.length > 0) {
@@ -51,7 +59,6 @@ const ProductsList = (props) => {
             products: categoryObj[key]
         }))
     ).flat();
-
     return (
         <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>
@@ -66,9 +73,15 @@ const ProductsList = (props) => {
             <ScrollView style={styles.flatListContainer} fadingEdgeLength={75}>
                 {transformedData.map((item, index) => (
                     <View key={index}>
-                        <Text style={[textTheme.titleMedium, styles.parentCategoryText]}>
-                            {item.parent_category}
-                        </Text>
+                        <View style={styles.parentCategoryAndProductsLengthContainer}>
+                            <Text style={[textTheme.titleMedium, styles.parentCategoryText]}>
+                                {item.parent_category}
+                            </Text>
+                            <View style={styles.productsLengthContainer}>
+                                <Text
+                                    style={[textTheme.titleMedium, styles.productsLengthText]}>{item.products.length}</Text>
+                            </View>
+                        </View>
                         <FlatList
                             data={item.products}
                             renderItem={({item}) => <ProductItem data={item}
@@ -98,13 +111,25 @@ const styles = StyleSheet.create({
     headingText: {
         marginBottom: 10
     },
-    parentCategoryText: {
-        marginHorizontal: 10,
-        marginVertical: 5,
-    },
+    parentCategoryText: {},
     flatListContainer: {
-        marginBottom: 120,
-    }
+        // marginBottom: 120,
+    },
+    parentCategoryAndProductsLengthContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginHorizontal: 40,
+        marginVertical: 25,
+        gap: 10,
+    },
+    productsLengthContainer: {
+        borderColor: Colors.black,
+        borderWidth: 1,
+        borderRadius: 100,
+        paddingVertical: 0,
+        paddingHorizontal: 6,
+    },
+    productsLengthText: {}
 });
 
 export default ProductsList;

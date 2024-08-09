@@ -203,6 +203,7 @@ const styles = StyleSheet.create({
     textInput: {
         flexDirection: "row",
         alignItems: "center",
+        textAlignVertical:"center",
         borderWidth: 1,
         borderRadius: 5,
         paddingRight: 20,

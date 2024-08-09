@@ -63,7 +63,7 @@ const ServicesList = React.memo(() => {
         setFilteredGeneralServicesData(filteredGeneral);
     }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
 
-
+console.log(filteredWomenServicesData)
     return (
         isFetching ?
             <View style={{
@@ -91,7 +91,7 @@ const ServicesList = React.memo(() => {
                             <FlatList data={filteredWomenServicesData}
                                       scrollEnabled={false}
                                       renderItem={({item}) => {
-                                          return <>
+                                          return item.resource_categories.length === 0 ? <></> : <>
                                               <View style={styles.parentCategoryAndGenderContainer}>
                                                   <Text
                                                       style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
@@ -115,7 +115,7 @@ const ServicesList = React.memo(() => {
                             <FlatList data={filteredMenServicesData}
                                       scrollEnabled={false}
                                       renderItem={({item}) => {
-                                          return <>
+                                          return item.resource_categories.length === 0 ? <></> : <>
                                               <View style={styles.parentCategoryAndGenderContainer}>
                                                   <Text
                                                       style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
@@ -139,7 +139,7 @@ const ServicesList = React.memo(() => {
                             <FlatList data={filteredKidsServicesData}
                                       scrollEnabled={false}
                                       renderItem={({item}) => {
-                                          return <>
+                                          return item.resource_categories.length === 0 ? <></> : <>
                                               <View style={styles.parentCategoryAndGenderContainer}>
                                                   <Text
                                                       style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
@@ -163,7 +163,7 @@ const ServicesList = React.memo(() => {
                             <FlatList data={filteredGeneralServicesData}
                                       scrollEnabled={false}
                                       renderItem={({item}) => {
-                                          return <>
+                                          return item.resource_categories.length === 0 ? <></> : <>
                                               <View style={styles.parentCategoryAndGenderContainer}>
                                                   <Text
                                                       style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>

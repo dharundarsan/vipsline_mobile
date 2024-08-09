@@ -38,5 +38,6 @@ const Colors = {
     inactiveClient: "#d5d7da",
     churnClient: "#fff0d1",
     allLeads: "#9ddde0",
+    errorContainer: "rgba(229,53,64,0.65)"
 };
 export default Colors;

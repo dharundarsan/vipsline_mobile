@@ -2,7 +2,7 @@ import React, {useState, useRef, useEffect} from "react";
 import {
     BackHandler,
     FlatList,
-    Modal,
+    Modal, Platform,
     Pressable,
     StyleSheet,
     Text,
@@ -57,6 +57,7 @@ const AddItemModal = (props) => {
             flex: 1,
         },
         backAndCloseContainer: {
+            marginTop: Platform.OS === "ios" ? 50 : 0,
             height: 60,
             flexDirection: "row",
             justifyContent: selectedCategory == null ? "" : "space-between",
@@ -209,7 +210,7 @@ const AddItemModal = (props) => {
         >
             <View style={styles.backAndCloseContainer}>
                 {
-                    selectedCategory == null ? null : <PrimaryButton
+                    selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
                         buttonStyle={styles.backButton}
                         onPress={() => {
                             setSelectedCategory(null);
@@ -220,7 +221,7 @@ const AddItemModal = (props) => {
                 }
                 <View style={styles.newSaleTextContainer}>
                     <Text
-                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
+                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem"  ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
                 </View>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}

@@ -1,4 +1,4 @@
-import {FlatList, Modal, StyleSheet, Text, View} from "react-native";
+import {FlatList, Modal, Platform, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {AntDesign, Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
@@ -12,6 +12,7 @@ import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
+import {SafeAreaView} from "react-native-safe-area-context";
 
 const AddClientModal = (props) => {
 
@@ -21,10 +22,10 @@ const AddClientModal = (props) => {
     const dispatch = useDispatch();
 
     return <>
-        <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
-            setIsCreateClientModalVisible(false)
-        }}/>
         <Modal visible={props.isVisible} animationType={"slide"}>
+            <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
+                setIsCreateClientModalVisible(false)
+            }}/>
             <View style={styles.closeAndHeadingContainer}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
                 <PrimaryButton
@@ -59,6 +60,7 @@ const AddClientModal = (props) => {
 
 const styles = StyleSheet.create({
     closeAndHeadingContainer: {
+        marginTop: Platform.OS === "ios" ? 50 : 0,
         justifyContent: "center",
         alignItems: "center",
         height: 60,

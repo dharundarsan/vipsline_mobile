@@ -14,7 +14,6 @@ import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
 import store from './store/store';
 import Colors from './constants/Colors';
 import {enableScreens} from "react-native-screens";
-import Toast from 'react-native-toast-message';
 
 // Drawer icon imports
 import calender_icon from "./assets/icons/drawerIcons/calendar.png";
@@ -62,7 +61,7 @@ export default function App() {
         <Provider store={store}>
             <SafeAreaView style={styles.safeAreaView}>
                 <NavigationContainer>
-                    <StatusBar style="light" backgroundColor={Colors.darkBlue}/>
+                    <StatusBar style={"dark"}/>
                     <Drawer.Navigator
                         initialRouteName="Checkout"
                         drawerContent={(props) => <CustomDrawer {...props} />}
