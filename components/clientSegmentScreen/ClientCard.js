@@ -13,10 +13,10 @@ export default function ClientCard(props) {
     return (<>
             <Pressable
                 style={[styles.card, props.card]}
-                android_ripple={{color: Colors.ripple}}
+                android_ripple={{color: props.rippleColor ? props.rippleColor : Colors.ripple}}
                 onPress={props.onPress}
             >
-                <View style={[styles.innerContainer]}>
+                <View style={[styles.innerContainer, props.cardInnerContainer]}>
                     <View style={[styles.clientProfile, props.clientProfile]}>
                         <Text
                             style={[styles.text, props.avatarText]}>
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     innerContainer: {
         marginLeft: 16,
         flexDirection: 'row',
-        alignItems: "center"
+        alignItems: "center",
     },
     clientDetailsContainer: {
         marginLeft: 16,
