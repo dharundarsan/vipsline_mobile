@@ -1,43 +1,35 @@
-import {View, Text, StyleSheet, Modal} from "react-native";
-import textTheme from "../../constants/TextTheme";
-import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
-import React from "react";
+import {View, StyleSheet} from "react-native";
 import Colors from "../../constants/Colors";
-import Divider from "../../ui/Divider";
-import ClientCard from "./ClientCard";
+import ClientStatistics from "./ClientStatistics";
 
 
 export default function ClientDetailedInfoModal(props) {
+
+
+    let content;
+    const selectedCategory = props.selectedCategory;
+    if(selectedCategory === "seeMoreStats") {
+        content = <ClientStatistics
+            title={selectedCategory}
+        />;
+    }
+    else {
+        content = <View></View>;
+    }
+
     return(
-        <Modal visible={props.modalVisiblity}>
-            <View style={styles.closeAndHeadingContainer}>
-                <ClientCard
-                    name={props.clientName}
-                    card={styles.clientProfileCard}
-                    cardInnerContainer={styles.cardInnerContainer}
-                    rippleColor={Colors.white}
-                />
-                <PrimaryButton
-                    buttonStyle={styles.closeButton}
-                    pressableStyle={styles.closeButtonPressable}
-                    onPress={props.closeModal}
-                >
-                    <Ionicons name="close" size={25} color="black"/>
-                </PrimaryButton>
-            </View>
-            <Divider />
+        <>
             <View style={styles.modalContent}>
-
+                {content}
             </View>
-
-        </Modal>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     modalContent: {
         flex: 1,
+        alignItems: "center",
     },
     closeAndHeadingContainer: {
         justifyContent: "center",
@@ -60,12 +52,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         alignItems: "center"
     },
-    clientProfileCard: {
-        paddingVertical: 0,
-        paddingHorizontal: 0,
-        width: 'auto'
-    },
-    cardInnerContainer: {
-        marginLeft: 0
-    }
+    statisticsCard: {},
+
 })

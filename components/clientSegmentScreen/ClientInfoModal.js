@@ -1,43 +1,32 @@
 import {Modal, Text, View, StyleSheet, ScrollView} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Feather, Ionicons} from "@expo/vector-icons";
+import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
 import ClientDetailedInfoModal from "./ClientDetailedInfoModal";
-import {useState} from "react";
+import React, {useState} from "react";
+import Divider from "../../ui/Divider";
+
 
 export default function clientInfoModal(props) {
-    const [categoryPressed, setCategoryPressed] = useState(false);
+    const [clientMoreDetails, setClientMoreDetails] = useState(null);
 
-    function clientInfoCategoryPressHandler() {
-        setCategoryPressed(true);
+    function clientInfoCategoryPressHandler(id) {
+        console.log(id);
+        setClientMoreDetails(id);
     }
-
-    function closeDetailedInfoModalHandler() {
-        setCategoryPressed(false);
+    function seeMoreStatisticsHandler() {
+        console.log("seeMoreStatisticsHandler");
+        setClientMoreDetails("seeMoreStats");
     }
+    let content;
 
-    return (
-        <Modal visible={props.visible} animationType={"slide"}>
-            <ClientDetailedInfoModal
-                modalVisiblity={categoryPressed}
-                clientName={props.name}
-                closeModal={closeDetailedInfoModalHandler}
-            />
-            <View style={styles.closeAndHeadingContainer}>
-                <PrimaryButton
-                    buttonStyle={styles.closeButton}
-                    pressableStyle={styles.closeButtonPressable}
-                    onPress={props.closeModal}
-                >
-                    <Ionicons name="close" size={25} color="black"/>
-                </PrimaryButton>
-            </View>
-            <ScrollView>
+    if(clientMoreDetails === null) {
+        content = <ScrollView>
             <View style={styles.modalContent}>
                 <ClientCard
                     name={props.name}
@@ -68,17 +57,72 @@ export default function clientInfoModal(props) {
                     totalSales={7000}
                     lastVisit={"25 August 2024"}
                     salesCard={styles.salesCard}
+                    onPress={seeMoreStatisticsHandler}
                 />
 
                 <View style={styles.clientInfoCategoryContainer}>
                     <ClientInfoCategories
                         onPress={clientInfoCategoryPressHandler}
-
                     />
                 </View>
             </View>
-            </ScrollView>
+        </ScrollView>
 
+    }
+    else if(clientMoreDetails === "seeMoreStats") {
+        content = <ClientDetailedInfoModal
+            selectedCategory={clientMoreDetails}
+        />
+    }
+    else if(clientMoreDetails === "clientDetails") {
+        content = <ClientDetailedInfoModal
+            selectedCategory={clientMoreDetails}
+        />
+    }
+
+    return (
+        <Modal visible={props.visible} animationType={"slide"}>
+            <View style={styles.closeAndHeadingContainer}>
+                {
+                    clientMoreDetails === null ?
+                        null :
+                        <PrimaryButton
+                            buttonStyle={styles.backButton}
+                            onPress={() => {
+                                setClientMoreDetails(null);
+                            }}
+                        >
+                            <AntDesign name="arrowleft" size={24} color="black"/>
+                        </PrimaryButton>
+                }
+
+                <PrimaryButton
+                    buttonStyle={styles.closeButton}
+                    pressableStyle={styles.closeButtonPressable}
+                    onPress={props.closeModal}
+                >
+                    <Ionicons name="close" size={25} color="black"/>
+                </PrimaryButton>
+                {
+                    clientMoreDetails === null ?
+                        null :
+                    <ClientCard
+                        name={props.name}
+                        card={styles.clientProfileCard}
+                        cardInnerContainer={styles.cardInnerContainer}
+                        rippleColor={Colors.white}
+                    />
+                }
+
+            </View>
+            {
+                clientMoreDetails === null ?
+                    null :
+                    <>
+                    <Divider />
+                    </>
+            }
+            {content}
 
         </Modal>
     );
@@ -150,5 +194,18 @@ const styles = StyleSheet.create({
         marginTop: 16,
         overflow: 'hidden',
         marginBottom: 32
-    }
+    },
+    backButton: {
+        position: "absolute",
+        left: 0,
+        backgroundColor: Colors.background,
+    },
+    clientProfileCard: {
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        width: 'auto'
+    },
+    cardInnerContainer: {
+        marginLeft: 0
+    },
 })
