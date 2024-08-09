@@ -14,7 +14,9 @@ export default function ClientCard(props) {
             <Pressable
                 style={[styles.card, props.card]}
                 android_ripple={{color: props.rippleColor ? props.rippleColor : Colors.ripple}}
-                onPress={props.onPress}
+                onPress={() => {
+                    props.onPress(props.clientId)
+                }}
             >
                 <View style={[styles.innerContainer, props.cardInnerContainer]}>
                     <View style={[styles.clientProfile, props.clientProfile]}>
@@ -29,7 +31,8 @@ export default function ClientCard(props) {
                             props.name !== undefined ? <Text style={[styles.name, props.nameText]}>{name}</Text> : null
                         }
                         {
-                            props.phone !== undefined ? < Text style={[styles.phone, props.phoneText]}>{phone}</Text> : null
+                            props.phone !== undefined ?
+                                < Text style={[styles.phone, props.phoneText]}>{phone}</Text> : null
                         }
                         {
                             email !== undefined && email !== null && email.trim().length !== 0 ?
@@ -53,8 +56,8 @@ export default function ClientCard(props) {
 const styles = StyleSheet.create({
     card: {
         width: '100%',
-        paddingVertical:20,
-        paddingHorizontal:10,
+        paddingVertical: 20,
+        paddingHorizontal: 10,
         justifyContent: 'center',
     },
     clientProfile: {

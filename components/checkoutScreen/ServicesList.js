@@ -63,7 +63,6 @@ const ServicesList = React.memo(() => {
         setFilteredGeneralServicesData(filteredGeneral);
     }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
 
-console.log(filteredWomenServicesData)
     return (
         isFetching ?
             <View style={{

@@ -12,6 +12,6 @@ export default async function createNewClientAPI(data) {
                 }
             })
     } catch (e) {
-        throw e.response.data.other_message
+        throw e.response.data.other_message;
     }
 }
