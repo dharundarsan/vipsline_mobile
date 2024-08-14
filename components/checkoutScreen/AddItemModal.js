@@ -29,6 +29,7 @@ import MembershipsAndPackagesList from "./MembershipsAndPackagesList";
 import textTheme from "../../constants/TextTheme";
 import {capitalizeFirstLetter, formatDate} from "../../util/Helpers";
 import AddCustomItemModal from "./AddCustomItemModal";
+import PrepaidModal from "./PrepaidModal";
 
 
 const modalCategoryListData = [
@@ -36,7 +37,7 @@ const modalCategoryListData = [
     {id: "products", title: "PRODUCTS"},
     {id: "customItem", title: "CUSTOM ITEM"},
     {id: "memberships", title: "MEMBERSHIP"},
-    {id: 4, title: "PREPAID"},
+    {id: "prepaid", title: "PREPAID"},
     {id: "packages", title: "PACKAGES"},
     // {id: 6, title: "GIFT VOUCHER"},
 ];
@@ -132,11 +133,11 @@ const AddItemModal = (props) => {
                         <Text style={TextTheme.titleMedium}>
                             {formatDate(selectedDate)}
                         </Text>
-                            <MaterialCommunityIcons
-                                name="calendar-month-outline"
-                                size={24}
-                                color={Colors.darkBlue}
-                            />
+                        <MaterialCommunityIcons
+                            name="calendar-month-outline"
+                            size={24}
+                            color={Colors.darkBlue}
+                        />
                     </Pressable>
                     {isDatePickerVisible && (
                         <RNDateTimePicker
@@ -200,6 +201,10 @@ const AddItemModal = (props) => {
         content = <AddCustomItemModal isVisible={true} onCloseModal={() => {
             setSelectedCategory(null)
         }}/>
+    } else if (selectedCategory === "prepaid") {
+        content = <PrepaidModal isVisible={true} onCloseModal={() => {
+            setSelectedCategory(null)
+        }}/>
     }
 
     return (
@@ -221,7 +226,7 @@ const AddItemModal = (props) => {
                 }
                 <View style={styles.newSaleTextContainer}>
                     <Text
-                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem"  ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
+                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
                 </View>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}

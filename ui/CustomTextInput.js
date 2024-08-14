@@ -160,7 +160,7 @@ const CustomTextInput = (props) => {
                         onChange={(event, selectedDate) => {
                             setIsDateTimePickerVisible(false);
                             if (selectedDate) {
-                                props.onChange(selectedDate.getTime());
+                                props.onChangeValue(new Date(selectedDate.getTime()));
                             }
                         }}
                     />
