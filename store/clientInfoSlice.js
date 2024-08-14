@@ -23,7 +23,7 @@ export const loadClientInfoFromDb = (clientId) => async (dispatch) => {
         );
         dispatch(setDetails(response.data.data[0]));
     } catch (error) {
-        console.error("Error fetching data: " + error);
+        console.error("Error fetching data client info slice: " + error);
     }
 };
 

@@ -9,15 +9,18 @@ import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import ClientFiltersCategories from "../components/clientSegmentScreen/ClientFiltersCategories";
 import ClientCard from "../components/clientSegmentScreen/ClientCard";
 import SearchBar from "../ui/SearchBar";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import AddClient from "../components/clientSegmentScreen/AddClient";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
 import Pagination from "../components/clientSegmentScreen/Pagination";
 import {Bullets} from "react-native-easy-content-loader";
 import ClientInfoModal from "../components/clientSegmentScreen/ClientInfoModal";
+import {loadClientInfoFromDb} from "../store/clientInfoSlice";
 
 
 export default function ClientSegmentScreen() {
+
+    const dispatch = useDispatch();
     const [filterPressed, setFilterPressed] = useState("all_clients_count");
 
     const filterClientsList = useSelector(state => state.clientFilter.clients);
@@ -34,6 +37,8 @@ export default function ClientSegmentScreen() {
     const [clientName, setClientName] = useState("");
     const [clientPhone, setClientPhone] = useState("");
 
+    const [clientId, setClientId] = useState("");
+
     function renderItem(itemData) {
         return (
             <ClientCard
@@ -43,6 +48,7 @@ export default function ClientSegmentScreen() {
                 onPress={() => {
                     clientInfoHandler();
                     clientNamePhoneHandler(itemData.item.name, itemData.item.mobile);
+                    dispatch(loadClientInfoFromDb(itemData.item.id));
                 }}
                 divider={true}
             />
@@ -76,9 +82,13 @@ export default function ClientSegmentScreen() {
             <ClientInfoModal
                 visible={isClientInfoModalVisible}
                 setVisible={setIsClientInfoModalVisible}
-                closeModal={() => setIsClientInfoModalVisible(false)}
+                closeModal={() => {
+                    setIsClientInfoModalVisible(false)
+
+                }}
                 name={clientName}
                 phone={clientPhone}
+                id={clientId}
             />
 
             <AddClient/>

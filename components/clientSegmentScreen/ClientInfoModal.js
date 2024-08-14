@@ -7,12 +7,29 @@ import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
-import ClientDetailedInfoModal from "./ClientDetailedInfoModal";
-import React, {useState} from "react";
+import {useState} from "react";
 import Divider from "../../ui/Divider";
+import ClientStatistics from "./ClientStatistics";
+import ClientDetails from "./ClientDetails";
+
+
+
+const getCategoryTitle =
+    {"clientDetails": "Client details",
+        "billActivity": "Bill activity",
+        "appointments": "Appointments",
+        "memberships": "Memberships",
+        "packageSales": "Package sales",
+        "prepaidSales": "Prepaid sales",
+        "review": "Review",
+        "giftVoucher": "Gift Voucher",
+        "seeMoreStats": "Statistics"
+    }
 
 
 export default function clientInfoModal(props) {
+
+
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
 
     function clientInfoCategoryPressHandler(id) {
@@ -70,14 +87,17 @@ export default function clientInfoModal(props) {
 
     }
     else if(clientMoreDetails === "seeMoreStats") {
-        content = <ClientDetailedInfoModal
-            selectedCategory={clientMoreDetails}
-        />
+        content =
+            <ClientStatistics
+                title={getCategoryTitle[clientMoreDetails]}
+            />
     }
     else if(clientMoreDetails === "clientDetails") {
-        content = <ClientDetailedInfoModal
-            selectedCategory={clientMoreDetails}
-        />
+        content =
+            <ClientDetails
+                title={getCategoryTitle[clientMoreDetails]}
+
+            />
     }
 
     return (
@@ -99,7 +119,10 @@ export default function clientInfoModal(props) {
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     pressableStyle={styles.closeButtonPressable}
-                    onPress={props.closeModal}
+                    onPress={() => {
+                        props.closeModal();
+                        setClientMoreDetails(null);
+                    }}
                 >
                     <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
