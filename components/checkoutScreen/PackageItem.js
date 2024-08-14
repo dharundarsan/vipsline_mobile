@@ -5,9 +5,12 @@ import textTheme from "../../constants/TextTheme";
 import {capitalizeFirstLetter} from "../../util/Helpers";
 import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import PackageModal from "./PackageModal";
+import {useState} from "react";
 
 const PackageItem = (props) => {
     const dispatch = useDispatch();
+    const [isPackageModalVisible, setIsPackageModalVisible] = useState(false);
 
     const styles = StyleSheet.create({
         packageItemButton: {
@@ -53,8 +56,10 @@ const PackageItem = (props) => {
     return <PrimaryButton buttonStyle={styles.packageItemButton} pressableStyle={styles.packageItemPressable}
                           onPress={() => {
                               props.addToTempSelectedItems(props.data);
+                              setIsPackageModalVisible(true);
                               dispatch(addItemToCart(props.data));
                           }}>
+        <PackageModal isVisible={isPackageModalVisible} data={props.data} onCloseModal={()=>{setIsPackageModalVisible(false)}} />
         <View style={styles.leftBar}></View>
         <View style={styles.packageItemInnerContainer}>
             <Text style={[styles.nameText, textTheme.titleMedium]}>{capitalizeFirstLetter(props.data.name)}</Text>
