@@ -17,23 +17,6 @@ const totalSalesPrice = "7000"
 
 export default function ClientStatistics(props) {
 
-    const [title, setTitle] = useState("");
-
-    useEffect(() => {
-        const getCategoryTitle =
-            {"clientDetails": "Client details",
-            "billActivity": "Bill activity",
-            "appointments": "Appointments",
-            "memberships": "Memberships",
-            "packageSales": "Package sales",
-            "prepaidSales": "Prepaid sales",
-            "review": "Review",
-            "giftVoucher": "Gift Voucher",
-            "seeMoreStats": "Statistics"}
-        setTitle(getCategoryTitle[props.title]);
-        console.log("called" + title)
-
-    }, [props.title]);
 
 
     function renderItem(itemData) {
@@ -50,10 +33,10 @@ export default function ClientStatistics(props) {
     }
 
     return (
-        <>
+        <View style={styles.statistics}>
             <View style={styles.titleContainer}>
                 <Text style={[textTheme.titleMedium, styles.title]}>
-                    {title}
+                    {props.title}
                 </Text>
             </View>
 
@@ -71,15 +54,19 @@ export default function ClientStatistics(props) {
                     style={{width: '100%'}}
                 />
             </View>
-        </>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    statistics: {
+        flex: 1,
+        alignItems: "center",
+    },
     salesStatisticsCard: {
         width: "95%",
         flexDirection: 'row',
-        marginTop: 64,
+        marginTop: 32,
         height: 95
     },
     statisticsCardOuterContainer: {

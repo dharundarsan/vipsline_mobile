@@ -2,12 +2,31 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {Text, View, StyleSheet} from "react-native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Colors from "../../constants/Colors";
-import React from "react";
+import React, {useState} from "react";
+import CreateClientModal from "../checkoutScreen/CreateClientModal";
+import {loadClientsFromDb} from "../../store/clientSlice";
+import {useDispatch} from "react-redux";
 
 export default function AddClient() {
+    const dispatch = useDispatch();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
     return(
         <View style={styles.addClientContainer}>
-            <PrimaryButton buttonStyle={styles.addClientButton}>
+            <CreateClientModal
+                isVisible={isModalVisible}
+                onCloseModal={() => {
+                    setIsModalVisible(false);
+                    dispatch(loadClientsFromDb());
+                }}
+
+            />
+            <PrimaryButton
+                buttonStyle={styles.addClientButton}
+                onPress={() => {
+                    setIsModalVisible(true);
+                }}
+            >
                 <View style={{flexDirection: 'row'}}>
                     <View style={styles.addTextContainer}>
                         <Text style={styles.addText}>Add </Text>
