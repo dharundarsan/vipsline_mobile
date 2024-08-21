@@ -30,15 +30,15 @@ const ProductItem = (props) => {
             flexDirection: "row",
             justifyContent: "space-between"
         },
-        nameText:{
+        nameText: {
             color: props.data.showAlert ? Colors.white : Colors.black,
         },
         priceContainer: {
             flexDirection: "row",
             gap: 15,
         },
-        priceText:{
-             color: props.data.showAlert ? Colors.white : Colors.black,
+        priceText: {
+            color: props.data.showAlert ? Colors.white : Colors.black,
         },
         lineThroughPrice: {
             textDecorationLine: "line-through",
@@ -54,13 +54,11 @@ const ProductItem = (props) => {
         }
     });
 
-    console.log(props.data.barCode + props.data.available_quantity);
-
     return <PrimaryButton buttonStyle={styles.selectProductItemButton}
                           pressableStyle={styles.selectProductItemPressable}
                           onPress={() => {
                               props.addToTempSelectedItems(props.data);
-                              dispatch(addItemToCart(props.data));
+                              dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
                           }}
     >
         <View style={styles.nameAndPriceContainer}>
@@ -71,7 +69,8 @@ const ProductItem = (props) => {
                         <Text style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + props.data.price}</Text>
                     </> : <>
                         <Text style={[textTheme.titleSmall, styles.lineThroughPrice]}>{"₹ " + props.data.price}</Text>
-                        <Text style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + props.data.discounted_price}</Text>
+                        <Text
+                            style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + props.data.discounted_price}</Text>
                     </>
                 }
             </View>

@@ -7,6 +7,7 @@ import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {addItemToCart} from "../../store/cartSlice";
+import {useDispatch} from "react-redux";
 
 const PrepaidModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
@@ -14,6 +15,7 @@ const PrepaidModal = (props) => {
     const [prepaidAmount, setPrepaidAmount] = useState()
     const [prepaidBonus, setPrepaidBonus] = useState()
     const [description, setDescription] = useState()
+    const dispatch = useDispatch();
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Prepaid</Text>
@@ -49,7 +51,11 @@ const PrepaidModal = (props) => {
         <View style={styles.saveButtonContainer}>
             <PrimaryButton onPress={() => {
                 props.onCloseModal();
-                dispatch(addItemToCart(props.data));
+                dispatch(addItemToCart({
+                    description: description,
+                    wallet_amount: prepaidAmount,
+                    wallet_bonus: prepaidBonus
+                }));
             }} label={"Save"}/>
         </View>
     </Modal>
@@ -78,22 +84,22 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 15,
     },
-    noteContainer:{
-        borderRadius:5,
+    noteContainer: {
+        borderRadius: 5,
         backgroundColor: Colors.grey100,
-        overflow:"hidden",
-        padding:10,
+        overflow: "hidden",
+        padding: 10,
     },
-    noteLeftBar:{
+    noteLeftBar: {
         position: "absolute",
         backgroundColor: Colors.highlight,
         width: 2,
         height: "200%",
         left: 0,
     },
-    totalCreditText:{
-        alignSelf:"flex-end",
-        marginTop:20,
+    totalCreditText: {
+        alignSelf: "flex-end",
+        marginTop: 20,
     },
     saveButtonContainer: {
         marginHorizontal: 30,

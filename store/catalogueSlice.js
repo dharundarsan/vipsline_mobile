@@ -62,7 +62,7 @@ export const loadProductsDataFromDb = () => async (dispatch) => {
 export const loadMembershipsDataFromDb = () => async (dispatch) => {
     try {
         const response = await axios.post(
-             process.env.EXPO_PUBLIC_API_URI + "/package/getListOfPackagesByBusiness",
+             process.env.EXPO_PUBLIC_API_URI + "/membership/getListOfMembershipByBusiness",
             {
                 business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
             },

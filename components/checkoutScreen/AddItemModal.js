@@ -194,11 +194,11 @@ const AddItemModal = (props) => {
     } else if (selectedCategory === "products") {
         content = <ProductsList/>
     } else if (selectedCategory === "memberships") {
-        content = <MembershipsAndPackagesList category={selectedCategory}/>
+        content = <MembershipsAndPackagesList category={"memberships"}/>
     } else if (selectedCategory === "packages") {
-        content = <MembershipsAndPackagesList category={selectedCategory}/>
+        content = <MembershipsAndPackagesList category={"packages"}/>
     } else if (selectedCategory === "customItem") {
-        content = <AddCustomItemModal isVisible={true} onCloseModal={() => {
+        content = <AddCustomItemModal addCustomItems={props.addCustomItems} isVisible={true} onCloseModal={() => {
             setSelectedCategory(null)
         }}/>
     } else if (selectedCategory === "prepaid") {

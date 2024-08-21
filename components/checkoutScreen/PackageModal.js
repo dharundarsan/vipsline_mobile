@@ -8,10 +8,28 @@ import Divider from "../../ui/Divider";
 import axios from "axios";
 import {formatDate} from "../../util/Helpers";
 import Entypo from '@expo/vector-icons/Entypo';
-import {addItemToCart} from "../../store/cartSlice";
+import {addItemToCart, loadCartFromDB} from "../../store/cartSlice";
+import packageSittingItem from "./PackageSittingItem";
+import PackageSittingItem from "./PackageSittingItem";
+import {useDispatch} from "react-redux";
 
 const PackageModal = (props) => {
     const [packageDetails, setPackageDetails] = useState([]);
+    const [selectedSittingItems, setSelectedSittingItems] = useState([]);
+    const dispatch = useDispatch();
+
+    const addSittingItems = (item) => {
+        setSelectedSittingItems(prev => [...prev, item]);
+        console.log(selectedSittingItems);
+    }
+
+    // const deleteSittingItems = (item) => {
+    //     setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
+    // }
+    useEffect(() => {
+        console.log(selectedSittingItems);
+
+    }, [selectedSittingItems]);
 
     useEffect(() => {
         const getPackageDetailsFromDB = async () => {
@@ -60,42 +78,23 @@ const PackageModal = (props) => {
                 </View>
                 {packageDetails.length === 0 ? <ActivityIndicator/> :
                     <FlatList scrollEnabled={false} data={packageDetails[0].service_list}
-                              renderItem={({item}) => <View style={styles.editPackageItem}>
-                                  <Text style={[textTheme.titleMedium]}>{item.name}</Text>
-                                  <View style={styles.editPackageItemInnerRow}>
-                                      <View style={styles.quantityDetailsContainer}>
-                                          <Text style={[textTheme.bodySmall]}>Total
-                                              Sessions {item.total_quantity}</Text>
-                                          <Text style={[textTheme.bodySmall]}>Available
-                                              Sessions {item.available_quantity}</Text>
-                                      </View>
-                                      <View style={styles.quantityToggleContainer}>
-                                          <PrimaryButton buttonStyle={[styles.toggleButton, {
-                                              borderBottomRightRadius: 0,
-                                              borderTopRightRadius: 0
-                                          }]}
-                                                         pressableStyle={styles.togglePressable}>
-                                              <Entypo name="minus" size={18} color="black"/>
-                                          </PrimaryButton>
-                                          <Text>100</Text>
-                                          <PrimaryButton buttonStyle={[styles.toggleButton, {
-                                              borderBottomLeftRadius: 0,
-                                              borderTopLeftRadius: 0
-                                          }]}
-                                                         pressableStyle={styles.togglePressable}>
-                                              <Entypo name="plus" size={18} color="black"/>
-                                          </PrimaryButton>
-                                      </View>
-                                  </View>
-                              </View>}/>
+                              renderItem={({item}) => <PackageSittingItem data={item}
+                                                                          addSittingItems={addSittingItems}/>}/>
                 }
             </ScrollView>
         </View>
         <Divider/>
         <View style={styles.saveButtonContainer}>
             <PrimaryButton onPress={() => {
+                dispatch(addItemToCart({package_id: props.data.id}));
+                selectedSittingItems.forEach((item) => {
+                    dispatch(addItemToCart({
+                        package_id: props.data.id,
+                        resource_category: item.res_cat_id,
+                        resource_id: null
+                    }));
+                })
                 props.onCloseModal();
-                dispatch(addItemToCart(props.data));
             }} label={"Save"}/>
         </View>
     </Modal>
@@ -141,38 +140,6 @@ const styles = StyleSheet.create({
         price: {
             fontWeight: "bold",
             marginBottom: 30,
-        },
-        editPackageItem: {
-            borderWidth: 1,
-            borderColor: Colors.grey300,
-            borderRadius: 5,
-            padding: 15,
-            marginBottom: 15,
-        },
-        editPackageItemInnerRow: {
-            flexDirection: "row",
-            justifyContent: "space-between",
-        },
-        quantityDetailsContainer: {
-            marginTop: 8,
-            gap: 5,
-        },
-        quantityToggleContainer: {
-            alignItems: "center",
-            alignSelf: "flex-start",
-            flexDirection: "row",
-            borderWidth: 1,
-            borderColor: Colors.grey300,
-            borderRadius: 5,
-            gap: 10,
-        },
-        toggleButton: {
-            backgroundColor: Colors.grey300,
-            borderRadius: 5,
-        },
-        togglePressable: {
-            paddingHorizontal: 5,
-            paddingVertical: 5,
         },
         saveButtonContainer: {
             marginHorizontal: 30,

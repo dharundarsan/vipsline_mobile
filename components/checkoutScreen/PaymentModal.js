@@ -90,7 +90,7 @@ const PaymentModal = (props) => {
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
                            onPress={() => {
-                               setIsPaymentModalVisible(true)
+                               props.onCloseModal();
                            }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>

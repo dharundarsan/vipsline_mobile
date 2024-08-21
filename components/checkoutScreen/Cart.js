@@ -19,6 +19,16 @@ const Cart = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const cartItems = useSelector((state) => state.cart.items);
+    const [customItems, setCustomItems] = useState([]);
+
+    const addCustomItems = (item) => {
+        setCustomItems(prev => [...prev, {id: Math.floor(10000 + Math.random() * 90000), ...item}]);
+    };
+
+    const removeCustomItems = (id) => {
+        console.log(id);
+        setCustomItems(prev => prev.filter((oldItem) => oldItem.id !== id));
+    };
 
     const openAddItemModal = () => {
         setIsModalVisible(true);
@@ -73,8 +83,9 @@ const Cart = () => {
 
     return (
         <View style={styles.cart}>
-            <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>
-            {cartItems.length === 0 ?
+            <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}
+                          addCustomItems={addCustomItems}/>
+            {cartItems.length === 0 && customItems.length === 0 ?
                 <View style={styles.emptyCartContainer}>
                     <MaterialIcons style={styles.icon} name="add-shopping-cart" size={40} color={Colors.highlight}/>
                     <Text style={[TextTheme.titleMedium, styles.emptyCartText]}>Your cart is empty</Text>
@@ -84,9 +95,9 @@ const Cart = () => {
                 </View> :
                 <>
                     <View style={{flex: 1}}>
-                        <FlatList fadingEdgeLength={50} style={{flexGrow: 0}} data={cartItems}
+                        <FlatList fadingEdgeLength={50} style={{flexGrow: 0}} data={[...cartItems, ...customItems]}
                                   keyExtractor={(item, index) => index}
-                                  renderItem={({item}) => <CartItem data={item}/>}
+                                  renderItem={({item}) => <CartItem data={item} removeCustomItems={removeCustomItems}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>
                             <View style={styles.addItemsWithLogoContainer}>

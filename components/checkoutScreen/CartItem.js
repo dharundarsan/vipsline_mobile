@@ -9,23 +9,25 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import {MaterialIcons} from '@expo/vector-icons';
 import {useDispatch} from "react-redux";
-import {deleteItemFromCart} from "../../store/cartSlice";
+import {deleteItemFromCart, removeItemFromCart} from "../../store/cartSlice";
 
 const CartItem = (props) => {
     const dispatch = useDispatch();
     const removeItemHandler = () => {
-        dispatch(deleteItemFromCart(props.data.key));
+        dispatch(removeItemFromCart(props.data.item_id));
     }
 
     return <>
         <View style={styles.cartItem}>
             <View style={styles.itemNameAndDetailsContainer}>
-                <Text style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.name}</Text>
+                <Text
+                    style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>
                 <View style={styles.itemDetailsContainer}>
                     <Text style={[TextTheme.labelLarge, styles.itemQuantityText]}>1x</Text>
                     <View style={styles.amountContainer}>
                         <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
-                        <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.discounted_price == null ? props.data.price : props.data.discounted_price}</Text>
+                        {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
+                        <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.price}</Text>
                         <PrimaryButton buttonStyle={styles.editAmountButton}
                                        pressableStyle={styles.editAmountPressable}>
                             <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
@@ -33,7 +35,7 @@ const CartItem = (props) => {
                         </PrimaryButton>
                     </View>
                     <PrimaryButton buttonStyle={styles.closeIconButton} pressableStyle={styles.closeIconPressable}
-                                   onPress={removeItemHandler}>
+                                   onPress={props.data.category === "custom_item" ? () => props.removeCustomItems(props.data.id) : removeItemHandler}>
                         <Ionicons name="close" size={24} color="black"/>
                     </PrimaryButton>
                 </View>
@@ -46,10 +48,10 @@ const CartItem = (props) => {
                     </View>
                 </PrimaryButton>
 
-                {/*{props.data.discount_percent === 0 && props.data.discount_amount === 0 ? null :*/}
-                {/*    <Text*/}
-                {/*        style={[textTheme.labelLarge, styles.discountText]}>{props.data.discount_amount !== 0 ? `Discount ${props.data.discount_amount}₹` : `Discount ${props.data.discount_percent}%`}</Text>*/}
-                {/*}*/}
+                {props.data.price - props.data.total_price === 0 ? null :
+                    <Text
+                        style={[textTheme.labelLarge, styles.discountText]}>{`Discount ₹${props.data.price - props.data.total_price}`}</Text>
+                }
             </View>
         </View>
         <Divider/>

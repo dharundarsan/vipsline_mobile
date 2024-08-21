@@ -52,7 +52,7 @@ const ServiceItem = (props) => {
                           pressableStyle={styles.selectServiceItemPressable}
                           onPress={() => {
                               props.addToTempSelectedItems(props.data);
-                              dispatch(addItemToCart(props.data));
+                              dispatch(addItemToCart({resource_category: props.data.id, resource_id: ""}));
                           }}
     >
         <View style={styles.leftBar}></View>

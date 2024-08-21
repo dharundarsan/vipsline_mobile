@@ -105,7 +105,8 @@ const EditMembershipModal = (props) => {
             <View style={styles.addToCartButtonContainer}>
                 <PrimaryButton onPress={() => {
                     props.onCloseModal();
-                    dispatch(addItemToCart(props.data));
+                    console.log(props.data);
+                    dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
                 }} label={"Add to cart"}/>
             </View>
 

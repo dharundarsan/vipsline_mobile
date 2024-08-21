@@ -56,8 +56,6 @@ const MembershipItem = (props) => {
         <EditMembershipModal isVisible={isEditMembershipModalVisible} onCloseModal={closeEditMembershipModal} data={props.data} />
         <PrimaryButton buttonStyle={styles.membershipItemButton} pressableStyle={styles.membershipItemPressable}
                        onPress={() => {
-                           // props.addToTempSelectedItems(props.data);
-                           // dispatch(addItemToCart(props.data));
                            setIsEditMembershipModalVisible(true);
                        }}>
             <View style={styles.leftBar}></View>
