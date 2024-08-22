@@ -3,20 +3,18 @@ import {View, Text, StyleSheet, FlatList} from "react-native"
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useState} from "react";
 
-const StatisticsItems = [
-    {id: "totalVisit", label: "Total Visit", value: "25 August 2024"},
-    {id: "lastVisit", label: "Last Visit", value: "25 August 2024"},
-    {id: "completed", label: "Completed", value: "25"},
-    {id: "canceled", label: "Canceled", value: "23"},
-    {id: "No shows", label: "No shows", value: "23"},
-    {id: "reviews", label: "Reviews", value: "26"},
-]
 
-const totalSales = "Total Sales"
-const totalSalesPrice = "7000"
 
 export default function ClientStatistics(props) {
 
+    const StatisticsItems = [
+        {id: "totalVisit", label: "Total Visit", value: props.totalVisits},
+        {id: "lastVisit", label: "Last Visit", value: props.lastVisit},
+        {id: "completed", label: "Completed", value: props.completedAppointment},
+        {id: "canceled", label: "Canceled", value: props.cancelledAppointment},
+        {id: "No shows", label: "No shows", value: props.noShows},
+        {id: "reviews", label: "Reviews", value: props.feedbackCount},
+    ]
 
 
     function renderItem(itemData) {
@@ -41,8 +39,8 @@ export default function ClientStatistics(props) {
             </View>
 
             <ClientStatisticsCard
-                label={totalSales}
-                value={totalSalesPrice}
+                label={"Total Sales"}
+                value={props.totalSales}
                 containerStyle={styles.salesStatisticsCard}
             />
             <View style={styles.statisticsCardOuterContainer}>

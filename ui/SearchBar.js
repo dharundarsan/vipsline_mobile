@@ -26,6 +26,7 @@ const SearchBar = (props) => {
                    onChangeText={props.onChangeText}
                    placeholderTextColor={Colors.grey400}
                    cursorColor={Colors.black}
+                   value={props.value}
         />
         {props.filter ? <PrimaryButton onPress={props.onFilterPress} buttonStyle={styles.searchFilterButton}
                                        pressableStyle={styles.searchFilterPressable}>

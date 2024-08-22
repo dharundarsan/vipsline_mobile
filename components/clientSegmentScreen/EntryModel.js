@@ -2,8 +2,8 @@ import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import Colors from "../../constants/Colors"
 import {RadioButton} from "react-native-paper";
 import {useEffect, useState} from "react";
-import {useDispatch} from "react-redux";
-import {updateMaxEntry} from "../../store/clientFilterSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {updateMaxEntry, updateSearchClientMaxEntry} from "../../store/clientFilterSlice";
 
 const modalHeight = 180;
 
@@ -13,9 +13,21 @@ export default function EntryModel(props) {
 
     const [checkedNumber, setCheckedNumber] = useState(10);
 
+    const normalMaxEntry = useSelector(state   => state.clientFilter.maxEntry);
+    const searchMaxEntry = useSelector(state   => state.clientFilter.searchMaxEntry);
+
     useEffect(() => {
         setCheckedNumber(10);
     }, [props.filterPressed]);
+
+    useEffect(() => {
+        if(props.query === "") {
+            setCheckedNumber(normalMaxEntry);
+        }
+        else {
+            setCheckedNumber(searchMaxEntry);
+        }
+    }, [normalMaxEntry, searchMaxEntry]);
 
     return (
         <Modal
@@ -38,6 +50,7 @@ export default function EntryModel(props) {
                         setCheckedNumber(10);
                         props.setIsModalVisible(false);
                         dispatch(updateMaxEntry(10));
+                        dispatch(updateSearchClientMaxEntry(10));
 
                     }}
                 />
@@ -51,6 +64,7 @@ export default function EntryModel(props) {
                             setCheckedNumber(25);
                             props.setIsModalVisible(false);
                             dispatch(updateMaxEntry(25));
+                            dispatch(updateSearchClientMaxEntry(25));
 
                         }}
                     />
@@ -64,6 +78,7 @@ export default function EntryModel(props) {
                         setCheckedNumber(50)
                         props.setIsModalVisible(false);
                         dispatch(updateMaxEntry(50));
+                        dispatch(updateSearchClientMaxEntry(50));
                     }}
                 />
                 </View>
@@ -76,6 +91,7 @@ export default function EntryModel(props) {
                         setCheckedNumber(100)
                         props.setIsModalVisible(false);
                         dispatch(updateMaxEntry(100));
+                        dispatch(updateSearchClientMaxEntry(100));
                     }}
                 />
                 </View>

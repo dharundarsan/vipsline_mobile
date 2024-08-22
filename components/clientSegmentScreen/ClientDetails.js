@@ -4,21 +4,48 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useSelector} from "react-redux";
+import {dateFormatter} from "../../util/Helpers";
 
 export default function ClientDetails(props) {
 
     const details = useSelector(state => state.clientInfo.details);
     const name = details.name
     const mobile = details.mobile_1;
-    const altPhone = details.mobile_2 === "" ? "Not selected" : details.mobile_2;
-    const address = details.address === "" ? "Not selected" : details.address;
-    const email = details.username === "" ? "Not selected" : details.username;
-    const gender = details.gender === "" ? "Not selected" : details.gender;
-    const clientSource = details.client_source === "" ? "Not selected" : details.client_source;
-    const anniversary = details.anniversary === null ? "Not selected" : details.anniversary;
-    const clientNotes = details.client_notes === "" ? "Not selected" : details.client_notes;
-    const dob = details.dob === null ? "Not selected" : details.dob;
-    const customerGST = details.customer_gst === null ? "Not selected" : details.customer_gst;
+    const altPhone =
+        details.mobile_2 === null || (details.mobile_2).trim().length === 0 ?
+        "Not selected" :
+        details.mobile_2;
+    const address =
+        details.address === null || (details.address).trim().length === 0 ?
+            "Not selected" :
+            details.address;
+    const email = details.username === null || (details.username).trim().length === 0 ?
+        "Not selected" :
+        details.username;
+    const gender =
+        details.gender === "" ?
+            "Not selected" :
+            details.gender;
+    const clientSource =
+        details.client_source === null || (details.client_source).trim().length === 0 ?
+        "Not selected" :
+        details.client_source;
+    const anniversary =
+        details.anniversary === null ?
+        "Not selected" :
+        dateFormatter(details.anniversary, 'long');
+    const clientNotes =
+        details.client_notes === null || (details.client_notes).trim.length === 0 ?
+        "Add any important client information" :
+        details.client_notes;
+    const dob =
+        details.dob === null || (details.dob).trim().length === 0 ?
+        "Not selected" :
+        dateFormatter(details.dob, 'long');
+    const customerGST =
+        details.customer_gst === null || (details.customer_gst).trim().length === 0 ?
+        "Not selected" :
+        details.customer_gst;
 
 
 
@@ -51,14 +78,11 @@ export default function ClientDetails(props) {
                         Client Info
                     </Text>
                 </View>
+                <Text style={[textTheme.bodyMedium, styles.clientInfoText]}>
+                    {clientNotes}
+                </Text>
 
-                <TextInput
-                    style={styles.clientInfoTextBox}
-                    placeholder={"Add any important client information"}
-                    multiline={true}
-                    cursorColor={Colors.black}
 
-                />
             </View>
 
             <View style={styles.personalDetails}>
@@ -172,6 +196,10 @@ const styles = StyleSheet.create({
         width: '95%',
         marginTop: 32,
         marginBottom: 40
-    }
+    },
+    clientInfoText: {
+        paddingLeft: 32,
+        paddingVertical: 8,
+    },
 
 })

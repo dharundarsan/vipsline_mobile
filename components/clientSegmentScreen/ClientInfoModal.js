@@ -7,10 +7,15 @@ import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Divider from "../../ui/Divider";
 import ClientStatistics from "./ClientStatistics";
 import ClientDetails from "./ClientDetails";
+import MoreOptionDropDownModal from "./MoreOptionDropDownModal";
+import UpdateClientModal from "./UpdateClientModal";
+import DeleteClient from "./DeleteClientModal";
+import {useDispatch, useSelector} from "react-redux";
+import {dateFormatter} from "../../util/Helpers";
 
 
 
@@ -29,8 +34,57 @@ const getCategoryTitle =
 
 export default function clientInfoModal(props) {
 
+    const dispatch = useDispatch();
+
+    const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
+
+    const [totalSales, setTotalSales] = useState("");
+    const [lastVisit, setLastVisit] = useState("");
+    const [completedAppointments, setCompletedAppointment] = useState(0);
+    const [cancelledAppointments, setCancelledAppointment] = useState(0);
+    const [feedbackCount, setFeedbackCount] = useState(0);
+    const [noShows, setNoShows] = useState(0);
+    const [totalVisits, setTotalVisits] = useState(0);
+
+
+
+
+    useEffect(() => {
+        setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
+        setLastVisit(
+            analyticDetails.history_appointmentList !== undefined ?
+            analyticDetails.history_appointmentList.length !== 0 ?
+                dateFormatter(analyticDetails.history_appointmentList[0].appointment_date, 'short') :
+                "" : "");
+        setCompletedAppointment(analyticDetails.completed_appointments === undefined ? "" : analyticDetails.completed_appointments);
+        setCancelledAppointment(analyticDetails.cancelled_appointments === undefined ? "" : analyticDetails.cancelled_appointments);
+        setFeedbackCount(analyticDetails.feedbacks);
+        setNoShows(0);
+        setTotalVisits(analyticDetails.total_visits === undefined ? "" : analyticDetails.total_visits);
+
+    }, [analyticDetails]);
+
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
+    const [selectedOption, setSelectedOption] = useState("");
+
+    const [modalVisibility, setModalVisibility] = useState(false)
+
+    const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
+    const [deleteClientModalVisibility, setDeleteClientModalVisibility] = useState(false);
+
+    useEffect(() => {
+        if(selectedOption === "editClient") {
+            setEditClientModalVisibility(true);
+            setSelectedOption("");
+        }
+        else if(selectedOption === "deleteClient") {
+            setDeleteClientModalVisibility(true);
+            setSelectedOption("");
+            setModalVisibility(false);
+        }
+    }, [selectedOption]);
+
 
     function clientInfoCategoryPressHandler(id) {
         console.log(id);
@@ -44,6 +98,39 @@ export default function clientInfoModal(props) {
 
     if(clientMoreDetails === null) {
         content = <ScrollView>
+            <MoreOptionDropDownModal
+                isVisible={modalVisibility}
+                onCloseModal={() => setModalVisibility(false)}
+                dropdownItems={[
+                    "Edit client",
+                    "Delete client",
+                ]}
+                setOption={setSelectedOption}
+
+            />
+
+            <UpdateClientModal
+                isVisible={editClientModalVisibility}
+                onCloseModal={() => {
+                    setEditClientModalVisibility(false);
+                    setModalVisibility(false);
+                }}
+
+            />
+
+            <DeleteClient
+                isVisible={deleteClientModalVisibility}
+                onCloseModal={() => {
+                    setDeleteClientModalVisibility(false)
+                    setModalVisibility(false);
+                }}
+                onCloseClientInfoAfterDeleted={() => {
+                    props.setVisible(false);
+                    props.setSearchQuery("");
+                    props.setFilterPressed("all_clients_count");
+                }}
+
+            />
             <View style={styles.modalContent}>
                 <ClientCard
                     name={props.name}
@@ -53,7 +140,12 @@ export default function clientInfoModal(props) {
                     phoneText={[textTheme.titleSmall, styles.phone]}
                 />
                 <View style={styles.optionsContainer}>
-                    <PrimaryButton buttonStyle={styles.updateOrDeleteOption}>
+                    <PrimaryButton
+                        buttonStyle={styles.updateOrDeleteOption}
+                        onPress={() => {
+                            setModalVisibility(true);
+                        }}
+                    >
                         <SimpleLineIcons name="options" size={24} color="black" />
                     </PrimaryButton>
                     <PrimaryButton buttonStyle={styles.callButton} pressableStyle={styles.pressableStyle}>
@@ -71,8 +163,8 @@ export default function clientInfoModal(props) {
                 </View>
 
                 <ClientSaleInfo
-                    totalSales={7000}
-                    lastVisit={"25 August 2024"}
+                    totalSales={totalSales}
+                    lastVisit={lastVisit}
                     salesCard={styles.salesCard}
                     onPress={seeMoreStatisticsHandler}
                 />
@@ -90,6 +182,13 @@ export default function clientInfoModal(props) {
         content =
             <ClientStatistics
                 title={getCategoryTitle[clientMoreDetails]}
+                lastVisit={lastVisit}
+                totalSales={totalSales}
+                completedAppointment={completedAppointments}
+                cancelledAppointment={cancelledAppointments}
+                feedbackCount={feedbackCount}
+                noShows={noShows}
+                totalVisits={totalVisits}
             />
     }
     else if(clientMoreDetails === "clientDetails") {
