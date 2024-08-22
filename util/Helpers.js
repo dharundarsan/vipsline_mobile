@@ -1,4 +1,5 @@
 export const capitalizeFirstLetter = (string) => {
+    if (string === undefined) return;
     return string[0].toUpperCase() + string.slice(1, string.length);
 }
 
@@ -14,7 +15,7 @@ export const formatDate = (date, format) => {
     const month = d.getMonth();
     const year = d.getFullYear();
 
-    const padZero = (num) => num.toString().padStart(2, '0');
+    const padZero = (num) => num.toString().padStart(2, '0')
 
     switch (format) {
         case "yyyy-mm-dd":
@@ -35,3 +36,18 @@ export const formatDate = (date, format) => {
             return `${day} ${months[month]} ${year}`;
     }
 }
+
+
+export function dateFormatter(date, monthType) {
+    if(date === undefined) return;
+    date = new Date(date);
+    return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: monthType,
+        year: 'numeric'
+    });
+}
+
+
+
+

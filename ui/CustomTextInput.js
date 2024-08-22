@@ -29,7 +29,7 @@ const CustomTextInput = (props) => {
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [countryCode, setCountryCode] = useState("+91");
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState(props.value);
     const [isDropdownModalVisible, setIsDropdownModalVisible] = useState(false);
     const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState(false);
 

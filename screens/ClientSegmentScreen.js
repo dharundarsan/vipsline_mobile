@@ -2,8 +2,8 @@ import {View, Text, StyleSheet, Image, FlatList, ScrollView} from "react-native"
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
-import React, {useState} from "react";
-import appliedFilter from "../util/chooseFilter";
+import React, {useEffect, useState} from "react";
+import appliedFilter, {chooseFilterCount, clientFilterNames} from "../util/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import ClientFiltersCategories from "../components/clientSegmentScreen/ClientFiltersCategories";
@@ -15,7 +15,16 @@ import EntryModel from "../components/clientSegmentScreen/EntryModel";
 import Pagination from "../components/clientSegmentScreen/Pagination";
 import {Bullets} from "react-native-easy-content-loader";
 import ClientInfoModal from "../components/clientSegmentScreen/ClientInfoModal";
-import {loadClientInfoFromDb} from "../store/clientInfoSlice";
+import {
+    clearClientInfo,
+    loadAnalyticsClientDetailsFromDb,
+    loadClientInfoFromDb,
+    updateClientId
+} from "../store/clientInfoSlice";
+import {loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
+import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
+import {loadClientCountFromDb} from "../store/clientSlice";
+
 
 
 export default function ClientSegmentScreen() {
@@ -26,34 +35,71 @@ export default function ClientSegmentScreen() {
     const filterClientsList = useSelector(state => state.clientFilter.clients);
     const isFetching = useSelector(state => state.clientFilter.isFetching);
 
-    const clientCount = useSelector(state => state.client.clientCount)[0].all_clients_count;
+    const [clientCount, setClientCount] = useState(0);
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const maxEntry = useSelector(state => state.clientFilter.maxEntry);
+    const searchMaxEntry = useSelector(state => state.clientFilter.searchMaxEntry);
+
+    const pageNo = useSelector(state => state.clientFilter.pageNo);
+    const searchPageNo = useSelector(state => state.clientFilter.searchPageNo);
 
     const [isClientInfoModalVisible,setIsClientInfoModalVisible ] = useState(false);
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const searchClientList = useSelector(state => state.clientFilter.searchClients);
 
     const [clientName, setClientName] = useState("");
     const [clientPhone, setClientPhone] = useState("");
 
     const [clientId, setClientId] = useState("");
+    const isSearchClientFetching = useSelector(state => state.clientFilter.isFetchingSearchClient);
+
+    const allClientCount = useSelector(state => state.client.clientCount)[0].all_clients_count;
+    const activeClientCount = useSelector(state => state.client.clientCount)[0].active_clients_count;
+    const inActiveClientCount = useSelector(state => state.client.clientCount)[0].inactive_clients_count;
+    const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
+    const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
+
+
+    useEffect(() => {
+        dispatch(loadClientCountFromDb());
+        setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount))
+    }, [filterPressed]);
+
+    useEffect(() => {
+        console.log(maxEntry + clientFilterNames(filterPressed) + searchQuery);
+        dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
+    }, [searchQuery]);
+
 
     function renderItem(itemData) {
         return (
             <ClientCard
                 name={itemData.item.name}
                 phone={itemData.item.mobile}
-                email={itemData.item.username}
+                email={itemData.item.email}
                 onPress={() => {
+                    if(searchQuery === "") {
+                        dispatch(loadAnalyticsClientDetailsFromDb(maxEntry, pageNo, itemData.item.id));
+                    }
+                    else {
+                        dispatch(loadAnalyticsClientDetailsFromDb(searchMaxEntry, searchPageNo, itemData.item.id));
+                    }
+                    dispatch(updateClientId(itemData.item.id === undefined ? "" : itemData.item.id));
+                    setClientId(itemData.item.id);
+                    dispatch(loadClientInfoFromDb(itemData.item.id));
                     clientInfoHandler();
                     clientNamePhoneHandler(itemData.item.name, itemData.item.mobile);
-                    dispatch(loadClientInfoFromDb(itemData.item.id));
                 }}
                 divider={true}
             />
         );
     }
+
+
+
 
     function clientInfoHandler() {
         console.log("clientInfoHandler");
@@ -77,18 +123,22 @@ export default function ClientSegmentScreen() {
                 isModalVisible={isModalVisible}
                 setIsModalVisible={setIsModalVisible}
                 filterPressed={filterPressed}
+                query={searchQuery}
             />
 
             <ClientInfoModal
                 visible={isClientInfoModalVisible}
                 setVisible={setIsClientInfoModalVisible}
                 closeModal={() => {
-                    setIsClientInfoModalVisible(false)
+                    setIsClientInfoModalVisible(false);
+                    dispatch(clearClientInfo());
 
                 }}
                 name={clientName}
                 phone={clientPhone}
                 id={clientId}
+                setSearchQuery={setSearchQuery}
+                setFilterPressed={setFilterPressed}
             />
 
             <AddClient/>
@@ -120,6 +170,10 @@ export default function ClientSegmentScreen() {
                     <SearchBar
                         placeholder={"search by mobile number name"}
                         searchContainerStyle={styles.searchBarContainer}
+                        onChangeText={(text) => {
+                            setSearchQuery(text);
+                        }}
+                        value={searchQuery}
                     />
                 </View>
 
@@ -143,28 +197,70 @@ export default function ClientSegmentScreen() {
                 </Text>
             </View>
 
-            {
-                !isFetching ?
-                    <FlatList
-                        data={filterClientsList}
-                        renderItem={renderItem}
-                        scrollEnabled={false}
-                    /> :
-                    <Bullets
-                        tHeight={35}
-                        tWidth={"75%"}
-                        listSize={maxEntry}
-                        aSize={35}
-                        animationDuration={500}
-                        containerStyles={{paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: Colors.grey250}}
-                        avatarStyles={{marginLeft: 16}}
-                    />
-            }
 
-            <Pagination
-                filterPressed={filterPressed}
-                setIsModalVisible={setIsModalVisible}
-            />
+
+            {
+                searchQuery === "" ?
+                <>
+
+                {
+                    !isFetching ?
+                        <FlatList
+                            data={filterClientsList}
+                            renderItem={renderItem}
+                            scrollEnabled={false}
+                        /> :
+                        <Bullets
+                            tHeight={35}
+                            tWidth={"75%"}
+                            listSize={maxEntry}
+                            aSize={35}
+                            animationDuration={500}
+                            containerStyles={{
+                                paddingVertical: 16,
+                                borderBottomWidth: 1,
+                                borderBottomColor: Colors.grey250
+                            }}
+                            avatarStyles={{marginLeft: 16}}
+                        />
+                }
+
+                    <Pagination
+                        filterPressed={filterPressed}
+                        setIsModalVisible={setIsModalVisible}
+                    />
+                </> :
+                    <>
+                        {
+                            !isSearchClientFetching ?
+                            <FlatList
+                                data={searchClientList}
+                                scrollEnabled={false}
+                                renderItem={renderItem}
+                            /> :
+                                <Bullets
+                                    tHeight={35}
+                                    tWidth={"75%"}
+                                    listSize={maxEntry}
+                                    aSize={35}
+                                    animationDuration={500}
+                                    containerStyles={{
+                                        paddingVertical: 16,
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: Colors.grey250
+                                    }}
+                                    avatarStyles={{marginLeft: 16}}
+                                />
+
+                        }
+
+                        <SearchClientPagination
+                            filterPressed={filterPressed}
+                            setIsModalVisible={setIsModalVisible}
+                            query={searchQuery}
+                        />
+                    </>
+            }
 
 
         </View>
