@@ -48,6 +48,11 @@ export function dateFormatter(date, monthType) {
     });
 }
 
+export const checkNullUndefined = (value) => {
+    if(value === undefined) return false;
+    return value !== null;
+}
+
 
 
 
