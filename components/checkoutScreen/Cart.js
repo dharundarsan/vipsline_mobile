@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     StyleSheet,
     Text,
@@ -14,12 +14,39 @@ import AddItemModal from "./AddItemModal";
 import CartItem from "./CartItem";
 import CheckoutSection from "./CheckoutSection";
 import {useSelector} from "react-redux";
+import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 
 const Cart = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const cartItems = useSelector((state) => state.cart.items);
     const [customItems, setCustomItems] = useState([]);
+    const [calculatedPrice, setCalculatedPrice] = useState([]);
+
+    useEffect(() => {
+        if (cartItems.length === 0) {
+            setCalculatedPrice([]);
+        }
+
+        calculateCartPriceAPI({
+            additional_discounts: [],
+            additional_services: [],
+            cart: cartItems.map(item => {
+                return {id: item.item_id}
+            }),
+            coupon_code: "",
+            edited_cart: [],
+            extra_charges: [],
+            isWalletSelected: false,
+            promo_code: "",
+            user_coupon: "",
+            walkin: "yes",
+            wallet_amt: 0
+        }).then(result => {
+            setCalculatedPrice(result);
+        })
+
+    }, [cartItems]);
 
     const addCustomItems = (item) => {
         setCustomItems(prev => [...prev, {id: Math.floor(10000 + Math.random() * 90000), ...item}]);
@@ -107,7 +134,7 @@ const Cart = () => {
                             </View>
                         </PrimaryButton>
                     </View>
-                    <CheckoutSection/>
+                    <CheckoutSection data={calculatedPrice} />
                 </>
             }
         </View>
