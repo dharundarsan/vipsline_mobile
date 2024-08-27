@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, Image, FlatList, ScrollView} from "react-native"
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import appliedFilter, {chooseFilterCount, clientFilterNames} from "../util/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
@@ -61,6 +61,10 @@ export default function ClientSegmentScreen() {
     const inActiveClientCount = useSelector(state => state.client.clientCount)[0].inactive_clients_count;
     const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
     const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
+
+    useLayoutEffect(() => {
+        dispatch(loadClientCountFromDb());
+    }, []);
 
 
     useEffect(() => {

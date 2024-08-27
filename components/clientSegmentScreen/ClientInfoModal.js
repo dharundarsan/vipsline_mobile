@@ -37,6 +37,8 @@ export default function clientInfoModal(props) {
     const dispatch = useDispatch();
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
+    const details = useSelector(state => state.clientInfo.details);
+
 
     const [totalSales, setTotalSales] = useState("");
     const [lastVisit, setLastVisit] = useState("");
@@ -115,6 +117,7 @@ export default function clientInfoModal(props) {
                     setEditClientModalVisibility(false);
                     setModalVisibility(false);
                 }}
+                details={details}
 
             />
 
