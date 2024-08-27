@@ -1,7 +1,7 @@
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Text, View, StyleSheet} from "react-native";
 import {AntDesign, FontAwesome6} from "@expo/vector-icons";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
     incrementSearchClientPageNumber,
     decrementSearchPageNumber,
@@ -19,7 +19,23 @@ export default function SearchClientPagination(props) {
     const [upperCount, setUpperCount] = useState(10);
     const [lowerCount, setLowerCount] = useState(1);
 
-    const totalCount = useSelector(state => state.clientFilter.totalSearchClients);
+    let getTotalCount = useSelector(state => state.clientFilter.totalSearchClients);
+
+    // let totalCount = 0;
+
+    const [totalCount, setTotalCount] = useState(0);
+
+    // const memoizedTotalCount = useMemo(() => totalCount, [totalCount]);
+    //
+    // console.log("memo: " + memoizedTotalCount);
+
+
+    console.log("totalCount outside", totalCount);
+
+    // useEffect(() => {
+    //     totalCount = useSelector(state => state.clientFilter.totalSearchClients);
+    //     console.log("totalCount inside useEffect", totalCount);
+    // }, [totalCount]);
 
 
     useEffect(() => {
@@ -32,7 +48,7 @@ export default function SearchClientPagination(props) {
         setLowerCount(1);
         setUpperCount(10 > totalCount ? totalCount : 10);
 
-    }, [props.filterPressed,]);
+    }, [props.filterPressed]);
 
     useEffect(() => {
         console.log("2st");
@@ -53,15 +69,27 @@ export default function SearchClientPagination(props) {
         }
     }, [lowerCount, upperCount]);
 
+    useEffect(()=>{
+        // totalCount = memoizedTotalCount;
+        setTotalCount(getTotalCount);
+    },[getTotalCount])
+
+
     useEffect(() => {
+        let upper_count = 0;
+        console.log("total count", totalCount);
+        if(maxEntry > totalCount) {
+            upper_count = totalCount;
+        }
+        else {
+            upper_count = maxEntry;
+        }
         setLowerCount(1);
-        setUpperCount(maxEntry);
+        setUpperCount(upper_count);
         dispatch(resetSearchClientFilter());
         console.log("3rt");
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
-    }, [maxEntry]);
-
-
+    }, [maxEntry,totalCount]);
 
 
     const [isBackwardButtonDisabled, setIsBackwardButtonDisabled]  = useState(false);

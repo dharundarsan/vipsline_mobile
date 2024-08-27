@@ -28,16 +28,21 @@ export default function Pagination(props) {
     const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
     const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
 
+    let currentClientCount = 0;
+
+
+
     useEffect(() => {
         dispatch(updateMaxEntry(10))
         // console.log("inside the props max entry: " + maxEntry);
 
-        const currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
+        currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         dispatch(resetClientFilter());
         dispatch(loadClientFiltersFromDb(10, clientFilterNames(props.filterPressed)))
         setTotalCount(currentClientCount);
         setLowerCount(1);
         setUpperCount(10 > currentClientCount ? currentClientCount : 10);
+
 
     }, [props.filterPressed]);
 
@@ -61,8 +66,16 @@ export default function Pagination(props) {
     }, [lowerCount, upperCount]);
 
     useEffect(() => {
+        currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         setLowerCount(1);
-        setUpperCount(maxEntry);
+        if(maxEntry > currentClientCount) {
+
+            setUpperCount(currentClientCount);
+        }
+        else {
+            setUpperCount(maxEntry);
+        }
+
         dispatch(resetClientFilter());
         dispatch(loadClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed)));
     }, [maxEntry]);

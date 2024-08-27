@@ -1,35 +1,36 @@
 import {Modal, ScrollView, StyleSheet, Text, View, ToastAndroid, Platform} from "react-native";
 import CustomTextInput from "../../ui/CustomTextInput";
 import React, {useState, useRef, useEffect} from "react";
-import DropdownModal from "../../ui/DropdownModal";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
-import createNewClientAPI from "../../util/apis/createNewClientAPI";
-import {capitalizeFirstLetter, formatDate} from "../../util/Helpers";
+import {capitalizeFirstLetter, checkNullUndefined, formatDate} from "../../util/Helpers";
 import {useDispatch, useSelector} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
 import updateClientAPI from "../../util/apis/updateClientAPI";
 
 const UpdateClientModal = (props) => {
-    const details = useSelector(state => state.clientInfo.details);
+    // const details = useSelector(state => state.clientInfo.details);
+    const details = props.details;
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [phoneNo, setPhoneNo] = useState(["+91", ""]);
-    const [secondaryNo, setSecondaryNo] = useState(["+91", ""]);
-    const [email, setEmail] = useState("");
-    const [gender, setGender] = useState("");
-    const [clientSource, setClientSource] = useState("");
-    const [gstNo, setGstNo] = useState("");
-    const [clientNotes, setClientNotes] = useState("")
-    const [clientAddress, setClientAddress] = useState("");
-    const [dateOfBirth, setDateOfBirth] = useState("");
-    const [anniversaryDate, setAnniversaryDate] = useState("");
-    const [isDobSelected, setIsDobSelected] = useState(false);
-    const [isAnniversarySelected, setIsAnniversarySelected] = useState(false);
+    const [clientData, setClientData] = useState({
+        firstName: details.firstName,
+        lastName: "",
+        phoneNo: ["+91", details.mobile_1],
+        secondaryNo: ["+91", ""],
+        email: "",
+        gender: "",
+        clientSource: "",
+        gstNo: "",
+        clientNotes: "",
+        clientAddress: "",
+        dateOfBirth: "",
+        anniversaryDate: "",
+        isDobSelected: false,
+        isAnniversarySelected: false,
+    });
 
     const dispatch = useDispatch();
 
@@ -39,42 +40,38 @@ const UpdateClientModal = (props) => {
     const emailRef = useRef(null);
 
 
-
-
     const existingValues = () => {
-        setFirstName(details.firstName);
-        setLastName(details.lastName);
-        setPhoneNo(["+91", details.mobile_1]);
-        setSecondaryNo(["+91", details.mobile_2]);
-        setEmail(details.username);
-        setGender(
-            details.gender !== undefined  && details.gender.trim().length !== 0 ?
-                capitalizeFirstLetter(details.gender) :
-                ""
-        );
-        setGstNo(details.customer_gst)
-        setClientNotes(details.client_notes)
-        setIsAnniversarySelected(false);
-        setIsDobSelected(false);
-        setAnniversaryDate(details.anniversary);
-        setDateOfBirth(
-            details.dob !== undefined && (details.dob).trim().length !== 0 ?
-                new Date(details.dob) :
-                Date.now()
-        );
-        setClientSource(details.client_source);
-        setClientAddress(details.address);
-
-    }
+        setClientData({
+            firstName: details.firstName,
+            lastName: details.lastName,
+            phoneNo: ["+91", details.mobile_1],
+            secondaryNo: ["+91", details.mobile_2],
+            email: details.username,
+            gender: checkNullUndefined(details.gender) && details.gender.trim().length !== 0 ?
+                capitalizeFirstLetter(details.gender) : "",
+            gstNo: details.customer_gst,
+            clientNotes: details.client_notes,
+            clientAddress: details.address,
+            isDobSelected: false,
+            isAnniversarySelected: false,
+            anniversaryDate: details.anniversary,
+            dateOfBirth: checkNullUndefined(details.dob) && details.dob.trim().length !== 0 ?
+                new Date(details.dob) : Date.now(),
+            clientSource: details.client_source,
+        });
+    };
 
     const clientId = useSelector(state => state.clientInfo.clientId);
 
+
+    console.log(clientData.phoneNo);
+    console.log(details.mobile_1);
 
 
 
     useEffect(() => {
         existingValues();
-    }, [props.isVisible]);
+    }, [props.isVisible, details]);
 
     const handleUpdate = async () => {
         const firstNameValid = firstNameRef.current();
@@ -85,38 +82,44 @@ const UpdateClientModal = (props) => {
         if (!firstNameValid || !lastNameValid || !phoneNoValid || !emailValid) return;
         try {
             await updateClientAPI(clientId, {
-                address: clientAddress,
-                anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-mm-dd") : "",
+                address: clientData.clientAddress,
+                anniversary: clientData.isAnniversarySelected ? formatDate(clientData.anniversaryDate, "yyyy-mm-dd") : "",
                 businessId: process.env.EXPO_PUBLIC_BUSINESS_ID,
                 city: "",
-                clientNotes: clientNotes,
-                clientSource: clientSource,
+                clientNotes: clientData.clientNotes,
+                clientSource: clientData.clientSource,
                 country: "India",
-                countryCode: phoneNo[0],
-                custGst: gstNo,
-                dob: isDobSelected ? formatDate(dateOfBirth, "yyyy-mm-dd") : "",
-                username: email,
-                firstName: firstName,
-                gender: gender,
-                lastName: lastName,
-                mobile_1: phoneNo[1],
-                mobile_2: secondaryNo[1],
+                countryCode: clientData.phoneNo[0],
+                custGst: clientData.gstNo,
+                dob: clientData.isDobSelected ? formatDate(clientData.dateOfBirth, "yyyy-mm-dd") : "",
+                username: clientData.email,
+                firstName: clientData.firstName,
+                gender: clientData.gender,
+                lastName: clientData.lastName,
+                mobile_1: clientData.phoneNo[1],
+                mobile_2: clientData.secondaryNo[1],
                 pinCode: "",
                 state: "Tamilnadu",
-
             });
-            ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
+            ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
             dispatch(loadClientCountFromDb());
             props.onCloseModal();
         } catch (e) {
-            console.log(e)
-            ToastAndroid.show(e + "error", ToastAndroid.LONG)
+            console.log(e);
+            ToastAndroid.show(e + "error", ToastAndroid.LONG);
         }
-
     };
 
+    const handleChange = (field, value) => {
+        setClientData(prevState => ({
+            ...prevState,
+            [field]: value,
+        }));
+    };
+
+
     return (
-        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} >
+        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}>
             <View style={styles.closeAndHeadingContainer}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Edit client</Text>
                 <PrimaryButton
@@ -135,118 +138,98 @@ const UpdateClientModal = (props) => {
                         type="text"
                         label="First name"
                         placeholder="Enter client's first name"
-                        value={firstName}
-                        onChangeText={setFirstName}
-                        validator={(text) => {
-                            if (text.length === 0) return "First name is required";
-                            else return true;
-                        }}
-                        onSave={(callback) => {
-                            firstNameRef.current = callback;
-                        }}
+                        value={clientData.firstName}
+                        onChangeText={(value) => handleChange("firstName", value)}
+                        validator={(text) => text.length === 0 ? "First name is required" : true}
+                        onSave={(callback) => { firstNameRef.current = callback; }}
                     />
                     <CustomTextInput
                         type="text"
                         label="Last name"
                         placeholder="Enter client's last name"
-                        value={lastName}
-                        onChangeText={setLastName}
-                        validator={(text) => {
-                            if (text.length === 0) return "Last name is required";
-                            else return true;
-                        }}
-                        onSave={(callback) => {
-                            lastNameRef.current = callback;
-                        }}
+                        value={clientData.lastName}
+                        onChangeText={(value) => handleChange("lastName", value)}
+                        validator={(text) => text.length === 0 ? "Last name is required" : true}
+                        onSave={(callback) => { lastNameRef.current = callback; }}
                     />
                     <CustomTextInput
                         type="phoneNo"
                         label="Mobile"
                         placeholder="0123456789"
-                        value={phoneNo[1]}
-                        onChangeText={setPhoneNo}
-                        validator={(text) => {
-                            if (text.length !== 10) return "Phone number is invalid";
-                            else return true;
-                        }}
-                        onSave={(callback) => {
-                            phoneNoRef.current = callback;
-                        }}
+                        value={clientData.phoneNo[1]}
+                        onChangeText={(value) => handleChange("phoneNo", [value[0], value[1]])}
+                        validator={(text) => text.length !== 10 ? "Phone number is invalid" : true}
+                        onSave={(callback) => { phoneNoRef.current = callback; }}
                     />
                     <CustomTextInput
                         type="email"
                         label="Email address"
                         placeholder="Enter email address"
-                        value={email}
-                        onChangeText={setEmail}
-                        validator={(text) => {
-                            if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) return "Email is invalid";
-                            else return true;
-                        }}
-                        onSave={(callback) => {
-                            emailRef.current = callback;
-                        }}
+                        value={clientData.email}
+                        onChangeText={(value) => handleChange("email", value)}
+                        validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
+                        onSave={(callback) => { emailRef.current = callback; }}
                     />
                     <CustomTextInput
                         type="dropdown"
                         label="Gender"
-                        value={gender}
-                        onChangeValue={setGender}
+                        value={clientData.gender}
+                        onChangeValue={(value) => handleChange("gender", value)}
                         dropdownItems={["Male", "Female", "Others"]}
                     />
                     <CustomTextInput
                         type="dropdown"
                         label="Client source"
-                        value={clientSource}
-                        onChangeValue={setClientSource}
+                        value={clientData.clientSource}
+                        onChangeValue={(value) => handleChange("clientSource", value)}
                         dropdownItems={["Justdial", "Google", "Facebook", "Instagram", "SMS Campaign", "Walk-in", "Membership", "Others"]}
                     />
                     <CustomTextInput
                         type="date"
                         label="Date of birth"
-                        value={new Date(dateOfBirth)}
+                        value={new Date(clientData.dateOfBirth)}
                         onChange={(value) => {
-                            setIsDobSelected(true);
-                            setDateOfBirth(value);
+                            handleChange("isDobSelected", true);
+                            handleChange("dateOfBirth", value);
                         }}
                     />
                     <CustomTextInput
                         type="date"
                         label="Anniversary"
-                        value={new Date(anniversaryDate)}
+                        value={new Date(clientData.anniversaryDate)}
                         onChange={(value) => {
-                            setIsAnniversarySelected(true);
-                            setAnniversaryDate(value);
+                            handleChange("isAnniversarySelected", true);
+                            handleChange("anniversaryDate", value);
                         }}
                     />
-                    <Text style={[textTheme.bodyMedium, styles.headingText]}>Additional Infomation</Text>
+                    <Text style={[textTheme.bodyMedium, styles.headingText]}>Additional Information</Text>
                     <CustomTextInput
                         type="text"
                         label="GST number"
                         placeholder="Enter client's GSTIN"
-                        value={gstNo}
-                        onChangeText={setGstNo}
+                        value={clientData.gstNo}
+                        onChangeText={(value) => handleChange("gstNo", value)}
                     />
                     <CustomTextInput
                         type="phoneNo"
                         label="Secondary Number"
                         placeholder="0123456789"
-                        value={secondaryNo[1]}
-                        onChangeText={setSecondaryNo}
+                        value={clientData.secondaryNo[1]}
+                        onChangeText={(value) => handleChange("secondaryNo", ["+91", value])}
                     />
                     <CustomTextInput
                         type="multiLine"
                         label="Client notes"
                         placeholder="Enter Notes"
-                        value={clientNotes}
-                        onChangeText={setClientNotes}
+                        value={clientData.clientNotes}
+                        onChangeText={(value) => handleChange("clientNotes", value)}
                     />
                     <CustomTextInput
                         type="multiLine"
                         label="Client address"
                         placeholder="Enter client address details"
-                        value={clientAddress}
-                        onChangeText={setClientAddress}
+                        value={clientData.clientAddress}
+                        onChangeText={(value) => handleChange("clientAddress", value)}
                     />
                 </View>
             </ScrollView>
