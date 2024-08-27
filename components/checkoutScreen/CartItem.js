@@ -1,6 +1,6 @@
 import {View, StyleSheet, Text, TextInput, ScrollView} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
-import React from "react";
+import React, {useState} from "react";
 import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
@@ -10,6 +10,7 @@ import textTheme from "../../constants/TextTheme";
 import {MaterialIcons} from '@expo/vector-icons';
 import {useDispatch} from "react-redux";
 import {deleteItemFromCart, removeItemFromCart} from "../../store/cartSlice";
+import DropdownModal from "../../ui/DropdownModal";
 
 const CartItem = (props) => {
     const dispatch = useDispatch();
@@ -17,8 +18,13 @@ const CartItem = (props) => {
         dispatch(removeItemFromCart(props.data.item_id));
     }
 
+    const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
+    const [selectedStaff, setSelectedStaff] = useState(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
+
     return <>
         <View style={styles.cartItem}>
+            <DropdownModal isVisible={isStaffDropdownModalVisible}
+                           onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs} selectedValue={selectedStaff} onChangeValue={setSelectedStaff} />
             <View style={styles.itemNameAndDetailsContainer}>
                 <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>
@@ -41,9 +47,9 @@ const CartItem = (props) => {
                 </View>
             </View>
             <View style={styles.staffAndDiscountContainer}>
-                <PrimaryButton buttonStyle={styles.staffButton} pressableStyle={styles.staffPressable}>
+                <PrimaryButton buttonStyle={styles.staffButton} pressableStyle={styles.staffPressable} onPress={()=>setIsStaffDropdownModalVisible(true)}>
                     <View style={styles.staffContainer}>
-                        <Text style={[textTheme.bodyMedium, styles.staffText]}>Select Staff</Text>
+                        <Text style={[textTheme.bodyMedium, styles.staffText]}>{ selectedStaff !== null ? selectedStaff.name : "Select Staff"}</Text>
                         <MaterialIcons name="keyboard-arrow-down" size={24} color="black"/>
                     </View>
                 </PrimaryButton>

@@ -8,11 +8,16 @@ import Colors from "../../constants/Colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CustomTextInput from "../../ui/CustomTextInput";
 import Entypo from '@expo/vector-icons/Entypo';
+import InvoiceModal from "./InvoiceModal";
 
 const PaymentModal = (props) => {
     const [selectedPaymentOption, setSelectedPaymentOption] = useState("split_payment");
+    const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
 
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
+        <InvoiceModal isVisible={isInvoiceModalVisible} onCloseModal={() => {
+            setIsInvoiceModalVisible(false )
+        }}/>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
@@ -90,7 +95,7 @@ const PaymentModal = (props) => {
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
                            onPress={() => {
-                               props.onCloseModal();
+                               setIsInvoiceModalVisible(true);
                            }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
@@ -143,7 +148,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.grey400,
     },
     paymentOptionSelected: {
-        borderRadius:10,
+        borderRadius: 10,
         borderColor: Colors.highlight,
         borderWidth: 2,
     },

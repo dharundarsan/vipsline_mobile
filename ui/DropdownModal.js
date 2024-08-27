@@ -12,10 +12,11 @@ const DropdownModal = (props) => {
         <TouchableOpacity style={styles.modalContent} onPress={props.onCloseModal} activeOpacity={1} >
             <FlatList style={styles.dropdownList} data={props.dropdownItems}  renderItem={({item}) => {
                 return <>
-                    <PrimaryButton label={item} buttonStyle={styles.closeButton}
+                    <PrimaryButton label={item.name} buttonStyle={styles.closeButton}
                                    pressableStyle={styles.closeButtonPressable}
                                    onPress={() => {
                                        props.onChangeValue(item);
+                                       props.onCloseModal();
                                    }}
                                    textStyle={[textTheme.bodyLarge, styles.closeButtonText, props.selectedValue === item ? {color: Colors.highlight, fontWeight: 500} : {}]}/>
                     <Divider/>

@@ -4,6 +4,7 @@ import catalogueReducer from "./catalogueSlice";
 import clientReducer from "./clientSlice";
 import clientFilterReducer from "./clientFilterSlice";
 import clientInfoReducer from "./clientInfoSlice";
+import staffReducer from "./staffSlice";
 
 const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
         client: clientReducer,
         clientFilter: clientFilterReducer,
         clientInfo: clientInfoReducer,
+        staff: staffReducer,
     },
 });
 

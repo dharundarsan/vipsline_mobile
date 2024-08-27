@@ -20,18 +20,21 @@ const Cart = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const cartItems = useSelector((state) => state.cart.items);
+    const staffs = useSelector((state) => state.staff.staffs);
     const [customItems, setCustomItems] = useState([]);
     const [calculatedPrice, setCalculatedPrice] = useState([]);
 
     useEffect(() => {
-        if (cartItems.length === 0) {
+        if (cartItems.length === 0 && customItems.length === 0) {
             setCalculatedPrice([]);
         }
 
+        console.log(customItems);
+
         calculateCartPriceAPI({
             additional_discounts: [],
-            additional_services: [],
-            cart: cartItems.map(item => {
+            additional_services: customItems,
+            cart: cartItems.length === 0 ? [] : cartItems.map(item => {
                 return {id: item.item_id}
             }),
             coupon_code: "",
@@ -46,7 +49,7 @@ const Cart = () => {
             setCalculatedPrice(result);
         })
 
-    }, [cartItems]);
+    }, [cartItems, customItems]);
 
     const addCustomItems = (item) => {
         setCustomItems(prev => [...prev, {id: Math.floor(10000 + Math.random() * 90000), ...item}]);
@@ -124,7 +127,8 @@ const Cart = () => {
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}} data={[...cartItems, ...customItems]}
                                   keyExtractor={(item, index) => index}
-                                  renderItem={({item}) => <CartItem data={item} removeCustomItems={removeCustomItems}/>}
+                                  renderItem={({item}) => <CartItem staffs={staffs} data={item}
+                                                                    removeCustomItems={removeCustomItems}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>
                             <View style={styles.addItemsWithLogoContainer}>
@@ -134,7 +138,7 @@ const Cart = () => {
                             </View>
                         </PrimaryButton>
                     </View>
-                    <CheckoutSection data={calculatedPrice} />
+                    <CheckoutSection data={calculatedPrice}/>
                 </>
             }
         </View>
