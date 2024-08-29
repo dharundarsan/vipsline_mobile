@@ -157,6 +157,7 @@ const AddItemModal = (props) => {
             </View>
             <Divider/>
             <FlatList
+                bounces={false}
                 data={modalCategoryListData}
                 renderItem={({item}) => {
                     return (
