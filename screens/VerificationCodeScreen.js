@@ -7,13 +7,13 @@ import VerificationCodeBody from "../components/verificationCodeScreen/Verificat
 
 
 
-export default function VerificationCodeScreen({navigation}) {
+export default function VerificationCodeScreen({route, navigation}) {
     return (
         <SafeAreaView style={styles.safeAreaView}>
             <StatusBar style="light" />
         <View style={styles.verificationCodeScreen}>
             <SignInHeader />
-            <VerificationCodeBody />
+            <VerificationCodeBody mobileNumber={route.params.mobileNumber} navigation={navigation} />
 
         </View>
         </SafeAreaView>

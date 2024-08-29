@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet } from 'react-native';
 import Colors from "../../constants/Colors";
 
 
-export default function OtpInputBox({style}) {
+export default function OtpInputBox(props) {
     const ref1 = useRef(null);
     const ref2 = useRef(null);
     const ref3 = useRef(null);
@@ -19,8 +19,13 @@ export default function OtpInputBox({style}) {
     const [box3, setBox3] = useState(false);
     const [box4, setBox4] = useState(false);
 
+    const [otp1, setOtp1] = useState("");
+    const [otp2, setOtp2] = useState("");
+    const [otp3, setOtp3] = useState("");
+    const [otp4, setOtp4] = useState("");
+
     return(
-        <View style={[styles.otpInput, style]}>
+        <View style={[styles.otpInput, props.style]}>
             <TextInput
                 placeholder="*"
                 placeholderTextColor={Colors.grey800}
@@ -41,6 +46,7 @@ export default function OtpInputBox({style}) {
                         setIsBoxOneFocussed(true);
                         setBox1(false);
                     }
+                    setOtp1(text);
                 }}
                 onFocus={() => {
                     setIsBoxTwoFocussed(false)
@@ -48,6 +54,7 @@ export default function OtpInputBox({style}) {
                     setIsBoxFourFocussed(false);
                     setIsBoxOneFocussed(true);
                 }}
+                value={otp1}
 
             />
             <TextInput
@@ -70,6 +77,7 @@ export default function OtpInputBox({style}) {
                         setIsBoxTwoFocussed(false);
                         setBox2(false);
                     }
+                    setOtp2(text);
                 }}
                 onFocus={() => {
                     setIsBoxTwoFocussed(true)
@@ -77,6 +85,7 @@ export default function OtpInputBox({style}) {
                     setIsBoxFourFocussed(false);
                     setIsBoxOneFocussed(false);
                 }}
+                value={otp2}
             />
             <TextInput
                 placeholder="*"
@@ -98,6 +107,7 @@ export default function OtpInputBox({style}) {
                         setIsBoxThreeFocussed(false);
                         setBox3(false);
                     }
+                    setOtp3(text);
                 }}
                 onFocus={() => {
                     setIsBoxTwoFocussed(false)
@@ -105,6 +115,7 @@ export default function OtpInputBox({style}) {
                     setIsBoxFourFocussed(false);
                     setIsBoxOneFocussed(false);
                 }}
+                value={otp3}
             />
             <TextInput
                 placeholder="*"
@@ -125,6 +136,9 @@ export default function OtpInputBox({style}) {
                         setBox4(true);
                         setIsBoxFourFocussed(false);
                     }
+                    setOtp4(text)
+                    props.otp(otp1 + otp2 + otp3 + text);
+
                 }}
                 onFocus={() => {
                     setIsBoxTwoFocussed(false)
@@ -132,6 +146,7 @@ export default function OtpInputBox({style}) {
                     setIsBoxFourFocussed(true);
                     setIsBoxOneFocussed(false);
                 }}
+                value={otp4}
             />
         </View>
     );

@@ -1,11 +1,126 @@
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Text, TextInput, View, StyleSheet} from "react-native";
+import {Text, TextInput, View, StyleSheet, ActivityIndicator} from "react-native";
 import Colors from "../../constants/Colors";
 import {Ionicons} from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
+import textTheme from "../../constants/TextTheme";
+import {useState} from "react";
+import axios from "axios";
 
-export default function ForgetPasswordEmailOrNumber({otpHandler}) {
+export default function ForgetPasswordEmailOrNumber(props) {
     const navigation = useNavigation();
+    const [mobileNumber, setMobileNumber] = useState("");
+
+    const [isFocussed, setIsFocussed] = useState(false);
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [isUserTyping, setIsUserTyping] = useState(false);
+    const [isUserFound, setIsUserFound] = useState(true);
+
+    const BaseURL = process.env.EXPO_PUBLIC_API_URI
+    const platform = "BUSINESS";
+
+    let responseUserMessage = "";
+
+
+    function onFocusHandler() {
+        setIsFocussed(true);
+    }
+
+    function onFocusOutHandler() {
+        setIsFocussed(false);
+    }
+
+    async function findUser() {
+        let response = "something went wrong"
+        try {
+            response = await axios.post(BaseURL + '/user/findUser', {
+                platform: platform,
+                userName: mobileNumber
+            })
+            responseUserMessage = response.data.message;
+
+        }
+        catch (error) {
+            console.log("user not found: " + error);
+        }
+
+        // console.log(response);
+        return responseUserMessage;
+    }
+
+    async function sendOtp() {
+        setIsLoading(true);
+        if(await findUser() === "user found") {
+            try {
+                const response = await axios.post(
+                    BaseURL + "/user/sendOtp",
+                    {
+                        userName:mobileNumber,
+                        platform:platform,
+                    })
+
+                setIsUserFound(true);
+                props.otpHandler();
+                props.setMobileNumber(mobileNumber);
+            }
+            catch (error) {
+                console.log("sendOtp error: " + error);
+            }
+
+        }
+        else {
+            setIsUserFound(false);
+        }
+
+        setIsLoading(false);
+
+    }
+
+
+    const styles = StyleSheet.create({
+        buttonStyle: {
+            backgroundColor: Colors.grey550,
+            width: '20%',
+            marginTop: 32,
+        },
+        forgetPasswordBody: {
+            alignItems: "center",
+        },
+        forgetPasswordText: {
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: '600',
+            marginTop: 32,
+        },
+        mobileNumberInput: {
+            width: '100%',
+            borderWidth: 2,
+            paddingVertical: 8,
+            borderColor: isFocussed ? isUserFound ? Colors.highlight : Colors.error : !isUserFound ? Colors.error :Colors.grey400,
+            borderRadius: 6,
+            paddingHorizontal: 12,
+        },
+        mobileNumberContainer: {
+            alignItems: "flex-start",
+            // borderWidth: 2,
+            width:'100%',
+        },
+        sendOtpButton: {
+            width: '85%',
+            backgroundColor: Colors.highlight,
+            height: 45,
+            marginTop: 16
+        },
+        inputContainer: {
+            marginTop: 32,
+            width: '85%',
+        },
+        inputLabel: {
+            marginBottom: 8,
+        }
+    })
 
     return (
         <View style={styles.forgetPasswordBody}>
@@ -17,57 +132,44 @@ export default function ForgetPasswordEmailOrNumber({otpHandler}) {
             >
                 <Ionicons name="arrow-back-sharp" size={24} color="white" />
             </PrimaryButton>
-            <Text style={styles.forgetPasswordText}>Forget Password</Text>
+            <Text style={[textTheme.titleMedium, styles.forgetPasswordText]}>Forget Password</Text>
 
             <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Mobile number / Email</Text>
+                <Text style={[textTheme.titleMedium, styles.inputLabel]}>Mobile number / Email</Text>
                 <TextInput
-                    style={styles.mobileNumberInput}
-                    placeholder='Mobile number / email'
+                    style={[textTheme.titleSmall, styles.mobileNumberInput]}
+                    placeholder='Mobile number / Email'
                     keyboardType= "number-pad"
+                    onFocus={onFocusHandler}
+                    onBlur={onFocusOutHandler}
+                    value={mobileNumber}
+                    onChangeText={(text) => {
+                        setMobileNumber(text);
+                        setIsUserTyping(true);
+                    }}
+                    maxLength={10}
                 />
+                {
+                    !isUserFound ?
+                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number / Email</Text> :
+                        <Text > </Text>
+                }
             </View>
             <PrimaryButton
-                label='Send OTP'
-                buttonStyle={{width: '85%', backgroundColor: Colors.highlight, marginTop: 32}}
-                textStyle={{color: Colors.onHighlight}}
-                onPress={otpHandler}
-                >
-            </PrimaryButton>
+                buttonStyle={styles.sendOtpButton}
+                onPress={async () => {
+                    await sendOtp();
+                }}
+            >
+                {
+                    !isLoading ?
+                        <Text style={[textTheme.titleSmall, {color: Colors.onHighlight}]}>Send OTP</Text> :
+                        <ActivityIndicator color={Colors.onHighlight}/>
+                }
 
+            </PrimaryButton>
         </View>
     );
 
 }
 
-const styles = StyleSheet.create({
-    buttonStyle: {
-        backgroundColor: Colors.grey550,
-        width: '20%',
-        marginTop: 32,
-    },
-    forgetPasswordBody: {
-        alignItems: "center",
-    },
-    forgetPasswordText: {
-        color: Colors.black,
-        fontSize: 20,
-        fontWeight: '600',
-        marginTop: 32,
-    },
-    mobileNumberInput: {
-        width: '100%',
-        borderWidth: 2,
-        borderColor: Colors.highlight,
-        borderRadius: 6,
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-    },
-    inputContainer: {
-        marginTop: 32,
-        width: '85%',
-    },
-    inputLabel: {
-        marginBottom: 8,
-    }
-})
