@@ -4,11 +4,12 @@ import Colors from "../../constants/Colors";
 import {useNavigation} from "@react-navigation/native";
 import {useState} from "react";
 import axios from "axios";
+import textTheme from "../../constants/TextTheme";
 
 
 export default function MobileOtp() {
     const navigation = useNavigation();
-    const [mobileNUmber, setMobileNUmber] = useState("");
+    const [mobileNumber, setMobileNumber] = useState("");
 
     const [isFocussed, setIsFocussed] = useState(false);
 
@@ -35,7 +36,7 @@ export default function MobileOtp() {
         try {
             response = await axios.post(BaseURL + '/user/findUser', {
                 platform: platform,
-                userName: mobileNUmber
+                userName: mobileNumber
             })
             responseUserMessage = response.data.message;
 
@@ -55,12 +56,12 @@ export default function MobileOtp() {
                 const response = await axios.post(
                     BaseURL + "/user/sendOtp",
                     {
-                        userName:mobileNUmber,
+                        userName:mobileNumber,
                         platform:platform,
                     })
-                navigation.navigate('VerifyOTP',
+                navigation.navigate('VerificationCodeScreen',
                     {
-                        mobileNumber: mobileNUmber
+                        mobileNumber: mobileNumber
                     });
                 setIsUserFound(true);
             }
@@ -105,30 +106,27 @@ export default function MobileOtp() {
     return (
         <View style={styles.mobileOtpContainer}>
             <View style={{marginTop: 30, marginBottom: 8, width: '82%', }}>
-                <Text style={{fontWeight: '500'}}>Mobile number</Text>
+                <Text style={[textTheme.titleSmall]}>Mobile number</Text>
             </View>
             <View style={styles.mobileNumberContainer}>
 
 
                 <TextInput
-                    style={styles.mobileNumberInput}
+                    style={[textTheme.titleSmall, styles.mobileNumberInput]}
                     placeholder='Enter mobile number'
                     keyboardType= "number-pad"
                     onFocus={onFocusHandler}
                     onBlur={onFocusOutHandler}
-                    value={mobileNUmber}
+                    value={mobileNumber}
                     onChangeText={(text) => {
-                        setMobileNUmber(text);
+                        setMobileNumber(text);
                         setIsUserTyping(true);
-                        // if(text.length === 10) {
-                        //     await findUser() === "user found" ? setIsUserFound(true) : setIsUserFound(false);
-                        // }
                     }}
                     maxLength={10}
                 />
                 {
                     !isUserFound ?
-                        <Text style={{color: Colors.error}}>Incorrect Mobile number</Text> :
+                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number</Text> :
                         <Text > </Text>
                 }
                 <PrimaryButton
@@ -137,7 +135,7 @@ export default function MobileOtp() {
                     >
                     {
                         !isLoading ?
-                            <Text style={{color: Colors.onHighlight}}>Send OTP</Text> :
+                            <Text style={[textTheme.titleSmall, {color: Colors.onHighlight}]}>Send OTP</Text> :
                             <ActivityIndicator color={Colors.onHighlight}/>
                     }
 

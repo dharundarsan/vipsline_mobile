@@ -1,18 +1,52 @@
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet, Pressable} from 'react-native';
 import Colors from "../../constants/Colors";
-import { OtpInput } from "react-native-otp-entry";
-import {useRef, useEffect} from "react";
-import OTPTextInput from "react-native-otp-textinput"
-import OTPInput from "./otpInputBox";
+import {useEffect, useRef, useState} from "react";
 import OtpInputBox from "./otpInputBox";
 import PrimaryButton from "../../ui/PrimaryButton";
+import textTheme from "../../constants/TextTheme";
+import {useDispatch, useSelector} from "react-redux";
+import {authenticateWithOTP} from "../../store/authSlice";
 
-export default function VerificationCodeBody() {
+export default function VerificationCodeBody(props) {
 
-    const otpInputRef = useRef(null);
-    function func() {
-        console.log("hello");
+    const dispatch = useDispatch();
+    const isAuthenticated = useSelector(state => state.authDetails.isAuthenticated);
+
+    const [otp, setOtp] = useState("");
+    // const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const [timer, setTimer] = useState(60);
+
+    useEffect(() => {
+        if (timer <= 0) {
+            return
+        }
+        const s = setInterval(() => {
+            setTimer((prev) => prev - 1);
+        }, 1000)
+        return () => {
+            clearInterval(s);
+        }
+    }, [timer])
+
+    function resendOTPHandler() {
+        setTimer(60);
     }
+
+    function handleOTP(otp) {
+        setOtp(otp);
+    }
+
+    function verifyWithOTP() {
+        // setIsAuthenticated(true);
+        dispatch(authenticateWithOTP(props.mobileNumber, otp, "BUSINESS"));
+
+    }
+
+    // useEffect(() => {
+    //     dispatch(authenticateWithOTP(props.mobileNumber, otp, "BUSINESS"));
+    // }, [dispatch, isAuthenticated]);
+
 
 
     return (
@@ -20,18 +54,46 @@ export default function VerificationCodeBody() {
             <Text style={styles.verificationText}>Verification Code</Text>
             <View style={styles.verificationMessage}>
                 <Text>Enter the 4-digit number we sent to</Text>
-                <Text style={styles.mobileNumber}>+91 902552 2263 - <Text style={styles.editNumberText}>Edit Number</Text></Text>
+                <View style={styles.editNumberContainer}>
+                    <Text
+                        style={[textTheme.titleSmall, styles.mobileNumber]}>
+                        +91 {props.mobileNumber.slice(0, 5)} {props.mobileNumber.slice(5, 10)} - <Text></Text>
+
+                    </Text>
+                    <Pressable onPress={() => props.navigation.goBack()}>
+                        <Text style={[textTheme.titleSmall, styles.editNumberText]}>
+                            Edit Number
+                        </Text>
+                    </Pressable>
+                </View>
+
 
             </View>
 
-            <OtpInputBox style={styles.otpContainer}/>
+            <OtpInputBox style={styles.otpContainer} otp={handleOTP}/>
 
             <View style={styles.resendOtpContainer}>
-                <Text style={styles.didntGetCodeText}>Didn't get a code?</Text>
-                <Text style={styles.resendOtp}>Resend OTP in <Text style={styles.timer}>60 sec</Text></Text>
+                <Text style={[textTheme.titleMedium, styles.didntGetCodeText]}>Didn't get a code?</Text>
+                <Pressable onPress={timer === 0 ? resendOTPHandler : null}>
+                    <Text style={[textTheme.titleSmall, styles.resendOtp]}>
+
+                        Resend OTP {
+                        timer > 0 ?
+                            <Text style={[textTheme.titleSmall, styles.timer]}>
+                                <Text style={[textTheme.titleSmall, styles.resendOtp]}>
+                                    in
+                                </Text> {timer} sec</Text> : <Text></Text>
+                    }
+                    </Text>
+                </Pressable>
             </View>
 
-            <PrimaryButton label="SUBMIT" buttonStyle={styles.submitButton}/>
+            <PrimaryButton
+                label="SUBMIT"
+                buttonStyle={styles.submitButton}
+                textStyle={[textTheme.titleSmall]}
+                onPress={verifyWithOTP}
+            />
 
 
 
@@ -89,5 +151,8 @@ const styles = StyleSheet.create({
         alignSelf: 'auto',
         marginTop: 32,
         backgroundColor: Colors.highlight,
+    },
+    editNumberContainer: {
+        flexDirection: 'row',
     }
 })

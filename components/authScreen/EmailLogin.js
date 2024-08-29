@@ -6,6 +6,9 @@ import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
 import CheckBox from 'react-native-check-box'
 import findUser from "../../util/apis/findUserApi";
+import textTheme from "../../constants/TextTheme";
+import {useDispatch} from "react-redux";
+import {updateAuthStatus} from "../../store/authSlice";
 
 export default function EmailLogin() {
     const navigation = useNavigation();
@@ -32,12 +35,14 @@ export default function EmailLogin() {
 
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
 
+    const dispatch = useDispatch();
+
     /**
      * UI logics ---------------------------------------------------------------------------
      */
 
     function forgetPasswordOnPressHandler() {
-        navigation.navigate('ForgetPassword');
+        navigation.navigate('ForgetPasswordScreen');
     }
 
     /** Authentication Logic
@@ -71,10 +76,12 @@ export default function EmailLogin() {
 
         if (isAuthenticationSuccessful) {
             setIsPasswordValid(true);
+            dispatch(updateAuthStatus(true));
             console.log("Signed In Successfully!!!");
         }
         else {
             setIsPasswordValid(false);
+            dispatch(updateAuthStatus(false));
         }
         setIsLoading(false);
 
@@ -121,7 +128,8 @@ export default function EmailLogin() {
         },
         inputLabel: {
             marginBottom: 8,
-            fontWeight: '500'
+            fontWeight: '500',
+            marginTop: 6,
         },
         signInButton: {
             width: '100%',
@@ -131,6 +139,9 @@ export default function EmailLogin() {
         },
         activityIndicator: {
 
+        },
+        showPasswordText: {
+            marginLeft: 6
         }
     })
 
@@ -140,10 +151,10 @@ export default function EmailLogin() {
 
     return (
         <View style={styles.emailContainer}>
-                <Text style={styles.inputLabel}>Email Address</Text>
+                <Text style={[textTheme.titleSmall, styles.inputLabel]}>Email Address</Text>
                 <TextInput
                 placeholder="Enter email Address"
-                style={[styles.emailInput]}
+                style={[textTheme.titleSmall, styles.emailInput]}
                 onChangeText={setEmail}
                 value={email}
                 onFocus={() => {
@@ -154,15 +165,15 @@ export default function EmailLogin() {
                 />
             {
                 !isUserFound ?
-                    <Text style={{color: Colors.error}}>Incorrect email</Text> :
+                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect email</Text> :
                     <Text></Text>
 
             }
-                <Text style={[styles.inputLabel, {marginTop: 6}]}>Password</Text>
+                <Text style={[textTheme.titleSmall, styles.inputLabel]}>Password</Text>
                 <TextInput
                 placeholder="Enter password"
                 value={password}
-                style={styles.passwordInput}
+                style={[textTheme.titleSmall, styles.passwordInput]}
                 onChangeText={setPassword}
                 secureTextEntry={!isChecked}
                 onFocus={() => {
@@ -172,7 +183,7 @@ export default function EmailLogin() {
                 />
             {
                 !isPasswordValid ?
-                    <Text style={{color: Colors.error}}>Incorrect password</Text> :
+                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect password</Text> :
                     <Text></Text>
             }
             <View style={{marginTop: 6, width: '100%',flexDirection:'row', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -187,12 +198,12 @@ export default function EmailLogin() {
 
 
                 />
-                    <Text style={{marginLeft: 6}}>Show Password</Text>
+                    <Text style={[textTheme.titleSmall, styles.showPasswordText]}>Show Password</Text>
                 </View>
                 <Pressable
                     onPress={forgetPasswordOnPressHandler}
                 >
-                    <Text style={{color: Colors.highlight, fontWeight: "600"}}>Forgot Password?</Text>
+                    <Text style={[textTheme.titleSmall, {color: Colors.highlight, fontWeight: "600"}]}>Forgot Password?</Text>
                 </Pressable>
             </View>
                 <PrimaryButton
@@ -201,7 +212,7 @@ export default function EmailLogin() {
                 >
                     {
                         !isLoading ?
-                            <Text style={{color: Colors.onHighlight, fontWeight: '600'}}>Sign in</Text> :
+                            <Text style={[textTheme.titleSmall, {color: Colors.onHighlight, fontWeight: '600'}]}>Sign in</Text> :
                             <ActivityIndicator color={Colors.onHighlight} style={styles.activityIndicator}/>
                     }
 
