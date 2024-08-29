@@ -3,9 +3,9 @@ import {Image, SafeAreaView, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
+import {AntDesign, FontAwesome5} from '@expo/vector-icons';
+import React, {useCallback, useEffect} from 'react';
 import {Provider, useDispatch, useSelector} from 'react-redux';
-import {AntDesign} from '@expo/vector-icons';
-import React, {useEffect} from 'react';
 import CheckoutScreen from './screens/CheckoutScreen';
 import CustomDrawer from './components/common/CustomDrawer';
 import AuthScreen from './screens/AuthScreen';
@@ -15,7 +15,13 @@ import store from './store/store';
 import Colors from './constants/Colors';
 import {enableScreens} from "react-native-screens";
 import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
-import ClientSegmentScreen from "./screens/ClientSegmentScreen";
+// import ClientSegmentScreen from "./screens/ClientSegmentScreen";
+
+//Font And SplashScreen Imports
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+SplashScreen.preventAutoHideAsync();
+
 
 // Drawer icon imports
 import calender_icon from "./assets/icons/drawerIcons/calendar.png";
@@ -31,6 +37,8 @@ import marketing_icon from "./assets/icons/drawerIcons/marketing.png";
 import staffs_icon from "./assets/icons/drawerIcons/staffs.png";
 import settings_icon from "./assets/icons/drawerIcons/settings.png";
 import reports_icon from "./assets/icons/drawerIcons/reports.png";
+import ClientSegmentScreen from "./screens/ClientSegmentScreen";
+import {useFonts} from "expo-font";
 
 enableScreens();
 
@@ -41,6 +49,20 @@ const AuthStack = createNativeStackNavigator();
 // const MainStack = createNativeStackNavigator();
 
 export default function App() {
+    const [loaded, error] = useFonts({
+        'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
+        'Inter-Bold':require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
+    });
+
+    useEffect(() => {
+        if (loaded || error) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded, error]);
+
+    if (!loaded && !error) {
+        return null;
+    }
     return (
         <Provider store={store}>
             <SafeAreaView style={styles.safeAreaView}>
@@ -80,7 +102,9 @@ const AppNavigator = () => {
 
     return (
         <NavigationContainer>
-            {isAuthenticated ? <MainDrawerNavigator /> : <AuthNavigator />}
+            {/*{isAuthenticated ? */}
+                <MainDrawerNavigator />
+            {/*: <AuthNavigator />}*/}
         </NavigationContainer>
     );
 };
