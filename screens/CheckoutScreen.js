@@ -24,6 +24,7 @@ import {
 } from "../store/clientFilterSlice";
 import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
+import {loadCartFromDB} from "../store/cartSlice";
 
 
 const CheckoutScreen = () => {
@@ -44,6 +45,7 @@ const CheckoutScreen = () => {
         dispatch(loadClientCountFromDb());
         dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadStaffsFromDB());
+        dispatch(loadCartFromDB());
     }, []);
 
     return (

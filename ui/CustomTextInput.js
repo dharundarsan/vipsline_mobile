@@ -1,13 +1,13 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {StyleSheet, Text, TextInput, View} from "react-native";
 import textTheme from "../constants/TextTheme";
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import Colors from "../constants/Colors";
 import DropdownModal from "./DropdownModal";
 import PrimaryButton from "./PrimaryButton";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { formatDate } from "../util/Helpers";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {formatDate} from "../util/Helpers";
+import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 /**
  * CustomTextInput component for various types of text inputs, including text, email, phone number, and dropdown.
@@ -15,11 +15,15 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
  * @param {Object} props - Props for the CustomTextInput component.
  * @param {'text' | 'email' | 'phoneNo' | 'dropdown' | 'multiLine' | 'date'} props.type - The type of input to display.
  * @param {string | Date} [props.value] - The current value of the text input.
+ * @param {string | Date} [props.defaultValue] - The default value of the text input.
  * @param {string} [props.placeholder] - Placeholder text for the input.
+ * @param {number} [props.flex] - Flex of text input.
  * @param {string} [props.label] - Label text to display above the input.
+ * @param {boolean} [props.readOnly] - Makes the text input read only.
  * @param {Array} [props.dropdownItems] - Items to be listed in the dropdown option.
  * @param {function} [props.validator] - Function to validate the input value.
  * @param {function} props.onChangeText - Function to call when the text input value changes.
+ * @param {function} props.onEndEditing - Function to call when the text input change complete.
  * @param {function} [props.onChangeValue] - Function to call when the selected value changes in dropdown.
  * @param {function} [props.onSave] - Function to call when the save button is pressed.
  *
@@ -59,14 +63,17 @@ const CustomTextInput = (props) => {
     if (props.type === "text" || props.type === "email" || props.type === "multiLine") {
         content = (
             <TextInput
+                onEndEditing={(event) => props.onEndEditing(event.nativeEvent.text)}
+                readOnly={props.readOnly}
                 style={[
                     textTheme.bodyLarge,
                     styles.textInput,
-                    { borderColor: error ? Colors.error : Colors.grey400 },
-                    props.type === "multiLine" ? { height: 100, textAlignVertical: "top", paddingVertical: 10 } : {},
+                    {borderColor: error ? Colors.error : Colors.grey400},
+                    props.type === "multiLine" ? {height: 100, textAlignVertical: "top", paddingVertical: 10} : {},
                 ]}
                 multiline={props.type === "multiLine"}
                 value={props.value}
+                defaultValue={props.defaultValue}
                 placeholder={props.placeholder}
                 onBlur={() => handleSave()}
                 onChangeText={(text) => {
@@ -87,7 +94,7 @@ const CustomTextInput = (props) => {
                     onCloseModal={() => setIsDropdownModalVisible(false)}
                     onChangeValue={(value) => {
                         setCountryCode(value);
-                        props.onChangeText([value,phoneNumber]);
+                        props.onChangeText([value, phoneNumber]);
                         setIsDropdownModalVisible(false);
                     }}
                     dropdownItems={["+91", "+74", "+423", "+983"]}
@@ -99,21 +106,21 @@ const CustomTextInput = (props) => {
                         onPress={() => setIsDropdownModalVisible(true)}
                     >
                         <Text style={[textTheme.bodyLarge]}>{countryCode}</Text>
-                        <FontAwesome name="angle-down" size={24} color="black" />
+                        <FontAwesome name="angle-down" size={24} color="black"/>
                     </PrimaryButton>
                     <TextInput
                         style={[
                             textTheme.bodyLarge,
                             styles.textInput,
                             styles.phoneNumberInput,
-                            { borderColor: error ? Colors.error : Colors.grey400 },
+                            {borderColor: error ? Colors.error : Colors.grey400},
                         ]}
                         value={phoneNumber}
                         placeholder={props.placeholder}
                         onBlur={() => handleSave()}
                         onChangeText={(text) => {
                             setPhoneNumber(text);
-                            props.onChangeText([countryCode,text]);
+                            props.onChangeText([countryCode, text]);
                             if (error && props.validator && props.validator(text) === true) {
                                 setError(false);
                                 setErrorMessage("");
@@ -145,7 +152,7 @@ const CustomTextInput = (props) => {
                     <Text style={[textTheme.bodyLarge]}>
                         {props.value === undefined || props.value === "" ? "Select " + props.label : props.value}
                     </Text>
-                    <FontAwesome name="angle-down" size={24} color="black" />
+                    <FontAwesome name="angle-down" size={24} color="black"/>
                 </PrimaryButton>
             </>
         );
@@ -185,7 +192,7 @@ const CustomTextInput = (props) => {
     }
 
     return (
-        <View style={styles.commonContainer}>
+        <View style={[styles.commonContainer, props.flex !== undefined ? {flex: 1} : {}]}>
             <Text style={[textTheme.bodyMedium, styles.labelText]}>{props.label}</Text>
             {content}
             {error && <Text style={[textTheme.bodyMedium, styles.errorText]}>{errorMessage}</Text>}
@@ -203,7 +210,7 @@ const styles = StyleSheet.create({
     textInput: {
         flexDirection: "row",
         alignItems: "center",
-        textAlignVertical:"center",
+        textAlignVertical: "center",
         borderWidth: 1,
         borderRadius: 5,
         paddingRight: 20,
@@ -250,30 +257,30 @@ const styles = StyleSheet.create({
         paddingVertical: 9,
         paddingHorizontal: 20,
     },
-    dateTimeButtom:{
+    dateTimeButtom: {
         borderWidth: 1,
         borderRadius: 5,
         borderColor: Colors.grey400,
         backgroundColor: Colors.background,
         marginVertical: 5,
     },
-    dateTimeButtonPressable:{
+    dateTimeButtonPressable: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         paddingVertical: 0,
         paddingHorizontal: 0,
     },
-    dateTimeButtonIcon:{
-        borderLeftWidth:1,
-        borderLeftColor:Colors.grey400,
-        height:"100%",
-        paddingHorizontal:10,
-        paddingVertical:9,
+    dateTimeButtonIcon: {
+        borderLeftWidth: 1,
+        borderLeftColor: Colors.grey400,
+        height: "100%",
+        paddingHorizontal: 10,
+        paddingVertical: 9,
     },
     dateTimeButtonText: {
-        paddingHorizontal:20,
-        paddingVertical:9,
+        paddingHorizontal: 20,
+        paddingVertical: 9,
     }
 });
 

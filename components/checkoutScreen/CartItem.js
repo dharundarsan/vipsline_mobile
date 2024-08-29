@@ -24,7 +24,7 @@ const CartItem = (props) => {
     return <>
         <View style={styles.cartItem}>
             <DropdownModal isVisible={isStaffDropdownModalVisible}
-                           onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs} selectedValue={selectedStaff} onChangeValue={setSelectedStaff} />
+                           onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs} object={true} objectName={"name"} selectedValue={selectedStaff} onChangeValue={setSelectedStaff} />
             <View style={styles.itemNameAndDetailsContainer}>
                 <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>

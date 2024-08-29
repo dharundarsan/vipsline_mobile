@@ -22,7 +22,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "axios": "^1.7.2",
     "eas": "^0.1.0",
-    "expo": "^51.0.25",
+    "expo": "^51.0.31",
     "expo-build-properties": "~0.12.4",
     "expo-constants": "^16.0.2",
     "expo-status-bar": "~1.12.1",

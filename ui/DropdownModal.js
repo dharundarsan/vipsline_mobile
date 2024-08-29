@@ -12,7 +12,7 @@ const DropdownModal = (props) => {
         <TouchableOpacity style={styles.modalContent} onPress={props.onCloseModal} activeOpacity={1} >
             <FlatList style={styles.dropdownList} data={props.dropdownItems}  renderItem={({item}) => {
                 return <>
-                    <PrimaryButton label={item.name} buttonStyle={styles.closeButton}
+                    <PrimaryButton label={ props.object ? Object.entries(item).filter((arr) => arr[0] === props.objectName)[0][1] : item} buttonStyle={styles.closeButton}
                                    pressableStyle={styles.closeButtonPressable}
                                    onPress={() => {
                                        props.onChangeValue(item);

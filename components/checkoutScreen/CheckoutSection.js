@@ -52,7 +52,7 @@ const CheckoutSection = (props) => {
 
 
     return <View style={styles.checkoutSection}>
-        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={()=>{setIsPaymentModalVisible(false)}} />
+        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={()=>{setIsPaymentModalVisible(false)}} price={props.data[0].total_price} />
         <View style={styles.checkoutDetailRow}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_discount_in_price}</Text>
