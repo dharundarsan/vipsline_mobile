@@ -89,7 +89,6 @@ export default function clientInfoModal(props) {
 
 
     function clientInfoCategoryPressHandler(id) {
-        console.log(id);
         setClientMoreDetails(id);
     }
     function seeMoreStatisticsHandler() {
