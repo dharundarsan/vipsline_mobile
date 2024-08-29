@@ -6,12 +6,40 @@ import {Entypo} from '@expo/vector-icons';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import MobileOtp from "../components/authScreen/MobileOtp";
 import EmailLogin from "../components/authScreen/EmailLogin";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
+import textTheme from "../constants/TextTheme";
+import {
+    loadMembershipsDataFromDb,
+    loadPackagesDataFromDb,
+    loadProductsDataFromDb,
+    loadServicesDataFromDb
+} from "../store/catalogueSlice";
+import {loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
+import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
+import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
+import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
+import {useDispatch} from "react-redux";
 
 function AuthScreen() {
     const navigate = useNavigation();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(loadServicesDataFromDb("women"));
+        dispatch(loadServicesDataFromDb("men"));
+        dispatch(loadServicesDataFromDb("kids"));
+        dispatch(loadServicesDataFromDb("general"));
+        dispatch(loadProductsDataFromDb());
+        dispatch(loadPackagesDataFromDb());
+        dispatch(loadMembershipsDataFromDb());
+        dispatch(loadClientsFromDb());
+        dispatch(loadClientCountFromDb());
+        dispatch(loadClientFiltersFromDb(10, "All"));
+        dispatch(loadBusinessesListFromDb());
+        dispatch(loadLoginUserDetailsFromDb());
+    }, []);
 
 
     function signUpHandler() {
@@ -31,21 +59,15 @@ function AuthScreen() {
     const styles = StyleSheet.create({
         signIn: {
             flex: 1,
-            // borderWidth: 7,
-            // borderColor: 'pink',
         },
         body: {
             flex: 1,
-            backgroundColor: "#ffffff",
+            backgroundColor: Colors.white,
             alignItems: "center",
-            // borderWidth: 10,
-            // borderColor: 'purple',
-            // height: '100%'
 
         },
         signInText: {
-            fontSize: 20,
-            fontWeight: "600",
+            fontWeight: '600',
             marginTop: 30,
         },
         buttonContainer: {
@@ -59,17 +81,18 @@ function AuthScreen() {
             fontWeight: '700',
             color: isMobileOtp ? Colors.white : Colors.black,
             marginLeft: 12,
+            letterSpacing: 0,
         },
         emailButtonTextStyle: {
             fontWeight: '700',
             color: !isMobileOtp ? Colors.white : Colors.black,
             marginLeft: 12,
+            letterSpacing: 0,
 
         },
         orContainer: {
             flexDirection: "row",
             width: '80%',
-            // borderWidth: 2,
             alignItems: "center",
             marginTop: 16
         },
@@ -81,6 +104,9 @@ function AuthScreen() {
         signUpContainer: {
             flexDirection: 'row',
             marginTop: 16
+        },
+        signUpText: {
+            fontWeight: '600',
         },
         mobileOtpButtonStyle: {
             backgroundColor: isMobileOtp ? Colors.darkBlue : Colors.grey200,
@@ -97,7 +123,7 @@ function AuthScreen() {
         <View style={styles.signIn}>
             <SignInHeader/>
             <View style={styles.body}>
-                <Text style={styles.signInText}>Sign In</Text>
+                <Text style={[textTheme.headlineMedium, styles.signInText]}>Sign in</Text>
                 <View style={styles.buttonContainer}>
                     <PrimaryButton
                         buttonStyle={styles.mobileOtpButtonStyle}
@@ -106,7 +132,7 @@ function AuthScreen() {
                     >
                         <View style={{flexDirection: "row"}}>
                             <Entypo name="mobile" size={20} color={isMobileOtp ? Colors.white : "black"}/>
-                            <Text style={styles.mobileButtonTextStyle}>Mobile otp</Text>
+                            <Text style={[textTheme.labelLarge, styles.mobileButtonTextStyle]}>Mobile otp</Text>
                         </View>
 
                     </PrimaryButton>
@@ -118,28 +144,25 @@ function AuthScreen() {
                         <View style={{flexDirection: "row"}}>
                             <MaterialCommunityIcons name="email-outline" size={20}
                                                     color={!isMobileOtp ? Colors.white : "black"}/>
-                            <Text style={styles.emailButtonTextStyle}>Email</Text>
+                            <Text style={[textTheme.labelLarge, styles.emailButtonTextStyle]}>Email</Text>
                         </View>
                     </PrimaryButton>
                 </View>
                 {isMobileOtp ? <MobileOtp /> : <EmailLogin />}
-                {/*<EmailLogin />*/}
                 <View style={styles.orContainer}>
 
                     <View style={styles.hr}></View>
-                    <Text style={{paddingHorizontal: 8}}>or</Text>
+                    <Text style={[textTheme.bodyMedium, {paddingHorizontal: 8}]}>or</Text>
                     <View style={styles.hr}></View>
 
                 </View>
 
                 <View style={styles.signUpContainer}>
-                    <Text style={{fontWeight: '600'}}>Don't have an account? </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: '600'}]}>Don't have an account? </Text>
                     <Pressable onPress={signUpHandler}>
-                        <Text style={{color: Colors.highlight, fontWeight: '600'}}>Sign Up Now</Text>
+                        <Text style={[textTheme.bodyMedium, styles.signUpText]}>Sign Up Now</Text>
                     </Pressable>
                 </View>
-                {/*<PrimaryButton buttonStyle={{marginTop: 20}} onPress={() => navigate.navigate('Checkout')}*/}
-                {/*               label="Dummy Navigate to Checkout Screen"/>*/}
             </View>
         </View>
     );

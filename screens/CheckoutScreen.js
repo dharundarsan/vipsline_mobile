@@ -23,6 +23,8 @@ import {
     loadClientFiltersFromDb,
 } from "../store/clientFilterSlice";
 import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
+import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
+import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 
 
 const CheckoutScreen = () => {
@@ -31,18 +33,20 @@ const CheckoutScreen = () => {
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
 
 
-    useEffect(() => {
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb());
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
-    }, []);
+    // useEffect(() => {
+    //     dispatch(loadServicesDataFromDb("women"));
+    //     dispatch(loadServicesDataFromDb("men"));
+    //     dispatch(loadServicesDataFromDb("kids"));
+    //     dispatch(loadServicesDataFromDb("general"));
+    //     dispatch(loadProductsDataFromDb());
+    //     dispatch(loadPackagesDataFromDb());
+    //     dispatch(loadMembershipsDataFromDb());
+    //     dispatch(loadClientsFromDb());
+    //     dispatch(loadClientCountFromDb());
+    //     dispatch(loadClientFiltersFromDb(10, "All"));
+    //     dispatch(loadBusinessesListFromDb());
+    //     dispatch(loadLoginUserDetailsFromDb());
+    // }, []);
 
     return (
         <View style={styles.checkoutScreen}>

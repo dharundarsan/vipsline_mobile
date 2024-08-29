@@ -7,7 +7,7 @@ import {useState} from "react";
 import ForgetPasswordEmailOrNumber from "../components/forgetPasswordScreen/ForgetPasswordEmailOrNumber";
 import ForgetPasswordOTP from "../components/forgetPasswordScreen/ForgetPasswordOTP";
 
-export default function ForgetPasswordScreen({navigation}) {
+export default function ForgetPasswordScreen() {
     function sendOtpHandler() {
         setIsOtp(true);
     }
@@ -16,7 +16,15 @@ export default function ForgetPasswordScreen({navigation}) {
         setIsOtp(false);
     }
 
+    /**
+     * @constant {isOtp}  - send otp button is clicked or not in {ForgetPasswordEmailOrNumber} screen
+     */
+
     const [isOtp, setIsOtp] = useState(false);
+
+    const [mobileNumber, setMobileNumber] = useState("");
+
+    console.log("mobile number", mobileNumber);
 
     return(
         <>
@@ -24,7 +32,11 @@ export default function ForgetPasswordScreen({navigation}) {
             <StatusBar style="light" />
             <View style={styles.forgetPassword}>
                 <SignInHeader />
-                {isOtp ? <ForgetPasswordOTP backHandler={backHandler}/> : <ForgetPasswordEmailOrNumber otpHandler={sendOtpHandler} />}
+                {
+                    isOtp ?
+                        <ForgetPasswordOTP backHandler={backHandler} mobileNumber={mobileNumber} /> :
+                        <ForgetPasswordEmailOrNumber otpHandler={sendOtpHandler} setMobileNumber={setMobileNumber} />
+                }
 
             </View>
 
@@ -37,15 +49,11 @@ const styles = StyleSheet.create({
     safeAreaView: {
         flex: 1,
         backgroundColor: Colors.onBackground,
-        // borderWidth: 3,
-        // borderColor: 'blue'
     },
     forgetPassword: {
         flex: 1,
         backgroundColor: Colors.white,
 
-        // borderWidth: 3,
-        // borderColor: 'green'
     },
 
 })
