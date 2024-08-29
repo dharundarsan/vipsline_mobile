@@ -103,6 +103,8 @@ const AddItemModal = (props) => {
             flexDirection: "row",
         },
         categoryListItemButton: {
+            borderBottomColor:Colors.grey500,
+            borderBottomWidth:1,
             backgroundColor: Colors.transparent,
             alignSelf: "auto",
         },
@@ -157,10 +159,11 @@ const AddItemModal = (props) => {
             </View>
             <Divider/>
             <FlatList
+                bounces={false}
                 data={modalCategoryListData}
+                // contentContainerStyle={{borderBottomColor:Colors.grey500,borderBottomWidth:1}}
                 renderItem={({item}) => {
                     return (
-                        <>
                             <PrimaryButton
                                 buttonStyle={styles.categoryListItemButton}
                                 pressableStyle={styles.categoryListItemPressable}
@@ -182,8 +185,7 @@ const AddItemModal = (props) => {
                                     color="black"
                                 />
                             </PrimaryButton>
-                            <Divider/>
-                        </>
+
                     );
                 }}
                 keyExtractor={(item) => item.id.toString()}

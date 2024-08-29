@@ -1,10 +1,13 @@
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI} from "@env";
+import {useDispatch} from "react-redux";
+import {updateAuthStatus} from "../../store/authSlice";
 
 export default async function authenticateWithOTPApi(mobileNumber, otp, platform) {
     let isAuthenticated;
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
     let message = '';
+    const dispatch = useDispatch();
     try {
         console.log(`${otp} ${mobileNumber} ${platform}`);
         const response = await axios.post(BaseURL + "/authenticateWithOtp", {
@@ -12,20 +15,14 @@ export default async function authenticateWithOTPApi(mobileNumber, otp, platform
             otp: otp,
             platform: platform,
         });
-        isAuthenticated = true
         message = response.data.message;
-    }
-    catch (error) {
+        if (message === "User authenticated") {
+            dispatch(updateAuthStatus(true));
+        } else {
+            dispatch(updateAuthStatus(false));
+        }
+    } catch (error) {
         console.log("incorrect Otp: " + error);
-        isAuthenticated = false;
+        dispatch(updateAuthStatus(false));
     }
-    if(message === "User authenticated") {
-        console.log(message + "with OTP");
-        isAuthenticated = true;
-    }
-    else {
-        isAuthenticated = false;
-    }
-
-    return isAuthenticated
 }
