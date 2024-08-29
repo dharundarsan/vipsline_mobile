@@ -66,7 +66,11 @@ export default function BusinessCard(props) {
 
 
     return (
-        <Pressable style={styles.businessCard} android_ripple={{color: Colors.grey250}}>
+        <Pressable
+            style={styles.businessCard}
+            android_ripple={{color: Colors.grey250}}
+            onPress={props.onPress}
+        >
             <View style={styles.profileImageContainer}>
                 <Image
                     source={{
