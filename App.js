@@ -88,6 +88,7 @@ const CheckoutStack = () => (
                         onPress={() => navigation.toggleDrawer()}
                     />
                 ),
+                presentation: 'modal'
             })}
         />
     </Stack.Navigator>
@@ -103,8 +104,8 @@ const AppNavigator = () => {
 
     return (
         <NavigationContainer>
-            {/*{isAuthenticated ? */}
-            <MainDrawerNavigator/>
+            {/*{isAuthenticated ?*/}
+                <MainDrawerNavigator />
             {/*: <AuthNavigator />}*/}
         </NavigationContainer>
     );

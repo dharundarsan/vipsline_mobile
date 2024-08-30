@@ -6,11 +6,13 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
 import {authenticateWithOTP} from "../../store/authSlice";
+import {useNavigation} from "@react-navigation/native";
+import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
 
 export default function VerificationCodeBody(props) {
 
     const dispatch = useDispatch();
-    const isAuthenticated = useSelector(state => state.authDetails.isAuthenticated);
+    const navigation = useNavigation();
 
     const [otp, setOtp] = useState("");
     // const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,17 +39,20 @@ export default function VerificationCodeBody(props) {
         setOtp(otp);
     }
 
-    function verifyWithOTP() {
+    async function verifyWithOTP() {
+
+
         // setIsAuthenticated(true);
-        dispatch(authenticateWithOTP(props.mobileNumber, otp, "BUSINESS"));
 
+        const isAuthenticated = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS");
+
+        if(isAuthenticated) {
+
+            navigation.navigate(
+                'ListOfBusinessesScreen',
+            );
+        }
     }
-
-    // useEffect(() => {
-    //     dispatch(authenticateWithOTP(props.mobileNumber, otp, "BUSINESS"));
-    // }, [dispatch, isAuthenticated]);
-
-
 
     return (
         <View style={styles.verificationCodeBody}>
@@ -70,7 +75,7 @@ export default function VerificationCodeBody(props) {
 
             </View>
 
-            <OtpInputBox style={styles.otpContainer} otp={handleOTP}/>
+            <OtpInputBox style={styles.otpContainer} otp={handleOTP} verify={false} />
 
             <View style={styles.resendOtpContainer}>
                 <Text style={[textTheme.titleMedium, styles.didntGetCodeText]}>Didn't get a code?</Text>
@@ -92,7 +97,9 @@ export default function VerificationCodeBody(props) {
                 label="SUBMIT"
                 buttonStyle={styles.submitButton}
                 textStyle={[textTheme.titleSmall]}
-                onPress={verifyWithOTP}
+                onPress={() => {
+                    verifyWithOTP();
+                }}
             />
 
 

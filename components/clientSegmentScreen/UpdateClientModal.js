@@ -10,6 +10,7 @@ import {capitalizeFirstLetter, checkNullUndefined, formatDate} from "../../util/
 import {useDispatch, useSelector} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
 import updateClientAPI from "../../util/apis/updateClientAPI";
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 const UpdateClientModal = (props) => {
     // const details = useSelector(state => state.clientInfo.details);
@@ -98,9 +99,11 @@ const UpdateClientModal = (props) => {
                 pinCode: "",
                 state: "Tamilnadu",
             });
-            ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
             dispatch(loadClientCountFromDb());
+            dispatch(loadClientInfoFromDb(clientId));
             props.onCloseModal();
+            ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
+            // props.onUpdate();
         } catch (e) {
             console.log(e);
             ToastAndroid.show(e + "error", ToastAndroid.LONG);

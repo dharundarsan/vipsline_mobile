@@ -8,7 +8,7 @@ import CheckBox from 'react-native-check-box'
 import findUser from "../../util/apis/findUserApi";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch} from "react-redux";
-import {updateAuthStatus} from "../../store/authSlice";
+import {updateAuthStatus, updateAuthToken} from "../../store/authSlice";
 
 export default function EmailLogin() {
     const navigation = useNavigation();
@@ -62,6 +62,7 @@ export default function EmailLogin() {
                     userName: email,
                     password: password
                 });
+                dispatch(updateAuthToken(response.data.other_message));
             }
             catch (error) {
                 console.log("could not authenticate with email: " + error);
@@ -76,7 +77,9 @@ export default function EmailLogin() {
 
         if (isAuthenticationSuccessful) {
             setIsPasswordValid(true);
-            dispatch(updateAuthStatus(true));
+            navigation.navigate(
+                "ListOfBusinessesScreen",
+            );
             console.log("Signed In Successfully!!!");
         }
         else {

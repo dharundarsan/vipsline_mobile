@@ -12,20 +12,14 @@ export default async function authenticateWithOTPApi(mobileNumber, otp, platform
             otp: otp,
             platform: platform,
         });
-        isAuthenticated = true
         message = response.data.message;
-    }
-    catch (error) {
+        if (message === "User authenticated") {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
         console.log("incorrect Otp: " + error);
-        isAuthenticated = false;
+        return false;
     }
-    if(message === "User authenticated") {
-        console.log(message + "with OTP");
-        isAuthenticated = true;
-    }
-    else {
-        isAuthenticated = false;
-    }
-
-    return isAuthenticated
 }

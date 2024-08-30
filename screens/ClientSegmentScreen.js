@@ -21,7 +21,7 @@ import {
     loadClientInfoFromDb,
     updateClientId
 } from "../store/clientInfoSlice";
-import {loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
 import {loadClientCountFromDb} from "../store/clientSlice";
 
@@ -61,8 +61,11 @@ export default function ClientSegmentScreen() {
     const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
     const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
 
+    // const [currentCount, setCurrentCount] = useState(allClientCount);
+
     useLayoutEffect(() => {
         dispatch(loadClientCountFromDb());
+        // dispatch(loadClientFiltersFromDb(10, "All"));
     }, []);
 
 
@@ -126,20 +129,20 @@ export default function ClientSegmentScreen() {
                         query={searchQuery}
                     />
 
-                    <ClientInfoModal
-                        visible={isClientInfoModalVisible}
-                        setVisible={setIsClientInfoModalVisible}
-                        closeModal={() => {
-                            setIsClientInfoModalVisible(false);
-                            dispatch(clearClientInfo());
-
-                        }}
-                        name={clientName}
-                        phone={clientPhone}
-                        id={clientId}
-                        setSearchQuery={setSearchQuery}
-                        setFilterPressed={setFilterPressed}
-                    />
+            <ClientInfoModal
+                visible={isClientInfoModalVisible}
+                setVisible={setIsClientInfoModalVisible}
+                closeModal={() => {
+                    setIsClientInfoModalVisible(false);
+                    dispatch(clearClientInfo());
+                    dispatch(loadClientFiltersFromDb(10, "All"));
+                }}
+                name={clientName}
+                phone={clientPhone}
+                id={clientId}
+                setSearchQuery={setSearchQuery}
+                setFilterPressed={setFilterPressed}
+            />
 
                     <AddClient/>
 
@@ -224,42 +227,51 @@ export default function ClientSegmentScreen() {
                                         />
                                 }
 
-                                <Pagination
-                                    filterPressed={filterPressed}
-                                    setIsModalVisible={setIsModalVisible}
+                {
+                    clientCount >= 10 ?
+                    <Pagination
+                        filterPressed={filterPressed}
+                        setIsModalVisible={setIsModalVisible}
+                    /> : null
+                }
+
+                </> :
+                    <>
+                        {
+                            !isSearchClientFetching ?
+                            <FlatList
+                                data={searchClientList}
+                                scrollEnabled={false}
+                                renderItem={renderItem}
+                            /> :
+                                <Bullets
+                                    tHeight={35}
+                                    tWidth={"75%"}
+                                    listSize={maxEntry}
+                                    aSize={35}
+                                    animationDuration={500}
+                                    containerStyles={{
+                                        paddingVertical: 16,
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: Colors.grey250
+                                    }}
+                                    avatarStyles={{marginLeft: 16}}
                                 />
-                            </> :
-                            <>
-                                {
-                                    !isSearchClientFetching ?
-                                        <FlatList
-                                            data={searchClientList}
-                                            scrollEnabled={false}
-                                            renderItem={renderItem}
-                                        /> :
-                                        <Bullets
-                                            tHeight={35}
-                                            tWidth={"75%"}
-                                            listSize={maxEntry}
-                                            aSize={35}
-                                            animationDuration={500}
-                                            containerStyles={{
-                                                paddingVertical: 16,
-                                                borderBottomWidth: 1,
-                                                borderBottomColor: Colors.grey250
-                                            }}
-                                            avatarStyles={{marginLeft: 16}}
-                                        />
 
                                 }
 
-                                <SearchClientPagination
-                                    filterPressed={filterPressed}
-                                    setIsModalVisible={setIsModalVisible}
-                                    query={searchQuery}
-                                />
-                            </>
-                    }
+                        {
+                            clientCount >= 10 ?
+                            <SearchClientPagination
+                                filterPressed={filterPressed}
+                                setIsModalVisible={setIsModalVisible}
+                                query={searchQuery}
+                            /> : null
+                        }
+
+
+                    </>
+            }
 
 
                 </View>

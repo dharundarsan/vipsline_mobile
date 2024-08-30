@@ -7,11 +7,14 @@ import textTheme from "../../constants/TextTheme";
 import {useEffect, useState} from "react";
 import sendOTPApi from "../../util/apis/sendOTPApi";
 import {useDispatch} from "react-redux";
-import {authenticateWithOTP} from "../../store/authSlice";
+import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
 
 export default function ForgetPasswordOTP(props) {
     const [otp, setOtp] = useState("");
     const dispatch = useDispatch();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const [changing, setChanging] = useState(0);
 
     const [timer, setTimer] = useState(60)
     useEffect(() => {
@@ -46,7 +49,13 @@ export default function ForgetPasswordOTP(props) {
                     Enter one-time password sent to your registered email and mobile number
                 </Text>
             </View>
-            <OtpInputBox style={styles.otpBox} otp={(otp) => setOtp(otp)}/>
+            <OtpInputBox
+                style={styles.otpBox}
+                otp={(otp) => setOtp(otp)}
+                verify={isAuthenticated}
+                changing={changing}
+                setChanging={setChanging}
+            />
 
             <View style={styles.resendOtpContainer}>
                 <Text
@@ -73,8 +82,9 @@ export default function ForgetPasswordOTP(props) {
                 label="VERIFY"
                 buttonStyle={styles.submitButton}
                 textStyle={[textTheme.titleMedium]}
-                onPress={() => {
-                    dispatch(authenticateWithOTP(props.mobileNumber, otp, "BUSINESS"));
+                onPress={async () => {
+                    const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS")
+                    setIsAuthenticated(authStatus);
                 }}
             />
 

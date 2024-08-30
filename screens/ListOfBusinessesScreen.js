@@ -3,12 +3,15 @@ import textTheme from "../constants/TextTheme";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
 import BusinessCard from "../components/listOfBusinessesScreen/BusinessCard";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {updateAuthStatus, updateBusinessId} from "../store/authSlice";
 
 
-export default function ListOfBusinessesScreen() {
+export default function ListOfBusinessesScreen(props) {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     const name = useSelector(state => state.loginUser.details).name;
+    const dispatch = useDispatch();
+
 
     function renderItem(itemData) {
         return (
@@ -18,9 +21,21 @@ export default function ListOfBusinessesScreen() {
                 address={itemData.item.address}
                 imageURL={itemData.item.photo}
                 status={itemData.item.verificationStatus}
+                onPress={() => {
+                    dispatch(updateBusinessId(itemData.item.id));
+                    dispatch(updateAuthStatus(true));
+
+
+                }}
             />
         );
     }
+
+    const token = useSelector(state => state.authDetails.authToken);
+    const id = useSelector(state => state.authDetails.businessId);
+
+    console.log("token: " + token);
+    console.log("business id: " + id);
 
 
 
