@@ -21,7 +21,7 @@ import {
     loadClientInfoFromDb,
     updateClientId
 } from "../store/clientInfoSlice";
-import {loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
 import {loadClientCountFromDb} from "../store/clientSlice";
 
@@ -62,8 +62,11 @@ export default function ClientSegmentScreen() {
     const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
     const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
 
+    // const [currentCount, setCurrentCount] = useState(allClientCount);
+
     useLayoutEffect(() => {
         dispatch(loadClientCountFromDb());
+        // dispatch(loadClientFiltersFromDb(10, "All"));
     }, []);
 
 
@@ -136,7 +139,7 @@ export default function ClientSegmentScreen() {
                 closeModal={() => {
                     setIsClientInfoModalVisible(false);
                     dispatch(clearClientInfo());
-
+                    dispatch(loadClientFiltersFromDb(10, "All"));
                 }}
                 name={clientName}
                 phone={clientPhone}
@@ -229,10 +232,14 @@ export default function ClientSegmentScreen() {
                         />
                 }
 
+                {
+                    clientCount >= 10 ?
                     <Pagination
                         filterPressed={filterPressed}
                         setIsModalVisible={setIsModalVisible}
-                    />
+                    /> : null
+                }
+
                 </> :
                     <>
                         {
@@ -258,11 +265,16 @@ export default function ClientSegmentScreen() {
 
                         }
 
-                        <SearchClientPagination
-                            filterPressed={filterPressed}
-                            setIsModalVisible={setIsModalVisible}
-                            query={searchQuery}
-                        />
+                        {
+                            clientCount >= 10 ?
+                            <SearchClientPagination
+                                filterPressed={filterPressed}
+                                setIsModalVisible={setIsModalVisible}
+                                query={searchQuery}
+                            /> : null
+                        }
+
+
                     </>
             }
 

@@ -181,6 +181,7 @@ import { View, TextInput, StyleSheet } from 'react-native';
 import Colors from "../../constants/Colors";
 import {useSelector} from "react-redux";
 import {checkNullUndefined} from "../../util/Helpers";
+import textTheme from "../../constants/TextTheme";
 
 export default function OtpInputBox(props) {
     const refs = [useRef(null), useRef(null), useRef(null), useRef(null)];
@@ -193,7 +194,7 @@ export default function OtpInputBox(props) {
         filled: [false, false, false, false],
     });
 
-    const [changing, setChanging] = useState(false);
+
 
     const handleOtpChange = (text, index) => {
         const newOtp = [...state.otp];
@@ -219,6 +220,7 @@ export default function OtpInputBox(props) {
 
         if (index === 3) {
             props.otp(newOtp.join(''));
+
         }
     };
 
@@ -228,6 +230,8 @@ export default function OtpInputBox(props) {
             focusedIndex: index,
         }));
     };
+
+
 
     function clearOTP() {
         setState(prevState => ({
@@ -242,7 +246,7 @@ export default function OtpInputBox(props) {
                 const newOtp = [...state.otp].join('');
                 const isFocused = state.focusedIndex === index;
                 const isFilled = state.filled[index];
-                const borderColor = props.verify
+                const borderColor = props.changing >=1 && !props.verify
                     ? Colors.error
                     : isFocused
                         ? Colors.highlight
@@ -258,17 +262,19 @@ export default function OtpInputBox(props) {
                         placeholderTextColor={Colors.grey800}
                         style={[
                             styles.otpBox,
-                            { borderColor }
+                            { borderColor },
+                            textTheme.bodyMedium
                         ]}
                         maxLength={1}
                         ref={ref}
                         keyboardType='number-pad'
                         onChangeText={text => {
                             handleOtpChange(text, index);
-
+                            props.setChanging(prevState => prevState + 1);
                         }}
                         onFocus={() => handleFocus(index)}
                         value={state.otp[index]}
+                        cursorColor={Colors.highlight}
 
                     />
                 );
@@ -288,7 +294,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderRadius: 6,
         width: 57,
-        textAlign: 'center',
+        textAlign: 'center'
     }
 });
 

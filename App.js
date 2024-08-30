@@ -87,6 +87,7 @@ const CheckoutStack = () => (
                         onPress={() => navigation.toggleDrawer()}
                     />
                 ),
+                presentation: 'modal'
             })}
         />
     </Stack.Navigator>
@@ -102,7 +103,7 @@ const AppNavigator = () => {
 
     return (
         <NavigationContainer>
-            {/*{isAuthenticated ? */}
+            {/*{isAuthenticated ?*/}
                 <MainDrawerNavigator />
             {/*: <AuthNavigator />}*/}
         </NavigationContainer>
@@ -160,7 +161,7 @@ const MainDrawerNavigator = () => (
             drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(clients_icon).uri}}
                                      width={25} height={25} style={{resizeMode: "contain"}}/>,
             headerTitle:"Client Segment",
-            headerTitleAlign:"center"
+            headerTitleAlign:"center",
         }}/>
         <Drawer.Screen name="Marketing" component={ListOfBusinessesScreen} options={{
             drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}

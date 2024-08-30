@@ -113,11 +113,11 @@ export const clientInfoSlice = createSlice({
     initialState: initialClientInfoState,
     reducers: {
         setDetails(state, action) {
-            console.log(action.payload);
+            // console.log(action.payload);
             state.isClientSelected = true;
-            state.details = action.payload.response;
-            state.membershipDetails = action.payload.membershipDetails;
-            state.packageDetails = action.payload.packageDetails;
+            state.details = {...action.payload.response};
+            state.membershipDetails = [...action.payload.membershipDetails];
+            state.packageDetails = [...action.payload.packageDetails];
         },
         clearClientInfo(state, action) {
             state.details = initialClientInfoState.details;
