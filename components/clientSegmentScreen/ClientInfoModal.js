@@ -1,4 +1,4 @@
-import {Modal, Text, View, StyleSheet, ScrollView} from "react-native";
+import {Modal, Text, View, StyleSheet, ScrollView, Platform} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
@@ -16,6 +16,8 @@ import UpdateClientModal from "./UpdateClientModal";
 import DeleteClient from "./DeleteClientModal";
 import {useDispatch, useSelector} from "react-redux";
 import {dateFormatter} from "../../util/Helpers";
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 
 
 
@@ -47,8 +49,8 @@ export default function clientInfoModal(props) {
     const [feedbackCount, setFeedbackCount] = useState(0);
     const [noShows, setNoShows] = useState(0);
     const [totalVisits, setTotalVisits] = useState(0);
-
-
+    const [phone, setPhone] = useState("");
+    const [name, setName] = useState("");
 
 
     useEffect(() => {
@@ -63,8 +65,10 @@ export default function clientInfoModal(props) {
         setFeedbackCount(analyticDetails.feedbacks);
         setNoShows(0);
         setTotalVisits(analyticDetails.total_visits === undefined ? "" : analyticDetails.total_visits);
+        setName(details.name);
+        setPhone(details.mobile_1);
 
-    }, [analyticDetails]);
+    }, [analyticDetails, details]);
 
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
@@ -113,8 +117,12 @@ export default function clientInfoModal(props) {
             <UpdateClientModal
                 isVisible={editClientModalVisibility}
                 onCloseModal={() => {
+                    dispatch(loadClientInfoFromDb(props.id))
+                    dispatch(loadClientFiltersFromDb(10, "All"));
+                    dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
                     setEditClientModalVisibility(false);
                     setModalVisibility(false);
+
                 }}
                 details={details}
 
@@ -125,6 +133,9 @@ export default function clientInfoModal(props) {
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     setModalVisibility(false);
+                    console.log("Fetched")
+                    dispatch(loadClientInfoFromDb(props.id))
+
                 }}
                 onCloseClientInfoAfterDeleted={() => {
                     props.setVisible(false);
@@ -135,8 +146,8 @@ export default function clientInfoModal(props) {
             />
             <View style={styles.modalContent}>
                 <ClientCard
-                    name={props.name}
-                    phone={props.phone}
+                    name={name === undefined ? " " : name}
+                    phone={phone === undefined ? " " : phone}
                     card={styles.clientDetailsContainer}
                     nameText={[textTheme.titleSmall, styles.name]}
                     phoneText={[textTheme.titleSmall, styles.phone]}
@@ -262,6 +273,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
         height: 60,
         flexDirection: "row",
+        ...Platform.select({
+            ios: {
+                marginTop: 32,
+            },
+            android: {
+            },
+        }),
+
     },
     closeButton: {
         position: "absolute",
@@ -327,7 +346,7 @@ const styles = StyleSheet.create({
     clientProfileCard: {
         paddingVertical: 0,
         paddingHorizontal: 0,
-        width: 'auto'
+        width: 'auto',
     },
     cardInnerContainer: {
         marginLeft: 0
