@@ -85,6 +85,7 @@ export default function ForgetPasswordOTP(props) {
                 onPress={async () => {
                     const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS")
                     setIsAuthenticated(authStatus);
+                    setChanging(0);
                 }}
             />
 

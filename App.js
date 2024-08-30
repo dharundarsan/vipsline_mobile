@@ -103,9 +103,9 @@ const AppNavigator = () => {
 
     return (
         <NavigationContainer>
-            {/*{isAuthenticated ?*/}
+            {isAuthenticated ?
                 <MainDrawerNavigator />
-            {/*: <AuthNavigator />}*/}
+            : <AuthNavigator />}
         </NavigationContainer>
     );
 };
