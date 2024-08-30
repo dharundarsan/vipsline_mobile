@@ -25,6 +25,8 @@ import {
 import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
 import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
+import {loadStaffsFromDB} from "../store/staffSlice";
+import {loadCartFromDB} from "../store/cartSlice";
 
 
 const CheckoutScreen = () => {
@@ -46,6 +48,8 @@ const CheckoutScreen = () => {
         dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
         dispatch(loadLoginUserDetailsFromDb());
+        dispatch(loadStaffsFromDB());
+        dispatch(loadCartFromDB());
     }, []);
 
     return (

@@ -20,6 +20,7 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 //Font And SplashScreen Imports
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+
 SplashScreen.preventAutoHideAsync();
 
 
@@ -51,7 +52,7 @@ const AuthStack = createNativeStackNavigator();
 export default function App() {
     const [loaded, error] = useFonts({
         'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
-        'Inter-Bold':require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
+        'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
     });
 
     useEffect(() => {
@@ -66,15 +67,15 @@ export default function App() {
     return (
         <Provider store={store}>
             <SafeAreaView style={styles.safeAreaView}>
-                <StatusBar style="dark" />
-                <AppNavigator />
+                <StatusBar style="dark"/>
+                <AppNavigator/>
             </SafeAreaView>
         </Provider>
     );
 }
 
 const CheckoutStack = () => (
-    <Stack.Navigator screenOptions={{headerShown: false}} >
+    <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen
             name="CheckoutScreen"
             component={CheckoutScreen}
@@ -97,9 +98,9 @@ const CheckoutStack = () => (
 const AppNavigator = () => {
     let isAuthenticated = false;
     const isFetching = useSelector(state => state.authDetails.isFetching);
-    console.log("isFetching "+isFetching)
+    console.log("isFetching " + isFetching)
     isAuthenticated = useSelector((state) => state.authDetails.isAuthenticated);
-    console.log("isAuthenticated "+!!isAuthenticated);
+    console.log("isAuthenticated " + !!isAuthenticated);
 
     return (
         <NavigationContainer>
@@ -111,11 +112,11 @@ const AppNavigator = () => {
 };
 
 const AuthNavigator = () => (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-        <AuthStack.Screen name="AuthScreen" component={AuthScreen} />
-        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen} />
-        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen} />
-        <AuthStack.Screen name="ListOfBusinessesScreen" component={ListOfBusinessesScreen} />
+    <AuthStack.Navigator screenOptions={{headerShown: false}}>
+        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
+        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
+        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+        <AuthStack.Screen name="ListOfBusinessesScreen" component={ListOfBusinessesScreen}/>
     </AuthStack.Navigator>
 );
 
@@ -126,6 +127,7 @@ const MainDrawerNavigator = () => (
         screenOptions={{
             drawerActiveTintColor: Colors.highlight,
             drawerInactiveTintColor: Colors.white,
+            drawerStyle: {backgroundColor: Colors.darkBlue},
         }}
     >
         <Drawer.Screen
@@ -153,16 +155,26 @@ const MainDrawerNavigator = () => (
                 drawerLabel: 'Checkout',
                 drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(checkout_icon).uri}}
                                          width={25} height={25} style={{resizeMode: "contain"}}/>,
-                headerTitle:"Add to cart",
-                headerTitleAlign:"center",
+                headerTitle: "Add to cart",
+                headerTitleAlign: "center",
             }}
         />
-        <Drawer.Screen name="Clients" component={ClientSegmentScreen} options={{
-            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(clients_icon).uri}}
-                                     width={25} height={25} style={{resizeMode: "contain"}}/>,
-            headerTitle:"Client Segment",
-            headerTitleAlign:"center",
-        }}/>
+        <Drawer.Screen
+            name="Clients"
+            component={ClientSegmentScreen} // Use the modal stack here
+            options={{
+                drawerIcon: () => (
+                    <Image
+                        source={{uri: Image.resolveAssetSource(clients_icon).uri}}
+                        width={25}
+                        height={25}
+                        style={{resizeMode: 'contain'}}
+                    />
+                ),
+                headerTitle: 'Client Segment',
+                headerTitleAlign: 'center',
+            }}
+        />
         <Drawer.Screen name="Marketing" component={ListOfBusinessesScreen} options={{
             drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}
                                      width={25} height={25} style={{resizeMode: "contain"}}/>
@@ -208,8 +220,6 @@ const MainDrawerNavigator = () => (
             drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(feedback_icon).uri}}
                                      width={25} height={25} style={{resizeMode: "contain"}}/>
         }}/>
-
-
     </Drawer.Navigator>
 );
 

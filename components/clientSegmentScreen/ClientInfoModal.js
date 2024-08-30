@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeAndHeadingContainer: {
+        marginTop:32,
         justifyContent: "center",
         alignItems: "center",
         height: 60,
