@@ -179,32 +179,23 @@
 import React, { useRef, useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import Colors from "../../constants/Colors";
-import {useSelector} from "react-redux";
-import {checkNullUndefined} from "../../util/Helpers";
 import textTheme from "../../constants/TextTheme";
+import { useSelector } from "react-redux";
 
 export default function OtpInputBox(props) {
     const refs = [useRef(null), useRef(null), useRef(null), useRef(null)];
 
-    const isAuthenticated = useSelector((state) => state.authDetails.isAuthenticated);
-
     const [state, setState] = useState({
-        focusedIndex: 0,
         otp: ['', '', '', ''],
+        focusedIndex: 0,
         filled: [false, false, false, false],
     });
 
-
-
     const handleOtpChange = (text, index) => {
         const newOtp = [...state.otp];
-        const newFilled = [...state.filled];
-
-        // Update otp and filled states
         newOtp[index] = text;
-        newFilled[index] = text.length > 0;
 
-        // Automatically focus on next input if not empty, or previous input if empty
+        // Automatically focus on the next input
         if (text.length >= 1 && index < refs.length - 1) {
             refs[index + 1].current.focus();
         } else if (text.length === 0 && index > 0) {
@@ -214,13 +205,12 @@ export default function OtpInputBox(props) {
         setState(prevState => ({
             ...prevState,
             otp: newOtp,
-            filled: newFilled,
+            filled: newOtp.map(item => item.length > 0),
             focusedIndex: index,
         }));
 
         if (index === 3) {
             props.otp(newOtp.join(''));
-
         }
     };
 
@@ -231,29 +221,26 @@ export default function OtpInputBox(props) {
         }));
     };
 
-
-
-    function clearOTP() {
-        setState(prevState => ({
-            ...prevState,
-            otp: ["", "", "", ""],
-        }));
-    }
+    const clearOTP = () => {
+        setState({
+            otp: ['', '', '', ''],
+            focusedIndex: 0,
+            filled: [false, false, false, false],
+        });
+    };
 
     return (
         <View style={[styles.otpInput, props.style]}>
             {refs.map((ref, index) => {
-                const newOtp = [...state.otp].join('');
                 const isFocused = state.focusedIndex === index;
                 const isFilled = state.filled[index];
-                const borderColor = props.changing >=1 && !props.verify
+                const borderColor = props.verify && props.changing
                     ? Colors.error
                     : isFocused
                         ? Colors.highlight
                         : isFilled
                             ? Colors.green
                             : Colors.grey400;
-
 
                 return (
                     <TextInput
@@ -263,19 +250,19 @@ export default function OtpInputBox(props) {
                         style={[
                             styles.otpBox,
                             { borderColor },
-                            textTheme.bodyMedium
+
                         ]}
                         maxLength={1}
                         ref={ref}
                         keyboardType='number-pad'
                         onChangeText={text => {
                             handleOtpChange(text, index);
-                            props.setChanging(prevState => prevState + 1);
+                            props.setChanging(prev => prev + 1);
                         }}
                         onFocus={() => handleFocus(index)}
                         value={state.otp[index]}
-                        cursorColor={Colors.highlight}
-
+                        selection={{ start: state.otp[index].length, end: state.otp[index].length }}  // Manually manage cursor position
+                        cursorColor={Colors.transparent}
                     />
                 );
             })}
@@ -294,7 +281,9 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderRadius: 6,
         width: 57,
-        textAlign: 'center'
+        textAlign: 'center',
+
     }
 });
+
 
