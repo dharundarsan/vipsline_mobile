@@ -5,10 +5,10 @@ import Divider from "../../ui/Divider";
 const radius = 38;
 
 export default function ClientCard(props) {
-    const name = props.name !== undefined ? props.name.toString() : props.name;
+    const name = props.name !== undefined && props.name.trim()!=="" ? props.name.toString() : "Z";
     const phone = props.phone;
     const email = props.email;
-
+    console.log(name)
 
     return (<>
             <Pressable
