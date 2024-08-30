@@ -5,10 +5,10 @@ import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from
 const initialClientInfoState = {
     isClientSelected: false,
     details: {},
-
+    membershipDetails:[],
+    packageDetails:[],
     fetchingAnalytics: false,
     analyticDetails: [],
-
     clientId: "",
 };
 
@@ -26,7 +26,37 @@ export const loadClientInfoFromDb = (clientId) => async (dispatch) => {
                 }
             }
         );
-        dispatch(setDetails(response.data.data[0]));
+        const membershipDetails = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/membership/getListOfActiveMembershipForClient`,
+            {
+                client_id: clientId,
+                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                }
+            }
+        );
+        const packageDetails = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/package/getListOfActiveClientPackageDetailByClientId`,
+            {
+                client_id: clientId,
+                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                }
+            }
+        );
+        const data = {
+            membershipDetails: membershipDetails.data.data,
+            packageDetails: packageDetails.data.data,
+            response: response.data.data[0],
+        }
+        dispatch(setDetails(data));
+
     } catch (error) {
         console.error("Error fetching data client info slice: " + error);
     }
@@ -84,10 +114,13 @@ export const clientInfoSlice = createSlice({
     reducers: {
         setDetails(state, action) {
             state.isClientSelected = true;
-            state.details = action.payload;
+            state.details = action.payload.response;
+            state.membershipDetails = action.payload.membershipDetails;
+            state.packageDetails = action.payload.packageDetails;
         },
         clearClientInfo(state, action) {
-            state.details = initialClientInfoState;
+            state.details = initialClientInfoState.details;
+            state.isClientSelected = false;
         },
         updateAnalyticDetails(state, action) {
             state.analyticDetails = action.payload;

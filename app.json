@@ -8,11 +8,18 @@
     "userInterfaceStyle": "light",
     "plugins": [
       [
-        "expo-build-properties", {
-        "android": {
-          "usesCleartextTraffic": true
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
-      }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": ["./assets/fonts/Inter/static/Inter_18pt-Medium.ttf"]
+        }
       ]
     ],
     "splash": {

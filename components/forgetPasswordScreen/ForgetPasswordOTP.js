@@ -1,38 +1,82 @@
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Text, TextInput, View, StyleSheet, Image} from "react-native";
+import {Text, View, StyleSheet, Pressable} from "react-native";
 import Colors from "../../constants/Colors";
-import {OtpInput} from "react-native-otp-entry";
 import OtpInputBox from "../verificationCodeScreen/otpInputBox";
-import { Ionicons } from '@expo/vector-icons';
+import {Ionicons} from '@expo/vector-icons';
+import textTheme from "../../constants/TextTheme";
+import {useEffect, useState} from "react";
+import sendOTPApi from "../../util/apis/sendOTPApi";
+import {useDispatch} from "react-redux";
+import {authenticateWithOTP} from "../../store/authSlice";
 
-export default function ForgetPasswordOTP({backHandler}) {
+export default function ForgetPasswordOTP(props) {
+    const [otp, setOtp] = useState("");
+    const dispatch = useDispatch();
+
+    const [timer, setTimer] = useState(60)
+    useEffect(() => {
+        if (timer <= 0) {
+            return
+        }
+        const s = setInterval(() => {
+            setTimer((prev) => prev - 1);
+        }, 1000)
+        return () => {
+            clearInterval(s);
+        }
+    }, [timer])
+
+    async function resendOTPHandler() {
+        await sendOTPApi(props.mobileNumber, "BUSINESS");
+        setTimer(60);
+    }
+
     return (
         <View style={styles.forgetPasswordBody}>
             <PrimaryButton
                 buttonStyle={styles.buttonStyle}
-                onPress={backHandler}
+                onPress={props.backHandler}
             >
-                <Ionicons name="arrow-back-sharp" size={24} color="white" />
-                </PrimaryButton>
-            <Text style={styles.forgetPasswordText}>Forget Password</Text>
+                <Ionicons name="arrow-back-sharp" size={24} color="white"/>
+            </PrimaryButton>
+            <Text style={[textTheme.titleMedium, styles.forgetPasswordText]}>Forget Password</Text>
             <View style={{width: "75%", marginTop: 32}}>
                 <Text
-                    style={{textAlign: 'center'}}>
+                    style={[textTheme.titleSmall, {textAlign: 'center'}]}>
                     Enter one-time password sent to your registered email and mobile number
                 </Text>
             </View>
-            <OtpInputBox style={styles.otpBox}/>
+            <OtpInputBox style={styles.otpBox} otp={(otp) => setOtp(otp)}/>
 
             <View style={styles.resendOtpContainer}>
                 <Text
-                    style={styles.didntGetCodeText}
+                    style={[textTheme.titleSmall, styles.didntGetCodeText]}
                 >
                     Didn't get a code?
                 </Text>
-                <Text style={styles.resendOtp}>Resend OTP in <Text style={styles.timer}>60 sec</Text></Text>
+                <Pressable onPress={timer === 0 ? resendOTPHandler : null}>
+                    <Text style={[textTheme.titleSmall, styles.resendOtp]}>
+
+                        Resend OTP {
+                        timer > 0 ?
+                            <Text style={[textTheme.titleSmall, styles.timer]}>
+                                <Text style={[textTheme.titleSmall, styles.resendOtp]}>
+                                    in
+                                </Text> {timer} sec</Text> : <Text></Text>
+                    }
+                    </Text>
+                </Pressable>
+
             </View>
 
-            <PrimaryButton label="VERIFY" buttonStyle={styles.submitButton}/>
+            <PrimaryButton
+                label="VERIFY"
+                buttonStyle={styles.submitButton}
+                textStyle={[textTheme.titleMedium]}
+                onPress={() => {
+                    dispatch(authenticateWithOTP(props.mobileNumber, otp, "BUSINESS"));
+                }}
+            />
 
 
         </View>
