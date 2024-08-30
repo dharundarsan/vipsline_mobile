@@ -22,6 +22,7 @@ const PaymentModal = (props) => {
     const [isSplitPaymentDropdownVisible, setIsSplitPaymentDropdownVisible] = useState(false)
     const [recentlyChanged, setRecentlyChanged] = useState([]);
     const [paymentOrder, setPaymentOrder] = useState(["cash"])
+    const [isError, setIsError] = useState(false);
     const [bodyData, setBodyData] = useState([])
 
     const [splitUpState, setSplitUpState] = useState([
@@ -32,7 +33,7 @@ const PaymentModal = (props) => {
                 name: "Cash"
             }, {
                 mode: "card",
-                shown: false,
+                shown: true,
                 amount: 0,
                 name: "Credit / Debit Card"
             }, {
@@ -45,15 +46,26 @@ const PaymentModal = (props) => {
     )
 
     useEffect(() => {
-        setPaymentOrder(prev => [...prev, addedSplitPayment]);
+        if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
         setSplitUpState(prev => prev.map((split) => {
+            const shownCount = splitUpState.reduce((acc, item) => {
+                return item.shown ? acc + 1 : acc;
+            }, 0);
             if (split.name === addedSplitPayment) {
                 console.log(addedSplitPayment)
                 console.log(split.name === addedSplitPayment)
-                return ({
-                    ...split,
-                    shown: true
-                })
+                if (shownCount === 0) {
+                    return ({
+                        ...split,
+                        amount: props.price,
+                        shown: true
+                    })
+                } else {
+                    return ({
+                        ...split,
+                        shown: true
+                    })
+                }
             }
             return split;
         }))
@@ -70,7 +82,7 @@ const PaymentModal = (props) => {
                 name: "Cash"
             }, {
                 mode: "card",
-                shown: false,
+                shown: true,
                 amount: 0,
                 name: "Credit / Debit card"
             }, {
@@ -87,7 +99,7 @@ const PaymentModal = (props) => {
         setTotalPrice(props.price);
     }, [selectedPaymentOption]);
 
-    const callAPI = () => {
+    const callSplitAPI = () => {
         if (stopAPI) return;
 
         const splitApi = async () => {
@@ -104,6 +116,7 @@ const PaymentModal = (props) => {
                 data = {
                     booking_amount: props.price,
                     paid_amount: splitUpState.map(split => {
+
                         if (split.mode === "cash" && split.shown) {
                             if (shownCount === 3 && paymentOrder.at(-1) === "cash") {
                                 return {
@@ -161,6 +174,7 @@ const PaymentModal = (props) => {
                 }
             }
 
+            console.log(splitUpState);
             console.log("DATA")
             console.log(data)
 
@@ -174,6 +188,14 @@ const PaymentModal = (props) => {
     }
 
     useEffect(() => {
+        let totalCount = 0;
+        splitUpState.map((prev => {
+            if (prev.shown) {
+                totalCount += prev.amount;
+            }
+        }))
+        if (totalCount === props.price)
+            setIsError(false);
 
     }, [splitUpState]);
 
@@ -193,17 +215,13 @@ const PaymentModal = (props) => {
         }));
     }, [splitResponse]);
 
-    useEffect(() => {
+    const callCashAPI = () => {
         if (selectedPaymentOption === "card" || selectedPaymentOption === "digital payments") {
             if (parseFloat(totalPrice) > props.price) {
                 setTotalPrice(props.price);
             }
         }
 
-        if (parseFloat(totalPrice) < props.price) {
-            setSelectedPaymentOption("split_payment");
-            return;
-        }
         const splitApi = async () => {
             if (selectedPaymentOption === "cash") {
                 const response = await splitPaymentAPI({
@@ -221,7 +239,7 @@ const PaymentModal = (props) => {
             console.log(response);
         }
         splitApi();
-    }, [totalPrice]);
+    }
 
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
@@ -244,9 +262,10 @@ const PaymentModal = (props) => {
             <View style={styles.modalContent}>
                 <View style={styles.paymentOptionsContainer}>
                     <View style={styles.paymentOptionsRow}>
-                        <PrimaryButton buttonStyle={styles.paymentOptionButton}
+                        <PrimaryButton
+                            buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "cash" ? styles.paymentOptionSelected : {}]}
                                        onPress={() => setSelectedPaymentOption("cash")}
-                                       pressableStyle={[styles.paymentOptionButtonPressable, selectedPaymentOption === "cash" ? styles.paymentOptionSelected : {}]}>
+                                       pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "cash" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
@@ -254,9 +273,10 @@ const PaymentModal = (props) => {
                             <MaterialCommunityIcons name="cash" size={30} color={Colors.green}/>
                             <Text>Cash</Text>
                         </PrimaryButton>
-                        <PrimaryButton buttonStyle={styles.paymentOptionButton}
+                        <PrimaryButton
+                            buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "card" ? styles.paymentOptionSelected : {}]}
                                        onPress={() => setSelectedPaymentOption("card")}
-                                       pressableStyle={[styles.paymentOptionButtonPressable, selectedPaymentOption === "card" ? styles.paymentOptionSelected : {}]}>
+                                       pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "card" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
@@ -277,9 +297,10 @@ const PaymentModal = (props) => {
                             <MaterialCommunityIcons name="contactless-payment" size={30} color={Colors.green}/>
                             <Text>Digital Payments</Text>
                         </PrimaryButton>
-                        <PrimaryButton buttonStyle={styles.paymentOptionButton}
+                        <PrimaryButton
+                            buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}
                                        onPress={() => setSelectedPaymentOption("split_payment")}
-                                       pressableStyle={[styles.paymentOptionButtonPressable, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}>
+                                       pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "split_payment" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
@@ -290,12 +311,28 @@ const PaymentModal = (props) => {
                     </View>
                 </View>
                 {selectedPaymentOption === "cash" || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" ? <>
-                    <CustomTextInput type={"text"} label={"Payment"} value={totalPrice.toString()} placeholder={"Price"}
+                    <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()} placeholder={"Price"}
                                      onChangeText={(price) => {
+                                         console.log(price)
+                                         console.log(price.length)
+                                         if(price.trim().length === 0) {
+                                             setTotalPrice(0)
+                                             return
+                                         }
+                                         if(price.split(" ").length > 1) return;
+                                         if(price.split(".").length > 2) return;
+
                                          setTotalPrice(price);
-                                     }}/>
+                                     }}
+                                     onEndEditing={(value) => {
+                                         if (parseFloat(value) < props.price) {
+                                             setSelectedPaymentOption("split_payment")
+                                         }
+                                         callCashAPI()
+                                     }}
+                    />
                     {selectedPaymentOption === "cash" && splitResponse.length > 0 && splitResponse[0] !== undefined ?
-                        <CustomTextInput type={"text"} label={"Change"}
+                        <CustomTextInput type={"number"} label={"Change"}
                                          value={splitResponse[0].change_to_be_given === undefined ? "" : splitResponse[0].change_to_be_given.toString()}
                                          readOnly={true}/> : null}
                 </> : null}
@@ -307,80 +344,108 @@ const PaymentModal = (props) => {
                         console.log("INDEX")
                         console.log(index)
                         console.log(shownCount)
-                        console.log(index - 1 === shownCount)
+                        console.log(index + 1 === shownCount)
                         if (item.shown) {
+                            console.log("item.mode")
+                            console.log(item.mode)
+                            console.log(paymentOrder)
+                            console.log(paymentOrder.at(-1))
                             return <View style={styles.splitInputAndCloseContainer}>
-                                <CustomTextInput type={"text"} label={item.name} value={item.amount.toString()} flex={1}
-
-                                                 readOnly={index + 1 === 3}
-                                                 onChangeText={(text) => {
-                                                     setSplitUpState(prev => prev.map((split) => {
-                                                         if (split.mode === item.mode) {
-                                                             return ({
-                                                                 ...split,
-                                                                 amount: text.trim().length === 0 ? 0 : parseFloat(text)
-                                                             })
-                                                         }
-                                                         return split;
-                                                     }))
-                                                     setStopAPI(false);
-                                                     setRecentlyChanged(prev => {
-                                                             if (prev.at(-1) === item.mode) return prev
-                                                             else return [...prev, item.mode]
-                                                         }
-                                                     );
-                                                     console.log("ONCHANGETEXT");
-                                                     console.log(text);
-                                                     console.log("ONCHANGE");
-                                                     console.log(splitUpState);
-                                                 }}
-                                                 onEndEditing={(text) => {
-                                                     const totalValue = splitUpState.reduce((acc, ele) => {
-                                                         if (ele.shown) {
-                                                             if (ele.mode === item.mode) return acc + parseFloat(text)
-                                                             return acc + ele.amount;
-                                                         }
-                                                         return acc;
-                                                     }, 0)
-
-                                                     if (totalValue > props.price) {
-                                                         ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
-                                                         return;
-                                                     }
-
-                                                     callAPI();
-                                                 }}
-                                />
-                                {index + 1 === shownCount ?
-                                    <PrimaryButton buttonStyle={styles.splitInputCloseButton} onPress={() => {
-                                        setPaymentOrder(prev => prev.slice(0, prev.length - 1));
-                                        setRecentlyChanged(prev => prev.filter(ele => ele !== item.mode));
-
+                                <CustomTextInput
+                                    textInputStyle={isError ? {borderColor: Colors.error} : {borderColor: Colors.green}}
+                                    type={"number"} label={item.name} value={item.amount.toString()} flex={1}
+                                    readOnly={shownCount === 3 && item.name === paymentOrder.at(-1)}
+                                    onChangeText={(text) => {
+                                        if(text.split(" ").length > 1) return;
+                                        if(text.split(".").length > 2) return;
                                         setSplitUpState(prev => prev.map((split) => {
-                                            if (split.mode === paymentOrder.at(0) && shownCount === 2) {
-                                                return ({
-                                                    ...split,
-                                                    amount: props.price,
-                                                })
-                                            }
-                                            if ((split.mode === paymentOrder.at(0) || split.mode === paymentOrder.at(1)) && shownCount === 3) {
-                                                return ({
-                                                    ...split,
-                                                    amount: props.price,
-                                                })
-                                            }
                                             if (split.mode === item.mode) {
-                                                return ({
-                                                    ...split,
-                                                    amount: 0,
-                                                    shown: false
-                                                })
+                                                if (text.trim().at(-1) === ".") {
+                                                    return ({
+                                                        ...split,
+                                                        amount: text.trim()
+                                                    })
+                                                } else {
+                                                    return ({
+                                                        ...split,
+                                                        amount: text.trim().length === 0 ? 0 : parseFloat(text)
+                                                    })
+                                                }
                                             }
                                             return split;
                                         }))
-                                    }}>
-                                        <Ionicons name="close" size={24} color="black"/>
-                                    </PrimaryButton> : null}
+                                        setStopAPI(false);
+                                        setRecentlyChanged(prev => {
+                                                if (prev.at(-1) === item.mode) return prev
+                                                else return [...prev, item.mode]
+                                            }
+                                        );
+                                        console.log("ONCHANGETEXT");
+                                        console.log(text);
+                                        console.log("ONCHANGE");
+                                        console.log(splitUpState);
+                                    }}
+                                    onEndEditing={(text) => {
+                                        const totalValue = splitUpState.reduce((acc, ele) => {
+                                            if (ele.shown) {
+                                                if (ele.mode === item.mode) return acc + parseFloat(text)
+                                                return acc + ele.amount;
+                                            }
+                                            return acc;
+                                        }, 0)
+
+                                        if (totalValue > props.price) {
+                                            setIsError(true);
+                                            ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
+                                            return;
+                                        } else if (totalValue > props.price) {
+                                            setIsError(false);
+                                        }
+
+                                        callSplitAPI();
+                                    }}
+                                />
+                                <PrimaryButton buttonStyle={styles.splitInputCloseButton} onPress={() => {
+                                    // setPaymentOrder(prev => prev.slice(0, prev.length - 1));
+                                    setPaymentOrder(prev => prev.filter((order) => order !== item.mode));
+                                    setRecentlyChanged(prev => prev.filter(ele => ele !== item.mode));
+
+                                    setSplitUpState(prev => prev.map((split) => {
+                                        if (split.mode === paymentOrder.at(0) && shownCount === 2) {
+                                            return ({
+                                                ...split,
+                                                amount: props.price,
+                                            })
+                                        }
+                                        return split;
+                                    }))
+                                    // if ((split.mode === paymentOrder.at(0) || split.mode === paymentOrder.at(1)) && shownCount === 3) {
+                                    //     if (split.mode === paymentOrder.at(0)){
+                                    //         return ({
+                                    //             ...split,
+                                    //             amount: props.price,
+                                    //         })
+                                    //     } else if (split.mode === paymentOrder.at(1)){
+                                    //         return ({
+                                    //             ...split,
+                                    //             amount: 0,
+                                    //         })
+                                    //     }
+                                    // }
+                                    setSplitUpState(prev => prev.map((split) => {
+
+                                        if (split.mode === item.mode) {
+                                            return ({
+                                                ...split,
+                                                amount: 0,
+                                                shown: false
+                                            })
+                                        }
+                                        return split;
+                                    }))
+                                }}>
+                                    <Ionicons name="close" size={24} color="black"/>
+                                </PrimaryButton>
                             </View>
                         }
                     }}/>

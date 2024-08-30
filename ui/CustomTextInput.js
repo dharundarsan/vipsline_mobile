@@ -13,12 +13,13 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
  * CustomTextInput component for various types of text inputs, including text, email, phone number, and dropdown.
  *
  * @param {Object} props - Props for the CustomTextInput component.
- * @param {'text' | 'email' | 'phoneNo' | 'dropdown' | 'multiLine' | 'date'} props.type - The type of input to display.
+ * @param {'text' | 'email' | 'phoneNo' | 'dropdown' | 'multiLine' | 'date' | 'number'} props.type - The type of input to display.
  * @param {string | Date} [props.value] - The current value of the text input.
  * @param {string | Date} [props.defaultValue] - The default value of the text input.
  * @param {string} [props.placeholder] - Placeholder text for the input.
  * @param {number} [props.flex] - Flex of text input.
  * @param {string} [props.label] - Label text to display above the input.
+ * @param {StyleSheet} [props.textInputStyle] - Custom style for text input.
  * @param {boolean} [props.readOnly] - Makes the text input read only.
  * @param {Array} [props.dropdownItems] - Items to be listed in the dropdown option.
  * @param {function} [props.validator] - Function to validate the input value.
@@ -60,7 +61,7 @@ const CustomTextInput = (props) => {
     }, [props.onSave]);
 
     let content;
-    if (props.type === "text" || props.type === "email" || props.type === "multiLine") {
+    if (props.type === "text" || props.type === "email" || props.type === "multiLine" || props.type === "number") {
         content = (
             <TextInput
                 onEndEditing={(event) => props.onEndEditing(event.nativeEvent.text)}
@@ -70,7 +71,9 @@ const CustomTextInput = (props) => {
                     styles.textInput,
                     {borderColor: error ? Colors.error : Colors.grey400},
                     props.type === "multiLine" ? {height: 100, textAlignVertical: "top", paddingVertical: 10} : {},
+                    props.textInputStyle
                 ]}
+                keyboardType={props.type === "number" ? "number-pad" : "default"}
                 multiline={props.type === "multiLine"}
                 value={props.value}
                 defaultValue={props.defaultValue}
