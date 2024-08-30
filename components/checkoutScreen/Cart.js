@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     StyleSheet,
     Text,
@@ -14,12 +14,42 @@ import AddItemModal from "./AddItemModal";
 import CartItem from "./CartItem";
 import CheckoutSection from "./CheckoutSection";
 import {useSelector} from "react-redux";
+import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 
 const Cart = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const cartItems = useSelector((state) => state.cart.items);
+    const staffs = useSelector((state) => state.staff.staffs);
     const [customItems, setCustomItems] = useState([]);
+    const [calculatedPrice, setCalculatedPrice] = useState([]);
+
+    useEffect(() => {
+        if (cartItems.length === 0 && customItems.length === 0) {
+            setCalculatedPrice([]);
+        }
+
+        console.log(customItems);
+
+        calculateCartPriceAPI({
+            additional_discounts: [],
+            additional_services: customItems,
+            cart: cartItems.length === 0 ? [] : cartItems.map(item => {
+                return {id: item.item_id}
+            }),
+            coupon_code: "",
+            edited_cart: [],
+            extra_charges: [],
+            isWalletSelected: false,
+            promo_code: "",
+            user_coupon: "",
+            walkin: "yes",
+            wallet_amt: 0
+        }).then(result => {
+            setCalculatedPrice(result);
+        })
+
+    }, [cartItems, customItems]);
 
     const addCustomItems = (item) => {
         setCustomItems(prev => [...prev, {id: Math.floor(10000 + Math.random() * 90000), ...item}]);
@@ -97,7 +127,8 @@ const Cart = () => {
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}} data={[...cartItems, ...customItems]}
                                   keyExtractor={(item, index) => index}
-                                  renderItem={({item}) => <CartItem data={item} removeCustomItems={removeCustomItems}/>}
+                                  renderItem={({item}) => <CartItem staffs={staffs} data={item}
+                                                                    removeCustomItems={removeCustomItems}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>
                             <View style={styles.addItemsWithLogoContainer}>
@@ -107,7 +138,7 @@ const Cart = () => {
                             </View>
                         </PrimaryButton>
                     </View>
-                    <CheckoutSection/>
+                    <CheckoutSection data={calculatedPrice}/>
                 </>
             }
         </View>

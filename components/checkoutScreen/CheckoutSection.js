@@ -10,7 +10,7 @@ import {Keyboard} from "react-native";
 import {useState, useEffect} from "react";
 import PaymentModal from "./PaymentModal";
 
-const CheckoutSection = () => {
+const CheckoutSection = (props) => {
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
 
     const styles = StyleSheet.create({
@@ -50,24 +50,25 @@ const CheckoutSection = () => {
         }
     });
 
+
     return <View style={styles.checkoutSection}>
-        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={()=>{setIsPaymentModalVisible(false)}} />
-        <View style={styles.checkoutDetailRow}>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>
-        </View>
+        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={()=>{setIsPaymentModalVisible(false)}} price={props.data[0].total_price} />
         <View style={styles.checkoutDetailRow}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_discount_in_price}</Text>
+        </View>
+        <View style={styles.checkoutDetailRow}>
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_price_after_discount}</Text>
         </View>
         <View style={styles.checkoutDetailRow}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].gst_charges}</Text>
         </View>
-        <View style={styles.checkoutDetailRow}>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>
-        </View>
+        {/*<View style={styles.checkoutDetailRow}>*/}
+        {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
+        {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>*/}
+        {/*</View>*/}
         <View style={styles.buttonContainer}>
             <PrimaryButton buttonStyle={styles.optionButton}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
@@ -75,7 +76,7 @@ const CheckoutSection = () => {
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable} onPress={()=>{setIsPaymentModalVisible(true)}}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
-                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ 5000</Text>
+                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.data[0].total_price}</Text>
                     <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                 </View>
             </PrimaryButton>
