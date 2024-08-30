@@ -60,15 +60,27 @@ const CheckoutSection = (props) => {
     return <View style={styles.checkoutSection}>
         {
             isModalOpen ?
-                <DropdownModal isVisible={isModalOpen} onCloseModal={()=>{setIsModalOpen(false)}}
-                dropdownItems={["Apply Discount","Add Charges","Add Sales Notes","Cancel Sales"]}
-                onChangeValue={(value) => console.log(value)}
-                iconImage={[require("../../assets/icons/checkout/actionmenu/applydiscount.png"),
-                require("../../assets/icons/checkout/actionmenu/addcharges.png"),
-                require("../../assets/icons/checkout/actionmenu/salesnote.png"),
-                require("../../assets/icons/checkout/actionmenu/cancelsale.png")]}
-                primaryViewChildrenStyle={styles.primaryViewChildrenStyle}
+                <DropdownModal
+                    isVisible={isModalOpen}
+                    onCloseModal={() => { setIsModalOpen(false) }}
+                    dropdownItems={[
+                        "Apply Discount",
+                        "Add Charges",
+                        "Add Sales Notes",
+                        "Cancel Sales"
+                    ]}
+                    onChangeValue={(value) => console.log(value)}
+                    iconImage={[
+                        require("../../assets/icons/checkout/actionmenu/applydiscount.png"),
+                        require("../../assets/icons/checkout/actionmenu/addcharges.png"),
+                        require("../../assets/icons/checkout/actionmenu/salesnote.png"),
+                        require("../../assets/icons/checkout/actionmenu/cancelsale.png")
+                    ]}
+                    primaryViewChildrenStyle={styles.primaryViewChildrenStyle}
+                    imageWidth={25}
+                    imageHeight={25}
                 />
+
                 :
                 <>
                     <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {

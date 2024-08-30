@@ -27,7 +27,7 @@ const DropdownModal = (props) => {
                             } : {}]}>
                         {props.iconImage !== undefined && props.iconImage[index] ? (
                             <View style={props.primaryViewChildrenStyle}>
-                                <Image source={props.iconImage[index]} style={{width: 30, height: 30, marginRight: 8}}/>
+                                <Image source={props.iconImage[index]} style={{width: props.imageWidth, height: props.imageHeight, marginRight: 8}}/>
                                 <Text style={[textTheme.bodyLarge, styles.closeButtonText, props.selectedValue === item
                                     ? {color: Colors.highlight, fontWeight: 500} : {}]}>
                                     {props.object ? Object.entries(item).filter((arr) => arr[0] === props.objectName)[0][1] : item}</Text>
