@@ -1,11 +1,9 @@
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Pressable, StyleSheet, Text, View} from "react-native";
-import {FontAwesome6} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import ClientFilterCard from "../clientSegmentScreen/ClientFilterCard";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
 import {clearClientInfo} from "../../store/clientInfoSlice";
