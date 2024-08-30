@@ -64,9 +64,6 @@ const UpdateClientModal = (props) => {
     const clientId = useSelector(state => state.clientInfo.clientId);
 
 
-    console.log(clientData.phoneNo);
-    console.log(details.mobile_1);
-
 
 
     useEffect(() => {

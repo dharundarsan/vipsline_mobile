@@ -5,6 +5,9 @@ import clientReducer from "./clientSlice";
 import clientFilterReducer from "./clientFilterSlice";
 import clientInfoReducer from "./clientInfoSlice";
 import staffReducer from "./staffSlice";
+import businessesReducer from "./listOfBusinessSlice";
+import loginUserReducer from "./loginUserSlice";
+import authReducer from "./authSlice";
 
 const store = configureStore({
     reducer: {
@@ -14,6 +17,9 @@ const store = configureStore({
         clientFilter: clientFilterReducer,
         clientInfo: clientInfoReducer,
         staff: staffReducer,
+        businesses: businessesReducer,
+        loginUser: loginUserReducer,
+        authDetails: authReducer,
     },
 });
 

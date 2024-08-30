@@ -89,7 +89,6 @@ export default function clientInfoModal(props) {
 
 
     function clientInfoCategoryPressHandler(id) {
-        console.log(id);
         setClientMoreDetails(id);
     }
     function seeMoreStatisticsHandler() {
@@ -259,6 +258,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeAndHeadingContainer: {
+        marginTop:32,
         justifyContent: "center",
         alignItems: "center",
         height: 60,
