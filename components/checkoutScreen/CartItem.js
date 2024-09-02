@@ -13,6 +13,7 @@ import {deleteItemFromCart, removeItemFromCart} from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 
 const CartItem = (props) => {
+    console.log(props)
     const dispatch = useDispatch();
     const removeItemHandler = () => {
         dispatch(removeItemFromCart(props.data.item_id));
@@ -54,9 +55,9 @@ const CartItem = (props) => {
                     </View>
                 </PrimaryButton>
 
-                {props.data.price - props.data.total_price === 0 ? null :
+                {props.data.price - props.data.discounted_price === props.data.price ? null :
                     <Text
-                        style={[textTheme.labelLarge, styles.discountText]}>{`Discount ₹${props.data.price - props.data.total_price}`}</Text>
+                        style={[textTheme.labelLarge, styles.discountText]}>{`Discount ₹${props.data.price - props.data.discounted_price}`}</Text>
                 }
             </View>
         </View>
