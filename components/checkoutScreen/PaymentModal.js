@@ -481,7 +481,7 @@ const PaymentModal = (props) => {
                            }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
-                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ 5000</Text>
+                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price}</Text>
                     <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                 </View>
             </PrimaryButton>

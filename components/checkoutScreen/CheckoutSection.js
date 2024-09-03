@@ -4,7 +4,7 @@ import {
     Pressable,
     ScrollView,
     StyleSheet,
-    Text,
+    Text, ToastAndroid,
     TouchableOpacity,
     View
 } from "react-native";
@@ -123,9 +123,9 @@ const CheckoutSection = (props) => {
             setIsPaymentModalVisible(false)
         }} price={ props.data !== null ? props.data[0].total_price : 0}/>
         <View style={styles.checkoutDetailRow}>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-            <Text
-                style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>
+            {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
+            {/*<Text*/}
+            {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>*/}
             <View>
                 <Popover popoverStyle={styles.popoverStyle}
                          from={
@@ -158,7 +158,7 @@ const CheckoutSection = (props) => {
                 </Popover>
             </View>
 
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_discount_in_price}</Text>
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>
         </View>
 
         <View style={styles.checkoutDetailRow}>

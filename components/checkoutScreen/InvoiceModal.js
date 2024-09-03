@@ -239,7 +239,7 @@ styles.heading]}>Invoice</Text>*/}
                             {
                                 splitPayment.map((item, index) => (
                                     <Row
-
+                                        key={index}
                                         data={[dateFormatter(item.date, 'short') + " " + item.time,
                                             item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
                                         style={styles.paymentModeTableRow}
