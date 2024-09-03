@@ -19,7 +19,7 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
  * @param {string} [props.placeholder] - Placeholder text for the input.
  * @param {number} [props.flex] - Flex of text input.
  * @param {string} [props.label] - Label text to display above the input.
- * @param {StyleSheet} [props.textInputStyle] - Custom style for text input.
+ * @param {Object} [props.textInputStyle] - Custom style for text input.
  * @param {boolean} [props.readOnly] - Makes the text input read only.
  * @param {Array} [props.dropdownItems] - Items to be listed in the dropdown option.
  * @param {function} [props.validator] - Function to validate the input value.

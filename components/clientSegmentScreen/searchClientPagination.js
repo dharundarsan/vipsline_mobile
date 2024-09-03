@@ -30,7 +30,7 @@ export default function SearchClientPagination(props) {
     // console.log("memo: " + memoizedTotalCount);
 
 
-    console.log("totalCount outside", totalCount);
+    // console.log("totalCount outside", totalCount);
 
     // useEffect(() => {
     //     totalCount = useSelector(state => state.clientFilter.totalSearchClients);
@@ -42,7 +42,7 @@ export default function SearchClientPagination(props) {
         dispatch(updateSearchClientMaxEntry(10))
         // console.log("inside the props max entry: " + maxEntry);
         dispatch(resetSearchClientFilter());
-        console.log("1st");
+        // console.log("1st");
         dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
         // setTotalCount(totalCount);
         setLowerCount(1);
@@ -51,7 +51,7 @@ export default function SearchClientPagination(props) {
     }, [props.filterPressed]);
 
     useEffect(() => {
-        console.log("2st");
+        // console.log("2st");
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
         if(lowerCount === 1) {
             setIsBackwardButtonDisabled(true);
@@ -72,12 +72,14 @@ export default function SearchClientPagination(props) {
     useEffect(()=>{
         // totalCount = memoizedTotalCount;
         setTotalCount(getTotalCount);
-    },[getTotalCount])
+        console.log("Loggigfgdfgf")
+        props.getTotalCountPagination(getTotalCount)
+    },[getTotalCount,props.query])
 
 
     useEffect(() => {
         let upper_count = 0;
-        console.log("total count", totalCount);
+        // console.log("total count", totalCount);
         if(maxEntry > totalCount) {
             upper_count = totalCount;
         }
@@ -87,7 +89,7 @@ export default function SearchClientPagination(props) {
         setLowerCount(1);
         setUpperCount(upper_count);
         dispatch(resetSearchClientFilter());
-        console.log("3rt");
+        // console.log("3rt");
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
     }, [maxEntry,totalCount]);
 

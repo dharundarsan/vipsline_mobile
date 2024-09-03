@@ -33,9 +33,8 @@ export default function ClientSegmentScreen() {
 
     const filterClientsList = useSelector(state => state.clientFilter.clients);
     const isFetching = useSelector(state => state.clientFilter.isFetching);
-
     const [clientCount, setClientCount] = useState(0);
-
+    // const [totalCount, setTotalCount] = useState(11);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const maxEntry = useSelector(state => state.clientFilter.maxEntry);
@@ -61,8 +60,15 @@ export default function ClientSegmentScreen() {
     const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
     const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
 
-    // const [currentCount, setCurrentCount] = useState(allClientCount);
+    const [totalCount, setTotalCount] = useState(allClientCount);
+    function getTotalCountPagination(totalCountData){
+        // totalCount = totalCountData;
+        setClientCount(totalCountData);
+        setTotalCount(clientCount)
+    }
 
+    // const [currentCount, setCurrentCount] = useState(allClientCount);
+    console.log("Total Count "+totalCount)
     useLayoutEffect(() => {
         dispatch(loadClientCountFromDb());
         // dispatch(loadClientFiltersFromDb(10, "All"));
@@ -73,6 +79,13 @@ export default function ClientSegmentScreen() {
         dispatch(loadClientCountFromDb());
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount))
     }, [filterPressed]);
+
+    useEffect(()=>{
+        if(searchQuery.trim().length!==0){
+            setSearchQuery("");
+        }
+        else return;
+    },[filterPressed]);
 
     useEffect(() => {
         console.log(maxEntry + clientFilterNames(filterPressed) + searchQuery);
@@ -261,8 +274,9 @@ export default function ClientSegmentScreen() {
                                 }
 
                         {
-                            clientCount >= 10 ?
+                            (totalCount >= 10) ?
                             <SearchClientPagination
+                                getTotalCountPagination={getTotalCountPagination}
                                 filterPressed={filterPressed}
                                 setIsModalVisible={setIsModalVisible}
                                 query={searchQuery}
