@@ -140,109 +140,6 @@ const CheckoutSection = (props) => {
         <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
             setIsPaymentModalVisible(false)
         }} price={ props.data !== null ? props.data[0].total_price : 0}/>
-        <View style={styles.checkoutDetailRow}>
-            {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
-            {/*<Text*/}
-            {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>*/}
-            <View>
-                <Popover popoverStyle={styles.popoverStyle}
-                         from={
-                             <Pressable style={styles.checkoutDetailInnerContainer}>
-                                 <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-                                 <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
-                             </Pressable>
-                }
-                         offset={Platform.OS === "ios" ? 0 : 32}
-                >
-                    {
-                        discountCategory.service !== "0" ?
-                            <Text>Service Discount: ₹{discountCategory.service}</Text> : null
-                    }
-                    {
-                        discountCategory.product !== "0" ?
-                            <Text>Product Discount: ₹{discountCategory.product}</Text> : null
-                    }
-                    {
-                        discountCategory.package !== "0" ?
-                            <Text>Package Discount: ₹{discountCategory.package}</Text> : null
-                    }
-                    {
-                        discountCategory.service === "0" &&
-                        discountCategory.product === "0" &&
-                        discountCategory.package === "0" ?
-                            <Text>No discounts applied</Text> :
-                            null
-                    }
-                </Popover>
-            </View>
-
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>
-        </View>
-
-        <View style={styles.checkoutDetailRow}>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
-            <Text
-                style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_price_after_discount : 0}</Text>
-        </View>
-        <View style={styles.checkoutDetailRow}>
-            <View>
-                <Popover popoverStyle={styles.popoverStyle}
-                         from={
-                             <Pressable style={styles.checkoutDetailInnerContainer}>
-                                 <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
-                                 <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
-                             </Pressable>
-                         }
-                         offset={Platform.OS === "ios" ? 0 : 32}
-                >
-                    <Text>SGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
-                    <Text>CGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
-                </Popover>
-            </View>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].gst_charges : 0}</Text>
-        </View>
-        {/*<View style={styles.checkoutDetailRow}>*/}
-        {/*    <View>*/}
-        {/*        <Popover popoverStyle={styles.popoverStyle}*/}
-        {/*                 from={*/}
-        {/*                     (<Pressable style={styles.checkoutDetailInnerContainer}>*/}
-        {/*                         <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
-        {/*                         <MaterialCommunityIcons name="information-outline" size={24} color="black"/>*/}
-        {/*                     </Pressable>)*/}
-        {/*                 }*/}
-        {/*                 offset={Platform.OS === "ios" ? 0 : 32}*/}
-        {/*        >*/}
-        {/*            <Text>{itemName} : ₹ {itemPrice}</Text>*/}
-        {/*        </Popover>*/}
-        {/*    </View>*/}
-
-        {/*    /!*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*!/*/}
-        {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>*/}
-        {/*</View>*/}
-        <View style={styles.buttonContainer}>
-            <PrimaryButton buttonStyle={styles.optionButton}>
-                <Entypo name="dots-three-horizontal" size={24} color="black"/>
-            </PrimaryButton>
-            <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
-                           onPress={() => {
-                               if(!clientInfo.isClientSelected) {
-                                   ToastAndroid.show("Please select client", ToastAndroid.LONG);
-                                   return;
-                               }
-                               if (!dispatch(checkStaffOnCartItems())) {
-                                   ToastAndroid.show("Please select staff", ToastAndroid.LONG);
-                                   return;
-                               }
-                               setIsPaymentModalVisible(true)
-                           }}>
-                <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
-                <View style={styles.checkoutButtonAmountAndArrowContainer}>
-                    <Text
-                        style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.data !== null ? props.data[0].total_price : 0}</Text>
-                    <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
-                </View>
-            </PrimaryButton>
-        </View>
         {
             ActionModal && <MiniActionTextModal isVisible={ActionModal}
                 onCloseModal={()=>{setActionModal(false)}}
@@ -340,25 +237,66 @@ const CheckoutSection = (props) => {
                     }}
                                   price={props.data[0].total_price}/>
                     <View style={styles.checkoutDetailRow}>
-                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-                        <Text
-                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_discount_in_price}</Text>
+                        {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
+                        {/*<Text*/}
+                        {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>*/}
+                        <View>
+                            <Popover popoverStyle={styles.popoverStyle}
+                                     from={
+                                         <Pressable style={styles.checkoutDetailInnerContainer}>
+                                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                                             <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                         </Pressable>
+                                     }
+                                     offset={Platform.OS === "ios" ? 0 : 32}
+                            >
+                                {
+                                    discountCategory.service !== "0" ?
+                                        <Text>Service Discount: ₹{discountCategory.service}</Text> : null
+                                }
+                                {
+                                    discountCategory.product !== "0" ?
+                                        <Text>Product Discount: ₹{discountCategory.product}</Text> : null
+                                }
+                                {
+                                    discountCategory.package !== "0" ?
+                                        <Text>Package Discount: ₹{discountCategory.package}</Text> : null
+                                }
+                                {
+                                    discountCategory.service === "0" &&
+                                    discountCategory.product === "0" &&
+                                    discountCategory.package === "0" ?
+                                        <Text>No discounts applied</Text> :
+                                        null
+                                }
+                            </Popover>
+                        </View>
+
+                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>
                     </View>
-                    <Divider/>
+
                     <View style={styles.checkoutDetailRow}>
                         <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
                         <Text
-                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_price_after_discount}</Text>
+                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_price_after_discount : 0}</Text>
                     </View>
                     <View style={styles.checkoutDetailRow}>
-                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
-                        <Text
-                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].gst_charges}</Text>
+                        <View>
+                            <Popover popoverStyle={styles.popoverStyle}
+                                     from={
+                                         <Pressable style={styles.checkoutDetailInnerContainer}>
+                                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
+                                             <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                         </Pressable>
+                                     }
+                                     offset={Platform.OS === "ios" ? 0 : 32}
+                            >
+                                <Text>SGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
+                                <Text>CGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
+                            </Popover>
+                        </View>
+                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].gst_charges : 0}</Text>
                     </View>
-                    {/*<View style={styles.checkoutDetailRow}>*/}
-                    {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
-                    {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>*/}
-                    {/*</View>*/}
                     <View style={styles.buttonContainer}>
                         <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
                             <Entypo name="dots-three-horizontal" size={24} color="black"/>
