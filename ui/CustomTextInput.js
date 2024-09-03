@@ -204,6 +204,10 @@ const CustomTextInput = (props) => {
                         mode="date"
                         display="default"
                         onChange={(event, selectedDate) => {
+                            if (event.type === "dismissed") {
+                                setIsDateTimePickerVisible(false);
+                                return;
+                            }
                             setIsDateTimePickerVisible(false);
                             if (selectedDate) {
                                 props.onChangeValue(new Date(selectedDate.getTime()));
