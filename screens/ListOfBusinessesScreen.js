@@ -4,7 +4,9 @@ import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
 import BusinessCard from "../components/listOfBusinessesScreen/BusinessCard";
 import {useDispatch, useSelector} from "react-redux";
-import {updateAuthStatus, updateBusinessId} from "../store/authSlice";
+import {updateAuthStatus, updateBusinessId, updateBusinessName} from "../store/authSlice";
+import {updateSelectedBusinessDetails} from "../store/listOfBusinessSlice";
+import getBusinessNotificationDetailsAPI from "../util/apis/getBusinessNotificationDetailsAPI";
 
 
 export default function ListOfBusinessesScreen(props) {
@@ -23,9 +25,8 @@ export default function ListOfBusinessesScreen(props) {
                 status={itemData.item.verificationStatus}
                 onPress={() => {
                     dispatch(updateBusinessId(itemData.item.id));
+                    dispatch(updateSelectedBusinessDetails(itemData.item));
                     dispatch(updateAuthStatus(true));
-
-
                 }}
             />
         );

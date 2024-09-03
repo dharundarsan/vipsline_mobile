@@ -28,7 +28,7 @@ export default function DeleteClient(props) {
         >
             <TouchableOpacity
                 style={styles.modalContent}
-                onPress={props.onCloseModal}
+                // onPress={props.onCloseModal}
                 activeOpacity={1}
             >
                 <View style={styles.label}>

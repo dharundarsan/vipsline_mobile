@@ -8,6 +8,7 @@ import staffReducer from "./staffSlice";
 import businessesReducer from "./listOfBusinessSlice";
 import loginUserReducer from "./loginUserSlice";
 import authReducer from "./authSlice";
+import invoiceReducer from "./invoiceSlice";
 
 const store = configureStore({
     reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
         businesses: businessesReducer,
         loginUser: loginUserReducer,
         authDetails: authReducer,
+        invoice: invoiceReducer
     },
 });
 

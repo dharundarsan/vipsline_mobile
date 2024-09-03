@@ -1,5 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
+import getBusinessNotificationDetailsAPI from "../util/apis/getBusinessNotificationDetailsAPI";
 
 const initialClientState = {
     isAuthenticated: false,
@@ -22,7 +23,11 @@ export const authSlice = createSlice({
             state.authToken = action.payload;
         },
         updateBusinessId(state, action) {
+
             state.businessId = action.payload;
+        },
+        updateBusinessName(state, action) {
+            state.businessName = action.payload;
         }
     }
 });
@@ -31,7 +36,8 @@ export const {
     updateAuthStatus,
     updateFetchingState,
     updateAuthToken,
-    updateBusinessId
+    updateBusinessId,
+    updateBusinessName
 } = authSlice.actions;
 
 export default authSlice.reducer;

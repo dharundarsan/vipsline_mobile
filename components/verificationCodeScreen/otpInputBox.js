@@ -179,11 +179,9 @@
 import React, { useRef, useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import Colors from "../../constants/Colors";
-import textTheme from "../../constants/TextTheme";
-import { useSelector } from "react-redux";
 
 export default function OtpInputBox(props) {
-    const refs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+    const refs = useRef([null, null, null, null]);
 
     const [state, setState] = useState({
         otp: ['', '', '', ''],
@@ -195,11 +193,12 @@ export default function OtpInputBox(props) {
         const newOtp = [...state.otp];
         newOtp[index] = text;
 
-        // Automatically focus on the next input
-        if (text.length >= 1 && index < refs.length - 1) {
-            refs[index + 1].current.focus();
+        // Automatically focus on the next input if the text length is 1
+        if (text.length >= 1 && index < refs.current.length - 1) {
+            refs.current[index + 1].focus();
         } else if (text.length === 0 && index > 0) {
-            refs[index - 1].current.focus();
+            // Move focus to the previous input if text length is 0
+            refs.current[index - 1].focus();
         }
 
         setState(prevState => ({
@@ -209,9 +208,18 @@ export default function OtpInputBox(props) {
             focusedIndex: index,
         }));
 
+        // Trigger OTP callback when the last input is filled
         if (index === 3) {
             props.otp(newOtp.join(''));
         }
+
+        // if(index === 1 && (parseInt(state.otp[0]) !== "")) {
+        //     setState(prevState => ({
+        //         ...prevState,
+        //         otp: ,
+        //     }))
+        // }
+        console.log(index, text);
     };
 
     const handleFocus = (index) => {
@@ -221,51 +229,49 @@ export default function OtpInputBox(props) {
         }));
     };
 
-    const clearOTP = () => {
-        setState({
-            otp: ['', '', '', ''],
-            focusedIndex: 0,
-            filled: [false, false, false, false],
-        });
+    const handleKeyPress = (e, index) => {
+        // Move focus to the previous input on 'Backspace'
+        if (e.nativeEvent.key === 'Backspace' && index > 0 && state.otp[index].length === 0) {
+            refs.current[index - 1].focus();
+        }
+    };
+
+    const borderColor = (index) => {
+        const { focusedIndex, filled } = state;
+        return !props.verify && props.changing
+            ? Colors.error
+            : focusedIndex === index
+                ? Colors.highlight
+                : filled[index]
+                    ? Colors.green
+                    : Colors.grey400;
     };
 
     return (
         <View style={[styles.otpInput, props.style]}>
-            {refs.map((ref, index) => {
-                const isFocused = state.focusedIndex === index;
-                const isFilled = state.filled[index];
-                const borderColor = props.verify && props.changing
-                    ? Colors.error
-                    : isFocused
-                        ? Colors.highlight
-                        : isFilled
-                            ? Colors.green
-                            : Colors.grey400;
-
-                return (
-                    <TextInput
-                        key={index}
-                        placeholder="*"
-                        placeholderTextColor={Colors.grey800}
-                        style={[
-                            styles.otpBox,
-                            { borderColor },
-
-                        ]}
-                        maxLength={1}
-                        ref={ref}
-                        keyboardType='number-pad'
-                        onChangeText={text => {
-                            handleOtpChange(text, index);
-                            props.setChanging(prev => prev + 1);
-                        }}
-                        onFocus={() => handleFocus(index)}
-                        value={state.otp[index]}
-                        selection={{ start: state.otp[index].length, end: state.otp[index].length }}  // Manually manage cursor position
-                        cursorColor={Colors.transparent}
-                    />
-                );
-            })}
+            {state.otp.map((value, index) => (
+                <TextInput
+                    key={index}
+                    placeholder="*"
+                    placeholderTextColor={Colors.grey800}
+                    style={[
+                        styles.otpBox,
+                        { borderColor: borderColor(index) },
+                    ]}
+                    maxLength={1}
+                    ref={el => refs.current[index] = el}
+                    keyboardType='number-pad'
+                    onChangeText={text => {
+                        handleOtpChange(text, index);
+                        props.setChanging(false);
+                    }}
+                    onFocus={() => handleFocus(index)}
+                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    value={value}
+                    selection={{ start: value.length, end: value.length }}
+                    cursorColor={Colors.transparent}
+                />
+            ))}
         </View>
     );
 }
@@ -282,8 +288,8 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         width: 57,
         textAlign: 'center',
-
     }
 });
+
 
 
