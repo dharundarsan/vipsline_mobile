@@ -16,7 +16,6 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useState } from "react";
 import textTheme from "../../constants/TextTheme";
-import { SafeAreaView } from "react-native-safe-area-context";
 const MiniActionTextModal = (props) => {
   const [selectedOption, setSelectedOption] = useState(null);
 
@@ -30,14 +29,22 @@ const MiniActionTextModal = (props) => {
         activeOpacity={1}
         style={styles.modalOverlay}
       >
-        <KeyboardAvoidingView behavior="position" style={{ flex: 1, justifyContent:"flex-end" }}>
+        <KeyboardAvoidingView
+          behavior="position"
+          style={{ flex: 1, justifyContent: "flex-end" }}
+        >
           <View style={styles.modalContent}>
             <View style={styles.modalTitle}>
               <Text></Text>
               <Text style={[textTheme.titleLarge, styles.deleteClientText]}>
                 {props.title}
               </Text>
-              <Entypo name="cross" size={24} color="black" onPress={props.onCloseModal} />
+              <Entypo
+                name="cross"
+                size={24}
+                color="black"
+                onPress={props.onCloseModal}
+              />
             </View>
             <FlatList
               data={props.data}
@@ -61,7 +68,13 @@ const MiniActionTextModal = (props) => {
                           <CustomTextInput type={"multiLine"} />
                         </View>
                       ) : item.boxType === "textBox" ? (
-                        <TextInput style={styles.textInputBox} />
+                        <TextInput
+                          style={styles.textInputBox}
+                          onChangeText={(value) => {
+                            props.setDiscountValue(value);
+                          }}
+                          keyboardType="number-pad"
+                        />
                       ) : item.boxType === "priceBox" ? (
                         <View style={styles.priceBoxContainer}>
                           <FontAwesome
@@ -175,6 +188,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   textInputBox: {
+    paddingHorizontal: 10,
     borderRadius: 5,
     flex: 3,
     height: 40,
@@ -235,9 +249,9 @@ const styles = StyleSheet.create({
     fontWeight: 1,
     marginRight: 10,
     paddingHorizontal: 6,
-    borderRightColor:Colors.ripple,
+    borderRightColor: Colors.ripple,
     borderRightWidth: 0.9,
-},
+  },
   priceTextInput: {
     flex: 1,
     paddingVertical: 0,

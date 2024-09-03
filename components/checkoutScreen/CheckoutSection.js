@@ -62,16 +62,20 @@ const CheckoutSection = (props) => {
     const [ActionModal,setActionModal] = useState(false);
     const [title, setTitle] = useState("")
     const [isDelete, setIsDelete] = useState(false);
+    const [discountValue, setDiscountValue] = useState(0);
+    // const [first, setfirst] = useState(second)
     const [data, setData] = useState([{}])
     function openModal(title){
         setTitle(title);
     }
+    console.log(discountValue);
     return <View style={styles.checkoutSection}>
         {
             ActionModal && <MiniActionTextModal isVisible={ActionModal}
                 onCloseModal={()=>{setActionModal(false)}}
                 title={title}
                 data={data}
+                setDiscountValue={setDiscountValue}
             />
         }
         {
@@ -113,6 +117,7 @@ const CheckoutSection = (props) => {
                                 header:"Enter Discount",
                                 boxType:"textBox",
                                 typeToggle:1,
+                                keyboardType:"number-pad"
                             }])
                             setActionModal(true)
                         } else if (value === "Add Charges") {
@@ -122,11 +127,13 @@ const CheckoutSection = (props) => {
                                 header:"Item name",
                                 boxType:"textBox",
                                 typeToggle:0,
+                                keyboardType:"number-pad"
                             },
                             {
                                 header:"Price",
                                 boxType:"priceBox",
-                                typeToggle:0
+                                typeToggle:0,
+                                keyboardType:"number-pad"
                             }
                         ])
                             setActionModal(true)
