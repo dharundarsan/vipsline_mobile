@@ -8,13 +8,14 @@ import {useEffect, useState} from "react";
 import sendOTPApi from "../../util/apis/sendOTPApi";
 import {useDispatch} from "react-redux";
 import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
+import {useNavigation} from "@react-navigation/native";
 
 export default function ForgetPasswordOTP(props) {
     const [otp, setOtp] = useState("");
     const dispatch = useDispatch();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    const [changing, setChanging] = useState(0);
+    const navigation = useNavigation();
+    const [changing, setChanging] = useState(false);
 
     const [timer, setTimer] = useState(60)
     useEffect(() => {
@@ -85,7 +86,10 @@ export default function ForgetPasswordOTP(props) {
                 onPress={async () => {
                     const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS")
                     setIsAuthenticated(authStatus);
-                    setChanging(0);
+                    setChanging(true);
+                    if(authStatus === true) {
+                        navigation.navigate("ListOfBusinessesScreen");
+                    }
                 }}
             />
 

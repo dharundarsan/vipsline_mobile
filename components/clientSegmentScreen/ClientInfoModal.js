@@ -269,7 +269,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeAndHeadingContainer: {
-        marginTop:32,
         justifyContent: "center",
         alignItems: "center",
         height: 60,
@@ -279,6 +278,7 @@ const styles = StyleSheet.create({
                 marginTop: 32,
             },
             android: {
+                // marginTop: 0,
             },
         }),
 

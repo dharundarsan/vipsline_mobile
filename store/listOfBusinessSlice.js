@@ -5,6 +5,8 @@ import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from
 const initialClientState = {
     listOfBusinesses: [],
     isFetching: false,
+    selectedBusiness: {},
+
 };
 
 export const loadBusinessesListFromDb = () => async (dispatch) => {
@@ -33,10 +35,20 @@ export const listOfBusinessSlice = createSlice({
         updateListOfBusinesses(state, action) {
             state.listOfBusinesses = action.payload;
         },
+        updateSelectedBusinessDetails(state, action) {
+            state.selectedBusiness = action.payload;
+        },
+        updateBusinessNotificationDetails(state, action) {
+            state.selectedBusiness = {...state.selectedBusiness, ...action.payload};
+        }
 
-    }
-});
+        }
+    });
 
-export const {updateListOfBusinesses} = listOfBusinessSlice.actions;
+    export const {
+        updateListOfBusinesses,
+    updateSelectedBusinessDetails,
+    updateBusinessNotificationDetails
+} = listOfBusinessSlice.actions;
 
 export default listOfBusinessSlice.reducer;

@@ -16,7 +16,6 @@ import Colors from './constants/Colors';
 import {enableScreens} from "react-native-screens";
 import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 // import ClientSegmentScreen from "./screens/ClientSegmentScreen";
-
 //Font And SplashScreen Imports
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
@@ -105,8 +104,8 @@ const AppNavigator = () => {
     return (
         <NavigationContainer>
             {isAuthenticated ?
-                <MainDrawerNavigator />
-            : <AuthNavigator />}
+                <MainDrawerNavigator/>
+                 : <AuthNavigator/>}
         </NavigationContainer>
     );
 };
@@ -226,5 +225,5 @@ const MainDrawerNavigator = () => (
 const styles = StyleSheet.create({
     safeAreaView: {
         flex: 1,
-    },
+    }
 });
