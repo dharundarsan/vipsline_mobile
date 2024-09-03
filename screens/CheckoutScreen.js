@@ -27,6 +27,7 @@ import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
 import {loadCartFromDB} from "../store/cartSlice";
+import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 
 
 const CheckoutScreen = () => {
@@ -50,6 +51,7 @@ const CheckoutScreen = () => {
         dispatch(loadLoginUserDetailsFromDb());
         dispatch(loadStaffsFromDB());
         dispatch(loadCartFromDB());
+        dispatch(loadBookingDetailsFromDb());
     }, []);
 
     return (

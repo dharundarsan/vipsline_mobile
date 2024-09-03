@@ -1,14 +1,25 @@
-import {KeyboardAvoidingView, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
+import {
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {DataTable} from "react-native-paper";
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Entypo} from '@expo/vector-icons';
+import {Entypo, MaterialCommunityIcons} from '@expo/vector-icons';
 import {Feather} from '@expo/vector-icons';
 import {Keyboard} from "react-native";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import PaymentModal from "./PaymentModal";
+import Popover from "react-native-popover-view";
+import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {checkStaffOnCartItems} from "../../store/cartSlice";
 
@@ -16,6 +27,49 @@ const CheckoutSection = (props) => {
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
     const dispatch = useDispatch();
     const clientInfo = useSelector(state => state.clientInfo);
+    const centralGST = 30;
+    const stateGST = 30;
+
+    const itemName = "Shampoo";
+    const itemPrice = 500;
+
+
+    const serviceDiscount = true;
+    const productDiscount = false;
+
+    const [discountCategory, setDiscountCategory] = useState({
+        service: "",
+        product: "",
+        package: "",
+    });
+
+    const cartDetails = useSelector(state => state.cart.items);
+
+    useEffect(() => {
+        const updatedCategory = { service: 0, product: 0, package: 0 };
+
+        cartDetails.forEach(item => {
+            if (["Women", "Men", "General"].includes(item.gender)) {
+                updatedCategory.service += item.service_discount;
+            } else if (item.gender === "Products") {
+                updatedCategory.product += item.service_discount;
+            } else if (item.gender === "packages") {
+                updatedCategory.package += item.price - item.total_price;
+            }
+        });
+
+        setDiscountCategory({
+            service: updatedCategory.service.toFixed(0),
+            product: updatedCategory.product.toFixed(0),
+            package: updatedCategory.package.toFixed(0),
+        });
+    }, [cartDetails]);
+
+    const selectedClientDetails = useSelector(state => state.clientInfo.details);
+
+
+
+
 
     const styles = StyleSheet.create({
         checkoutSection: {
@@ -29,7 +83,9 @@ const CheckoutSection = (props) => {
             borderStyle: "dashed",
             paddingVertical: 5,
         },
-        checkoutDetailText: {},
+        checkoutDetailText: {
+            marginRight: 8
+        },
         buttonContainer: {
             flexDirection: "row", margin: 10, gap: 10,
         },
@@ -51,6 +107,13 @@ const CheckoutSection = (props) => {
         },
         checkoutButtonText: {
             color: Colors.white
+        },
+        checkoutDetailInnerContainer: {
+            flexDirection: 'row',
+            // borderWidth: 1
+        },
+        popoverStyle: {
+            padding: 12
         }
     });
 
@@ -63,18 +126,79 @@ const CheckoutSection = (props) => {
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>
+            <View>
+                <Popover popoverStyle={styles.popoverStyle}
+                         from={
+                             <Pressable style={styles.checkoutDetailInnerContainer}>
+                                 <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                                 <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                             </Pressable>
+                }
+                         offset={Platform.OS === "ios" ? 0 : 32}
+                >
+                    {
+                        discountCategory.service !== "0" ?
+                            <Text>Service Discount: ₹{discountCategory.service}</Text> : null
+                    }
+                    {
+                        discountCategory.product !== "0" ?
+                            <Text>Product Discount: ₹{discountCategory.product}</Text> : null
+                    }
+                    {
+                        discountCategory.package !== "0" ?
+                            <Text>Package Discount: ₹{discountCategory.package}</Text> : null
+                    }
+                    {
+                        discountCategory.service === "0" &&
+                        discountCategory.product === "0" &&
+                        discountCategory.package === "0" ?
+                            <Text>No discounts applied</Text> :
+                            null
+                    }
+                </Popover>
+            </View>
+
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_discount_in_price}</Text>
         </View>
+
         <View style={styles.checkoutDetailRow}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_price_after_discount : 0}</Text>
         </View>
         <View style={styles.checkoutDetailRow}>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
+            <View>
+                <Popover popoverStyle={styles.popoverStyle}
+                         from={
+                             <Pressable style={styles.checkoutDetailInnerContainer}>
+                                 <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
+                                 <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                             </Pressable>
+                         }
+                         offset={Platform.OS === "ios" ? 0 : 32}
+                >
+                    <Text>SGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
+                    <Text>CGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
+                </Popover>
+            </View>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].gst_charges : 0}</Text>
         </View>
         {/*<View style={styles.checkoutDetailRow}>*/}
-        {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
+        {/*    <View>*/}
+        {/*        <Popover popoverStyle={styles.popoverStyle}*/}
+        {/*                 from={*/}
+        {/*                     (<Pressable style={styles.checkoutDetailInnerContainer}>*/}
+        {/*                         <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
+        {/*                         <MaterialCommunityIcons name="information-outline" size={24} color="black"/>*/}
+        {/*                     </Pressable>)*/}
+        {/*                 }*/}
+        {/*                 offset={Platform.OS === "ios" ? 0 : 32}*/}
+        {/*        >*/}
+        {/*            <Text>{itemName} : ₹ {itemPrice}</Text>*/}
+        {/*        </Popover>*/}
+        {/*    </View>*/}
+
+        {/*    /!*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*!/*/}
         {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>*/}
         {/*</View>*/}
         <View style={styles.buttonContainer}>
