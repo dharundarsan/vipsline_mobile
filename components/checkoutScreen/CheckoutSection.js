@@ -304,6 +304,14 @@ const CheckoutSection = (props) => {
                         <PrimaryButton buttonStyle={styles.checkoutButton}
                                        pressableStyle={styles.checkoutButtonPressable}
                                        onPress={() => {
+                                           if(!clientInfo.isClientSelected) {
+                                               ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                                               return;
+                                           }
+                                           if (!dispatch(checkStaffOnCartItems())) {
+                                               ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                                               return;
+                                           }
                                            setIsPaymentModalVisible(true)
                                        }}>
                             <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
