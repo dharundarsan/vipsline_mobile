@@ -27,8 +27,8 @@ const UpdateClientModal = (props) => {
         gstNo: "",
         clientNotes: "",
         clientAddress: "",
-        dateOfBirth: "",
-        anniversaryDate: "",
+        dateOfBirth: null,
+        anniversaryDate: null,
         isDobSelected: false,
         isAnniversarySelected: false,
     });

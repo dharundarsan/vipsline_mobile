@@ -23,8 +23,8 @@ const CreateClientModal = (props) => {
     const [gstNo, setGstNo] = useState("");
     const [clientNotes, setClientNotes] = useState("")
     const [clientAddress, setClientAddress] = useState("");
-    const [dateOfBirth, setDateOfBirth] = useState(Date.now());
-    const [anniversaryDate, setAnniversaryDate] = useState(Date.now());
+    const [dateOfBirth, setDateOfBirth] = useState(null);
+    const [anniversaryDate, setAnniversaryDate] = useState(null);
     const [isDobSelected, setIsDobSelected] = useState(false);
     const [isAnniversarySelected, setIsAnniversarySelected] = useState(false);
 
@@ -33,7 +33,7 @@ const CreateClientModal = (props) => {
     const firstNameRef = useRef(null);
     const lastNameRef = useRef(null);
     const phoneNoRef = useRef(null);
-    const emailRef = useRef(null);
+    // const emailRef = useRef(null);
 
     const clearForm = () => {
         setFirstName("");
@@ -46,8 +46,8 @@ const CreateClientModal = (props) => {
         setClientNotes("")
         setIsAnniversarySelected(false);
         setIsDobSelected(false);
-        setAnniversaryDate(Date.now());
-        setDateOfBirth(Date.now());
+        setAnniversaryDate(null);
+        setDateOfBirth(null);
         setClientSource("");
         setClientAddress("");
     }
@@ -66,7 +66,7 @@ const CreateClientModal = (props) => {
         try {
             await createNewClientAPI({
                 address: clientAddress,
-                anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : "",
+                anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
                 businessId: process.env.EXPO_PUBLIC_BUSINESS_ID,
                 city: "",
                 clientNotes: clientNotes,
@@ -74,7 +74,7 @@ const CreateClientModal = (props) => {
                 country: "India",
                 countryCode: phoneNo[0],
                 custGst: gstNo,
-                dob: isDobSelected ? formatDate(dateOfBirth, "yyyy-dd-mm") : "",
+                dob: isDobSelected ? formatDate(dateOfBirth, "yyyy-dd-mm") : null,
                 email: email,
                 firstName: firstName,
                 gender: gender,
@@ -162,9 +162,6 @@ const CreateClientModal = (props) => {
                             if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) return "Email is invalid";
                             else return true;
                         }}
-                        onSave={(callback) => {
-                            emailRef.current = callback;
-                        }}
                     />
                     <CustomTextInput
                         type="dropdown"
@@ -183,7 +180,7 @@ const CreateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Date of birth"
-                        value={new Date(dateOfBirth)}
+                        value={ dateOfBirth === null || dateOfBirth === undefined ? null : new Date(dateOfBirth)}
                         onChangeValue={(value) => {
                             setIsDobSelected(true);
                             setDateOfBirth(value);
@@ -192,7 +189,7 @@ const CreateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Anniversary"
-                        value={new Date(anniversaryDate)}
+                        value={ anniversaryDate === null || anniversaryDate === undefined ? null : new Date(anniversaryDate)}
                         onChangeValue={(value) => {
                             setIsAnniversarySelected(true);
                             setAnniversaryDate(value);

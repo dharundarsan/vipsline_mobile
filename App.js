@@ -112,9 +112,9 @@ const AppNavigator = () => {
 
 const AuthNavigator = () => (
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
-        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
-        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
-        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+        {/*<AuthStack.Screen name="AuthScreen" component={AuthScreen}/>*/}
+        {/*<AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>*/}
+        {/*<AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>*/}
         <AuthStack.Screen name="ListOfBusinessesScreen" component={ListOfBusinessesScreen}/>
     </AuthStack.Navigator>
 );
