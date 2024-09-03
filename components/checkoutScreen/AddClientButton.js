@@ -1,11 +1,10 @@
 import PrimaryButton from "../../ui/PrimaryButton";
-import {StyleSheet, Text, View} from "react-native";
 import {FontAwesome6, Ionicons} from "@expo/vector-icons";
+import {Pressable, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import ClientFilterCard from "../clientSegmentScreen/ClientFilterCard";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
 import {clearClientInfo} from "../../store/clientInfoSlice";
@@ -14,6 +13,7 @@ import React, {useState} from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
@@ -37,18 +37,20 @@ const AddClientButton = (props) => {
                             <View style={styles.actionMenu}>
                                 {clientInfo.details &&
                                 clientInfo.details.wallet_balance !== 0 &&
-                                clientInfo.membershipDetails.length &&
+                                clientInfo.membershipDetails.length !==0 &&
                                 clientInfo.packageDetails.length !== 0 ? (
                                     isClientInfo ? (
-                                        <Text
-                                            style={{color: Colors.highlight}}
-                                            onPress={() => {
-                                                console.log("done");
-                                                setIsVisibleModal(true);
-                                            }}
-                                        >
-                                            client info
-                                        </Text>
+                                        <Pressable style={[styles.activePlan,{flexDirection:'row',alignItems:"center",
+                                            borderColor: Colors.transparent}]} onPress={() => {
+                                            setIsVisibleModal(true);
+                                        }}>
+                                            <MaterialIcons name="sort" size={17} color={Colors.highlight} />
+                                            <Text
+                                                style={{color: Colors.highlight}}
+                                            >
+                                                client info
+                                            </Text>
+                                        </Pressable>
                                     ) : (
                                         <SimpleLineIcons
                                             name="options"
@@ -57,7 +59,19 @@ const AddClientButton = (props) => {
                                             onPress={() => setIsClientInfo(true)}
                                         />
                                     )
-                                ) : null}
+                                ) :
+                                    <Pressable style={[styles.activePlan,{flexDirection:'row',alignItems:"center",
+                                        borderColor: Colors.transparent}]} onPress={() => {
+                                        setIsVisibleModal(true);
+                                    }}>
+                                        <MaterialIcons name="sort" size={17} color={Colors.highlight} />
+                                        <Text
+                                            style={{color: Colors.highlight}}
+                                        >
+                                            client info
+                                        </Text>
+                                    </Pressable>
+                                }
 
                                 <Ionicons name="close" size={24} color="black"/>
 
@@ -143,13 +157,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     clientCard: {
-        flex: 0.65,
+        flex: 0.60,
     },
     actionMenu: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
-        flex: 0.35
+        flex: 0.40
     },
     clientDetailContainer: {
         alignItems: "center",

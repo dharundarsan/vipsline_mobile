@@ -184,7 +184,7 @@ const CreateClientModal = (props) => {
                         type="date"
                         label="Date of birth"
                         value={new Date(dateOfBirth)}
-                        onChange={(value) => {
+                        onChangeValue={(value) => {
                             setIsDobSelected(true);
                             setDateOfBirth(value);
                         }}
@@ -193,7 +193,7 @@ const CreateClientModal = (props) => {
                         type="date"
                         label="Anniversary"
                         value={new Date(anniversaryDate)}
-                        onChange={(value) => {
+                        onChangeValue={(value) => {
                             setIsAnniversarySelected(true);
                             setAnniversaryDate(value);
                         }}

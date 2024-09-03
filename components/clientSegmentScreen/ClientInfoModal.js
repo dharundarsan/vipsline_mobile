@@ -137,6 +137,8 @@ export default function clientInfoModal(props) {
                     dispatch(loadClientInfoFromDb(props.id))
 
                 }}
+                header={"Delete Client"}
+                content={"Are you sure? This action cannot be undone."}
                 onCloseClientInfoAfterDeleted={() => {
                     props.setVisible(false);
                     props.setSearchQuery("");

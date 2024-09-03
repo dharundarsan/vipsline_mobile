@@ -22,6 +22,10 @@ import Popover from "react-native-popover-view";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {checkStaffOnCartItems} from "../../store/cartSlice";
+import DropdownModal from "../../ui/DropdownModal";
+import MiniActionTextModal from "./MiniActionTextModal";
+import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 const CheckoutSection = (props) => {
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
@@ -114,10 +118,24 @@ const CheckoutSection = (props) => {
         },
         popoverStyle: {
             padding: 12
+        },
+        primaryViewChildrenStyle: {
+            flexDirection: "row",
+            alignItems: "center"
         }
     });
 
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [ActionModal,setActionModal] = useState(false);
+    const [title, setTitle] = useState("")
+    const [isDelete, setIsDelete] = useState(false);
+    const [discountValue, setDiscountValue] = useState(0);
+    // const [first, setfirst] = useState(second)
+    const [data, setData] = useState([{}])
+    function openModal(title){
+        setTitle(title);
+    }
+    console.log(discountValue);
     return <View style={styles.checkoutSection}>
         <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
             setIsPaymentModalVisible(false)
@@ -225,6 +243,141 @@ const CheckoutSection = (props) => {
                 </View>
             </PrimaryButton>
         </View>
+        {
+            ActionModal && <MiniActionTextModal isVisible={ActionModal}
+                onCloseModal={()=>{setActionModal(false)}}
+                title={title}
+                data={data}
+                setDiscountValue={setDiscountValue}
+            />
+        }
+        {
+            isDelete && <DeleteClient
+                isVisible={isDelete}
+                onCloseModal={() => {
+                    setIsDelete(false)
+                    // setModalVisibility(false);
+                    // console.log("Fetched")
+                    // dispatch(loadClientInfoFromDb(props.id))
+                }}
+                header={"Cancel Sale"}
+                content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
+                onCloseClientInfoAfterDeleted={() => {
+                    // props.setVisible(false);
+                    // props.setSearchQuery("");
+                    // props.setFilterPressed("all_clients_count");
+                }}
+            />
+        }
+        {
+            isModalOpen ?
+                <DropdownModal
+                    isVisible={isModalOpen}
+                    onCloseModal={() => {
+                        setIsModalOpen(false)
+                    }}
+                    dropdownItems={[
+                        "Apply Discount",
+                        "Add Charges",
+                        "Add Sales Notes",
+                        "Cancel Sales"
+                    ]}
+                    onChangeValue={(value) => {
+                        console.log(value)
+                        if (value === "Apply Discount") {
+                            openModal("Add Discount")
+                            setData([{
+                                header:"Enter Discount",
+                                boxType:"textBox",
+                                typeToggle:1,
+                                keyboardType:"number-pad"
+                            }])
+                            setActionModal(true)
+                        } else if (value === "Add Charges") {
+                            openModal("Add extra charges")
+                            setData([
+                            {
+                                header:"Item name",
+                                boxType:"textBox",
+                                typeToggle:0,
+                                keyboardType:"number-pad"
+                            },
+                            {
+                                header:"Price",
+                                boxType:"priceBox",
+                                typeToggle:0,
+                                keyboardType:"number-pad"
+                            }
+                        ])
+                            setActionModal(true)
+                        } else if (value === "Add Sales Notes") {
+                            openModal("Add a note")
+                            setData([{
+                                header:"Sales notes",
+                                boxType:"multiLineBox",
+                                typeToggle:0,
+                            }])
+                            setActionModal(true)
+                        } else if (value === "Cancel Sales") {
+                            setIsDelete(true);
+                        }
+                    }}
+                    iconImage={[
+                        require("../../assets/icons/checkout/actionmenu/applydiscount.png"),
+                        require("../../assets/icons/checkout/actionmenu/addcharges.png"),
+                        require("../../assets/icons/checkout/actionmenu/salesnote.png"),
+                        require("../../assets/icons/checkout/actionmenu/cancelsale.png")
+                    ]}
+                    primaryViewChildrenStyle={styles.primaryViewChildrenStyle}
+                    imageWidth={25}
+                    imageHeight={25}
+                />
+
+                :
+                <>
+                    <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
+                        setIsPaymentModalVisible(false)
+                    }}
+                                  price={props.data[0].total_price}/>
+                    <View style={styles.checkoutDetailRow}>
+                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                        <Text
+                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_discount_in_price}</Text>
+                    </View>
+                    <Divider/>
+                    <View style={styles.checkoutDetailRow}>
+                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
+                        <Text
+                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_price_after_discount}</Text>
+                    </View>
+                    <View style={styles.checkoutDetailRow}>
+                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
+                        <Text
+                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].gst_charges}</Text>
+                    </View>
+                    {/*<View style={styles.checkoutDetailRow}>*/}
+                    {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
+                    {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ 5000</Text>*/}
+                    {/*</View>*/}
+                    <View style={styles.buttonContainer}>
+                        <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
+                            <Entypo name="dots-three-horizontal" size={24} color="black"/>
+                        </PrimaryButton>
+                        <PrimaryButton buttonStyle={styles.checkoutButton}
+                                       pressableStyle={styles.checkoutButtonPressable}
+                                       onPress={() => {
+                                           setIsPaymentModalVisible(true)
+                                       }}>
+                            <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
+                            <View style={styles.checkoutButtonAmountAndArrowContainer}>
+                                <Text
+                                    style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.data[0].total_price}</Text>
+                                <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
+                            </View>
+                        </PrimaryButton>
+                    </View>
+                </>
+        }
     </View>
 }
 

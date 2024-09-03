@@ -32,7 +32,7 @@ export default function DeleteClient(props) {
                 activeOpacity={1}
             >
                 <View style={styles.label}>
-                    <Text style={[textTheme.titleLarge, styles.deleteClientText]}>Delete Client</Text>
+                    <Text style={[textTheme.titleLarge, styles.deleteClientText]}>{props.header}</Text>
                     <PrimaryButton
                         buttonStyle={styles.closeButton}
                         pressableStyle={styles.closeButtonPressable}
@@ -44,7 +44,7 @@ export default function DeleteClient(props) {
                     </PrimaryButton>
                 </View>
                 <View style={styles.deleteClientCardContainer}>
-                    <Text style={[textTheme.bodyLarge]}>Are you sure? This action cannot be undone.</Text>
+                    <Text style={[textTheme.bodyLarge]}>{props.content}</Text>
                     <View style={styles.deleteClientCardButtonContainer}>
                         <PrimaryButton
                             label={"cancel"}
