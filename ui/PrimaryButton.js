@@ -13,6 +13,7 @@ import React from "react";
  * @param {String || number} [props.height] - Height of the button.
  * @param {String || number} [props.width] - Width of the button.
  * @param {string} [props.rippleColor] - Ripple color animation when pressed.
+ * @param {boolean} [props.disableRipple] - Disable ripple.
  * @param {Object} [props.buttonStyle] - Custom styles for the button container.
  * @param {Object} [props.textStyle] - Custom styles for the button text. Not applicable when children is present.
  * @param {Object} [props.pressableStyle] - Custom styles for the inner pressable container
@@ -50,11 +51,11 @@ const PrimaryButton = (props) => {
                     styles.pressable,
                     props.pressableStyle,
                     Platform.select({
-                        ios: { opacity: pressed ? 0.3 : 1},
+                        ios: props.disableRipple ? {} : { opacity: pressed ? 0.3 : 1},
                     }),
                 ]}
                 onPress={props.onPress}
-                android_ripple={{ color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)' }}
+                android_ripple={ props.disableRipple ? {} : { color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)' }}
             >
                 {props.children ? props.children :
                     <Text style={[TextTheme.titleSmall, styles.buttonLabel, props.textStyle]}>

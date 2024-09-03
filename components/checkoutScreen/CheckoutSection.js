@@ -1,4 +1,4 @@
-import {KeyboardAvoidingView, ScrollView, StyleSheet, Text, View} from "react-native";
+import {KeyboardAvoidingView, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
 import {DataTable} from "react-native-paper";
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
@@ -9,9 +9,13 @@ import {Feather} from '@expo/vector-icons';
 import {Keyboard} from "react-native";
 import {useState, useEffect} from "react";
 import PaymentModal from "./PaymentModal";
+import {useDispatch, useSelector} from "react-redux";
+import {checkStaffOnCartItems} from "../../store/cartSlice";
 
 const CheckoutSection = (props) => {
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
+    const dispatch = useDispatch();
+    const clientInfo = useSelector(state => state.clientInfo);
 
     const styles = StyleSheet.create({
         checkoutSection: {
@@ -52,18 +56,22 @@ const CheckoutSection = (props) => {
 
 
     return <View style={styles.checkoutSection}>
-        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={()=>{setIsPaymentModalVisible(false)}} price={props.data[0].total_price} />
+        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
+            setIsPaymentModalVisible(false)
+        }} price={ props.data !== null ? props.data[0].total_price : 0}/>
         <View style={styles.checkoutDetailRow}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_discount_in_price}</Text>
+            <Text
+                style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>
         </View>
         <View style={styles.checkoutDetailRow}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].total_price_after_discount}</Text>
+            <Text
+                style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_price_after_discount : 0}</Text>
         </View>
         <View style={styles.checkoutDetailRow}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data[0].gst_charges}</Text>
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].gst_charges : 0}</Text>
         </View>
         {/*<View style={styles.checkoutDetailRow}>*/}
         {/*    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
@@ -73,10 +81,22 @@ const CheckoutSection = (props) => {
             <PrimaryButton buttonStyle={styles.optionButton}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
-            <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable} onPress={()=>{setIsPaymentModalVisible(true)}}>
+            <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
+                           onPress={() => {
+                               if(!clientInfo.isClientSelected) {
+                                   ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                                   return;
+                               }
+                               if (!dispatch(checkStaffOnCartItems())) {
+                                   ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                                   return;
+                               }
+                               setIsPaymentModalVisible(true)
+                           }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
-                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.data[0].total_price}</Text>
+                    <Text
+                        style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.data !== null ? props.data[0].total_price : 0}</Text>
                     <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                 </View>
             </PrimaryButton>

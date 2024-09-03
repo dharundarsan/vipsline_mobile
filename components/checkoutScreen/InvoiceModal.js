@@ -71,7 +71,7 @@ const InvoiceModal = (props) => {
                     </View>
                     <Table style={styles.cartItemTable}>
                         <Row textStyle={{textAlign:"center", fontWeight:"bold"}} style={styles.cartItemTableHead} data={["ITEM","STAFF","QTY","AMOUNT"]} />
-                        {dummyData.map((item) => <Row data={item} style={styles.cartItemTableRow} textStyle={{textAlign:"center"}} />)}
+                        {dummyData.map((item, index) => <Row key={index.toString()} data={item} style={styles.cartItemTableRow} textStyle={{textAlign:"center"}} />)}
                     </Table>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge, styles.checkoutDetailText]}>Discount</Text>
@@ -98,7 +98,7 @@ const InvoiceModal = (props) => {
                         <Text style={[textTheme.titleMedium]}>Payment Mode</Text>
                         <Table style={styles.paymentModeTable}>
                             <Row textStyle={{}} style={styles.paymentModeTableHead} data={["Date & Time","Mode","Amount","Status"]} />
-                            {dummyData.map((item) => <Row data={item} style={styles.paymentModeTableRow} textStyle={{}} />)}
+                            {dummyData.map((item, index) => <Row key={index} data={item} style={styles.paymentModeTableRow} textStyle={{}} />)}
                         </Table>
                     </View>
                 </View>

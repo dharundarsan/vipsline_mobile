@@ -103,8 +103,8 @@ const AddItemModal = (props) => {
             flexDirection: "row",
         },
         categoryListItemButton: {
-            borderBottomColor:Colors.grey500,
-            borderBottomWidth:1,
+            borderBottomColor: Colors.grey500,
+            borderBottomWidth: 1,
             backgroundColor: Colors.transparent,
             alignSelf: "auto",
         },
@@ -164,27 +164,27 @@ const AddItemModal = (props) => {
                 // contentContainerStyle={{borderBottomColor:Colors.grey500,borderBottomWidth:1}}
                 renderItem={({item}) => {
                     return (
-                            <PrimaryButton
-                                buttonStyle={styles.categoryListItemButton}
-                                pressableStyle={styles.categoryListItemPressable}
-                                onPress={() => {
-                                    setSelectedCategory(item.id);
-                                }}
+                        <PrimaryButton
+                            buttonStyle={styles.categoryListItemButton}
+                            pressableStyle={styles.categoryListItemPressable}
+                            onPress={() => {
+                                setSelectedCategory(item.id);
+                            }}
+                        >
+                            <Text
+                                style={[
+                                    TextTheme.titleMedium,
+                                    styles.categoryListItemButtonText,
+                                ]}
                             >
-                                <Text
-                                    style={[
-                                        TextTheme.titleMedium,
-                                        styles.categoryListItemButtonText,
-                                    ]}
-                                >
-                                    {item.title}
-                                </Text>
-                                <Entypo
-                                    name="chevron-right"
-                                    size={24}
-                                    color="black"
-                                />
-                            </PrimaryButton>
+                                {item.title}
+                            </Text>
+                            <Entypo
+                                name="chevron-right"
+                                size={24}
+                                color="black"
+                            />
+                        </PrimaryButton>
 
                     );
                 }}
@@ -192,21 +192,35 @@ const AddItemModal = (props) => {
             />
         </View>
     } else if (selectedCategory === "services") {
-        content = <ServicesList/>
+        content = <ServicesList closeOverallModal={() => {
+            setSelectedCategory(null)
+            props.closeModal()
+        }}/>
     } else if (selectedCategory === "products") {
-        content = <ProductsList/>
+        content = <ProductsList closeOverallModal={() => {
+            setSelectedCategory(null)
+            props.closeModal()
+        }}/>
     } else if (selectedCategory === "memberships") {
-        content = <MembershipsAndPackagesList category={"memberships"}/>
+        content =
+            <MembershipsAndPackagesList category={"memberships"} closeOverallModal={() => {
+                setSelectedCategory(null)
+                props.closeModal()
+            }}/>
     } else if (selectedCategory === "packages") {
-        content = <MembershipsAndPackagesList category={"packages"}/>
+        content =
+            <MembershipsAndPackagesList category={"packages"} closeOverallModal={() => {
+                setSelectedCategory(null)
+                props.closeModal()
+            }}/>
     } else if (selectedCategory === "customItem") {
         content = <AddCustomItemModal addCustomItems={props.addCustomItems} isVisible={true} onCloseModal={() => {
             setSelectedCategory(null)
-        }}/>
+        }} closeOverallModal={props.closeModal}/>
     } else if (selectedCategory === "prepaid") {
         content = <PrepaidModal isVisible={true} onCloseModal={() => {
             setSelectedCategory(null)
-        }}/>
+        }} closeOverallModal={props.closeModal}/>
     }
 
     return (

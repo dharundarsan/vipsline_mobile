@@ -60,9 +60,9 @@ const CreateClientModal = (props) => {
         const firstNameValid = firstNameRef.current();
         const lastNameValid = lastNameRef.current();
         const phoneNoValid = phoneNoRef.current();
-        const emailValid = emailRef.current();
+        // const emailValid = emailRef.current();
 
-        if (!firstNameValid || !lastNameValid || !phoneNoValid || !emailValid) return;
+        if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
             await createNewClientAPI({
                 address: clientAddress,

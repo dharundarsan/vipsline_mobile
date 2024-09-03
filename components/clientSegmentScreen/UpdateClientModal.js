@@ -55,9 +55,10 @@ const UpdateClientModal = (props) => {
             clientAddress: details.address,
             isDobSelected: false,
             isAnniversarySelected: false,
-            anniversaryDate: details.anniversary,
+            anniversaryDate: checkNullUndefined( details.anniversary) &&  details.anniversary.trim().length !== 0 ?
+                new Date( details.anniversary) : null,
             dateOfBirth: checkNullUndefined(details.dob) && details.dob.trim().length !== 0 ?
-                new Date(details.dob) : Date.now(),
+                new Date(details.dob) : null,
             clientSource: details.client_source,
         });
     };
@@ -187,8 +188,8 @@ const UpdateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Date of birth"
-                        value={new Date(clientData.dateOfBirth)}
-                        onChange={(value) => {
+                        value={ clientData.dateOfBirth === undefined || clientData.dateOfBirth === null ? null : new Date(clientData.dateOfBirth)}
+                        onChangeValue={(value) => {
                             handleChange("isDobSelected", true);
                             handleChange("dateOfBirth", value);
                         }}
@@ -196,8 +197,8 @@ const UpdateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Anniversary"
-                        value={new Date(clientData.anniversaryDate)}
-                        onChange={(value) => {
+                        value={clientData.anniversaryDate === null || clientData.anniversaryDate === undefined ? null : new Date(clientData.anniversaryDate)}
+                        onChangeValue={(value) => {
                             handleChange("isAnniversarySelected", true);
                             handleChange("anniversaryDate", value);
                         }}
