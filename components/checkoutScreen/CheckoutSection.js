@@ -21,11 +21,15 @@ import PaymentModal from "./PaymentModal";
 import Popover from "react-native-popover-view";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import {useDispatch, useSelector} from "react-redux";
-import {checkStaffOnCartItems} from "../../store/cartSlice";
+import {checkStaffOnCartItems, loadCartFromDB} from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import MiniActionTextModal from "./MiniActionTextModal";
 import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import Cart from "./Cart";
+import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import clearCartAPI from "../../util/apis/clearCartAPI";
+
 
 const CheckoutSection = (props) => {
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
@@ -129,13 +133,59 @@ const CheckoutSection = (props) => {
     const [ActionModal,setActionModal] = useState(false);
     const [title, setTitle] = useState("")
     const [isDelete, setIsDelete] = useState(false);
-    const [discountValue, setDiscountValue] = useState(0);
-    // const [first, setfirst] = useState(second)
+    const [discountValue, setDiscountValue] = useState("");
+    const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage")
+    const [clickedValue, setClickedValue] = useState("")
     const [data, setData] = useState([{}])
-    function openModal(title){
+    const cartItems = useSelector((state) => state.cart.items);
+    const editedItems = useSelector((state) => state.cart.editedItems);
+    const [salesnote, setSalesnote] = useState("");
+
+    function openModal(title,value){
         setTitle(title);
+        setClickedValue(value);
     }
-    console.log(discountValue);
+    async function addDiscount(discountMode,type){
+        const addDiscount = {
+            name:"Custom Discount",
+            type:discountMode,
+            amount:discountValue
+        }
+        console.log(addDiscount);
+        await calculateCartPriceAPI({
+            additional_discounts: type === "clear" ? [] : [addDiscount],
+            additional_services: props.customItems,
+            cart: cartItems.length === 0 ? [] : cartItems.map(item => {
+                return {id: item.item_id}
+            }),
+            coupon_code: "",
+            edited_cart: editedItems.map(item => {
+                return {
+                    amount:item.price,
+                    bonus_value: 0,
+                    disc_value: 0,
+                    itemId: item.item_id,
+                    membership_id: item.id,
+                    membership_number: "",
+                    res_cat_id: 282773,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: item.valid_from,
+                    valid_till: item.valid_until,
+                    wallet_amount: 0,
+                }
+            }),
+            extra_charges: [],
+            isWalletSelected: false,
+            promo_code: "",
+            user_coupon: "",
+            walkin: "yes",
+            wallet_amt: 0
+        }).then(result => {
+            props.setCalculatedPrice(result);
+        })
+        setActionModal(false);
+    }
     return <View style={styles.checkoutSection}>
         <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
             setIsPaymentModalVisible(false)
@@ -144,8 +194,12 @@ const CheckoutSection = (props) => {
             ActionModal && <MiniActionTextModal isVisible={ActionModal}
                 onCloseModal={()=>{setActionModal(false)}}
                 title={title}
+                clickedValue={clickedValue}
                 data={data}
                 setDiscountValue={setDiscountValue}
+                discountValue={discountValue}
+                onChangeValue={setSalesnote}
+                addDiscount={addDiscount}
             />
         }
         {
@@ -159,10 +213,12 @@ const CheckoutSection = (props) => {
                 }}
                 header={"Cancel Sale"}
                 content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
-                onCloseClientInfoAfterDeleted={() => {
+                onCloseClientInfoAfterDeleted={async () => {
                     // props.setVisible(false);
                     // props.setSearchQuery("");
                     // props.setFilterPressed("all_clients_count");
+                    await clearCartAPI(process.env.EXPO_PUBLIC_BUSINESS_ID)
+                    dispatch(loadCartFromDB());
                 }}
             />
         }
@@ -182,22 +238,24 @@ const CheckoutSection = (props) => {
                     onChangeValue={(value) => {
                         console.log(value)
                         if (value === "Apply Discount") {
-                            openModal("Add Discount")
+                            openModal("Add Discount",value)
                             setData([{
                                 header:"Enter Discount",
                                 boxType:"textBox",
                                 typeToggle:1,
-                                keyboardType:"number-pad"
+                                keyboardType:"number-pad",
+                                selectedDiscountMode:selectedDiscountMode,
+                                setSelectedDiscountMode:setSelectedDiscountMode
                             }])
                             setActionModal(true)
                         } else if (value === "Add Charges") {
-                            openModal("Add extra charges")
+                            openModal("Add extra charges",value)
                             setData([
                             {
                                 header:"Item name",
                                 boxType:"textBox",
                                 typeToggle:0,
-                                keyboardType:"number-pad"
+                                keyboardType:"number-pad",
                             },
                             {
                                 header:"Price",
@@ -208,7 +266,7 @@ const CheckoutSection = (props) => {
                         ])
                             setActionModal(true)
                         } else if (value === "Add Sales Notes") {
-                            openModal("Add a note")
+                            openModal("Add a note",value)
                             setData([{
                                 header:"Sales notes",
                                 boxType:"multiLineBox",

@@ -154,7 +154,7 @@ const Cart = () => {
                             </View>
                         </PrimaryButton>
                     </View>
-                    <CheckoutSection data={calculatedPrice}/>
+                    <CheckoutSection data={calculatedPrice} setCalculatedPrice={setCalculatedPrice} customItems={customItems}/>
                 </>
             }
         </View>

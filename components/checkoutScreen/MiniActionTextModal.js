@@ -12,16 +12,18 @@ import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import CustomTextInput from "../../ui/CustomTextInput";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useState } from "react";
 import textTheme from "../../constants/TextTheme";
+import PrimaryButton from "../../ui/PrimaryButton";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 const MiniActionTextModal = (props) => {
-  const [selectedOption, setSelectedOption] = useState(null);
-
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option);
-  };
+  const [selectedDiscountMode, setSelectedDiscountMode] = useState("PERCENTAGE")
+  // const handleOptionSelect = (option) => {
+  //   setSelectedOption(option);
+  // };
+  console.log(props.clickedValue);
+  
   return (
     <Modal transparent={true} visible={props.isVisible} animationType="fade">
       <TouchableOpacity
@@ -39,18 +41,22 @@ const MiniActionTextModal = (props) => {
               <Text style={[textTheme.titleLarge, styles.deleteClientText]}>
                 {props.title}
               </Text>
+              <TouchableOpacity style={({ pressed }) => [
+                  { opacity: pressed ? 1 : 1 }
+                ]}
+                onPress={props.onCloseModal}
+                >
               <Entypo
                 name="cross"
                 size={24}
                 color="black"
-                onPress={props.onCloseModal}
               />
+              </TouchableOpacity>
             </View>
             <FlatList
               data={props.data}
               style={styles.flatList}
               renderItem={({ item }) => {
-                console.log(item);
                 return (
                   <View style={{ marginTop: 10 }}>
                     <Text style={TextTheme.bodyMedium}>{item.header}</Text>
@@ -65,7 +71,7 @@ const MiniActionTextModal = (props) => {
                     >
                       {item.boxType === "multiLineBox" ? (
                         <View>
-                          <CustomTextInput type={"multiLine"} />
+                          <CustomTextInput type={"multiLine"} onChangeText={props.onChangeValue} />
                         </View>
                       ) : item.boxType === "textBox" ? (
                         <TextInput
@@ -73,6 +79,7 @@ const MiniActionTextModal = (props) => {
                           onChangeText={(value) => {
                             props.setDiscountValue(value);
                           }}
+                          value={props.discountValue.toString()}
                           keyboardType="number-pad"
                         />
                       ) : item.boxType === "priceBox" ? (
@@ -88,40 +95,65 @@ const MiniActionTextModal = (props) => {
                       ) : null}
                       {item.typeToggle !== 0 ? (
                         <View style={styles.toggleBox}>
-                          <TouchableOpacity
-                            style={[
-                              styles.optionButton,
-                              selectedOption === "percentage" &&
-                                styles.selectedOption,
+                          <PrimaryButton
+                            onPress={() => {
+                              // props.setSelectedDiscountMode("PERCENTAGE");
+                              setSelectedDiscountMode("PERCENTAGE");
+                            }}
+                            buttonStyle={[
+                              styles.percentAndAmountButton,
+                              // props.selectedDiscountMode === "PERCENTAGE"
+                              selectedDiscountMode === "PERCENTAGE"
+                                ? { backgroundColor: Colors.highlight }
+                                : {},
+                              {
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
+                                marginLeft: 10,
+                              },
                             ]}
-                            onPress={() => handleOptionSelect("percentage")}
+                            pressableStyle={styles.percentAndAmountPressable}
                           >
-                            <FontAwesome6
-                              name="percentage"
+                            <Feather
+                              name="percent"
                               size={20}
                               color={
-                                selectedOption === "percentage"
-                                  ? "white"
-                                  : "black"
+                                // props.selectedDiscountMode === "PERCENTAGE"
+                                selectedDiscountMode === "PERCENTAGE"
+                                  ? Colors.white
+                                  : Colors.black
                               }
                             />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[
-                              styles.optionButton,
-                              selectedOption === "rupee" &&
-                                styles.selectedOption,
+                          </PrimaryButton>
+                          <PrimaryButton
+                            onPress={() => {
+                              // props.setSelectedDiscountMode("AMOUNT");
+                              setSelectedDiscountMode("AMOUNT");
+                            }}
+                            buttonStyle={[
+                              styles.percentAndAmountButton,
+                              // props.selectedDiscountMode === "AMOUNT"
+                              selectedDiscountMode === "AMOUNT"
+                                ? { backgroundColor: Colors.highlight }
+                                : {},
+                              {
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0,
+                              },
                             ]}
-                            onPress={() => handleOptionSelect("rupee")}
+                            pressableStyle={styles.percentAndAmountPressable}
                           >
-                            <FontAwesome
-                              name="rupee"
+                            <MaterialIcons
+                              name="currency-rupee"
                               size={20}
                               color={
-                                selectedOption === "rupee" ? "white" : "black"
+                                // props.selectedDiscountMode === "AMOUNT"
+                                selectedDiscountMode === "AMOUNT"
+                                  ? Colors.white
+                                  : Colors.black
                               }
                             />
-                          </TouchableOpacity>
+                          </PrimaryButton>
                         </View>
                       ) : null}
                     </View>
@@ -130,17 +162,33 @@ const MiniActionTextModal = (props) => {
               }}
             />
             <View style={styles.actionButton}>
-              <TouchableOpacity onPress={() => {}} style={styles.closeAction}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (props.clickedValue === "Apply Discount") {
+                    console.log(selectedDiscountMode);
+                    props.addDiscount(selectedDiscountMode,"clear");
+                  }
+                  else if(props.clickedValue === "Add Sales Notes"){
+                    console.log(props.onChangeValue);
+                  }
+                }}
+                style={styles.closeAction}>
                 <Text
                   style={[
                     { color: Colors.error, textAlign: "center" },
                     TextTheme.labelLarge,
                   ]}
                 >
-                  Close
+                  Clear
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => {}} style={styles.saveAction}>
+              <TouchableOpacity onPress={() => {
+                if(props.clickedValue === "Apply Discount"){
+                  console.log(selectedDiscountMode);
+                  if(props.discountValue.trim().length === 0) return
+                  props.addDiscount(selectedDiscountMode);
+                }
+              }} style={styles.saveAction}>
                 <Text
                   style={[
                     { color: Colors.white, textAlign: "center" },
@@ -179,6 +227,24 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  toggleBox: {
+    flexDirection: "row",
+    // width: "100%",  // Ensure the toggleBox takes the full width of the parent container
+  },
+  percentAndAmountButton: {
+    // flex: 1, 
+    width: 50,
+    borderColor: Colors.grey400,
+    borderWidth: 1,
+    backgroundColor: Colors.background,
+  },
+  percentAndAmountPressable: {
+    paddingVertical: 10,  // Adjust padding if necessary
+    paddingHorizontal: 0,
+    alignItems: "center",  // Center the content within the button
+    justifyContent: "center",
+    width: "100%",  // Ensure the pressable area covers the full button width
+  },
   flatList: {
     padding: 20,
     borderBottomWidth: 1,
@@ -191,18 +257,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
     flex: 3,
-    height: 40,
+    height: 50,
     borderWidth: 1,
     borderColor: Colors.ripple,
     marginRight: 10,
-  },
-  toggleBox: {
-    flexDirection: "row",
-    height: 40,
-    borderWidth: 1,
-    borderColor: Colors.ripple,
-    justifyContent: "space-between",
-    flex: 1,
   },
   optionButton: {
     padding: 5,
@@ -211,10 +269,10 @@ const styles = StyleSheet.create({
     // padding: 10,
     // borderRadius: 5,
   },
-  selectedOption: {
-    flexGrow: 1,
-    backgroundColor: Colors.highlight,
-  },
+  // selectedOption: {
+  //     flexGrow: 1,
+  //     backgroundColor: Colors.highlight,
+  // },
   actionButton: {
     flexDirection: "row",
     gap: 10,
@@ -230,8 +288,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   saveAction: {
-    padding: 10,
     backgroundColor: Colors.green,
+    padding: 10,
     flex: 7,
     borderRadius: 6,
   },
