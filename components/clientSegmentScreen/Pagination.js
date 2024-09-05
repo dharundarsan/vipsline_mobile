@@ -13,6 +13,29 @@ import {chooseFilterCount, clientFilterNames} from "../../util/chooseFilter";
 import {useDispatch, useSelector} from "react-redux";
 import Colors from "../../constants/Colors";
 
+/**
+ * Pagination Component
+ *
+ * Handles pagination controls and the display of page ranges for a data list.
+ * Allows users to navigate through pages and select the number of entries per page.
+ *
+ * @component
+ * @example
+ * return (
+ *   <Pagination
+ *     filterPressed="active"
+ *     setIsModalVisible={setIsModalVisible}
+ *   />
+ * );
+ *
+ * @param {Object} props - Component properties.
+ * @param {string} props.filterPressed - The current filter applied, affecting the client count.
+ * @param {Function} props.setIsModalVisible - Function to toggle the visibility of the modal for selecting entries per page.
+ *
+ * @returns {JSX.Element} The rendered component.
+ */
+
+
 export default function Pagination(props) {
     const dispatch = useDispatch();
 
@@ -34,7 +57,6 @@ export default function Pagination(props) {
 
     useEffect(() => {
         dispatch(updateMaxEntry(10))
-        // console.log("inside the props max entry: " + maxEntry);
 
         currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         dispatch(resetClientFilter());

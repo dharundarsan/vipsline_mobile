@@ -46,7 +46,7 @@ const TextTheme = StyleSheet.create({
     titleLarge: {
         fontFamily:"Inter-Regular",
         fontSize: 22,
-        fontWeight: "400",
+        fontWeight: "600",
         letterSpacing: 0,
         lineHeight: 28,
     },

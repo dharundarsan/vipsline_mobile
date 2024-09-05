@@ -1,6 +1,28 @@
 import {View, Text, StyleSheet, Image, Pressable} from "react-native";
 import Colors from "../../constants/Colors";
 import {useEffect, useState} from "react";
+import textTheme from "../../constants/TextTheme";
+
+/**
+ * ClientFilterCard Component
+ *
+ * This component represents a filter card for clients, typically used in a list or grid format.
+ * The card displays an icon, filter type name, and the total number of clients under that filter.
+ * The card's appearance changes when it is pressed, indicating it is selected.
+ *
+ * @param {Object} props - The properties passed to this component.
+ * @param {string} props.clientFilterName - The name of the filter displayed on the card.
+ * @param {string | number} props.totalClients - The number of clients associated with the filter.
+ * @param {function} props.onPress - Function to handle press events on the card.
+ * @param {boolean} props.isPressed - Boolean to determine if the card is selected/pressed.
+ * @param {string} props.color - The background color of the icon when the card is not pressed.
+ * @param {Object} props.imgSource - The source of the icon image to be displayed on the card.
+ * @param {Object} [props.iconSize] - (Optional) Custom styles for the icon size, default is 20x20.
+ *
+ * @returns {JSX.Element} The rendered card component.
+ */
+
+
 
 export default function ClientFilterCard(props) {
     const styles = StyleSheet.create({
@@ -34,7 +56,6 @@ export default function ClientFilterCard(props) {
             width: 20,
         },
         totalClientsText: {
-            fontWeight: '800',
             color: props.isPressed ? Colors.white : Colors.black,
         },
         filterType: {
@@ -57,11 +78,11 @@ export default function ClientFilterCard(props) {
                 <View style={styles.iconContainer}>
                     <Image source={props.imgSource} style={[styles.icon, props.iconSize]}/>
                 </View>
-                <Text style={styles.filterType}>
+                <Text style={[textTheme.bodyMedium, styles.filterType]}>
                     {props.clientFilterName}
                 </Text>
             </View>
-            <Text style={styles.totalClientsText}>
+            <Text style={[textTheme.titleSmall, styles.totalClientsText]}>
                 {props.totalClients}
             </Text>
         </Pressable>

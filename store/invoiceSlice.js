@@ -57,7 +57,7 @@ export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
         response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + '/wallet/getWalletBalanceForClient',
             {
-                business_id: "2db7d255-7797-4cce-9590-fc59d2019577",
+                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
                 client_id: clientId,
 
             },
@@ -73,7 +73,7 @@ export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
 
     }
     catch (e) {
-        console.error(e);
+        console.error(e + "wallet error");
     }
 }
 
