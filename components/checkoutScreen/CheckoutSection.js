@@ -21,11 +21,14 @@ import PaymentModal from "./PaymentModal";
 import Popover from "react-native-popover-view";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import {useDispatch, useSelector} from "react-redux";
-import {checkStaffOnCartItems} from "../../store/cartSlice";
+import {checkStaffOnCartItems, loadCartFromDB} from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import MiniActionTextModal from "./MiniActionTextModal";
 import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
-import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import clearCartAPI from "../../util/apis/clearCartAPI";
+import { updateChargeData, updateDiscount } from "../../store/CheckoutActionSlice";
+
 
 const CheckoutSection = (props) => {
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
@@ -129,27 +132,164 @@ const CheckoutSection = (props) => {
     const [ActionModal, setActionModal] = useState(false);
     const [title, setTitle] = useState("")
     const [isDelete, setIsDelete] = useState(false);
-    const [discountValue, setDiscountValue] = useState(0);
-    // const [first, setfirst] = useState(second)
+    const [discountValue, setDiscountValue] = useState("");
+    const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage")
+    const [clickedValue, setClickedValue] = useState("")
+    const cartItems = useSelector((state) => state.cart.items);
+    const editedItems = useSelector((state) => state.cart.editedItems);
+    const [salesnote, setSalesnote] = useState("");
+    const [chargesInputData, setChargesInputData] = useState([{ index: 0 }]);
     const [data, setData] = useState([{}])
-
-    function openModal(title) {
+    function openModal(title, value) {
         setTitle(title);
+        setClickedValue(value);
+    }
+    const checkoutDiscount = useSelector(state => state.checkoutAction.additionalDiscounts)
+    const checkoutCharges = useSelector(state => state.checkoutAction.chargesData);
+    async function addDiscount(discountMode, type) {
+        const addDiscount = {
+            name: "Custom Discount",
+            type: discountMode,
+            amount: discountValue
+        }
+
+        if (type === "clear") {
+            dispatch(updateDiscount([]));  // Clear the discounts
+        } else {
+            dispatch(updateDiscount(addDiscount));  // Overwrite with the new discount
+        }
+        await calculateCartPriceAPI({
+            additional_discounts: type === "clear" ? [] : [addDiscount],
+            additional_services: props.customItems,
+            cart: cartItems.length === 0 ? [] : cartItems.map(item => {
+                return { id: item.item_id }
+            }),
+            coupon_code: "",
+            edited_cart: editedItems.map(item => {
+                return {
+                    amount: item.price,
+                    bonus_value: 0,
+                    disc_value: 0,
+                    itemId: item.item_id,
+                    membership_id: item.id,
+                    membership_number: "",
+                    res_cat_id: 282773,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: item.valid_from,
+                    valid_till: item.valid_until,
+                    wallet_amount: 0,
+                }
+            }),
+            extra_charges: checkoutCharges,
+            isWalletSelected: false,
+            promo_code: "",
+            user_coupon: "",
+            walkin: "yes",
+            wallet_amt: 0
+        }).then(result => {
+            props.setCalculatedPrice(result);
+        })
+
+        setActionModal(false);
     }
 
-    console.log(discountValue);
+    async function addCharges() {
+        if (!chargesInputData || chargesInputData.length === 0) {
+            console.error("chargesInputData is not defined or is empty");
+            return;
+        }
+        console.log(props.data[0]);
+
+        // if(props.data[0]){
+        //     console.error('CheckoutSection: Missing data prop');
+        //     return null;
+        // }
+        console.log("Charges input data: ", chargesInputData);
+        dispatch(updateChargeData(chargesInputData));
+    }
+    console.log(props.data);
+    async function updateCharges() {
+        if (!chargesInputData || chargesInputData.length === 0) {
+            console.error("chargesInputData is not defined or is empty");
+            return;
+        }
+        const updatedCharges = chargesInputData.map((item) => {
+            // Convert `amount` to a number, default to 0 if conversion fails
+            const convertedAmount = parseFloat(item.amount);
+            console.log(convertedAmount);
+
+            return {
+              ...item,
+              amount: isNaN(convertedAmount) ? 0 : convertedAmount,
+            };
+          });
+          console.log(updatedCharges);
+          console.log("124567");
+
+        console.log(chargesInputData);
+
+        await calculateCartPriceAPI({
+            additional_discounts: checkoutDiscount,
+            additional_services: props.customItems,
+            cart: cartItems.length === 0 ? [] : cartItems.map(item => {
+                return { id: item.item_id }
+            }),
+            coupon_code: "",
+            edited_cart: editedItems.map(item => {
+                return {
+                    amount: item.price,
+                    bonus_value: 0,
+                    disc_value: 0,
+                    itemId: item.item_id,
+                    membership_id: item.id,
+                    membership_number: "",
+                    res_cat_id: 282773,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: item.valid_from,
+                    valid_till: item.valid_until,
+                    wallet_amount: 0,
+                }
+            }),
+            extra_charges: updatedCharges,
+            isWalletSelected: false,
+            promo_code: "",
+            user_coupon: "",
+            walkin: "yes",
+            wallet_amt: 0
+        }).then(result => {
+            props.setCalculatedPrice(result);
+            console.log("Resultttttt");
+
+            console.log(result);
+
+        }).catch(e => {
+            console.log(e);
+            console.log("8554");
+        })
+        console.log("52622929");
+
+        setActionModal(false);
+    }
     return <View style={styles.checkoutSection}>
         <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
             setIsPaymentModalVisible(false)
         }} price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
         {
             ActionModal && <MiniActionTextModal isVisible={ActionModal}
-                                                onCloseModal={() => {
-                                                    setActionModal(false)
-                                                }}
-                                                title={title}
-                                                data={data}
-                                                setDiscountValue={setDiscountValue}
+                onCloseModal={() => { setActionModal(false) }}
+                chargesInputData={chargesInputData}
+                setChargesInputData={setChargesInputData}
+                title={title}
+                clickedValue={clickedValue}
+                data={data}
+                setDiscountValue={setDiscountValue}
+                discountValue={discountValue}
+                onChangeValue={setSalesnote}
+                addDiscount={addDiscount}
+                addCharges={addCharges}
+                updateCharges={updateCharges}
             />
         }
         {
@@ -163,10 +303,12 @@ const CheckoutSection = (props) => {
                 }}
                 header={"Cancel Sale"}
                 content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
-                onCloseClientInfoAfterDeleted={() => {
+                onCloseClientInfoAfterDeleted={async () => {
                     // props.setVisible(false);
                     // props.setSearchQuery("");
                     // props.setFilterPressed("all_clients_count");
+                    await clearCartAPI(process.env.EXPO_PUBLIC_BUSINESS_ID)
+                    dispatch(loadCartFromDB());
                 }}
             />
         }
@@ -186,33 +328,27 @@ const CheckoutSection = (props) => {
                     onChangeValue={(value) => {
                         console.log(value)
                         if (value === "Apply Discount") {
-                            openModal("Add Discount")
+                            openModal("Add Discount", value)
                             setData([{
                                 header: "Enter Discount",
                                 boxType: "textBox",
                                 typeToggle: 1,
-                                keyboardType: "number-pad"
+                                keyboardType: "number-pad",
+                                selectedDiscountMode: selectedDiscountMode,
+                                setSelectedDiscountMode: setSelectedDiscountMode
                             }])
                             setActionModal(true)
                         } else if (value === "Add Charges") {
-                            openModal("Add extra charges")
+                            openModal("Add extra charges", value)
                             setData([
                                 {
-                                    header: "Item name",
-                                    boxType: "textBox",
-                                    typeToggle: 0,
-                                    keyboardType: "number-pad"
-                                },
-                                {
-                                    header: "Price",
-                                    boxType: "priceBox",
-                                    typeToggle: 0,
-                                    keyboardType: "number-pad"
+                                    boxType: "Charges",
+                                    typeToggle: 0
                                 }
                             ])
                             setActionModal(true)
                         } else if (value === "Add Sales Notes") {
-                            openModal("Add a note")
+                            openModal("Add a note", value)
                             setData([{
                                 header: "Sales notes",
                                 boxType: "multiLineBox",
@@ -270,8 +406,8 @@ const CheckoutSection = (props) => {
                                 }
                                 {
                                     discountCategory.service === "0" &&
-                                    discountCategory.product === "0" &&
-                                    discountCategory.package === "0" ?
+                                        discountCategory.product === "0" &&
+                                        discountCategory.package === "0" ?
                                         <Text>No discounts applied</Text> :
                                         null
                                 }
@@ -307,9 +443,25 @@ const CheckoutSection = (props) => {
                         <Text
                             style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].gst_charges}</Text>
                     </View>
+                    <View style={styles.checkoutDetailRow}>
+                        <View>
+                            <Popover popoverStyle={styles.popoverStyle}
+                                from={
+                                    (<Pressable style={styles.checkoutDetailInnerContainer}>
+                                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                        <MaterialCommunityIcons name="information-outline" size={24} color="black" />
+                                    </Pressable>)
+                                }
+                                offset={Platform.OS === "ios" ? 0 : 32}
+                            >
+                                <Text>itemName : ₹ itemPrice</Text>
+                            </Popover>
+                        </View>
+                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {}</Text>
+                    </View>
                     <View style={styles.buttonContainer}>
                         <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
-                            <Entypo name="dots-three-horizontal" size={24} color="black"/>
+                            <Entypo name="dots-three-horizontal" size={24} color="black" />
                         </PrimaryButton>
                         <PrimaryButton buttonStyle={styles.checkoutButton}
                                        pressableStyle={styles.checkoutButtonPressable}
