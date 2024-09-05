@@ -30,9 +30,6 @@ const CartItem = (props) => {
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
 
-    console.log("selectedStaff")
-    console.log(selectedStaff)
-
     return <>
         <View style={styles.cartItem}>
             <EditCartModal isVisible={isEditCartModalVisible} onCloseModal={() => setIsEditCartModalVisible(false)}
