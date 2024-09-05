@@ -12,6 +12,35 @@ import {loadClientCountFromDb} from "../../store/clientSlice";
 import updateClientAPI from "../../util/apis/updateClientAPI";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
+/**
+ * UpdateClientModal Component
+ *
+ * This component is a modal that allows users to update client information.
+ * It includes input fields for various client attributes such as name, phone number,
+ * email, and more. The modal also includes options to select dates and provide additional
+ * information. Upon saving, the updated client information is sent to the server.
+ *
+ * Props:
+ * @param {boolean} props.isVisible - Controls the visibility of the modal.
+ * @param {object} props.details - An object containing the existing client details to pre-populate
+ *                            the input fields. The object may include fields such as:
+ *                            - `firstName` (string): The client's first name.
+ *                            - `lastName` (string): The client's last name.
+ *                            - `mobile_1` (string): The client's primary mobile number.
+ *                            - `mobile_2` (string): The client's secondary mobile number.
+ *                            - `username` (string): The client's email address.
+ *                            - `gender` (string): The client's gender.
+ *                            - `customer_gst` (string): The client's GST number.
+ *                            - `client_notes` (string): Notes related to the client.
+ *                            - `address` (string): The client's address.
+ *                            - `dob` (string): The client's date of birth in string format.
+ *                            - `anniversary` (string): The client's anniversary date in string format.
+ *                            - `client_source` (string): The source through which the client was acquired.
+ * @param {Function} props.onCloseModal - Function to close the modal and handle any additional logic
+ *                                  after the modal is closed.
+ */
+
+
 const UpdateClientModal = (props) => {
     // const details = useSelector(state => state.clientInfo.details);
     const details = props.details;
@@ -27,8 +56,8 @@ const UpdateClientModal = (props) => {
         gstNo: "",
         clientNotes: "",
         clientAddress: "",
-        dateOfBirth: "",
-        anniversaryDate: "",
+        dateOfBirth: null,
+        anniversaryDate: null,
         isDobSelected: false,
         isAnniversarySelected: false,
     });
@@ -55,9 +84,10 @@ const UpdateClientModal = (props) => {
             clientAddress: details.address,
             isDobSelected: false,
             isAnniversarySelected: false,
-            anniversaryDate: details.anniversary,
+            anniversaryDate: checkNullUndefined( details.anniversary) &&  details.anniversary.trim().length !== 0 ?
+                new Date( details.anniversary) : null,
             dateOfBirth: checkNullUndefined(details.dob) && details.dob.trim().length !== 0 ?
-                new Date(details.dob) : Date.now(),
+                new Date(details.dob) : null,
             clientSource: details.client_source,
         });
     };
@@ -187,8 +217,8 @@ const UpdateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Date of birth"
-                        value={new Date(clientData.dateOfBirth)}
-                        onChange={(value) => {
+                        value={ clientData.dateOfBirth === undefined || clientData.dateOfBirth === null ? null : new Date(clientData.dateOfBirth)}
+                        onChangeValue={(value) => {
                             handleChange("isDobSelected", true);
                             handleChange("dateOfBirth", value);
                         }}
@@ -196,8 +226,8 @@ const UpdateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Anniversary"
-                        value={new Date(clientData.anniversaryDate)}
-                        onChange={(value) => {
+                        value={clientData.anniversaryDate === null || clientData.anniversaryDate === undefined ? null : new Date(clientData.anniversaryDate)}
+                        onChangeValue={(value) => {
                             handleChange("isAnniversarySelected", true);
                             handleChange("anniversaryDate", value);
                         }}

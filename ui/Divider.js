@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
         // paddingVertical:1,
         borderBottomWidth: 1,
         width: '100%',
-        borderBottomColor: Colors.grey500,
+        borderBottomColor: Colors.grey250,
     },
 });
 

@@ -32,6 +32,8 @@ export const formatDate = (date, format) => {
             return `${year}-${padZero(day)}-${padZero(month + 1)}`
         case "d month yyyy":
             return `${day} ${months[month]} ${year}`;
+        case "yyyy-d-m":
+            return `${day}-${month + 1}-${year}`;
         default:
             return `${day} ${months[month]} ${year}`;
     }

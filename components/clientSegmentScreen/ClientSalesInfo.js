@@ -4,6 +4,20 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 
+/**
+ * clientSalesInfo Component
+ *
+ * This component displays a card with client sales information, including total sales and last visit.
+ * It also includes a button to view more statistics.
+ *
+ * Props:
+ * @param {string} props.totalSales - The total sales amount for the client.
+ * @param {string} props.lastVisit - The date of the client's last visit.
+ * @param {Function} props.onPress - Function to handle the press event for viewing more statistics.
+ * @param {Object} props.salesCard - Optional styling for the sales card container.
+ */
+
+
 export default function clientSalesInfo(props) {
     return (
         <View style={[styles.salesCard, props.salesCard]}>

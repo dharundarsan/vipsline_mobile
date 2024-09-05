@@ -12,6 +12,33 @@ import {clientFilterNames} from "../../util/chooseFilter";
 import {useDispatch, useSelector} from "react-redux";
 import Colors from "../../constants/Colors";
 
+/**
+ * SearchClientPagination Component
+ *
+ * Manages pagination controls for search results, allowing users to navigate through pages of search results and set the number of entries per page.
+ *
+ * @component
+ * @example
+ * return (
+ *   <SearchClientPagination
+ *     filterPressed="active"
+ *     query="search query"
+ *     setIsModalVisible={setIsModalVisible}
+ *     setSearchClientTotalCount={setSearchClientTotalCount}
+ *   />
+ * );
+ *
+ * @param {Object} props - Component properties.
+ * @param {string} props.filterPressed - The current filter applied, affecting the count of search results.
+ * @param {string} props.query - The current search query used to filter results.
+ * @param {Function} props.setIsModalVisible - Function to toggle the visibility of the modal for selecting entries per page.
+ * @param {Function} props.setSearchClientTotalCount - Function to update the total count of search results.
+ *
+ * @returns {JSX.Element} The rendered component.
+ */
+
+
+
 export default function SearchClientPagination(props) {
     const dispatch = useDispatch();
     const maxEntry = useSelector(state => state.clientFilter.searchMaxEntry);
@@ -25,33 +52,22 @@ export default function SearchClientPagination(props) {
 
     const [totalCount, setTotalCount] = useState(0);
 
-    // const memoizedTotalCount = useMemo(() => totalCount, [totalCount]);
-    //
-    // console.log("memo: " + memoizedTotalCount);
-
-
-    console.log("totalCount outside", totalCount);
-
-    // useEffect(() => {
-    //     totalCount = useSelector(state => state.clientFilter.totalSearchClients);
-    //     console.log("totalCount inside useEffect", totalCount);
-    // }, [totalCount]);
 
 
     useEffect(() => {
         dispatch(updateSearchClientMaxEntry(10))
         // console.log("inside the props max entry: " + maxEntry);
         dispatch(resetSearchClientFilter());
-        console.log("1st");
+        // console.log("1st");
         dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
         // setTotalCount(totalCount);
         setLowerCount(1);
-        setUpperCount(10 > totalCount ? totalCount : 10);
+        setUpperCount(10 > getTotalCount ? getTotalCount : 10);
 
     }, [props.filterPressed]);
 
     useEffect(() => {
-        console.log("2st");
+        // console.log("2st");
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
         if(lowerCount === 1) {
             setIsBackwardButtonDisabled(true);
@@ -60,8 +76,8 @@ export default function SearchClientPagination(props) {
             setIsBackwardButtonDisabled(false);
         }
 
-        if(upperCount === totalCount) {
-            // console.log(upperCount + "  " + totalCount);
+        if(upperCount === getTotalCount) {
+            // console.log(upperCount + "  " + getTotalCount);
             setIsForwardButtonDisabled(true);
         }
         else {
@@ -69,27 +85,26 @@ export default function SearchClientPagination(props) {
         }
     }, [lowerCount, upperCount]);
 
-    useEffect(()=>{
-        // totalCount = memoizedTotalCount;
-        setTotalCount(getTotalCount);
+
+    useEffect(()=> {
+        props.setSearchClientTotalCount(getTotalCount);
     },[getTotalCount])
 
 
     useEffect(() => {
+        dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
+
         let upper_count = 0;
-        console.log("total count", totalCount);
-        if(maxEntry > totalCount) {
-            upper_count = totalCount;
+        // console.log("total count", getTotalCount);
+        if(maxEntry > getTotalCount) {
+            upper_count = getTotalCount;
         }
         else {
             upper_count = maxEntry;
         }
         setLowerCount(1);
         setUpperCount(upper_count);
-        dispatch(resetSearchClientFilter());
-        console.log("3rt");
-        dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
-    }, [maxEntry,totalCount]);
+    }, [maxEntry, getTotalCount]);
 
 
     const [isBackwardButtonDisabled, setIsBackwardButtonDisabled]  = useState(false);
@@ -101,24 +116,24 @@ export default function SearchClientPagination(props) {
             let lowerCountAfter = lowerCount + maxEntry;
             let upperCountAfter = upperCount + maxEntry;
 
-            if(upperCountAfter > totalCount && lowerCountAfter < 0) {
-                setLowerCount(totalCount - maxEntry);
-                setUpperCount(totalCount);
+            if(upperCountAfter > getTotalCount && lowerCountAfter < 0) {
+                setLowerCount(getTotalCount - maxEntry);
+                setUpperCount(getTotalCount);
                 // console.log("both are out of bound");
             }
-            else if(upperCountAfter <= totalCount && lowerCountAfter >= 0) {
+            else if(upperCountAfter <= getTotalCount && lowerCountAfter >= 0) {
                 // console.log("both are good not out of bound");
                 setLowerCount(lowerCountAfter);
                 setUpperCount(upperCountAfter);
                 dispatch(incrementSearchClientPageNumber());
             }
-            else if(upperCountAfter > totalCount && upperCountAfter >= 0) {
+            else if(upperCountAfter > getTotalCount && upperCountAfter >= 0) {
                 // console.log("upper bound is out of bound");
                 dispatch(incrementSearchClientPageNumber());
-                setUpperCount(totalCount);
+                setUpperCount(getTotalCount);
                 setLowerCount(lowerCountAfter)
             }
-            else if(lowerCountAfter < 0 && upperCountAfter < totalCount) {
+            else if(lowerCountAfter < 0 && upperCountAfter < getTotalCount) {
                 // console.log("lower bound is out of bound");
                 dispatch(incrementSearchClientPageNumber());
                 setUpperCount(upperCountAfter)
@@ -154,40 +169,47 @@ export default function SearchClientPagination(props) {
     }
 
     return(
-        <View style={styles.pagination}>
-            <PrimaryButton
-                pressableStyle={styles.entryButton}
-                buttonStyle={styles.entryButtonContainer}
-                onPress={() => props.setIsModalVisible(true)}
-            >
-                <View style={styles.buttonInnerContainer}>
-                    <Text style={styles.entryText}>
-                        {maxEntry}
-                    </Text>
-                    <AntDesign name="caretdown" size={14} color="black" style={{marginLeft: 16}}/>
+        <>
+        {
+            getTotalCount < 10 ?
+                null:
+                <View style={styles.pagination}>
+                    <PrimaryButton
+                        pressableStyle={styles.entryButton}
+                        buttonStyle={styles.entryButtonContainer}
+                        onPress={() => props.setIsModalVisible(true)}
+                    >
+                        <View style={styles.buttonInnerContainer}>
+                            <Text style={styles.entryText}>
+                                {maxEntry}
+                            </Text>
+                            <AntDesign name="caretdown" size={14} color="black" style={{marginLeft: 16}}/>
+                        </View>
+                    </PrimaryButton>
+
+                    <View style={styles.paginationInnerContainer}>
+                        <Text style={styles.pagingText}>
+                            {lowerCount < 0 ? 0 : lowerCount} - {upperCount} of {getTotalCount}
+                        </Text>
+                        <PrimaryButton
+                            buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}
+                            onPress={backwardButtonHandler}
+                        >
+                            <FontAwesome6 name="angle-left" size={24} color="black" />
+                        </PrimaryButton>
+                        <PrimaryButton
+                            buttonStyle={[isForwardButtonDisabled ? [styles.pageForwardButton, styles.disabled] : [styles.pageForwardButton]]}
+                            onPress={forwardButtonHandler}
+                        >
+                            <FontAwesome6 name="angle-right" size={24} color="black" />
+                        </PrimaryButton>
+
+                    </View>
+
                 </View>
-            </PrimaryButton>
+        }
 
-            <View style={styles.paginationInnerContainer}>
-                <Text style={styles.pagingText}>
-                    {lowerCount < 0 ? 0 : lowerCount} - {upperCount} of {totalCount}
-                </Text>
-                <PrimaryButton
-                    buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}
-                    onPress={backwardButtonHandler}
-                >
-                    <FontAwesome6 name="angle-left" size={24} color="black" />
-                </PrimaryButton>
-                <PrimaryButton
-                    buttonStyle={[isForwardButtonDisabled ? [styles.pageForwardButton, styles.disabled] : [styles.pageForwardButton]]}
-                    onPress={forwardButtonHandler}
-                >
-                    <FontAwesome6 name="angle-right" size={24} color="black" />
-                </PrimaryButton>
-
-            </View>
-
-        </View>
+        </>
     );
 }
 

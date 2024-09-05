@@ -5,14 +5,39 @@ import Divider from "../ui/Divider";
 import BusinessCard from "../components/listOfBusinessesScreen/BusinessCard";
 import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus, updateBusinessId, updateBusinessName} from "../store/authSlice";
-import {updateSelectedBusinessDetails} from "../store/listOfBusinessSlice";
+import {loadBusinessesListFromDb, updateSelectedBusinessDetails} from "../store/listOfBusinessSlice";
 import getBusinessNotificationDetailsAPI from "../util/apis/getBusinessNotificationDetailsAPI";
+import {useEffect, useLayoutEffect} from "react";
+import {
+    loadMembershipsDataFromDb,
+    loadPackagesDataFromDb,
+    loadProductsDataFromDb,
+    loadServicesDataFromDb
+} from "../store/catalogueSlice";
+import {loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
+import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
+import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 
 
 export default function ListOfBusinessesScreen(props) {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
+
+    useLayoutEffect(() => {
+        dispatch(loadServicesDataFromDb("women"));
+        dispatch(loadServicesDataFromDb("men"));
+        dispatch(loadServicesDataFromDb("kids"));
+        dispatch(loadServicesDataFromDb("general"));
+        dispatch(loadProductsDataFromDb());
+        dispatch(loadPackagesDataFromDb());
+        dispatch(loadMembershipsDataFromDb());
+        dispatch(loadClientsFromDb());
+        dispatch(loadClientCountFromDb());
+        dispatch(loadClientFiltersFromDb(10, "All"));
+        dispatch(loadBusinessesListFromDb());
+        dispatch(loadLoginUserDetailsFromDb());
+    }, []);
 
 
     function renderItem(itemData) {

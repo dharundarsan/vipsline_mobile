@@ -15,12 +15,6 @@ import SearchBar from "../../ui/SearchBar";
 const ProductsList = (props) => {
     const productsData = useSelector(state => state.catalogue.products.items);
     const [filteredProductsData, setFilteredProductsData] = useState(productsData);
-    const [tempSelectedItems, setTempSelectedItems] = useState([]);
-
-
-    const addToTempSelectedItems = (item) => {
-        setTempSelectedItems((prevState) => [...prevState, item]);
-    }
 
     const filterProductsData = (filterValue) => {
         const lowerCaseFilterValue = filterValue.toLowerCase();
@@ -29,14 +23,6 @@ const ProductsList = (props) => {
 
             Object.keys(categoryObj).forEach((category) => {
                 const filteredProducts = categoryObj[category].filter((product) => {
-                    // console.log(product.discounted_price);
-                    // if (product.discounted_price) {
-                    //     return product.name.toLowerCase().includes(lowerCaseFilterValue) ||
-                    //         product.price.toString().includes(filterValue);
-                    // } else {
-                    //     return product.name.toLowerCase().includes(lowerCaseFilterValue) ||
-                    //         product.price.toString().includes(filterValue) || product.discounted_price.toString().includes(filterValue);
-                    // }
                     return product.name.toLowerCase().includes(lowerCaseFilterValue) ||
                         product.price.toString().includes(filterValue) || product.discounted_price.toString().includes(filterValue);
 
@@ -85,8 +71,8 @@ const ProductsList = (props) => {
                         <FlatList
                             data={item.products}
                             renderItem={({item}) => <ProductItem data={item}
-                                                                 addToTempSelectedItems={addToTempSelectedItems}
-                                                                 selected={tempSelectedItems.includes(item)}/>}
+                                                                 closeOverallModal={props.closeOverallModal}
+                            />}
                             // renderItem={({item}) => <ProductItem data={item}
                             //                                      addToTempSelectedItems={addToTempSelectedItems}
                             //                                      selected={tempSelectedItems.includes(item)}/>}

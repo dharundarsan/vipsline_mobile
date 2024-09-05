@@ -24,6 +24,7 @@ const PaymentModal = (props) => {
     const [paymentOrder, setPaymentOrder] = useState(["cash"])
     const [isError, setIsError] = useState(false);
     const [bodyData, setBodyData] = useState([])
+    const [shownCount, setShownCount] = useState(0)
 
     const [splitUpState, setSplitUpState] = useState([
             {
@@ -48,9 +49,12 @@ const PaymentModal = (props) => {
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
         setSplitUpState(prev => prev.map((split) => {
-            const shownCount = splitUpState.reduce((acc, item) => {
+            setShownCount(prev.reduce((acc, item) => {
                 return item.shown ? acc + 1 : acc;
-            }, 0);
+            }, 0))
+            // const shownCount = splitUpState.reduce((acc, item) => {
+            //     return item.shown ? acc + 1 : acc;
+            // }, 0);
             if (split.name === addedSplitPayment) {
                 console.log(addedSplitPayment)
                 console.log(split.name === addedSplitPayment)
@@ -105,9 +109,9 @@ const PaymentModal = (props) => {
         const splitApi = async () => {
             let data;
             if (selectedPaymentOption === "split_payment") {
-                const shownCount = splitUpState.reduce((acc, item) => {
-                    return item.shown ? acc + 1 : acc;
-                }, 0);
+                // const shownCount = splitUpState.reduce((acc, item) => {
+                //     return item.shown ? acc + 1 : acc;
+                // }, 0);
                 console.log(shownCount)
                 const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
                 console.log("aiyoda");
@@ -213,6 +217,10 @@ const PaymentModal = (props) => {
             }
             return state;
         }));
+
+        setShownCount(splitUpState.reduce((acc, item) => {
+            return item.shown ? acc + 1 : acc;
+        }, 0))
     }, [splitResponse]);
 
     const callCashAPI = () => {
@@ -245,7 +253,7 @@ const PaymentModal = (props) => {
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
         }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment}/>
-        <InvoiceModal isVisible={isInvoiceModalVisible} onCloseModal={() => {
+        <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
             setIsInvoiceModalVisible(false)
         }}/>
         <View style={styles.headingAndCloseContainer}>
@@ -264,8 +272,8 @@ const PaymentModal = (props) => {
                     <View style={styles.paymentOptionsRow}>
                         <PrimaryButton
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "cash" ? styles.paymentOptionSelected : {}]}
-                                       onPress={() => setSelectedPaymentOption("cash")}
-                                       pressableStyle={styles.paymentOptionButtonPressable}>
+                            onPress={() => setSelectedPaymentOption("cash")}
+                            pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "cash" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
@@ -275,8 +283,8 @@ const PaymentModal = (props) => {
                         </PrimaryButton>
                         <PrimaryButton
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "card" ? styles.paymentOptionSelected : {}]}
-                                       onPress={() => setSelectedPaymentOption("card")}
-                                       pressableStyle={styles.paymentOptionButtonPressable}>
+                            onPress={() => setSelectedPaymentOption("card")}
+                            pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "card" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
@@ -299,8 +307,8 @@ const PaymentModal = (props) => {
                         </PrimaryButton>
                         <PrimaryButton
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}
-                                       onPress={() => setSelectedPaymentOption("split_payment")}
-                                       pressableStyle={styles.paymentOptionButtonPressable}>
+                            onPress={() => setSelectedPaymentOption("split_payment")}
+                            pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "split_payment" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
@@ -311,16 +319,17 @@ const PaymentModal = (props) => {
                     </View>
                 </View>
                 {selectedPaymentOption === "cash" || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" ? <>
-                    <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()} placeholder={"Price"}
+                    <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
+                                     placeholder={"Price"}
                                      onChangeText={(price) => {
                                          console.log(price)
                                          console.log(price.length)
-                                         if(price.trim().length === 0) {
+                                         if (price.trim().length === 0) {
                                              setTotalPrice(0)
                                              return
                                          }
-                                         if(price.split(" ").length > 1) return;
-                                         if(price.split(".").length > 2) return;
+                                         if (price.split(" ").length > 1) return;
+                                         if (price.split(".").length > 2) return;
 
                                          setTotalPrice(price);
                                      }}
@@ -338,9 +347,9 @@ const PaymentModal = (props) => {
                 </> : null}
                 {selectedPaymentOption === "split_payment" ? <View>
                     <FlatList scrollEnabled={false} data={splitUpState} renderItem={({item, index}) => {
-                        const shownCount = splitUpState.reduce((acc, item) => {
-                            return item.shown ? acc + 1 : acc;
-                        }, 0);
+                        // const shownCount = splitUpState.reduce((acc, item) => {
+                        //     return item.shown ? acc + 1 : acc;
+                        // }, 0);
                         console.log("INDEX")
                         console.log(index)
                         console.log(shownCount)
@@ -356,8 +365,8 @@ const PaymentModal = (props) => {
                                     type={"number"} label={item.name} value={item.amount.toString()} flex={1}
                                     readOnly={shownCount === 3 && item.name === paymentOrder.at(-1)}
                                     onChangeText={(text) => {
-                                        if(text.split(" ").length > 1) return;
-                                        if(text.split(".").length > 2) return;
+                                        if (text.split(" ").length > 1) return;
+                                        if (text.split(".").length > 2) return;
                                         setSplitUpState(prev => prev.map((split) => {
                                             if (split.mode === item.mode) {
                                                 if (text.trim().at(-1) === ".") {
@@ -409,7 +418,6 @@ const PaymentModal = (props) => {
                                     // setPaymentOrder(prev => prev.slice(0, prev.length - 1));
                                     setPaymentOrder(prev => prev.filter((order) => order !== item.mode));
                                     setRecentlyChanged(prev => prev.filter(ele => ele !== item.mode));
-
                                     setSplitUpState(prev => prev.map((split) => {
                                         if (split.mode === paymentOrder.at(0) && shownCount === 2) {
                                             return ({
@@ -433,7 +441,7 @@ const PaymentModal = (props) => {
                                     //     }
                                     // }
                                     setSplitUpState(prev => prev.map((split) => {
-
+                                        setShownCount(prev => prev - 1);
                                         if (split.mode === item.mode) {
                                             return ({
                                                 ...split,
@@ -443,20 +451,22 @@ const PaymentModal = (props) => {
                                         }
                                         return split;
                                     }))
+
+
                                 }}>
                                     <Ionicons name="close" size={24} color="black"/>
                                 </PrimaryButton>
                             </View>
                         }
                     }}/>
-                    {<View style={styles.addPaymentButtonContainer}>
+                    { shownCount !== 3 ? <View style={styles.addPaymentButtonContainer}>
                         <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
                                        buttonStyle={styles.addPaymentButton}
                                        pressableStyle={styles.addPaymentButtonPressable}>
                             <Entypo name="plus" size={15} color="black"/>
                             <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
                         </PrimaryButton>
-                    </View>}
+                    </View> : null}
                 </View> : null}
             </View>
         </ScrollView>
@@ -471,7 +481,7 @@ const PaymentModal = (props) => {
                            }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
-                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ 5000</Text>
+                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price}</Text>
                     <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                 </View>
             </PrimaryButton>
@@ -502,7 +512,7 @@ const styles = StyleSheet.create({
         padding: 25,
     },
     paymentOptionsContainer: {
-        marginTop: 40,
+        marginTop: 10,
         gap: 15,
         marginBottom: 25,
     },
@@ -532,7 +542,7 @@ const styles = StyleSheet.create({
     },
     paymentOptionButtonPressable: {
         paddingHorizontal: 0,
-        paddingVertical: 30,
+        paddingVertical: 20,
     },
     addPaymentButtonContainer: {
         flexDirection: "row",

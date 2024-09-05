@@ -6,6 +6,24 @@ import React, {useState} from "react";
 import CreateClientModal from "../checkoutScreen/CreateClientModal";
 import {loadClientsFromDb} from "../../store/clientSlice";
 import {useDispatch} from "react-redux";
+import textTheme from "../../constants/TextTheme";
+
+/**
+ * AddClient Component
+ *
+ * Displays a button that, when pressed, opens a modal to create a new client.
+ * Includes a button with a "+" icon and a label "Add". The modal allows users
+ * to enter client information and saves the new client to the database upon submission.
+ *
+ * @component
+ * @example
+ * return (
+ *   <AddClient />
+ * );
+ *
+ * @returns {JSX.Element} The rendered button component.
+ */
+
 
 export default function AddClient() {
     const dispatch = useDispatch();
@@ -29,7 +47,7 @@ export default function AddClient() {
             >
                 <View style={{flexDirection: 'row'}}>
                     <View style={styles.addTextContainer}>
-                        <Text style={styles.addText}>Add </Text>
+                        <Text style={[styles.addText]}>Add </Text>
                     </View>
                     <View style={styles.addSymbolContainer}>
                         <FontAwesome6 name="add" size={14} color={Colors.darkBlue}/>
@@ -57,7 +75,7 @@ const styles = StyleSheet.create({
         height: 18
     },
     addText: {
-        fontSize: 13,
+        fontFamily:"Inter-Regular",
         fontWeight: '700',
         includeFontPadding: false,
         paddingTop: 2

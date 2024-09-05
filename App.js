@@ -39,6 +39,7 @@ import settings_icon from "./assets/icons/drawerIcons/settings.png";
 import reports_icon from "./assets/icons/drawerIcons/reports.png";
 import ClientSegmentScreen from "./screens/ClientSegmentScreen";
 import {useFonts} from "expo-font";
+import textTheme from "./constants/TextTheme";
 
 enableScreens();
 
@@ -112,9 +113,9 @@ const AppNavigator = () => {
 
 const AuthNavigator = () => (
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
-        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
-        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
-        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+        {/*<AuthStack.Screen name="AuthScreen" component={AuthScreen}/>*/}
+        {/*<AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>*/}
+        {/*<AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>*/}
         <AuthStack.Screen name="ListOfBusinessesScreen" component={ListOfBusinessesScreen}/>
     </AuthStack.Navigator>
 );
@@ -127,6 +128,7 @@ const MainDrawerNavigator = () => (
             drawerActiveTintColor: Colors.highlight,
             drawerInactiveTintColor: Colors.white,
             drawerStyle: {backgroundColor: Colors.darkBlue},
+            headerTitleStyle: [textTheme.titleLarge]
         }}
     >
         <Drawer.Screen

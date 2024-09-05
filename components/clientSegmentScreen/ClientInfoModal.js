@@ -19,6 +19,24 @@ import {dateFormatter} from "../../util/Helpers";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 
+/**
+ * ClientInfoModal Component
+ *
+ * This component is a modal that displays detailed information about a client.
+ * It includes options to view and manage client details, such as viewing statistics,
+ * editing, or deleting the client. The modal dynamically updates its content based
+ * on the selected category (e.g., client details, bill activity, appointments, etc.).
+ *
+ * Props:
+ * @param {boolean} visible - Controls the visibility of the modal.
+ * @param {Function} closeModal - Function to close the modal.
+ * @param {string} name - The name of the client.
+ * @param {string} id - The ID of the client.
+ * @param {Function} setVisible - Function to control the visibility state of the modal.
+ * @param {Function} setSearchQuery - Function to set the search query for clients.
+ * @param {Function} setFilterPressed - Function to set the active filter.
+ */
+
 
 
 const getCategoryTitle =
@@ -96,7 +114,7 @@ export default function clientInfoModal(props) {
         setClientMoreDetails(id);
     }
     function seeMoreStatisticsHandler() {
-        console.log("seeMoreStatisticsHandler");
+        // console.log("seeMoreStatisticsHandler");
         setClientMoreDetails("seeMoreStats");
     }
     let content;
@@ -137,6 +155,8 @@ export default function clientInfoModal(props) {
                     dispatch(loadClientInfoFromDb(props.id))
 
                 }}
+                header={"Delete Client"}
+                content={"Are you sure? This action cannot be undone."}
                 onCloseClientInfoAfterDeleted={() => {
                     props.setVisible(false);
                     props.setSearchQuery("");
@@ -158,17 +178,18 @@ export default function clientInfoModal(props) {
                         onPress={() => {
                             setModalVisibility(true);
                         }}
+                        pressableStyle={[styles.pressable, {paddingHorizontal: 12}]}
                     >
                         <SimpleLineIcons name="options" size={24} color="black" />
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.callButton} pressableStyle={styles.pressableStyle}>
+                    <PrimaryButton buttonStyle={styles.callButton} pressableStyle={[styles.pressable, styles.pressableStyle]}>
                         <View style={{flexDirection: "row"}}>
                             <Feather name="phone" size={18} color="black" />
                             <Text style={[textTheme.bodyMedium, {marginLeft: 8}]}>Call</Text>
                         </View>
 
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={styles.pressableStyle}>
+                    <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={[styles.pressable, styles.pressableStyle]}>
                         <Text style={[textTheme.bodyMedium, {color: Colors.white}]}>
                             Book now
                         </Text>
@@ -232,7 +253,7 @@ export default function clientInfoModal(props) {
                     buttonStyle={styles.closeButton}
                     pressableStyle={styles.closeButtonPressable}
                     onPress={() => {
-                        props.closeModal();
+                        props.onClose();
                         setClientMoreDetails(null);
                     }}
                 >
@@ -352,4 +373,8 @@ const styles = StyleSheet.create({
     cardInnerContainer: {
         marginLeft: 0
     },
+    pressable: {
+        paddingVertical: 8,
+        paddingHorizontal: 8,
+    }
 })

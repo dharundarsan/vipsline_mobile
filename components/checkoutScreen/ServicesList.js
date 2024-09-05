@@ -11,7 +11,7 @@ import React from "react";
 import SearchBar from "../../ui/SearchBar";
 
 
-const ServicesList = React.memo(() => {
+const ServicesList = React.memo((props) => {
     const [isFetching, setIsFetching] = useState(false);
     const servicesData = useSelector(state => state.catalogue.services, shallowEqual);
     const womenServicesData = servicesData.women;
@@ -22,11 +22,7 @@ const ServicesList = React.memo(() => {
     const [filteredKidsServicesData, setFilteredKidsServicesData] = useState(kidsServicesData);
     const generalServicesData = servicesData.general;
     const [filteredGeneralServicesData, setFilteredGeneralServicesData] = useState(generalServicesData);
-    const [tempSelectedItems, setTempSelectedItems] = useState([]);
 
-    const addToTempSelectedItems = (item) => {
-        setTempSelectedItems((prevState) => [...prevState, item]);
-    }
 
     const filterServicesData = useCallback((filterValue) => {
         const lowerCaseFilterValue = filterValue.toLowerCase();
@@ -103,10 +99,10 @@ const ServicesList = React.memo(() => {
                                               <FlatList data={item.resource_categories}
                                                         renderItem={({item}) => {
                                                             return <ServiceItem
+                                                                closeOverallModal={props.closeOverallModal}
                                                                 leftBarColor={Colors.orange}
                                                                 data={item}
-                                                                addToTempSelectedItems={addToTempSelectedItems}
-                                                                selected={tempSelectedItems.includes(item)}/>
+                                                            />
                                                         }}>
                                               </FlatList>
                                           </>
@@ -127,10 +123,10 @@ const ServicesList = React.memo(() => {
                                               <FlatList data={item.resource_categories}
                                                         renderItem={({item}) => {
                                                             return <ServiceItem
+                                                                closeOverallModal={props.closeOverallModal}
                                                                 leftBarColor={Colors.blue}
                                                                 data={item}
-                                                                addToTempSelectedItems={addToTempSelectedItems}
-                                                                selected={tempSelectedItems.includes(item)}/>
+                                                            />
                                                         }}>
                                               </FlatList>
                                           </>
@@ -151,10 +147,10 @@ const ServicesList = React.memo(() => {
                                               <FlatList data={item.resource_categories}
                                                         renderItem={({item}) => {
                                                             return <ServiceItem
+                                                                closeOverallModal={props.closeOverallModal}
                                                                 leftBarColor={Colors.purple}
                                                                 data={item}
-                                                                addToTempSelectedItems={addToTempSelectedItems}
-                                                                selected={tempSelectedItems.includes(item)}/>
+                                                            />
                                                         }}>
                                               </FlatList>
                                           </>
@@ -175,10 +171,10 @@ const ServicesList = React.memo(() => {
                                               <FlatList data={item.resource_categories}
                                                         renderItem={({item}) => {
                                                             return <ServiceItem
+                                                                closeOverallModal={props.closeOverallModal}
                                                                 leftBarColor={Colors.brown}
-                                                                addToTempSelectedItems={addToTempSelectedItems}
                                                                 data={item}
-                                                                selected={tempSelectedItems.includes(item)}/>
+                                                            />
                                                         }}>
                                               </FlatList>
                                           </>

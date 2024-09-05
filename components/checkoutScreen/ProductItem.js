@@ -57,7 +57,7 @@ const ProductItem = (props) => {
     return <PrimaryButton buttonStyle={styles.selectProductItemButton}
                           pressableStyle={styles.selectProductItemPressable}
                           onPress={() => {
-                              props.addToTempSelectedItems(props.data);
+                              props.closeOverallModal()
                               dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
                           }}
     >

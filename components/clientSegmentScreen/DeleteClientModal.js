@@ -15,6 +15,20 @@ import {
 } from "../../store/clientFilterSlice";
 import {clientFilterNames} from "../../util/chooseFilter";
 
+/**
+ * DeleteClient Component
+ *
+ * This component displays a modal for confirming the deletion of a client. It provides options to cancel the deletion or proceed with it.
+ *
+ * Props:
+ * @param {boolean} props.isVisible - Controls the visibility of the modal.
+ * @param {function} props.onCloseModal - Function to close the modal.
+ * @param {function} props.onCloseClientInfoAfterDeleted - Function to close the client info screen after deletion.
+ * @param {string} props.header - The header text displayed at the top of the modal.
+ * @param {string} props.content - The content text displayed inside the modal, typically a message asking for confirmation.
+ */
+
+
 export default function DeleteClient(props) {
     const dispatch = useDispatch();
     const currentClientId = useSelector(state => state.clientInfo.clientId);
@@ -32,7 +46,7 @@ export default function DeleteClient(props) {
                 activeOpacity={1}
             >
                 <View style={styles.label}>
-                    <Text style={[textTheme.titleLarge, styles.deleteClientText]}>Delete Client</Text>
+                    <Text style={[textTheme.titleLarge, styles.deleteClientText]}>{props.header}</Text>
                     <PrimaryButton
                         buttonStyle={styles.closeButton}
                         pressableStyle={styles.closeButtonPressable}
@@ -44,7 +58,7 @@ export default function DeleteClient(props) {
                     </PrimaryButton>
                 </View>
                 <View style={styles.deleteClientCardContainer}>
-                    <Text style={[textTheme.bodyLarge]}>Are you sure? This action cannot be undone.</Text>
+                    <Text style={[textTheme.bodyLarge]}>{props.content}</Text>
                     <View style={styles.deleteClientCardButtonContainer}>
                         <PrimaryButton
                             label={"cancel"}

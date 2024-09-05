@@ -14,7 +14,7 @@ const ServiceItem = (props) => {
             marginHorizontal: 15,
             marginVertical: 5,
             backgroundColor: Colors.background,
-            borderColor: props.selected ? Colors.blue : Colors.grey400,
+            borderColor: Colors.grey400,
             borderWidth: 1,
             // borderWidth: 1
 
@@ -51,7 +51,7 @@ const ServiceItem = (props) => {
     return <PrimaryButton buttonStyle={styles.selectServiceItemButton}
                           pressableStyle={styles.selectServiceItemPressable}
                           onPress={() => {
-                              props.addToTempSelectedItems(props.data);
+                              props.closeOverallModal();
                               dispatch(addItemToCart({resource_category: props.data.id, resource_id: ""}));
                           }}
     >

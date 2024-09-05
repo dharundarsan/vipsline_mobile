@@ -5,6 +5,43 @@ import TextTheme from "../../constants/TextTheme";
 import {Entypo} from "@expo/vector-icons";
 import ItemCount from "../../ui/ItemCount";
 
+/**
+ * ClientInfoCategories Component
+ *
+ * This component renders a list of categories related to client information.
+ * Each category is displayed as a button, which, when pressed, triggers an action
+ * defined by the `onPress` function passed via props. The categories include options
+ * like 'Client details', 'Bill activity', 'Appointments', and more, each with
+ * optional dividers and message counts.
+ *
+ * Props:
+ * @param {Function} onPress - Function to be called when a category is pressed.
+ *
+ * State:
+ * None
+ *
+ * Data:
+ * - `modalClientDetails`: An array of objects representing different client categories.
+ *   - {string} id: Unique identifier for the category.
+ *   - {string} title: Display name of the category.
+ *   - {boolean} divider: Determines whether a top border is added.
+ *   - {boolean} msg: Indicates if a message count should be displayed.
+ *   - {number} count: The count to be displayed next to the category title if `msg` is true.
+ *   - {number} thickness: The thickness of the top border if `divider` is true.
+ *
+ * Components:
+ * - `PrimaryButton`: A customizable button component.
+ * - `ItemCount`: A component that displays a count next to a category title.
+ * - `FlatList`: A React Native component for efficiently rendering lists.
+ *
+ * Usage:
+ * ```jsx
+ * <ClientInfoCategories onPress={(id) => console.log(id)} />
+ * ```
+ */
+
+
+
 
 const modalClientDetails = [
     {id: "clientDetails", title: "Client details", divider: false, msg: false, thickness: 1},

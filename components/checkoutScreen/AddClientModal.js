@@ -25,7 +25,7 @@ const AddClientModal = (props) => {
     const queryRef = useRef("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const searchClientFromDB = useCallback(async (query, pageNo) => {
+    const searchClientFromDB = useCallback(async (query, pageNo) => {F
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
 
         setIsLoading(true);
