@@ -5,6 +5,32 @@ import Colors from "../../constants/Colors";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useSelector} from "react-redux";
 import {dateFormatter} from "../../util/Helpers";
+import {useState} from "react";
+import UpdateClientModal from "./UpdateClientModal";
+
+/**
+ * ClientDetails Component
+ *
+ * This component displays detailed information about a client in a scrollable view.
+ * It includes sections for client info and personal details, and allows users to edit
+ * client information via a modal. The modal is toggled by pressing the 'Edit' button.
+ *
+ * Props:
+ * @param {string} props.title - The title to be displayed at the top of the component.
+ *
+ * State:
+ * @property {boolean} updateModalVisibility - Controls the visibility of the UpdateClientModal.
+ *
+ * Components:
+ * - `UpdateClientModal`: Modal for editing client details.
+ *
+ * Usage:
+ * ```jsx
+ * <ClientDetails title="Client Details" />
+ * ```
+ */
+
+
 
 export default function ClientDetails(props) {
 
@@ -48,16 +74,25 @@ export default function ClientDetails(props) {
         details.customer_gst;
 
 
+    const [updateModalVisibility, setUpdateModalVisibility] = useState(false);
+
 
     return (
         <ScrollView style={styles.clientDetails} contentContainerStyle={{alignItems: "center",}}>
             <View style={styles.titleContainer}>
+                <UpdateClientModal
+                    isVisible={updateModalVisibility}
+                    details={details}
+                    onCloseModal={() => setUpdateModalVisibility(false)}
+
+                />
                 <Text style={[textTheme.titleMedium, styles.title]}>
                     {props.title}
                 </Text>
                 <PrimaryButton
                     buttonStyle={styles.editButton}
                     pressableStyle={styles.pressableStyle}
+                    onPress={() => setUpdateModalVisibility(true)}
 
                 >
                     <View style={styles.buttonInnerContainer}>

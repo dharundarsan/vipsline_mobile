@@ -39,6 +39,7 @@ import settings_icon from "./assets/icons/drawerIcons/settings.png";
 import reports_icon from "./assets/icons/drawerIcons/reports.png";
 import ClientSegmentScreen from "./screens/ClientSegmentScreen";
 import {useFonts} from "expo-font";
+import textTheme from "./constants/TextTheme";
 
 enableScreens();
 
@@ -127,6 +128,7 @@ const MainDrawerNavigator = () => (
             drawerActiveTintColor: Colors.highlight,
             drawerInactiveTintColor: Colors.white,
             drawerStyle: {backgroundColor: Colors.darkBlue},
+            headerTitleStyle: [textTheme.titleLarge]
         }}
     >
         <Drawer.Screen

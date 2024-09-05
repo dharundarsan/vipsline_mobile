@@ -10,7 +10,10 @@ const initialCartState = {
     editedMembership: [],
     editedCart: [],
     calculatedPrice: [],
-    customItems: []
+    customItems: [],
+    additionalDiscounts: [],
+    chargesData: [],
+    salesNotes: "",
 };
 
 export const addItemToCart = (data) => async (dispatch, getState) => {
@@ -62,7 +65,7 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
 export const updateCalculatedPrice = () => async (dispatch, getState) => {
     const {cart} = getState();
     calculateCartPriceAPI({
-        additional_discounts: [],
+        additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
         cart: cart.items.map(item => {
             return {id: item.item_id}
@@ -104,7 +107,7 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                     return item
             })
         ],
-        extra_charges: [],
+        extra_charges: cart.chargesData,
         isWalletSelected: false,
         promo_code: "",
         user_coupon: "",
@@ -282,6 +285,17 @@ export const cartSlice = createSlice({
         },
         removeCustomItems(state, action) {
             state.customItems = state.customItems.filter(oldItem => oldItem.id !== action.payload);
+        },
+        //Bhaski reducers
+        updateDiscount(state,action){
+            state.additionalDiscounts.pop();
+            state.additionalDiscounts = [action.payload];
+        },
+        updateChargeData(state,action){
+            state.chargesData = action.payload;
+        },
+        updateSalesNotes(state,action){
+            state.salesNotes = action.payload;
         }
     }
 });
@@ -298,7 +312,10 @@ export const {
     setCalculatedPrice,
     addCustomItems,
     removeCustomItems,
-    updateCustomItem
+    updateCustomItem,
+    updateDiscount,
+    updateChargeData,
+    updateSalesNotes
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

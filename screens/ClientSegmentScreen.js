@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, Image, FlatList, ScrollView} from "react-native"
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
-import React, {useEffect, useLayoutEffect, useState} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useState} from "react";
 import appliedFilter, {chooseFilterCount, clientFilterNames} from "../util/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
@@ -24,6 +24,9 @@ import {
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
 import {loadClientCountFromDb} from "../store/clientSlice";
+import textTheme from "../constants/TextTheme";
+import {clientFilterAPI} from "../util/apis/clientFilterAPI";
+import axios from "axios";
 
 
 export default function ClientSegmentScreen() {
@@ -34,7 +37,7 @@ export default function ClientSegmentScreen() {
     const filterClientsList = useSelector(state => state.clientFilter.clients);
     const isFetching = useSelector(state => state.clientFilter.isFetching);
     const [clientCount, setClientCount] = useState(0);
-    // const [totalCount, setTotalCount] = useState(11);
+
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const maxEntry = useSelector(state => state.clientFilter.maxEntry);
@@ -60,18 +63,57 @@ export default function ClientSegmentScreen() {
     const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
     const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
 
-    const [totalCount, setTotalCount] = useState(allClientCount);
-    function getTotalCountPagination(totalCountData){
-        // totalCount = totalCountData;
-        setClientCount(totalCountData);
-        setTotalCount(clientCount)
-    }
+    const [pageNo1, setPageNo1] = useState(0);
+    const [maxEntry1, setMaxEntry1] = useState(10);
 
-    // const [currentCount, setCurrentCount] = useState(allClientCount);
-    console.log("Total Count "+totalCount)
+    const [isLoading, setIsLoading] = useState(false);
+
+    const clientFilter = useCallback(async (pageSize, pageNo, filter) => {
+        if (isLoading) return; // Prevent initiating another request if one is already ongoing
+
+        setIsLoading(true);
+        try {
+            const response = await axios.post(
+                `${process.env.EXPO_PUBLIC_API_URI}/client/getClientReportBySegmentForBusiness?pageNo=${pageNo}&pageSize=${pageSize}`,
+                {
+                    business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                    fromDate: "",
+                    sortItem: "name",
+                    sortOrder: "asc",
+                    toDate: "",
+                    type: filter,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    }
+                }
+            );
+            let count = response.data.data.pop();
+            return response.data.data;
+        } catch (error) {
+            console.error("Error fetching data1: ", error);
+
+        } finally {
+            setIsLoading(false); // Ensure loading state is reset after completion or failure
+        }
+    }, [isLoading]);
+
+    const loadMoreClients = () => {
+        const newPageNo = pageNo1 + 1;
+        setPageNo1(newPageNo);
+        clientFilter(maxEntry1, newPageNo, clientFilterNames(filterPressed));
+    };
+
+
+
+
+    const [searchClientTotalCount, setSearchClientTotalCount] = useState(0);
+
+
+
     useLayoutEffect(() => {
         dispatch(loadClientCountFromDb());
-        // dispatch(loadClientFiltersFromDb(10, "All"));
     }, []);
 
 
@@ -80,15 +122,13 @@ export default function ClientSegmentScreen() {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount))
     }, [filterPressed]);
 
-    useEffect(()=>{
-        if(searchQuery.trim().length!==0){
-            setSearchQuery("");
-        }
-        else return;
-    },[filterPressed]);
+    // useEffect(()=>{
+    //     if(searchQuery.trim().length!==0){
+    //         setSearchQuery("");
+    //     }
+    // },[filterPressed]);
 
     useEffect(() => {
-        console.log(maxEntry + clientFilterNames(filterPressed) + searchQuery);
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
     }, [searchQuery]);
 
@@ -118,7 +158,6 @@ export default function ClientSegmentScreen() {
 
 
     function clientInfoHandler() {
-        console.log("clientInfoHandler");
         setIsClientInfoModalVisible(true);
     }
 
@@ -131,6 +170,8 @@ export default function ClientSegmentScreen() {
         // console.log("change", filter);
         setFilterPressed(filter);
     }
+
+
 
     return (
             <ScrollView style={styles.scrollView}>
@@ -155,9 +196,10 @@ export default function ClientSegmentScreen() {
                 id={clientId}
                 setSearchQuery={setSearchQuery}
                 setFilterPressed={setFilterPressed}
+                onClose={() => setIsClientInfoModalVisible(false)}
             />
 
-                    <AddClient/>
+                    <AddClient />
 
                     <Divider color={Colors.grey250}/>
 
@@ -171,12 +213,12 @@ export default function ClientSegmentScreen() {
                     <View style={styles.currentFilter}>
                         <View style={styles.descBullet}/>
                         <Text
-                            style={styles.descText}
+                            style={[textTheme.titleSmall, styles.descText]}
                         >
                             {appliedFilter(filterPressed) + (filterPressed === "churn_clients_count" ? " (likely to be Inactive)" : "")}
                         </Text>
                     </View>
-                    <Text style={styles.filterDescText}>
+                    <Text style={[textTheme.bodyMedium, styles.filterDescText]}>
                         {clientFilterDescriptionData[appliedFilter(filterPressed)]}
                     </Text>
 
@@ -185,7 +227,7 @@ export default function ClientSegmentScreen() {
                         <View style={styles.textInputContainer}>
                             <SearchBar
                                 placeholder={"search by mobile number name"}
-                                searchContainerStyle={styles.searchBarContainer}
+                                searchContainerStyle={[textTheme.bodyMedium, styles.searchBarContainer]}
                                 onChangeText={(text) => {
                                     setSearchQuery(text);
                                 }}
@@ -208,8 +250,12 @@ export default function ClientSegmentScreen() {
 
                     <View style={styles.clientCount}>
                         <Image source={require("../assets/icons/menu.png")} style={styles.menuImage}/>
-                        <Text style={styles.clientCountText}>
-                            Client count : {clientCount}
+                        <Text style={[textTheme.bodyMedium, styles.clientCountText]}>
+                            Client count : {
+                            searchQuery === "" ?
+                                clientCount :
+                                searchClientTotalCount
+                        }
                         </Text>
                     </View>
 
@@ -217,13 +263,13 @@ export default function ClientSegmentScreen() {
                     {
                         searchQuery === "" ?
                             <>
-
                                 {
                                     !isFetching ?
                                         <FlatList
                                             data={filterClientsList}
                                             renderItem={renderItem}
                                             scrollEnabled={false}
+
                                         /> :
                                         <Bullets
                                             tHeight={35}
@@ -240,52 +286,51 @@ export default function ClientSegmentScreen() {
                                         />
                                 }
 
-                {
-                    clientCount >= 10 ?
-                    <Pagination
-                        filterPressed={filterPressed}
-                        setIsModalVisible={setIsModalVisible}
-                    /> : null
-                }
+                                {
+                                    clientCount >= 10 ?
+                                    <Pagination
+                                        filterPressed={filterPressed}
+                                        setIsModalVisible={setIsModalVisible}
+                                    /> : null
+                                }
+                                </> :
 
-                </> :
-                    <>
-                        {
-                            !isSearchClientFetching ?
-                            <FlatList
-                                data={searchClientList}
-                                scrollEnabled={false}
-                                renderItem={renderItem}
-                            /> :
-                                <Bullets
-                                    tHeight={35}
-                                    tWidth={"75%"}
-                                    listSize={maxEntry}
-                                    aSize={35}
-                                    animationDuration={500}
-                                    containerStyles={{
-                                        paddingVertical: 16,
-                                        borderBottomWidth: 1,
-                                        borderBottomColor: Colors.grey250
-                                    }}
-                                    avatarStyles={{marginLeft: 16}}
-                                />
+                            <>
+                                {
+                                    !isSearchClientFetching ?
+                                    <FlatList
+                                        data={searchClientList}
+                                        scrollEnabled={false}
+                                        renderItem={renderItem}
+                                    /> :
+                                        <Bullets
+                                            tHeight={35}
+                                            tWidth={"75%"}
+                                            listSize={maxEntry}
+                                            aSize={35}
+                                            animationDuration={500}
+                                            containerStyles={{
+                                                paddingVertical: 16,
+                                                borderBottomWidth: 1,
+                                                borderBottomColor: Colors.grey250
+                                            }}
+                                            avatarStyles={{marginLeft: 16}}
+                                        />
 
                                 }
 
-                        {
-                            (totalCount >= 10) ?
-                            <SearchClientPagination
-                                getTotalCountPagination={getTotalCountPagination}
-                                filterPressed={filterPressed}
-                                setIsModalVisible={setIsModalVisible}
-                                query={searchQuery}
-                            /> : null
-                        }
+                                {
+                                    <SearchClientPagination
+                                        filterPressed={filterPressed}
+                                        setIsModalVisible={setIsModalVisible}
+                                        query={searchQuery}
+                                        setSearchClientTotalCount={setSearchClientTotalCount}
+                                        />
 
+                                }
 
-                    </>
-            }
+                                </>
+                    }
 
 
                 </View>

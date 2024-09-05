@@ -253,7 +253,7 @@ const PaymentModal = (props) => {
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
         }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment}/>
-        <InvoiceModal isVisible={isInvoiceModalVisible} onCloseModal={() => {
+        <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
             setIsInvoiceModalVisible(false)
         }}/>
         <View style={styles.headingAndCloseContainer}>
