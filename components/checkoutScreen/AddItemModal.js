@@ -214,7 +214,7 @@ const AddItemModal = (props) => {
                 props.closeModal()
             }}/>
     } else if (selectedCategory === "customItem") {
-        content = <AddCustomItemModal addCustomItems={props.addCustomItems} isVisible={true} onCloseModal={() => {
+        content = <AddCustomItemModal isVisible={true} onCloseModal={() => {
             setSelectedCategory(null)
         }} closeOverallModal={props.closeModal}/>
     } else if (selectedCategory === "prepaid") {

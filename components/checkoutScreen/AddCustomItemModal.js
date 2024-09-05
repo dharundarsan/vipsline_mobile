@@ -7,7 +7,7 @@ import React, {useState} from "react";
 import Colors from "../../constants/Colors";
 import {formatDate} from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {addItemToCart} from "../../store/cartSlice";
+import {addCustomItems, addItemToCart, updateCalculatedPrice} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
 
 const AddCustomItemModal = (props) => {
@@ -43,7 +43,17 @@ const AddCustomItemModal = (props) => {
             <PrimaryButton onPress={() => {
                 props.onCloseModal();
                 props.closeOverallModal()
-                props.addCustomItems({name: itemName, price: itemPrice, resource_category_name: null, total_price: itemPrice, category:"custom_item", amount: itemPrice, resource_id: null});
+                dispatch(addCustomItems({
+                    name: itemName,
+                    price: itemPrice,
+                    resource_category_name: null,
+                    total_price: itemPrice,
+                    category: "custom_item",
+                    gender: "custom_item",
+                    amount: itemPrice,
+                    resource_id: null,
+                }))
+                dispatch(updateCalculatedPrice());
             }} label={"Add to cart"}/>
         </View>
     </Modal>

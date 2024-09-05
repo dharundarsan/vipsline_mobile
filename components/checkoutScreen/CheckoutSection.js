@@ -33,6 +33,9 @@ const CheckoutSection = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
     const centralGST = 30;
     const stateGST = 30;
+    const calculatedPrice = useSelector(state => state.cart.calculatedPrice)
+    console.log("const calculatedPrice = useSelector(state => state.cart.calculatedPrice)")
+    console.log(calculatedPrice.length)
 
     const itemName = "Shampoo";
     const itemPrice = 500;
@@ -50,7 +53,7 @@ const CheckoutSection = (props) => {
     const cartDetails = useSelector(state => state.cart.items);
 
     useEffect(() => {
-        const updatedCategory = { service: 0, product: 0, package: 0 };
+        const updatedCategory = {service: 0, product: 0, package: 0};
 
         cartDetails.forEach(item => {
             if (["Women", "Men", "General"].includes(item.gender)) {
@@ -70,9 +73,6 @@ const CheckoutSection = (props) => {
     }, [cartDetails]);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
-
-
-
 
 
     const styles = StyleSheet.create({
@@ -126,26 +126,30 @@ const CheckoutSection = (props) => {
     });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [ActionModal,setActionModal] = useState(false);
+    const [ActionModal, setActionModal] = useState(false);
     const [title, setTitle] = useState("")
     const [isDelete, setIsDelete] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
     // const [first, setfirst] = useState(second)
     const [data, setData] = useState([{}])
-    function openModal(title){
+
+    function openModal(title) {
         setTitle(title);
     }
+
     console.log(discountValue);
     return <View style={styles.checkoutSection}>
         <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
             setIsPaymentModalVisible(false)
-        }} price={ props.data !== null ? props.data[0].total_price : 0}/>
+        }} price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
         {
             ActionModal && <MiniActionTextModal isVisible={ActionModal}
-                onCloseModal={()=>{setActionModal(false)}}
-                title={title}
-                data={data}
-                setDiscountValue={setDiscountValue}
+                                                onCloseModal={() => {
+                                                    setActionModal(false)
+                                                }}
+                                                title={title}
+                                                data={data}
+                                                setDiscountValue={setDiscountValue}
             />
         }
         {
@@ -184,35 +188,35 @@ const CheckoutSection = (props) => {
                         if (value === "Apply Discount") {
                             openModal("Add Discount")
                             setData([{
-                                header:"Enter Discount",
-                                boxType:"textBox",
-                                typeToggle:1,
-                                keyboardType:"number-pad"
+                                header: "Enter Discount",
+                                boxType: "textBox",
+                                typeToggle: 1,
+                                keyboardType: "number-pad"
                             }])
                             setActionModal(true)
                         } else if (value === "Add Charges") {
                             openModal("Add extra charges")
                             setData([
-                            {
-                                header:"Item name",
-                                boxType:"textBox",
-                                typeToggle:0,
-                                keyboardType:"number-pad"
-                            },
-                            {
-                                header:"Price",
-                                boxType:"priceBox",
-                                typeToggle:0,
-                                keyboardType:"number-pad"
-                            }
-                        ])
+                                {
+                                    header: "Item name",
+                                    boxType: "textBox",
+                                    typeToggle: 0,
+                                    keyboardType: "number-pad"
+                                },
+                                {
+                                    header: "Price",
+                                    boxType: "priceBox",
+                                    typeToggle: 0,
+                                    keyboardType: "number-pad"
+                                }
+                            ])
                             setActionModal(true)
                         } else if (value === "Add Sales Notes") {
                             openModal("Add a note")
                             setData([{
-                                header:"Sales notes",
-                                boxType:"multiLineBox",
-                                typeToggle:0,
+                                header: "Sales notes",
+                                boxType: "multiLineBox",
+                                typeToggle: 0,
                             }])
                             setActionModal(true)
                         } else if (value === "Cancel Sales") {
@@ -235,17 +239,19 @@ const CheckoutSection = (props) => {
                     <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
                         setIsPaymentModalVisible(false)
                     }}
-                                  price={props.data[0].total_price}/>
+                                  price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
                     <View style={styles.checkoutDetailRow}>
                         {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
                         {/*<Text*/}
-                        {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>*/}
+                        {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { calculatedPrice.length !== 0 ? calculatedPrice[0].total_discount_in_price : 0}</Text>*/}
                         <View>
                             <Popover popoverStyle={styles.popoverStyle}
                                      from={
                                          <Pressable style={styles.checkoutDetailInnerContainer}>
-                                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-                                             <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                             <Text
+                                                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                                             <MaterialCommunityIcons name="information-outline" size={24}
+                                                                     color="black"/>
                                          </Pressable>
                                      }
                                      offset={Platform.OS === "ios" ? 0 : 32}
@@ -272,30 +278,34 @@ const CheckoutSection = (props) => {
                             </Popover>
                         </View>
 
-                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].total_discount_in_price : 0}</Text>
+                        <Text
+                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
                     </View>
 
                     <View style={styles.checkoutDetailRow}>
                         <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
                         <Text
-                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { props.data !== null ? props.data[0].total_price_after_discount : 0}</Text>
+                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price_after_discount}</Text>
                     </View>
                     <View style={styles.checkoutDetailRow}>
                         <View>
                             <Popover popoverStyle={styles.popoverStyle}
                                      from={
                                          <Pressable style={styles.checkoutDetailInnerContainer}>
-                                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST (18%)</Text>
-                                             <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
+                                                 (18%)</Text>
+                                             <MaterialCommunityIcons name="information-outline" size={24}
+                                                                     color="black"/>
                                          </Pressable>
                                      }
                                      offset={Platform.OS === "ios" ? 0 : 32}
                             >
-                                <Text>SGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
-                                <Text>CGST (9%) : ₹ {props.data[0].gst_charges / 2}</Text>
+                                <Text>SGST (9%) : ₹ {calculatedPrice.length === 0 ? 0 :calculatedPrice[0].gst_charges / 2}</Text>
+                                <Text>CGST (9%) : ₹ {calculatedPrice.length === 0 ? 0 :calculatedPrice[0].gst_charges / 2}</Text>
                             </Popover>
                         </View>
-                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {props.data !== null ? props.data[0].gst_charges : 0}</Text>
+                        <Text
+                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].gst_charges}</Text>
                     </View>
                     <View style={styles.buttonContainer}>
                         <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
@@ -304,7 +314,7 @@ const CheckoutSection = (props) => {
                         <PrimaryButton buttonStyle={styles.checkoutButton}
                                        pressableStyle={styles.checkoutButtonPressable}
                                        onPress={() => {
-                                           if(!clientInfo.isClientSelected) {
+                                           if (!clientInfo.isClientSelected) {
                                                ToastAndroid.show("Please select client", ToastAndroid.LONG);
                                                return;
                                            }
@@ -317,7 +327,7 @@ const CheckoutSection = (props) => {
                             <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                             <View style={styles.checkoutButtonAmountAndArrowContainer}>
                                 <Text
-                                    style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.data[0].total_price}</Text>
+                                    style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {calculatedPrice.length === 0 ? 0 :calculatedPrice[0].total_price}</Text>
                                 <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                             </View>
                         </PrimaryButton>

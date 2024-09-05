@@ -10,14 +10,36 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import getDiscountAPI from "../../util/apis/getDiscountAPI";
 import Divider from "../../ui/Divider";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    addItemToEditedCart,
+    loadCartFromDB,
+    updateCalculatedPrice,
+    updateCustomItem,
+    updateEditedCart, updateEditedMembership
+} from "../../store/cartSlice";
+import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 
 const EditCartModal = (props) => {
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage");
     const [discountValue, setDiscountValue] = useState(0);
     const [discountAmount, setDiscountAmount] = useState(0);
+    console.log("props.dataaaaaa")
+    console.log(props.data)
     const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
+    console.log("Price")
+    console.log(price)
+    const cartItems = useSelector((state) => state.cart.items);
+    const editedMembership = useSelector((state) => state.cart.editedMembership);
+    const editedCart = useSelector((state) => state.cart.editedCart);
+
+    useEffect(() => {
+        // setPrice(props.data.total_price === undefined ? props.data.price : props.data.total_price)
+        setPrice(props.data.price)
+        setDiscountValue(0)
+        setDiscountAmount(0)
+    }, [props]);
 
 
     useEffect(() => {
@@ -113,8 +135,71 @@ const EditCartModal = (props) => {
         </View>
         <Divider/>
         <View style={styles.addToCartButtonContainer}>
-            <PrimaryButton onPress={() => {
+            <PrimaryButton onPress={async () => {
                 if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
+                    console.log("props.datafucker");
+                    console.log(props.data);
+                    if (props.data.gender === "Women") {
+                        dispatch(await addItemToEditedCart({
+                            ...props.data,
+                            amount: price,
+                            total_price: price,
+                            price: price,
+                            bonus_value: 0,
+                            disc_value: discountAmount,
+                            itemId: props.data.item_id,
+                            item_id: props.data.item_id,
+                            membership_id: props.data.membership_id,
+                            res_cat_id: props.data.resource_category_id,
+                            resource_id: props.data.resource_id,
+                            type: "AMOUNT",
+                            valid_from: "",
+                            valid_till: "",
+                            wallet_amount: props.data.wallet_amount,
+                            edited: true
+                        }))
+                        dispatch(updateEditedCart());
+                    } else if (props.data.gender === "Products") {
+                        dispatch(await addItemToEditedCart({
+                            ...props.data,
+                            amount: price,
+                            bonus_value: 0,
+                            disc_value: discountAmount,
+                            itemId: props.data.item_id,
+                            item_id: props.data.item_id,
+                            membership_id: 0,
+                            product_id: props.data.product_id,
+                            resource_id: props.data.resource_id,
+                            type: "AMOUNT",
+                            total_price: price,
+                            price: price,
+                            res_cat_id: props.data.resource_category_id,
+                            valid_from: "",
+                            valid_till: "",
+                            wallet_amount: props.data.wallet_amount,
+                            edited: true
+                        }))
+                        dispatch(updateEditedCart());
+                    } else if (props.data.gender === "custom_item") {
+                        dispatch(updateCustomItem({
+                            amount: price,
+                            price: price,
+                            total_price: price,
+                        }))
+                    } else if (props.data.gender === "membership") {
+                        dispatch(updateEditedMembership({
+                            type: "edit", id: props.data.item_id, data: {
+                                amount: price,
+                                bonus_value: 0,
+                                disc_value: discountAmount,
+                                type: "AMOUNT",
+                                res_cat_id: props.data.resource_category_id
+                            }
+                        }))
+
+                    }
+                    dispatch(updateCalculatedPrice());
+
                     props.onCloseModal()
                 } else {
                     props.onCloseModal()
