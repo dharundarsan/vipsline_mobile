@@ -55,11 +55,15 @@ const PackageItem = (props) => {
 
     return <PrimaryButton buttonStyle={styles.packageItemButton} pressableStyle={styles.packageItemPressable}
                           onPress={() => {
-                              props.addToTempSelectedItems(props.data);
                               setIsPackageModalVisible(true);
                               dispatch(addItemToCart(props.data));
                           }}>
-        <PackageModal isVisible={isPackageModalVisible} data={props.data} onCloseModal={()=>{setIsPackageModalVisible(false)}} />
+        <PackageModal isVisible={isPackageModalVisible} data={props.data}
+                      closeOverallModal={props.closeOverallModal}
+
+                      onCloseModal={() => {
+            setIsPackageModalVisible(false)
+        }}/>
         <View style={styles.leftBar}></View>
         <View style={styles.packageItemInnerContainer}>
             <Text style={[styles.nameText, textTheme.titleMedium]}>{capitalizeFirstLetter(props.data.name)}</Text>

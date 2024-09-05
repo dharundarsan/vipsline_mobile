@@ -13,6 +13,8 @@ export default function VerificationCodeBody(props) {
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const [changing, setChanging] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const [otp, setOtp] = useState("");
     // const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,20 +41,20 @@ export default function VerificationCodeBody(props) {
         setOtp(otp);
     }
 
-    async function verifyWithOTP() {
-
-
-        // setIsAuthenticated(true);
-
-        const isAuthenticated = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS");
-
-        if(isAuthenticated) {
-
-            navigation.navigate(
-                'ListOfBusinessesScreen',
-            );
-        }
-    }
+    // async function verifyWithOTP() {
+    //
+    //
+    //     // setIsAuthenticated(true);
+    //
+    //     const isAuthenticated = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS");
+    //
+    //     if(isAuthenticated) {
+    //
+    //         navigation.navigate(
+    //             'ListOfBusinessesScreen',
+    //         );
+    //     }
+    // }
 
     return (
         <View style={styles.verificationCodeBody}>
@@ -75,7 +77,13 @@ export default function VerificationCodeBody(props) {
 
             </View>
 
-            <OtpInputBox style={styles.otpContainer} otp={handleOTP} verify={false} />
+            <OtpInputBox
+                style={styles.otpContainer}
+                otp={handleOTP}
+                verify={isAuthenticated}
+                changing={changing}
+                setChanging={setChanging}
+            />
 
             <View style={styles.resendOtpContainer}>
                 <Text style={[textTheme.titleMedium, styles.didntGetCodeText]}>Didn't get a code?</Text>
@@ -97,8 +105,13 @@ export default function VerificationCodeBody(props) {
                 label="SUBMIT"
                 buttonStyle={styles.submitButton}
                 textStyle={[textTheme.titleSmall]}
-                onPress={() => {
-                    verifyWithOTP();
+                onPress={async () => {
+                    const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS")
+                    setIsAuthenticated(authStatus);
+                    setChanging(true);
+                    if(authStatus === true) {
+                        navigation.navigate("ListOfBusinessesScreen");
+                    }
                 }}
             />
 

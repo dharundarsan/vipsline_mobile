@@ -13,13 +13,14 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
  * CustomTextInput component for various types of text inputs, including text, email, phone number, and dropdown.
  *
  * @param {Object} props - Props for the CustomTextInput component.
- * @param {'text' | 'email' | 'phoneNo' | 'dropdown' | 'multiLine' | 'date' | 'number'} props.type - The type of input to display.
+ * @param {'text' | 'email' | 'phoneNo' | 'dropdown' | 'multiLine' | 'date' | 'number' | 'price'} props.type - The type of input to display.
  * @param {string | Date} [props.value] - The current value of the text input.
  * @param {string | Date} [props.defaultValue] - The default value of the text input.
  * @param {string} [props.placeholder] - Placeholder text for the input.
  * @param {number} [props.flex] - Flex of text input.
  * @param {string} [props.label] - Label text to display above the input.
  * @param {Object} [props.textInputStyle] - Custom style for text input.
+ * @param {Object} [props.labelTextStyle] - Custom style for label text.
  * @param {boolean} [props.readOnly] - Makes the text input read only.
  * @param {Array} [props.dropdownItems] - Items to be listed in the dropdown option.
  * @param {function} [props.validator] - Function to validate the input value.
@@ -64,7 +65,8 @@ const CustomTextInput = (props) => {
     if (props.type === "text" || props.type === "email" || props.type === "multiLine" || props.type === "number") {
         content = (
             <TextInput
-                onEndEditing={(event) => props.onEndEditing(event.nativeEvent.text)}
+                onEndEditing={props.onEndEditing !== undefined ? (event) => props.onEndEditing(event.nativeEvent.text) : () => {
+                }}
                 readOnly={props.readOnly}
                 style={[
                     textTheme.bodyLarge,
@@ -88,6 +90,40 @@ const CustomTextInput = (props) => {
                 }}
             />
         );
+    } else if (props.type === "price") {
+        content = (
+            <View style={[styles.priceInputContainer,
+                {borderColor: error ? Colors.error : Colors.grey400},
+            ]}>
+                <FontAwesome style={styles.rupeeSymbol} name="rupee" size={20} color={Colors.grey600}/>
+                <TextInput
+                    onEndEditing={props.onEndEditing !== undefined ? (event) => props.onEndEditing(event.nativeEvent.text) : () => {
+                    }}
+                    readOnly={props.readOnly}
+                    style={[
+                        textTheme.bodyLarge,
+                        styles.textInput,
+                        {borderWidth: 0, marginVertical: 0, paddingHorizontal: 0},
+                        props.textInputStyle,
+                        {flex: 1}
+                    ]}
+                    keyboardType={"number-pad"}
+                    value={props.value}
+                    defaultValue={props.defaultValue}
+                    placeholder={props.placeholder}
+                    onBlur={() => handleSave()}
+                    onChangeText={(text) => {
+                        console.log(text);
+                        props.onChangeText(text);
+                        if (error && props.validator && props.validator(text) === true) {
+                            setError(false);
+                            setErrorMessage("");
+                        }
+                    }}
+                />
+            </View>
+        );
+
     } else if (props.type === "phoneNo") {
         content = (
             <>
@@ -162,12 +198,16 @@ const CustomTextInput = (props) => {
     } else if (props.type === "date") {
         content = (
             <>
-                {isDateTimePickerVisible && (
+                {(isDateTimePickerVisible) && (
                     <RNDateTimePicker
-                        value={props.value || new Date()}
+                        value={props.value === undefined || props.value === null ? new Date(Date.now()) : new Date(props.value)}
                         mode="date"
                         display="default"
                         onChange={(event, selectedDate) => {
+                            if (event.type === "dismissed") {
+                                setIsDateTimePickerVisible(false);
+                                return;
+                            }
                             setIsDateTimePickerVisible(false);
                             if (selectedDate) {
                                 props.onChangeValue(new Date(selectedDate.getTime()));
@@ -181,7 +221,7 @@ const CustomTextInput = (props) => {
                     onPress={() => setIsDateTimePickerVisible(true)}
                 >
                     <Text style={[textTheme.bodyLarge, styles.dateTimeButtonText]}>
-                        {props.value === undefined || props.value === "" ? "Select " + props.label : formatDate(new Date(props.value))}
+                        {props.value === undefined || props.value === null ? "Select " + props.label : formatDate(new Date(props.value))}
                     </Text>
                     <MaterialCommunityIcons
                         style={styles.dateTimeButtonIcon}
@@ -196,7 +236,7 @@ const CustomTextInput = (props) => {
 
     return (
         <View style={[styles.commonContainer, props.flex !== undefined ? {flex: 1} : {}]}>
-            <Text style={[textTheme.bodyMedium, styles.labelText]}>{props.label}</Text>
+            <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}</Text>
             {content}
             {error && <Text style={[textTheme.bodyMedium, styles.errorText]}>{errorMessage}</Text>}
         </View>
@@ -224,6 +264,23 @@ const styles = StyleSheet.create({
     errorText: {
         color: Colors.error,
         fontWeight: "500",
+    },
+    priceInputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: Colors.grey400,
+        borderRadius: 5,
+        // paddingRight: 20,
+        marginTop: 5,
+        // marginBottom: 30,
+    },
+    rupeeSymbol: {
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        marginRight: 15,
+        borderRightWidth: 1,
+        borderRightColor: Colors.grey400,
     },
     phoneContainer: {
         flexDirection: 'row',

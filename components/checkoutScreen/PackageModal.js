@@ -13,7 +13,7 @@ import packageSittingItem from "./PackageSittingItem";
 import PackageSittingItem from "./PackageSittingItem";
 import {useDispatch} from "react-redux";
 
-const PackageModal = (props) => {
+const   PackageModal = (props) => {
     const [packageDetails, setPackageDetails] = useState([]);
     const [selectedSittingItems, setSelectedSittingItems] = useState([]);
     const dispatch = useDispatch();
@@ -94,6 +94,7 @@ const PackageModal = (props) => {
                         resource_id: null
                     }));
                 })
+                props.closeOverallModal()
                 props.onCloseModal();
             }} label={"Save"}/>
         </View>

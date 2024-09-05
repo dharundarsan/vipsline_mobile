@@ -16,7 +16,6 @@ import Colors from './constants/Colors';
 import {enableScreens} from "react-native-screens";
 import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 // import ClientSegmentScreen from "./screens/ClientSegmentScreen";
-
 //Font And SplashScreen Imports
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
@@ -104,18 +103,18 @@ const AppNavigator = () => {
 
     return (
         <NavigationContainer>
-            {/*{isAuthenticated ?*/}
-                <MainDrawerNavigator />
-            {/*: <AuthNavigator />}*/}
+            {isAuthenticated ?
+                <MainDrawerNavigator/>
+                 : <AuthNavigator/>}
         </NavigationContainer>
     );
 };
 
 const AuthNavigator = () => (
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
-        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
-        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
-        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+        {/*<AuthStack.Screen name="AuthScreen" component={AuthScreen}/>*/}
+        {/*<AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>*/}
+        {/*<AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>*/}
         <AuthStack.Screen name="ListOfBusinessesScreen" component={ListOfBusinessesScreen}/>
     </AuthStack.Navigator>
 );
@@ -226,5 +225,5 @@ const MainDrawerNavigator = () => (
 const styles = StyleSheet.create({
     safeAreaView: {
         flex: 1,
-    },
+    }
 });

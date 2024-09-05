@@ -42,6 +42,7 @@ const AddCustomItemModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={() => {
                 props.onCloseModal();
+                props.closeOverallModal()
                 props.addCustomItems({name: itemName, price: itemPrice, resource_category_name: null, total_price: itemPrice, category:"custom_item", amount: itemPrice, resource_id: null});
             }} label={"Add to cart"}/>
         </View>

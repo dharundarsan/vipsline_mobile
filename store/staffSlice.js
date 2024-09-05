@@ -1,5 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
+import {loadCartFromDB} from "./cartSlice";
 
 const initialStaffState = {
     staffs:[]
@@ -23,12 +24,14 @@ export const loadStaffsFromDB = () => async (dispatch, getState) => {
     }
 }
 
-export const updateCartItemStaff = () => async (dispatch, getState) => {
+export const updateCartItemStaff = (res_list) => async (dispatch, getState) => {
     try {
-        const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URI}/resource/getByBusiness`,
+        const response = await axios.put(
+            `${process.env.EXPO_PUBLIC_API_URI}/cart/updateMultipleResourceInCart2`,
             {
                 business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                res_list:res_list
+
             },
             {
                 headers: {
@@ -36,7 +39,7 @@ export const updateCartItemStaff = () => async (dispatch, getState) => {
                 }
             }
         );
-        dispatch(updateStaffs(response.data.data));
+        dispatch(loadCartFromDB());
     } catch (error) {
     }
 }

@@ -8,15 +8,23 @@ import {Feather} from '@expo/vector-icons';
 import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import {MaterialIcons} from '@expo/vector-icons';
-import {useDispatch} from "react-redux";
-import {deleteItemFromCart, removeItemFromCart} from "../../store/cartSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {deleteItemFromCart, removeItemFromCart, updateLoadingState} from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
+import {updateCartItemStaff} from "../../store/staffSlice";
+import EditCartModal from "./EditCartModal";
 
 const CartItem = (props) => {
-    console.log(props)
     const dispatch = useDispatch();
-    const removeItemHandler = () => {
-        dispatch(removeItemFromCart(props.data.item_id));
+    const isLoading = useSelector(state => state.cart.isLoading);
+    const [isEditCartModalVisible, setIsEditCartModalVisible] = useState(false);
+    const removeItemHandler = async () => {
+        if (isLoading) return;
+        dispatch(updateLoadingState(true));
+        dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
+            console.log("hello1")
+            dispatch(updateLoadingState(false));
+        })
     }
 
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
@@ -24,18 +32,28 @@ const CartItem = (props) => {
 
     return <>
         <View style={styles.cartItem}>
+            <EditCartModal isVisible={isEditCartModalVisible} onCloseModal={() => setIsEditCartModalVisible(false)}
+                           data={props.data}/>
             <DropdownModal isVisible={isStaffDropdownModalVisible}
-                           onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs} object={true} objectName={"name"} selectedValue={selectedStaff} onChangeValue={setSelectedStaff} />
+                           onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
+                           object={true} objectName={"name"} selectedValue={selectedStaff} onChangeValue={(value) => {
+                dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
+                setSelectedStaff(value)
+            }}/>
             <View style={styles.itemNameAndDetailsContainer}>
-                <Text
-                    style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>
+                {props.data.gender === "prepaid" ? <Text
+                    style={[TextTheme.bodyLarge, styles.itemNameText]}>Prepaid value
+                    ₹{parseFloat(props.data.wallet_amount) + parseFloat(props.data.wallet_bonus)}</Text> : <Text
+                    style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>}
+
                 <View style={styles.itemDetailsContainer}>
                     <Text style={[TextTheme.labelLarge, styles.itemQuantityText]}>1x</Text>
                     <View style={styles.amountContainer}>
                         <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
                         <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.price}</Text>
-                        <PrimaryButton buttonStyle={styles.editAmountButton}
+                        <PrimaryButton onPress={() => setIsEditCartModalVisible(true)}
+                                       buttonStyle={styles.editAmountButton}
                                        pressableStyle={styles.editAmountPressable}>
                             <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
                             {/*<Feather  name="edit" size={22} color="black"/>*/}
@@ -48,9 +66,11 @@ const CartItem = (props) => {
                 </View>
             </View>
             <View style={styles.staffAndDiscountContainer}>
-                <PrimaryButton buttonStyle={styles.staffButton} pressableStyle={styles.staffPressable} onPress={()=>setIsStaffDropdownModalVisible(true)}>
+                <PrimaryButton buttonStyle={styles.staffButton} pressableStyle={styles.staffPressable}
+                               onPress={() => setIsStaffDropdownModalVisible(true)}>
                     <View style={styles.staffContainer}>
-                        <Text style={[textTheme.bodyMedium, styles.staffText]}>{ selectedStaff !== null ? selectedStaff.name : "Select Staff"}</Text>
+                        <Text
+                            style={[textTheme.bodyMedium, styles.staffText]}>{selectedStaff !== null ? selectedStaff.name : "Select Staff"}</Text>
                         <MaterialIcons name="keyboard-arrow-down" size={24} color="black"/>
                     </View>
                 </PrimaryButton>

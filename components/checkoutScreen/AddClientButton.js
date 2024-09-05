@@ -1,4 +1,5 @@
 import PrimaryButton from "../../ui/PrimaryButton";
+import {FontAwesome6, Ionicons} from "@expo/vector-icons";
 import {Pressable, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
@@ -8,7 +9,7 @@ import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import {useState} from "react";
+import React, {useState} from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
@@ -72,16 +73,7 @@ const AddClientButton = (props) => {
                                     </Pressable>
                                 }
 
-                                <Entypo
-                                    name="cross"
-                                    size={24}
-                                    color="black"
-                                    style={styles.closeButton}
-                                    onPress={() => {
-                                        dispatch(clearClientInfo());
-                                        setIsClientInfo(false)
-                                    }}
-                                />
+                                <Ionicons name="close" size={24} color="black"/>
 
                                 {isVisibileModal && (
                                     <ClientInfoModal

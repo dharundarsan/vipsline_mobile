@@ -1,4 +1,14 @@
-import {KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    ToastAndroid,
+    View
+} from "react-native";
 import {AntDesign, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import PrimaryButton from "../../ui/PrimaryButton";
 import React, {useState} from "react";
@@ -8,47 +18,50 @@ import Divider from "../../ui/Divider";
 import {formatDate} from "../../util/Helpers";
 import RNDateTimePicker, {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {addItemToCart} from "../../store/cartSlice";
-import {useDispatch} from "react-redux";
+import {addItemToCart, addItemToEditedCart} from "../../store/cartSlice";
+import {useDispatch, useSelector} from "react-redux";
+import CustomTextInput from "../../ui/CustomTextInput";
 
 const EditMembershipModal = (props) => {
     const dispatch = useDispatch();
-    const [validFromDate, setValidFromDate] = useState(Date.now());
-    const [validUntilDate, setValidUntilDate] = useState(Date.now() + (props.data.duration * 24 * 60 * 60 * 1000));
-    const [isValidFromDatePickerVisible, setIsValidFromDatePickerVisible] = useState(false);
-    const [isValidUntilDatePickerVisible, setIsValidUntilDatePickerVisible] = useState(false);
+    const editedCart = useSelector(state => state.cart.editedItems);
+    const [date, setDate] = useState(new Date(Date.now()).setHours(0, 0, 0, 0));
+    const [validFromDate, setValidFromDate] = useState(date);
+    const [validUntilDate, setValidUntilDate] = useState(date + (props.data.duration * 24 * 60 * 60 * 1000));
     const [membershipPrice, setMembershipPrice] = useState(props.data.price);
     const [membershipId, setMembershipId] = useState(props.data.id);
 
+    const handleSave = () => {
+        if(editedCart.some(ele => ele.id === props.data.id)){
+            ToastAndroid.show("Item already in the cart", ToastAndroid.LONG);
+            return;
+        }
+
+        if (new Date(validFromDate).getTime() !== new Date(date).getTime() ||
+            new Date(validUntilDate).getTime() !== new Date(date + (props.data.duration * 24 * 60 * 60 * 1000)).getTime() ||
+            membershipPrice !== props.data.price ||
+            membershipId !== props.data.id) {
+            console.log("props.data")
+            dispatch(addItemToEditedCart({
+                ...props.data,
+                price: membershipPrice,
+                resource_id:null,
+                "id": membershipId,
+                "valid_from": formatDate(validFromDate, "yyyy-d-m"),
+                "valid_until": formatDate(validUntilDate, "yyyy-d-m"),
+            }));
+            dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+            props.onCloseModal();
+            props.closeOverallModal()
+            return;
+        }
+        dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+        props.onCloseModal();
+        props.closeOverallModal()
+    }
 
     return <>
-        {isValidFromDatePickerVisible && (
-            <RNDateTimePicker
-                value={new Date(validFromDate)}
-                mode="date"
-                display="default"
-                onChange={(date) => {
-                    setIsValidFromDatePickerVisible(false);
-                    setValidFromDate(
-                        date.nativeEvent.timestamp
-                    );
-                }}
-            />
-        )}
-        {isValidUntilDatePickerVisible && (
-            <RNDateTimePicker
-                value={new Date(validUntilDate)}
-                mode="date"
-                display="default"
-                onChange={(date) => {
-                    setIsValidUntilDatePickerVisible(false);
-                    setValidUntilDate(
-                        date.nativeEvent.timestamp
-                    );
-                }}
-            />
-        )}
-        <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"} >
+        <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}>
             <View style={styles.headingAndCloseContainer}>
                 <Text style={[textTheme.titleLarge, styles.heading]}>{props.data.name}</Text>
                 <PrimaryButton
@@ -60,56 +73,23 @@ const EditMembershipModal = (props) => {
             </View>
             <Divider/>
             <ScrollView style={{flex: 1,}}>
-
                 <View style={styles.modalContent}>
-                    <Text style={[textTheme.labelLarge]}>Valid from</Text>
-                    <View style={styles.validInputContainer}>
-                        <Text style={[textTheme.bodyLarge]}>{formatDate(validFromDate)}</Text>
-                        <PrimaryButton buttonStyle={styles.calendarButtonStyle} onPress={() => {
-                            setIsValidFromDatePickerVisible(true)
-                        }}>
-                            <MaterialCommunityIcons
-                                name="calendar-month-outline"
-                                size={24}
-                                color={Colors.grey600}
-                            />
-                        </PrimaryButton>
-                    </View>
-                    <Text style={[textTheme.labelLarge]}>Valid until</Text>
-                    <View style={styles.validInputContainer}>
-                        <Text style={[textTheme.bodyLarge]}>{formatDate(validUntilDate)}</Text>
-                        <PrimaryButton buttonStyle={styles.calendarButtonStyle} onPress={() => {
-                            setIsValidUntilDatePickerVisible(true)
-                        }}>
-                            <MaterialCommunityIcons
-                                name="calendar-month-outline"
-                                size={24}
-                                color={Colors.grey600}
-                            />
-                        </PrimaryButton>
-                    </View>
-                    <Text style={[textTheme.labelLarge]}>Membership Price</Text>
-                    <View style={styles.membershipPriceInputContainer}>
-                        <FontAwesome style={styles.rupeeSymbol} name="rupee" size={20} color={Colors.grey600}/>
-                        <TextInput style={[textTheme.bodyLarge, styles.membershipInputText]} keyboardType={"number-pad"}
-                                   value={membershipPrice.toString()}
-                                   onChangeText={(price) => setMembershipPrice(price)}/>
-                    </View>
-                    <Text style={[textTheme.labelLarge]}>Membership ID</Text>
-                    <View style={styles.membershipIDInputContainer}>
-                        <TextInput style={[textTheme.bodyLarge, styles.membershipInputText]}
-                                   value={membershipId.toString()} onChangeText={(_id) => setMembershipId(_id)}/>
-                    </View>
+                    <CustomTextInput label={"Valid from"} type={"date"} value={new Date(validFromDate)}
+                                     onChangeValue={setValidFromDate}/>
+                    <CustomTextInput label={"Valid until"} type={"date"} value={new Date(validUntilDate)}
+                                     onChangeValue={setValidUntilDate}/>
+                    <CustomTextInput label={"Membership Price"} type={"price"} value={membershipPrice.toString()}
+                                     onChangeText={(price) => {
+                                         if (price === "") setMembershipPrice(0)
+                                         else setMembershipPrice(parseFloat(price))
+                                     }}/>
+                    <CustomTextInput type={"number"} readOnly={true} label={"Membership ID"} value={membershipId.toString()}
+                                     onChangeText={(_id) => setMembershipId(_id)}/>
                 </View>
             </ScrollView>
             <View style={styles.addToCartButtonContainer}>
-                <PrimaryButton onPress={() => {
-                    props.onCloseModal();
-                    console.log(props.data);
-                    dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
-                }} label={"Add to cart"}/>
+                <PrimaryButton onPress={handleSave} label={"Add to cart"}/>
             </View>
-
         </Modal>
     </>
 
@@ -136,59 +116,6 @@ const styles = StyleSheet.create({
     modalContent: {
         flex: 1,
         padding: 30,
-    },
-    validInputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderWidth: 1,
-        borderColor: Colors.grey400,
-        borderRadius: 5,
-        paddingLeft: 20,
-        paddingRight: 1,
-        marginTop: 10,
-        marginBottom: 30,
-    },
-    membershipPriceInputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: Colors.grey400,
-        borderRadius: 5,
-        paddingRight: 20,
-        marginTop: 10,
-        marginBottom: 30,
-
-    },
-    calendarButtonStyle: {
-        backgroundColor: Colors.background,
-        alignSelf: "auto",
-        borderRadius: 0,
-        borderLeftWidth: 1,
-        borderLeftColor: Colors.grey400,
-    },
-    rupeeSymbol: {
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        marginRight: 15,
-        borderRightWidth: 1,
-        borderRightColor: Colors.grey400,
-    },
-    membershipIDInputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: Colors.grey400,
-        borderRadius: 5,
-        paddingRight: 20,
-        marginTop: 10,
-        marginBottom: 30,
-        paddingHorizontal: 15,
-        paddingVertical: 7,
-    },
-    membershipInputText: {
-        fontWeight: "500",
-        flex: 1,
     },
     addToCartButtonContainer: {
         marginHorizontal: 30,

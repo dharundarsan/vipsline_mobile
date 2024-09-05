@@ -53,14 +53,18 @@ const MembershipItem = (props) => {
     })
 
     return <>
-        <EditMembershipModal isVisible={isEditMembershipModalVisible} onCloseModal={closeEditMembershipModal} data={props.data} />
+        <EditMembershipModal isVisible={isEditMembershipModalVisible} onCloseModal={closeEditMembershipModal}
+                             data={props.data}
+                             closeOverallModal={props.closeOverallModal}
+
+        />
         <PrimaryButton buttonStyle={styles.membershipItemButton} pressableStyle={styles.membershipItemPressable}
                        onPress={() => {
                            setIsEditMembershipModalVisible(true);
                        }}>
             <View style={styles.leftBar}></View>
             <View style={styles.membershipItemInnerContainer}>
-                <Text style={[styles.nameText, textTheme.titleMedium]}>{capitalizeFirstLetter(props.data.name)}</Text>
+                <Text style={[styles.nameText, textTheme.titleMedium]}>{ props.data.name === null ? capitalizeFirstLetter(props.data.resource_category_name) :  capitalizeFirstLetter(props.data.name)}</Text>
                 <Text style={[styles.durationText, textTheme.labelLarge]}>Duration of
                     Membership: {props.data.duration} days</Text>
                 <Text
