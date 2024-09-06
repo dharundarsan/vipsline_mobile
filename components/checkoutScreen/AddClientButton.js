@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
-import {clearClientInfo} from "../../store/clientInfoSlice";
+import {clearClientInfo, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import React, {useState} from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -25,14 +25,29 @@ const AddClientButton = (props) => {
             {
                 clientInfo.isClientSelected ?
                     <View style={{borderBottomWidth: 1, borderColor: Colors.highlight}}>
+                        <ClientInfoModal
+                            visible={isVisibileModal}
+                            setVisible={setIsVisibleModal}
+                            closeModal={() => {
+                                setIsVisibleModal(false);
+                            }}
+                            phone={clientInfo.details.mobile_1}
+                            name={clientInfo.details.firstName}
+                            id={clientInfo.details.id}
+                            onClose={() => setIsVisibleModal(false)}
+                        />
                         <View style={styles.clientCardContainer}>
                             <ClientCard
                                 phone={clientInfo.details.mobile_1}
                                 name={clientInfo.details.firstName}
                                 email={clientInfo.details.username}
-                                onPress={() => null}
+                                onPress={() => {
+                                    return null;
+                                }}
                                 rippleColor={Colors.transparent}
                                 card={styles.clientCard}
+
+
                             />
                             <View style={styles.actionMenu}>
                                 {clientInfo.details &&
@@ -73,20 +88,9 @@ const AddClientButton = (props) => {
                                     </Pressable>
                                 }
 
-                                <Ionicons name="close" size={24} color="black"/>
+                                <Ionicons name="close" size={24} color="black" onPress={() => dispatch(clearClientInfo())}/>
 
-                                {isVisibileModal && (
-                                    <ClientInfoModal
-                                        visible={isVisibileModal}
-                                        setVisible={setIsVisibleModal}
-                                        closeModal={() => {
-                                            setIsVisibleModal(false);
-                                        }}
-                                        phone={clientInfo.details?.mobile_1}
-                                        name={clientInfo.details?.firstName}
-                                        id={clientInfo.details?.id}
-                                    />
-                                )}
+
                             </View>
                         </View>
                         {isClientInfo ?

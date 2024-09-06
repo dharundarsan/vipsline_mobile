@@ -12,7 +12,11 @@ const initialCartState = {
     calculatedPrice: [],
     customItems: [],
     additionalDiscounts: [],
-    chargesData: [],
+    chargesData: [{
+        name: "",
+        amount: 0,
+        index: 0,
+    }],
     salesNotes: "",
 };
 

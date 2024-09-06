@@ -63,47 +63,51 @@ export default function ClientSegmentScreen() {
     const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
     const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
 
+    const currentFilterClientCount = useSelector(state => state.clientFilter.totalClients);
+
     const [pageNo1, setPageNo1] = useState(0);
     const [maxEntry1, setMaxEntry1] = useState(10);
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const clientFilter = useCallback(async (pageSize, pageNo, filter) => {
-        if (isLoading) return; // Prevent initiating another request if one is already ongoing
+    const [toggle, setToggle] = useState(false);
 
-        setIsLoading(true);
-        try {
-            const response = await axios.post(
-                `${process.env.EXPO_PUBLIC_API_URI}/client/getClientReportBySegmentForBusiness?pageNo=${pageNo}&pageSize=${pageSize}`,
-                {
-                    business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
-                    fromDate: "",
-                    sortItem: "name",
-                    sortOrder: "asc",
-                    toDate: "",
-                    type: filter,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
-                    }
-                }
-            );
-            let count = response.data.data.pop();
-            return response.data.data;
-        } catch (error) {
-            console.error("Error fetching data1: ", error);
-
-        } finally {
-            setIsLoading(false); // Ensure loading state is reset after completion or failure
-        }
-    }, [isLoading]);
-
-    const loadMoreClients = () => {
-        const newPageNo = pageNo1 + 1;
-        setPageNo1(newPageNo);
-        clientFilter(maxEntry1, newPageNo, clientFilterNames(filterPressed));
-    };
+    // const clientFilter = useCallback(async (pageSize, pageNo, filter) => {
+    //     if (isLoading) return; // Prevent initiating another request if one is already ongoing
+    //
+    //     setIsLoading(true);
+    //     try {
+    //         const response = await axios.post(
+    //             `${process.env.EXPO_PUBLIC_API_URI}/client/getClientReportBySegmentForBusiness?pageNo=${pageNo}&pageSize=${pageSize}`,
+    //             {
+    //                 business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+    //                 fromDate: "",
+    //                 sortItem: "name",
+    //                 sortOrder: "asc",
+    //                 toDate: "",
+    //                 type: filter,
+    //             },
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+    //                 }
+    //             }
+    //         );
+    //         let count = response.data.data.pop();
+    //         return response.data.data;
+    //     } catch (error) {
+    //         console.error("Error fetching data1: ", error);
+    //
+    //     } finally {
+    //         setIsLoading(false); // Ensure loading state is reset after completion or failure
+    //     }
+    // }, [isLoading]);
+    //
+    // const loadMoreClients = () => {
+    //     const newPageNo = pageNo1 + 1;
+    //     setPageNo1(newPageNo);
+    //     clientFilter(maxEntry1, newPageNo, clientFilterNames(filterPressed));
+    // };
 
 
 
@@ -119,21 +123,45 @@ export default function ClientSegmentScreen() {
 
     useEffect(() => {
         dispatch(loadClientCountFromDb());
-        setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount))
+        setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
     }, [filterPressed]);
-
-    // useEffect(()=>{
-    //     if(searchQuery.trim().length!==0){
-    //         setSearchQuery("");
-    //     }
-    // },[filterPressed]);
 
     useEffect(() => {
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
+        if (currentFilterClientCount !== clientCount) {
+            dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
+        }
     }, [searchQuery]);
+
+    // useEffect(() => {
+    //     if (clientCount !== currentFilterClientCount) {
+    //         dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
+    //     }
+    // }, [clientCount, currentFilterClientCount, filterPressed]);
+
+    // useEffect(() => {
+    //     if (currentFilterClientCount !== clientCount) {
+    //         if(searchQuery === "") {
+    //             dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
+    //         }
+    //     }
+    // }, [toggle]);
 
 
     function renderItem(itemData) {
+
+
+        // if(searchQuery === "" && (currentFilterClientCount !== clientCount)) {
+        //     if(toggle) {
+        //         setToggle(false)
+        //     }
+        //     else{
+        //         setToggle(true);
+        //     }
+        //     console.log("rerender")
+        //     return ;
+        // }
+
         return (
             <ClientCard
                 name={itemData.item.name}
@@ -156,7 +184,6 @@ export default function ClientSegmentScreen() {
         );
     }
 
-
     function clientInfoHandler() {
         setIsClientInfoModalVisible(true);
     }
@@ -170,6 +197,11 @@ export default function ClientSegmentScreen() {
         // console.log("change", filter);
         setFilterPressed(filter);
     }
+
+    // console.log(filterPressed);
+    // console.log(filterClientsList);
+    // console.log(currentFilterClientCount);
+    // console.log(clientCount);
 
 
 
@@ -207,6 +239,8 @@ export default function ClientSegmentScreen() {
                         <ClientFiltersCategories
                             changeSelectedFilter={changeSelectedFilter}
                             filterPressed={filterPressed}
+                            isLoading={isFetching}
+                            searchLoading={isSearchClientFetching}
                         />
                     </View>
 
