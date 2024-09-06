@@ -21,6 +21,7 @@ import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {updateChargeData, updateDiscount} from "../../store/cartSlice";
+import {checkNullUndefined} from "../../util/Helpers";
 
 
 const CheckoutSection = (props) => {
@@ -30,17 +31,21 @@ const CheckoutSection = (props) => {
     const centralGST = 30;
     const stateGST = 30;
     const calculatedPrice = useSelector(state => state.cart.calculatedPrice)
-    console.log("const calculatedPrice = useSelector(state => state.cart.calculatedPrice)")
-    console.log(calculatedPrice.length)
+    // console.log("const calculatedPrice = useSelector(state => state.cart.calculatedPrice)")
+    // console.log(calculatedPrice.length)
     const customItems = useSelector(state => state.cart.customItems);
+
 
     const itemName = "Shampoo";
     const itemPrice = 500;
 
 
+
     const serviceDiscount = true;
     const productDiscount = false;
     const chargesAmount = useSelector(state => state.cart.chargesData);
+
+    // console.log("amountttttttttttttttttttttttt" + chargesAmount[0].amount)
     const [discountCategory, setDiscountCategory] = useState({
         service: "", product: "", package: "",
     });
@@ -143,7 +148,7 @@ const CheckoutSection = (props) => {
 
     async function addCharges() {
         if (!chargesInputData || chargesInputData.length === 0) {
-            console.error("chargesInputData is not defined or is empty");
+            // console.error("chargesInputData is not defined or is empty");
             return;
         }
 
@@ -151,33 +156,33 @@ const CheckoutSection = (props) => {
         //     console.error('CheckoutSection: Missing data prop');
         //     return null;
         // }
-        console.log("Charges input data: ", chargesInputData);
+        // console.log("Charges input data: ", chargesInputData);
         dispatch(updateChargeData(chargesInputData));
     }
 
 
     async function updateCharges() {
         if (!chargesInputData || chargesInputData.length === 0) {
-            console.error("chargesInputData is not defined or is empty");
+            // console.error("chargesInputData is not defined or is empty");
             return;
         }
         const updatedCharges = chargesInputData.map((item) => {
             // Convert `amount` to a number, default to 0 if conversion fails
             const convertedAmount = parseFloat(item.amount);
-            console.log(convertedAmount);
+            // console.log(convertedAmount);
 
             return {
                 ...item, amount: isNaN(convertedAmount) ? 0 : convertedAmount,
             };
         });
-        console.log(updatedCharges);
-        console.log("124567");
+        // console.log(updatedCharges);
+        // console.log("124567");
 
-        console.log(chargesInputData);
+        // console.log(chargesInputData);
 
         dispatch(updateCalculatedPrice());
 
-        console.log("52622929");
+        // console.log("52622929");
 
         setActionModal(false);
     }
@@ -227,7 +232,7 @@ const CheckoutSection = (props) => {
                 }}
                 dropdownItems={["Apply Discount", "Add Charges", "Add Sales Notes", "Cancel Sales"]}
                 onChangeValue={(value) => {
-                    console.log(value)
+                    // console.log(value)
                     if (value === "Apply Discount") {
                         openModal("Add Discount", value)
                         setData([{
@@ -333,12 +338,19 @@ const CheckoutSection = (props) => {
                                  }
                                  offset={Platform.OS === "ios" ? 0 : 32}
                         >
-                            <Text>{itemName} : ₹ {itemPrice}</Text>
+                            {
+
+                                chargesAmount.map((item, index) => {
+                                    return <Text >{item.name} : ₹ {item.amount}</Text>
+                                })
+                            }
                         </Popover>
                     </View>
 
                     {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
-                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {chargesAmount[0].amount}</Text>
+                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>
+                        ₹ {checkNullUndefined(chargesAmount[0].amount) ? chargesAmount[0].amount : null}
+                    </Text>
                 </View>
                 <View style={styles.buttonContainer}>
                     <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
