@@ -191,9 +191,8 @@ const CheckoutSection = (props) => {
     }
 
     return <View style={styles.checkoutSection}>
-        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
-            setIsPaymentModalVisible(false)
-        }} price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
+
+
         {ActionModal && <MiniActionTextModal isVisible={ActionModal}
                                              onCloseModal={() => {
                                                  setActionModal(false)
