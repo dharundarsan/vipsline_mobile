@@ -1,6 +1,7 @@
-import {View, Text, StyleSheet, Pressable} from "react-native";
+import {View, Text, StyleSheet, Pressable, KeyboardAvoidingView, StatusBar, ScrollView} from "react-native";
 import Colors from "../constants/Colors";
 import SignInHeader from "../components/authScreen/SignInHeader";
+import {SafeAreaView} from "react-native-safe-area-context";
 import PrimaryButton from "../ui/PrimaryButton";
 import {Entypo} from '@expo/vector-icons';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
@@ -26,20 +27,20 @@ function AuthScreen() {
     const navigate = useNavigation();
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb());
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
-        dispatch(loadBusinessesListFromDb());
-        dispatch(loadLoginUserDetailsFromDb());
-    }, []);
+    // useEffect(() => {
+    //     dispatch(loadServicesDataFromDb("women"));
+    //     dispatch(loadServicesDataFromDb("men"));
+    //     dispatch(loadServicesDataFromDb("kids"));
+    //     dispatch(loadServicesDataFromDb("general"));
+    //     dispatch(loadProductsDataFromDb());
+    //     dispatch(loadPackagesDataFromDb());
+    //     dispatch(loadMembershipsDataFromDb());
+    //     dispatch(loadClientsFromDb());
+    //     dispatch(loadClientCountFromDb());
+    //     dispatch(loadClientFiltersFromDb(10, "All"));
+    //     dispatch(loadBusinessesListFromDb());
+    //     dispatch(loadLoginUserDetailsFromDb());
+    // }, []);
 
 
     function signUpHandler() {
@@ -103,7 +104,8 @@ function AuthScreen() {
         },
         signUpContainer: {
             flexDirection: 'row',
-            marginTop: 16
+            marginTop: 16,
+            marginBottom: 32
         },
         signUpText: {
             fontWeight: '600',
@@ -120,7 +122,14 @@ function AuthScreen() {
 
 
     return (
-        <View style={styles.signIn}>
+        <>
+            <StatusBar
+                backgroundColor={Colors.darkBlue} // Change background color
+                barStyle="light-content" // Set the content (icons/text) to light
+            />
+
+        <SafeAreaView style={styles.signIn}>
+            <ScrollView style={{flex: 1, backgroundColor: Colors.white}}>
             <SignInHeader/>
             <View style={styles.body}>
                 <Text style={[textTheme.headlineMedium, styles.signInText]}>Sign in</Text>
@@ -164,7 +173,9 @@ function AuthScreen() {
                     </Pressable>
                 </View>
             </View>
-        </View>
+            </ScrollView>
+        </SafeAreaView>
+        </>
     );
 }
 

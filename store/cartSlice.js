@@ -3,6 +3,7 @@ import uuid from "react-native-uuid";
 import axios from "axios";
 import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialCartState = {
     items: [],
@@ -20,17 +21,42 @@ const initialCartState = {
     salesNotes: "",
 };
 
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            console.log("business token"+ value);
+            return value;
+        }
+    } catch (e) {
+        console.log("business token fetching error." + e);
+    }
+}
+
+
 export const addItemToCart = (data) => async (dispatch, getState) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error.(inside cartSlice addItemsToCart)" + e);
+    }
+
+
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/addItemsToCheckout`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
                 ...data
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -45,16 +71,28 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
 }
 
 export const loadCartFromDB = () => async (dispatch, getState) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
+    }
+
+
+
     const {cart} = getState();
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -67,6 +105,10 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
 }
 
 export const updateCalculatedPrice = () => async (dispatch, getState) => {
+
+
+
+
     const {cart} = getState();
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
@@ -126,18 +168,28 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
 }
 
 export const removeItemFromCart = async (itemId) => async (dispatch, getState) => {
-    const {cart} = getState()
+    const {cart} = getState();
+
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
+    }
 
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/removeFromCart2`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
                 item_id: itemId
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );

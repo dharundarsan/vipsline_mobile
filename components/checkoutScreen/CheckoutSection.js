@@ -22,6 +22,7 @@ import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {updateChargeData, updateDiscount} from "../../store/cartSlice";
 import {checkNullUndefined} from "../../util/Helpers";
+import {loadBusinessesListFromDb} from "../../store/listOfBusinessSlice";
 
 
 const CheckoutSection = (props) => {
@@ -38,6 +39,8 @@ const CheckoutSection = (props) => {
 
     const itemName = "Shampoo";
     const itemPrice = 500;
+
+
 
 
 
@@ -221,7 +224,7 @@ const CheckoutSection = (props) => {
                 // props.setVisible(false);
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
-                await clearCartAPI(process.env.EXPO_PUBLIC_BUSINESS_ID)
+                await clearCartAPI();
                 dispatch(loadCartFromDB());
             }}
         />}
@@ -329,22 +332,34 @@ const CheckoutSection = (props) => {
                 </View>
                 <View style={styles.checkoutDetailRow}>
                     <View>
-                        <Popover popoverStyle={styles.popoverStyle}
-                                 from={
-                                     (<Pressable style={styles.checkoutDetailInnerContainer}>
-                                         <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
-                                         <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
-                                     </Pressable>)
-                                 }
-                                 offset={Platform.OS === "ios" ? 0 : 32}
-                        >
-                            {
+                        {
+                            chargesAmount[0].amount === 0 ?
+                                <Pressable style={styles.checkoutDetailInnerContainer}>
+                                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                    <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                </Pressable> :
+                            <Popover popoverStyle={styles.popoverStyle}
+                                     from={
+                                         (<Pressable style={styles.checkoutDetailInnerContainer}>
+                                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                             <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                         </Pressable>)
+                                     }
+                                     offset={Platform.OS === "ios" ? 0 : 32}
+                            >
+                                {
 
-                                chargesAmount.map((item, index) => {
-                                    return <Text >{item.name} : ₹ {item.amount}</Text>
-                                })
-                            }
-                        </Popover>
+                                    chargesAmount.map((item, index) => {
+                                        return(
+                                            <View key={index}>
+                                                <Text key={index}>{item.name} : ₹ {item.amount}</Text>
+                                            </View>
+
+                                            )
+                                    })
+                                }
+                            </Popover>
+                        }
                     </View>
 
                     {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}

@@ -9,6 +9,7 @@ import findUser from "../../util/apis/findUserApi";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch} from "react-redux";
 import {updateAuthStatus, updateAuthToken} from "../../store/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function EmailLogin() {
     const navigation = useNavigation();
@@ -45,6 +46,14 @@ export default function EmailLogin() {
         navigation.navigate('ForgetPasswordScreen');
     }
 
+    const storeData = async (value) => {
+        try {
+            await AsyncStorage.setItem('my-key', value);
+        } catch (e) {
+            // saving error
+        }
+    };
+
     /** Authentication Logic
      *
      * @returns {Promise<string>}
@@ -63,6 +72,11 @@ export default function EmailLogin() {
                     password: password
                 });
                 dispatch(updateAuthToken(response.data.other_message));
+                try {
+                    await AsyncStorage.setItem('authKey', response.data.other_message);
+                } catch (e) {
+                    console.log("error storing auth token" + e);
+                }
             }
             catch (error) {
                 console.log("could not authenticate with email: " + error);
@@ -77,9 +91,7 @@ export default function EmailLogin() {
 
         if (isAuthenticationSuccessful) {
             setIsPasswordValid(true);
-            navigation.navigate(
-                "ListOfBusinessesScreen",
-            );
+            dispatch(updateAuthStatus(true));
             console.log("Signed In Successfully!!!");
         }
         else {

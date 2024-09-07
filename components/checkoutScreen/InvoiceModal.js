@@ -17,13 +17,22 @@ import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {log} from "expo/build/devtools/logger";
 
 const InvoiceModal = (props) => {
 
     const details = useSelector(state => state.invoice.details);
+    const bookingId = useSelector(state => state.invoice.booking_id1);
+
+    console.log("details");
+    console.log(details);
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
     const dispatch = useDispatch();
+
+    console.log("client: + selectedClientDetails");
+    console.log(selectedClientDetails)
 
     const navigation = useNavigation();
 
@@ -39,10 +48,15 @@ const InvoiceModal = (props) => {
     const cancelReasonRef = useRef(null);
 
     const [email, setEmail] = useState(selectedClientDetails.username);
-    const [phone, setPhone] = useState(selectedClientDetails.mobile_1);
+    const [phone, setPhone] = useState(["+91", selectedClientDetails.mobile_1]);
     const [cancelReason, setCancelReason] = useState("");
 
     const [isCancelled, setIsCancelled] = useState(false);
+    // const [businessId, setBusinessId] = useState("");
+
+    const calculatedPrice = useSelector(state => state.cart.calculatedPrice);
+
+    const businessId = useSelector(state => state.authDetails.businessId);
 
 
     const actualData = details.organized_list;
@@ -54,7 +68,37 @@ const InvoiceModal = (props) => {
 
     const splitPayment = details.split_payment;
 
-    const selectedBusinessDetails = useSelector(state => state.businesses.selectedBusiness);
+    async function getBusinessId() {
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                return value;
+            }
+        } catch (e) {
+            console.log("businessId fetching error. (inside getClientListApi)" + e);
+        }
+    }
+
+
+    console.log("businessId " + businessId);
+    const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
+    // let selectedBusinessDetails = "";
+    // getBusinessId().then(r => {
+    //     console.log("asdlklnhkuidgjkhdb")
+    //     console.log(r)
+    //     setBusinessId(r);
+    // console.log("businessId " + businessId)
+    // });
+    const selectedBusinessDetails = listOfBusinesses.filter((item) => {
+        return item.id === businessId
+    })[0];
+
+    console.log("businessId " + businessId)
+    console.log(listOfBusinesses);
+    console.log("Busones r" + businessId);
+
+    console.log("selectedBusinessDetails.name");
+    console.log(selectedBusinessDetails);
 
     const businessName = selectedBusinessDetails.name;
     const businessContact = selectedBusinessDetails.mobile_1;
@@ -62,7 +106,8 @@ const InvoiceModal = (props) => {
     const businessEmail = selectedBusinessDetails.email;
     const GSTIn = selectedBusinessDetails.gstin;
 
-
+    console.log("business")
+    console.log(selectedBusinessDetails);
 
 
     useEffect(() => {
@@ -97,11 +142,10 @@ const InvoiceModal = (props) => {
                 imageWidth={24}
                 primaryViewChildrenStyle={styles.dropdownInnerContainer}
                 onChangeValue={(value) => {
-                    if(value === "SMS") {
+                    if (value === "SMS") {
                         setSMSModalVisibility(true);
 
-                    }
-                    else if(value === "Email") {
+                    } else if (value === "Email") {
                         setEmailModalVisibility(true);
 
                     }
@@ -121,12 +165,14 @@ const InvoiceModal = (props) => {
                 value={phone[1]}
                 buttonTwoOnPress={() => {
                     const phoneNoValid = phoneNoRef.current();
-                    if(phoneNoValid) {
+                    if (phoneNoValid) {
                         sendSMSAPI(selectedClientDetails.name, phone[1]);
                         setSMSModalVisibility(false)
                     }
                 }}
-                onSave={(callback) => { emailRef.current = callback; }}
+                onSave={(callback) => {
+                    phoneNoRef.current = callback;
+                }}
                 validator={(text) => text.length !== 10 ? "Phone number is invalid" : true}
             />
             <BottomModal
@@ -142,13 +188,15 @@ const InvoiceModal = (props) => {
                 value={email}
                 buttonTwoOnPress={() => {
                     const emailValid = emailRef.current();
-                    if(emailValid) {
+                    if (emailValid) {
                         sendEmailAPI(email);
                         setEmailModalVisibility(false);
                     }
                 }}
                 validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
-                onSave={(callback) => { emailRef.current = callback; }}
+                onSave={(callback) => {
+                    emailRef.current = callback;
+                }}
             />
 
             <BottomModal
@@ -160,16 +208,18 @@ const InvoiceModal = (props) => {
                 label={"Reason"}
                 buttonOneName={"Cancel Invoice"}
                 validator={(text) => text.trim().length === 0 ? "Provide a valid Reason" : true}
-                onSave={(callback) => { cancelReasonRef.current = callback; }}
+                onSave={(callback) => {
+                    cancelReasonRef.current = callback;
+                }}
                 value={cancelReason}
                 onChangeText={(text) => setCancelReason(text)}
                 buttonOneOnPress={() => {
                     const cancelInvoiceValidation = cancelReasonRef.current();
-                    if(cancelInvoiceValidation) {
-                        // props.onCloseModal();
+                    if (cancelInvoiceValidation) {
                         setIsCancelled(true);
                         setCancelInvoiceModalVisibility(false);
-                        cancelInvoiceAPI(cancelReason, "5860d887-a7cc-4d37-8fdb-d025168490d3");
+                        cancelInvoiceAPI(cancelReason, bookingId);
+                        // props.onCloseModal();
                     }
                 }}
                 buttonOneStyle={{borderColor: Colors.error, borderWidth: 1.5}}
@@ -200,9 +250,10 @@ const InvoiceModal = (props) => {
 styles.heading]}>Invoice</Text>*/}
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={() => setCancelInvoiceModalVisibility(true)}
+                onPress={() => setCancelInvoiceModalVisibility(true)
+            }
             >
-                <Ionicons name="close" size={25} color="black" />
+                <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
         <Divider/>
@@ -226,9 +277,9 @@ styles.heading]}>Invoice</Text>*/}
                         <PrimaryButton
                             buttonStyle={styles.backToCheckoutButton}
                             label={"Back to checkout"}
-                            // onPress={() => {
-                            //     props.navigation.navigate("CheckoutScreen");
-                            // }}
+                            onPress={() => {
+                                props.onCloseModal();
+                            }}
                         />
                         <PrimaryButton
                             onPress={() => setOptionModalVisibility(true)}
@@ -277,8 +328,6 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>Email
                             : </Text>{businessEmail}</Text>
                         <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Contact : </Text></Text>
-                        <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
                         </Text>
                     </View>
@@ -310,8 +359,7 @@ styles.heading]}>Invoice</Text>*/}
                     </View>
                     <Table style={styles.cartItemTable}>
                         <Row
-                            textStyle={StyleSheet.flatten({textAlign:
-                                    "center", fontWeight: "bold"})}
+                            textStyle={StyleSheet.flatten({textAlign: "center", fontWeight: "bold"})}
                             style={styles.cartItemTableHead}
                             data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
                         />
@@ -353,7 +401,7 @@ styles.heading]}>Invoice</Text>*/}
                             {(details.sub_total_with_discount).toFixed(2)}</Text>
                     </View>
                     {
-                        props.data[0].tax_details.map((item, index) => (
+                        calculatedPrice[0].tax_details.map((item, index) => (
                             <View key={index} style={styles.calculatepriceRow}>
                                 <Text style={[textTheme.bodyLarge,
                                     styles.checkoutDetailText]}>{item.name}</Text>
@@ -565,7 +613,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         top: '40%',      // Adjust the placement
         left: '0%',     // Adjust the placement
-        transform: [{ rotate: '-35deg' }],  // Rotate the stamp diagonally
+        transform: [{rotate: '-35deg'}],  // Rotate the stamp diagonally
         // opacity: 0.6,    // Slight transparency
         alignItems: 'center',
         paddingVertical: 8,
