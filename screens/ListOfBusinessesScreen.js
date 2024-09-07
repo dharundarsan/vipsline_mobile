@@ -5,8 +5,11 @@ import Divider from "../ui/Divider";
 import BusinessCard from "../components/listOfBusinessesScreen/BusinessCard";
 import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus, updateBusinessId, updateBusinessName} from "../store/authSlice";
-import {loadBusinessesListFromDb, updateSelectedBusinessDetails} from "../store/listOfBusinessSlice";
-import getBusinessNotificationDetailsAPI from "../util/apis/getBusinessNotificationDetailsAPI";
+import {
+    loadBusinessesListFromDb,
+    updateIsBusinessSelected,
+    updateSelectedBusinessDetails
+} from "../store/listOfBusinessSlice";
 import {useEffect, useLayoutEffect} from "react";
 import {
     loadMembershipsDataFromDb,
@@ -17,28 +20,51 @@ import {
 import {loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
 import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
-export default function ListOfBusinessesScreen(props) {
+export default function ListOfBusinessesScreen({navigation}) {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
 
     useLayoutEffect(() => {
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb());
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
+        // dispatch(loadServicesDataFromDb("women"));
+        // dispatch(loadServicesDataFromDb("men"));
+        // dispatch(loadServicesDataFromDb("kids"));
+        // dispatch(loadServicesDataFromDb("general"));
+        // dispatch(loadProductsDataFromDb());
+        // dispatch(loadPackagesDataFromDb());
+        // dispatch(loadMembershipsDataFromDb());
+        // dispatch(loadClientsFromDb());
+        // dispatch(loadClientCountFromDb());
+        // dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
         dispatch(loadLoginUserDetailsFromDb());
     }, []);
 
+
+    async function authToken() {
+
+        let businessId = ""
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                businessId = value;
+            }
+        } catch (e) {
+            console.log("auth token fetching error." + e);
+        }
+
+    }
+
+    const storeData = async (value) => {
+        try {
+            await AsyncStorage.setItem('businessId', value);
+        } catch (e) {
+            console.log("error storing business id save", e);
+        }
+    };
 
     function renderItem(itemData) {
         return (
@@ -48,10 +74,12 @@ export default function ListOfBusinessesScreen(props) {
                 address={itemData.item.address}
                 imageURL={itemData.item.photo}
                 status={itemData.item.verificationStatus}
-                onPress={() => {
+                onPress={async () => {
+                    await storeData(itemData.item.id);
                     dispatch(updateBusinessId(itemData.item.id));
+                    dispatch(updateIsBusinessSelected(true));
                     dispatch(updateSelectedBusinessDetails(itemData.item));
-                    dispatch(updateAuthStatus(true));
+                    navigation.navigate("Checkout");
                 }}
             />
         );
@@ -100,6 +128,7 @@ const styles = StyleSheet.create({
     },
     header: {
         marginVertical: 16,
+
     },
     body: {
         width: "90%",

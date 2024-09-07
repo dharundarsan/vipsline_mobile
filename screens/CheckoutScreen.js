@@ -27,32 +27,78 @@ import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
 import {loadCartFromDB} from "../store/cartSlice";
-import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
+    const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated); // Redux state
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+
+    const checkAuthentication = async () => {
+        try {
+            const authKey = await AsyncStorage.getItem('authKey');
+            if (authKey !== null) {
+                setIsAuthenticated(true); // Update local state if the user is authenticated
+            } else {
+                setIsAuthenticated(false);
+            }
+        } catch (e) {
+            console.log('Error checking authentication:', e);
+            setIsAuthenticated(false);
+        }
+    };
 
 
     useEffect(() => {
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb());
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
-        dispatch(loadBusinessesListFromDb());
-        dispatch(loadLoginUserDetailsFromDb());
-        dispatch(loadStaffsFromDB());
-        dispatch(loadCartFromDB());
-        dispatch(loadBookingDetailsFromDb());
-    }, []);
+        checkAuthentication(); // Initial auth check
+    }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
+
+
+
+    useEffect(() => {
+                dispatch(loadServicesDataFromDb("women"));
+                dispatch(loadServicesDataFromDb("men"));
+                dispatch(loadServicesDataFromDb("kids"));
+                dispatch(loadServicesDataFromDb("general"));
+                dispatch(loadProductsDataFromDb());
+                dispatch(loadPackagesDataFromDb());
+                dispatch(loadMembershipsDataFromDb());
+                dispatch(loadClientsFromDb());
+                dispatch(loadClientCountFromDb());
+                dispatch(loadClientFiltersFromDb(10, "All"));
+                dispatch(loadBusinessesListFromDb());
+                dispatch(loadLoginUserDetailsFromDb());
+                dispatch(loadStaffsFromDB());
+                dispatch(loadCartFromDB());
+                // dispatch(loadBookingDetailsFromDb());
+
+        }, []);
+
+
+
+        //
+        // useEffect(() => {
+        //     dispatch(loadServicesDataFromDb("women"));
+        //     dispatch(loadServicesDataFromDb("men"));
+        //     dispatch(loadServicesDataFromDb("kids"));
+        //     dispatch(loadServicesDataFromDb("general"));
+        //     dispatch(loadProductsDataFromDb());
+        //     dispatch(loadPackagesDataFromDb());
+        //     dispatch(loadMembershipsDataFromDb());
+        //     dispatch(loadClientsFromDb());
+        //     dispatch(loadClientCountFromDb());
+        //     dispatch(loadClientFiltersFromDb(10, "All"));
+        //     dispatch(loadBusinessesListFromDb());
+        //     dispatch(loadLoginUserDetailsFromDb());
+        //     dispatch(loadStaffsFromDB());
+        //     dispatch(loadCartFromDB());
+        //     dispatch(loadBookingDetailsFromDb());
+        // }, []);
+
 
     return (
         <View style={styles.checkoutScreen}>

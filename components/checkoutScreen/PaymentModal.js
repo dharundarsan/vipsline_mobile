@@ -11,8 +11,15 @@ import Entypo from '@expo/vector-icons/Entypo';
 import InvoiceModal from "./InvoiceModal";
 import splitPaymentAPI from "../../util/apis/SplitPaymentAPI";
 import DropdownModal from "../../ui/DropdownModal";
+import checkoutBooking from "../../util/apis/checkoutBookingAPI";
+import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
+import {useDispatch, useSelector} from "react-redux";
+import {loadBookingDetailsFromDb, updateBookingId} from "../../store/invoiceSlice";
 
 const PaymentModal = (props) => {
+    const dispatch = useDispatch();
+
+
     const [selectedPaymentOption, setSelectedPaymentOption] = useState("cash");
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
@@ -25,6 +32,8 @@ const PaymentModal = (props) => {
     const [isError, setIsError] = useState(false);
     const [bodyData, setBodyData] = useState([])
     const [shownCount, setShownCount] = useState(0)
+    const invoiceDetails = useSelector(state => state.invoice.details);
+
 
     const [splitUpState, setSplitUpState] = useState([
             {
@@ -45,6 +54,9 @@ const PaymentModal = (props) => {
             },
         ]
     )
+
+    const cartItems = useSelector((state) => state.cart.items);
+    const details = useSelector(state => state.clientInfo.details);
 
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
@@ -178,13 +190,13 @@ const PaymentModal = (props) => {
                 }
             }
 
-            console.log(splitUpState);
-            console.log("DATA")
-            console.log(data)
+            // console.log(splitUpState);
+            // console.log("DATA")
+            // console.log(data)
 
             const response = await splitPaymentAPI(data);
-            console.log("response")
-            console.log(response)
+            // console.log("response")
+            // console.log(response)
             setSplitResponse(response[0]);
             setStopAPI(true);
         }
@@ -244,7 +256,7 @@ const PaymentModal = (props) => {
                 });
                 setSplitResponse(response);
             }
-            console.log(response);
+            // console.log(response);
         }
         splitApi();
     }
@@ -253,9 +265,15 @@ const PaymentModal = (props) => {
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
         }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment}/>
-        <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
-            setIsInvoiceModalVisible(false)
-        }}/>
+        {
+            isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 ?
+                <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
+                    setIsInvoiceModalVisible(false);
+                    props.onCloseModal();
+                }}/> :
+                null
+        }
+
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
@@ -459,7 +477,7 @@ const PaymentModal = (props) => {
                             </View>
                         }
                     }}/>
-                    { shownCount !== 3 ? <View style={styles.addPaymentButtonContainer}>
+                    {shownCount !== 3 ? <View style={styles.addPaymentButtonContainer}>
                         <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
                                        buttonStyle={styles.addPaymentButton}
                                        pressableStyle={styles.addPaymentButtonPressable}>
@@ -476,7 +494,10 @@ const PaymentModal = (props) => {
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
-                           onPress={() => {
+                           onPress={async () => {
+                               const response = await checkoutBookingAPI(details.id, cartItems);
+                               dispatch(updateBookingId(response[0].booking_id));
+                               dispatch(await loadBookingDetailsFromDb(response[0].booking_id));
                                setIsInvoiceModalVisible(true);
                            }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
