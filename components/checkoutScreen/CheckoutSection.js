@@ -185,7 +185,7 @@ const CheckoutSection = (props) => {
         <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
             setIsPaymentModalVisible(false)
         }} price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} />
-        {ActionModal && <MiniActionTextModal isVisible={ActionModal}
+        <MiniActionTextModal isVisible={ActionModal}
             onCloseModal={() => {
                 setActionModal(false)
             }}
@@ -203,7 +203,7 @@ const CheckoutSection = (props) => {
             updateCharges={updateCharges}
             UpdateSalesNotes={UpdateSalesNotes}
             clearCharges = {clearCharges}
-        />}
+        />
         {isDelete && <DeleteClient
             isVisible={isDelete}
             onCloseModal={() => {

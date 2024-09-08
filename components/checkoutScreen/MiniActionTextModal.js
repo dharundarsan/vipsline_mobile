@@ -7,6 +7,7 @@ import {
   FlatList,
   TextInput,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
@@ -18,7 +19,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 const MiniActionTextModal = React.memo((props) => {
   const dispatch = useDispatch();
@@ -49,7 +50,7 @@ const MiniActionTextModal = React.memo((props) => {
     });
   };
   const getChargeData = useSelector(state => state.cart.chargesData);
-
+  const insets = useSafeAreaInsets();
   return (
     <Modal transparent={true} visible={props.isVisible} animationType="fade">
       <TouchableOpacity
@@ -59,7 +60,10 @@ const MiniActionTextModal = React.memo((props) => {
       >
         <KeyboardAvoidingView
           behavior="position"
-          style={{ maxHeight: "80%", backgroundColor: Colors.white, }}
+          style={{
+            maxHeight: "80%", backgroundColor: Colors.white,
+            paddingBottom: insets.bottom
+          }}
         >
           <SafeAreaView style={{ maxHeight: "85%" }}>
             <View style={styles.modalContent}>
@@ -78,15 +82,15 @@ const MiniActionTextModal = React.memo((props) => {
                         ...item,
                         amount: Number(item.amount) // Convert amount to a number
                       }));
-                      if(updatedChargeData.index === undefined){
-                        updatedChargeData = [{index:0}];
+                      if (updatedChargeData.index === undefined) {
+                        updatedChargeData = [{ index: 0 }];
                       }
                       props.setChargesInputData(updatedChargeData);
                     }
                     // Close the modal regardless of clickedValue
                     props.onCloseModal();
                     console.log(props.chargesInputData);
-                    
+
                   }}
                 >
                   <Entypo
@@ -346,28 +350,28 @@ const MiniActionTextModal = React.memo((props) => {
                         charges: updatedChargesErrors,
                       }));
                       console.log("321");
-                      
+
                       console.log(props.chargesInputData);
-                      
-                      const hasAmountError = errorHandler.charges.every(element => 
+
+                      const hasAmountError = errorHandler.charges.every(element =>
                         element.amountError !== undefined && element.amountError === false
-                    );
-                    
-                    const hasNameError = errorHandler.charges.every(element => 
+                      );
+
+                      const hasNameError = errorHandler.charges.every(element =>
                         element.nameError !== undefined && element.nameError === false
-                    );
-                    const hasContents = props.chargesInputData.every(element => 
-                      element.amount !== undefined && element.name !== undefined
-                    )    
-                    console.log("hasAmountError "+hasAmountError);
-                    console.log(props.chargesInputData[0].amount);
-                    console.log("hasNameError "+hasNameError);
-                    console.log("hasAll " + hasContents);
-                    
-                      
+                      );
+                      const hasContents = props.chargesInputData.every(element =>
+                        element.amount !== undefined && element.name !== undefined
+                      )
+                      console.log("hasAmountError " + hasAmountError);
+                      console.log(props.chargesInputData[0].amount);
+                      console.log("hasNameError " + hasNameError);
+                      console.log("hasAll " + hasContents);
+
+
                       console.log(props.chargesInputData);
-                      
-                      if(hasAmountError && hasNameError && hasContents){
+
+                      if (hasAmountError && hasNameError && hasContents) {
                         await props.addCharges();
                         await props.updateCharges();
                       }

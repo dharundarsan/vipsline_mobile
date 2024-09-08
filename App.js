@@ -42,7 +42,7 @@ import { useFonts } from "expo-font";
 import textTheme from "./constants/TextTheme";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-enableScreens();
+enableScreens(false);
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -103,15 +103,13 @@ const AppNavigator = () => {
     console.log("isAuthenticated " + !!isAuthenticated);
 
     return (
-        <SafeAreaProvider
-        // style={styles.safeAreaView}
-        >
-            <NavigationContainer>
+        <NavigationContainer>
+            <SafeAreaProvider>
                 {isAuthenticated ?
                     <MainDrawerNavigator />
                     : <AuthNavigator />}
-            </NavigationContainer>
-        </SafeAreaProvider>
+            </SafeAreaProvider>
+        </NavigationContainer>
     );
 };
 
