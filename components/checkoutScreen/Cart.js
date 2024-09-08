@@ -22,6 +22,7 @@ const Cart = () => {
     const cartItems = useSelector((state) => state.cart.items);
     const editedMembership = useSelector((state) => state.cart.editedMembership);
     const editedCart = useSelector((state) => state.cart.editedCart);
+    const packageCart = useSelector((state) => state.cart.packageCart);
     const staffs = useSelector((state) => state.staff.staffs);
     // const [customItems, setCustomItems] = useState([]);
     // const [calculatedPrice, setCalculatedPrice] = useState([]);
@@ -143,7 +144,7 @@ console.log(editedMembership.length === 0)
     return (
         <View style={styles.cart}>
             <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>
-            {cartItems.length === 0 && customItems.length === 0 && editedCart.length === 0 && editedMembership.length === 0 ?
+            {cartItems.length === 0 && customItems.length === 0 && editedCart.length === 0 && editedMembership.length === 0 && packageCart.length === 0 ?
                 <View style={styles.emptyCartContainer}>
                     <MaterialIcons style={styles.icon} name="add-shopping-cart" size={40} color={Colors.highlight}/>
                     <Text style={[TextTheme.titleMedium, styles.emptyCartText]}>Your cart is empty</Text>
@@ -154,7 +155,7 @@ console.log(editedMembership.length === 0)
                 <>
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}}
-                                  data={[...cartItems, ...editedCart, ...customItems, ...editedMembership]}
+                                  data={[...cartItems, ...editedCart, ...customItems, ...editedMembership, packageCart[0].packageDetails, ...packageCart[0].packageItems]}
                                   keyExtractor={(item, index) => item}
                                   renderItem={({item}) => <CartItem staffs={staffs} data={item}/>}
                         />
