@@ -1,6 +1,6 @@
 import PrimaryButton from "../../ui/PrimaryButton";
 import {FontAwesome6, Ionicons} from "@expo/vector-icons";
-import {Pressable, StyleSheet, Text, View} from "react-native";
+import {Modal, Pressable, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
@@ -14,12 +14,22 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MemberShipDetailModal from "./MemberShipDetailModal";
+import { loadCartFromDB, updateCalculatedPrice } from "../../store/cartSlice";
 
 const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
     const [isClientInfo, setIsClientInfo] = useState(false)
     const [isVisibileModal, setIsVisibleModal] = useState(false)
+    const [isMembershipModalVisible, setIsMembershipModalVisible] = useState(false)
+    const [storeMembershipId, setStoreMembershipId] = useState(null)
     const dispatch = useDispatch();
+    async function onApplyMembership(clientMembershipId,clientId) {
+        console.log(clientMembershipId);
+        setStoreMembershipId(clientMembershipId)
+        dispatch(loadCartFromDB(clientMembershipId,clientId))
+        // dispatch(updateCalculatedPrice())
+    }
     return (
         <>
             {
@@ -35,10 +45,8 @@ const AddClientButton = (props) => {
                                 card={styles.clientCard}
                             />
                             <View style={styles.actionMenu}>
-                                {clientInfo.details &&
-                                clientInfo.details.wallet_balance !== 0 &&
-                                clientInfo.membershipDetails.length !==0 &&
-                                clientInfo.packageDetails.length !== 0 ? (
+                                {
+                                clientInfo.details ? (
                                     isClientInfo ? (
                                         <Pressable style={[styles.activePlan,{flexDirection:'row',alignItems:"center",
                                             borderColor: Colors.transparent}]} onPress={() => {
@@ -102,9 +110,20 @@ const AddClientButton = (props) => {
                                         </Text>
                                     </PrimaryButton>
                                 }
+                                {
+                                    isMembershipModalVisible &&
+                                    <MemberShipDetailModal isMembershipModalVisible={isMembershipModalVisible} 
+                                    membershipDetails={clientInfo.membershipDetails}
+                                    closeModal = {()=>setIsMembershipModalVisible(false)} 
+                                    onApplyMembership={onApplyMembership}
+                                    storedMembershipId={storeMembershipId}
+                                    />
+                                }
                                 {clientInfo.membershipDetails.length !== 0 &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}>
+                                                   pressableStyle={styles.activePlanPressable}
+                                                   onPress={()=>setIsMembershipModalVisible(true)}
+                                                   >
                                         <Feather name="user-check" size={17} color="black"/>
                                         <Text> Membership</Text>
                                     </PrimaryButton>}

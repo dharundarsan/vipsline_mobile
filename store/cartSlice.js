@@ -12,8 +12,15 @@ const initialCartState = {
     calculatedPrice: [],
     customItems: [],
     additionalDiscounts: [],
-    chargesData: [],
+    chargesData: [{
+        name:"",
+        amount:0,
+        index:0
+    }],
+    // client_membership_map:null,
     salesNotes: "",
+    totalChargeAmount: 0.0,
+
 };
 
 export const addItemToCart = (data) => async (dispatch, getState) => {
@@ -40,13 +47,15 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
     return cart.items.every(item => item.resource_id !== null);
 }
 
-export const loadCartFromDB = () => async (dispatch, getState) => {
+export const loadCartFromDB = (clientMembershipID,clientId) => async (dispatch, getState) => {
     const {cart} = getState();
+    
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
                 business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                client_membership_id:clientMembershipID
             },
             {
                 headers: {
@@ -57,12 +66,13 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
         dispatch(updateItem(response.data.data));
         dispatch(updateEditedMembership({type:"map"}))
         dispatch(updateEditedCart());
-        dispatch(updateCalculatedPrice());
+        dispatch(updateCalculatedPrice(clientMembershipID,clientId));
+        dispatch(updateTotalChargeAmount(cart?.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
     }
 }
 
-export const updateCalculatedPrice = () => async (dispatch, getState) => {
+export const updateCalculatedPrice = (clientMembershipID,clientId) => async (dispatch, getState) => {
     const {cart} = getState();
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
@@ -107,15 +117,16 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                     return item
             })
         ],
-        extra_charges: cart.chargesData,
+        extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
         isWalletSelected: false,
+        // client_membership_id: clientMembershipID === undefined ? null : clientMembershipID,
+        client_membership_id:clientMembershipID,
+        walkInUserId:clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
         wallet_amt: 0
     }).then(response => {
-        console.log("RESPONSE")
-        console.log(response)
         dispatch(setCalculatedPrice(response))
     })
 
@@ -296,6 +307,9 @@ export const cartSlice = createSlice({
         },
         updateSalesNotes(state,action){
             state.salesNotes = action.payload;
+        },
+        updateTotalChargeAmount(state,action){
+            state.totalChargeAmount = action.payload;
         }
     }
 });

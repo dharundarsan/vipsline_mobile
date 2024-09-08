@@ -20,11 +20,14 @@ import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import { updateChargeData } from "../../store/CheckoutActionSlice";
 const MiniActionTextModal = React.memo((props) => {
   const dispatch = useDispatch();
   const [selectedDiscountMode, setSelectedDiscountMode] = useState("PERCENTAGE")
-
+  const [errorHandler, setErrorHandler] = useState({
+    discount: false,
+    charges: [],
+    salesNote: false
+  })
   const addMoreInputs = () => {
     props.setChargesInputData((prev) => {
       const lastId = prev.length > 1 ? prev[prev.length - 1].index : 0;
@@ -33,7 +36,6 @@ const MiniActionTextModal = React.memo((props) => {
         { index: lastId + 1, name: "", amount: "" } // Increment the last ID
       ];
     });
-    console.log(props.chargesInputData);
   };
   const removeInput = (idToRemove) => {
     props.setChargesInputData((prev) => {
@@ -46,7 +48,7 @@ const MiniActionTextModal = React.memo((props) => {
       }));
     });
   };
-
+  const getChargeData = useSelector(state => state.cart.chargesData);
 
   return (
     <Modal transparent={true} visible={props.isVisible} animationType="fade">
@@ -69,7 +71,23 @@ const MiniActionTextModal = React.memo((props) => {
                 <TouchableOpacity style={({ pressed }) => [
                   { opacity: pressed ? 1 : 1 }
                 ]}
-                  onPress={props.onCloseModal}
+                  onPress={() => {
+                    if (props.clickedValue === "Add Charges") {
+                      // Access Redux state and update chargesInputData
+                      let updatedChargeData = getChargeData.map(item => ({
+                        ...item,
+                        amount: Number(item.amount) // Convert amount to a number
+                      }));
+                      if(updatedChargeData.index === undefined){
+                        updatedChargeData = [{index:0}];
+                      }
+                      props.setChargesInputData(updatedChargeData);
+                    }
+                    // Close the modal regardless of clickedValue
+                    props.onCloseModal();
+                    console.log(props.chargesInputData);
+                    
+                  }}
                 >
                   <Entypo
                     name="cross"
@@ -85,7 +103,8 @@ const MiniActionTextModal = React.memo((props) => {
                   return (
                     <View style={{ marginTop: 0 }}>
                       {item.header ?
-                        <Text style={TextTheme.bodyMedium}>{item.header}</Text>
+                        <Text style={[TextTheme.bodyMedium, errorHandler.discount || errorHandler.salesNote ?
+                          { color: Colors.error } : null]}>{item.header}</Text>
                         : null
                       }
                       <View
@@ -99,11 +118,12 @@ const MiniActionTextModal = React.memo((props) => {
                       >
                         {item.boxType === "multiLineBox" ? (
                           <View>
-                            <CustomTextInput type={"multiLine"} onChangeText={props.onChangeValue} />
+                            <CustomTextInput type={"multiLine"} onChangeText={props.onChangeValue} textInputStyle={errorHandler.salesNote ?
+                              { borderColor: Colors.error } : null} />
                           </View>
                         ) : item.boxType === "textBox" ? (
                           <TextInput
-                            style={styles.textInputBox}
+                            style={[styles.textInputBox, errorHandler.discount ? { borderColor: Colors.error } : null]}
                             onChangeText={(value) => {
                               props.setDiscountValue(value);
                             }}
@@ -188,13 +208,24 @@ const MiniActionTextModal = React.memo((props) => {
                           item.boxType === "Charges" ? (
                             <ScrollView>
                               {props.chargesInputData.map((item, index) => {
+                                const chargeError = errorHandler.charges[index]; // Access the error for the current index
                                 return (
                                   <View key={index}>
-                                    <Text style={[TextTheme.bodyMedium, styles.chargeHeader]} onPress={() => removeInput(index)}>
+                                    <Text
+                                      style={[
+                                        TextTheme.bodyMedium,
+                                        styles.chargeHeader,
+                                        chargeError?.nameError ? { color: Colors.error } : null // Apply error color if nameError is true
+                                      ]}
+                                      onPress={() => removeInput(index)}
+                                    >
                                       Item name
                                     </Text>
                                     <TextInput
-                                      style={styles.textInputBox}
+                                      style={[
+                                        styles.textInputBox,
+                                        chargeError?.nameError ? { borderColor: Colors.error } : null // Apply error border color if nameError is true
+                                      ]}
                                       value={item.name} // Track the value from the state
                                       onChangeText={(value) => {
                                         // Update the specific item in the state
@@ -205,10 +236,16 @@ const MiniActionTextModal = React.memo((props) => {
                                         );
                                       }}
                                     />
-                                    <Text style={[TextTheme.bodyMedium, styles.chargeHeader]}>
+                                    <Text
+                                      style={[
+                                        TextTheme.bodyMedium,
+                                        styles.chargeHeader,
+                                        chargeError?.amountError ? { color: Colors.error } : null
+                                      ]}
+                                    >
                                       Price
                                     </Text>
-                                    <View style={styles.chargePriceBoxContainer}>
+                                    <View style={[styles.chargePriceBoxContainer, chargeError?.amountError ? { borderColor: Colors.error } : null]}>
                                       <FontAwesome
                                         name="rupee"
                                         size={20}
@@ -220,7 +257,6 @@ const MiniActionTextModal = React.memo((props) => {
                                         keyboardType="number-pad"
                                         value={item.amount} // Track the value from the state
                                         onChangeText={(value) => {
-                                          // Update the specific item in the state
                                           props.setChargesInputData((prev) =>
                                             prev.map((inputItem, idx) =>
                                               idx === index ? { ...inputItem, amount: value } : inputItem
@@ -233,6 +269,7 @@ const MiniActionTextModal = React.memo((props) => {
                                 );
                               })}
 
+
                               <PrimaryButton
                                 buttonStyle={styles.addItemsWithLogoButton}
                                 onPress={addMoreInputs}
@@ -241,7 +278,7 @@ const MiniActionTextModal = React.memo((props) => {
                                   <Text
                                     style={[TextTheme.titleMedium, styles.addItemWithLogo_text]}
                                   >
-                                    Add items to cart
+                                    Add Extra Charges
                                   </Text>
                                   <MaterialIcons
                                     name="add-circle-outline"
@@ -265,10 +302,10 @@ const MiniActionTextModal = React.memo((props) => {
                       props.addDiscount(selectedDiscountMode, "clear");
                     }
                     else if (props.clickedValue === "Add Sales Notes") {
-                      console.log(props.onChangeValue);
+                      // props.updateSalesNotes();
                     }
                     else if (props.clickedValue === "Add Charges") {
-                      dispatch(updateChargeData([]))
+                      props.clearCharges()
                     }
                   }}
                   style={styles.closeAction}>
@@ -284,16 +321,67 @@ const MiniActionTextModal = React.memo((props) => {
                 <TouchableOpacity
                   onPress={async () => {
                     if (props.clickedValue === "Apply Discount") {
-                      if (props.discountValue.trim().length === 0) return;
+                      if (props.discountValue.trim().length === 0) {
+                        setErrorHandler((prev) => ({
+                          ...prev,
+                          discount: true
+                        }));
+                        return;
+                      }
                       props.addDiscount(selectedDiscountMode);
                     }
                     else if (props.clickedValue === "Add Charges") {
                       console.log("Done:0");
 
-                      await props.addCharges(); // Ensure state is updated before proceeding
-                      await props.updateCharges(); // Now update charges with the correct state
+                      const updatedChargesErrors = props.chargesInputData.map((item) => {
+                        return {
+                          index: item.index,
+                          nameError: !item.name?.trim(), // true if name is empty or missing
+                          amountError: !item.amount?.trim(), // true if amount is empty or missing
+                        };
+                      });
 
+                      setErrorHandler((prev) => ({
+                        ...prev,
+                        charges: updatedChargesErrors,
+                      }));
+                      console.log("321");
+                      
+                      console.log(props.chargesInputData);
+                      
+                      const hasAmountError = errorHandler.charges.every(element => 
+                        element.amountError !== undefined && element.amountError === false
+                    );
+                    
+                    const hasNameError = errorHandler.charges.every(element => 
+                        element.nameError !== undefined && element.nameError === false
+                    );
+                    const hasContents = props.chargesInputData.every(element => 
+                      element.amount !== undefined && element.name !== undefined
+                    )    
+                    console.log("hasAmountError "+hasAmountError);
+                    console.log(props.chargesInputData[0].amount);
+                    console.log("hasNameError "+hasNameError);
+                    console.log("hasAll " + hasContents);
+                    
+                      
+                      console.log(props.chargesInputData);
+                      
+                      if(hasAmountError && hasNameError && hasContents){
+                        await props.addCharges();
+                        await props.updateCharges();
+                      }
                       console.log("Done:1");
+                    }
+                    else if (props.clickedValue === "Add Sales Notes") {
+                      if (props.salesNote.trim().length === 0) {
+                        setErrorHandler(prev => ({
+                          ...prev,
+                          salesNote: true
+                        }));
+                        return;
+                      }
+                      await props.UpdateSalesNotes();
                     }
                   }}
                   style={styles.saveAction}
@@ -302,7 +390,6 @@ const MiniActionTextModal = React.memo((props) => {
                     Save
                   </Text>
                 </TouchableOpacity>
-
               </View>
             </View>
           </SafeAreaView>
