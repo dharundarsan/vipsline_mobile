@@ -155,7 +155,7 @@ console.log(editedMembership.length === 0)
                 <>
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}}
-                                  data={[...cartItems, ...editedCart, ...customItems, ...editedMembership, packageCart[0].packageDetails, ...packageCart[0].packageItems]}
+                                  data={[...cartItems, ...editedCart, ...customItems, ...editedMembership]}
                                   keyExtractor={(item, index) => item}
                                   renderItem={({item}) => <CartItem staffs={staffs} data={item}/>}
                         />
