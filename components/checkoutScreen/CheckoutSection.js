@@ -21,6 +21,8 @@ import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {updateChargeData, updateDiscount} from "../../store/cartSlice";
+import {checkNullUndefined} from "../../util/Helpers";
+import {loadBusinessesListFromDb} from "../../store/listOfBusinessSlice";
 
 
 const CheckoutSection = (props) => {
@@ -30,17 +32,23 @@ const CheckoutSection = (props) => {
     const centralGST = 30;
     const stateGST = 30;
     const calculatedPrice = useSelector(state => state.cart.calculatedPrice)
-    console.log("const calculatedPrice = useSelector(state => state.cart.calculatedPrice)")
-    console.log(calculatedPrice.length)
+    // console.log("const calculatedPrice = useSelector(state => state.cart.calculatedPrice)")
+    // console.log(calculatedPrice.length)
     const customItems = useSelector(state => state.cart.customItems);
+
 
     const itemName = "Shampoo";
     const itemPrice = 500;
 
 
+
+
+
     const serviceDiscount = true;
     const productDiscount = false;
     const chargesAmount = useSelector(state => state.cart.chargesData);
+
+    // console.log("amountttttttttttttttttttttttt" + chargesAmount[0].amount)
     const [discountCategory, setDiscountCategory] = useState({
         service: "", product: "", package: "",
     });
@@ -143,7 +151,7 @@ const CheckoutSection = (props) => {
 
     async function addCharges() {
         if (!chargesInputData || chargesInputData.length === 0) {
-            console.error("chargesInputData is not defined or is empty");
+            // console.error("chargesInputData is not defined or is empty");
             return;
         }
 
@@ -151,41 +159,40 @@ const CheckoutSection = (props) => {
         //     console.error('CheckoutSection: Missing data prop');
         //     return null;
         // }
-        console.log("Charges input data: ", chargesInputData);
+        // console.log("Charges input data: ", chargesInputData);
         dispatch(updateChargeData(chargesInputData));
     }
 
 
     async function updateCharges() {
         if (!chargesInputData || chargesInputData.length === 0) {
-            console.error("chargesInputData is not defined or is empty");
+            // console.error("chargesInputData is not defined or is empty");
             return;
         }
         const updatedCharges = chargesInputData.map((item) => {
             // Convert `amount` to a number, default to 0 if conversion fails
             const convertedAmount = parseFloat(item.amount);
-            console.log(convertedAmount);
+            // console.log(convertedAmount);
 
             return {
                 ...item, amount: isNaN(convertedAmount) ? 0 : convertedAmount,
             };
         });
-        console.log(updatedCharges);
-        console.log("124567");
+        // console.log(updatedCharges);
+        // console.log("124567");
 
-        console.log(chargesInputData);
+        // console.log(chargesInputData);
 
         dispatch(updateCalculatedPrice());
 
-        console.log("52622929");
+        // console.log("52622929");
 
         setActionModal(false);
     }
 
     return <View style={styles.checkoutSection}>
-        <PaymentModal isVisible={isPaymentModalVisible} onCloseModal={() => {
-            setIsPaymentModalVisible(false)
-        }} price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
+
+
         {ActionModal && <MiniActionTextModal isVisible={ActionModal}
                                              onCloseModal={() => {
                                                  setActionModal(false)
@@ -216,7 +223,7 @@ const CheckoutSection = (props) => {
                 // props.setVisible(false);
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
-                await clearCartAPI(process.env.EXPO_PUBLIC_BUSINESS_ID)
+                await clearCartAPI();
                 dispatch(loadCartFromDB());
             }}
         />}
@@ -227,7 +234,7 @@ const CheckoutSection = (props) => {
                 }}
                 dropdownItems={["Apply Discount", "Add Charges", "Add Sales Notes", "Cancel Sales"]}
                 onChangeValue={(value) => {
-                    console.log(value)
+                    // console.log(value)
                     if (value === "Apply Discount") {
                         openModal("Add Discount", value)
                         setData([{
@@ -324,21 +331,40 @@ const CheckoutSection = (props) => {
                 </View>
                 <View style={styles.checkoutDetailRow}>
                     <View>
-                        <Popover popoverStyle={styles.popoverStyle}
-                                 from={
-                                     (<Pressable style={styles.checkoutDetailInnerContainer}>
-                                         <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
-                                         <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
-                                     </Pressable>)
-                                 }
-                                 offset={Platform.OS === "ios" ? 0 : 32}
-                        >
-                            <Text>{itemName} : ₹ {itemPrice}</Text>
-                        </Popover>
+                        {
+                            chargesAmount[0].amount === 0 ?
+                                <Pressable style={styles.checkoutDetailInnerContainer}>
+                                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                    <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                </Pressable> :
+                            <Popover popoverStyle={styles.popoverStyle}
+                                     from={
+                                         (<Pressable style={styles.checkoutDetailInnerContainer}>
+                                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                             <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                         </Pressable>)
+                                     }
+                                     offset={Platform.OS === "ios" ? 0 : 32}
+                            >
+                                {
+
+                                    chargesAmount.map((item, index) => {
+                                        return(
+                                            <View key={index}>
+                                                <Text key={index}>{item.name} : ₹ {item.amount}</Text>
+                                            </View>
+
+                                            )
+                                    })
+                                }
+                            </Popover>
+                        }
                     </View>
 
                     {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
-                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {chargesAmount[0].amount}</Text>
+                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>
+                        ₹ {checkNullUndefined(chargesAmount[0].amount) ? chargesAmount[0].amount : null}
+                    </Text>
                 </View>
                 <View style={styles.buttonContainer}>
                     <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>

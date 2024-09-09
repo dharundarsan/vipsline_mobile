@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialCatalogueState = {
     services: {
@@ -20,17 +21,39 @@ const initialCatalogueState = {
     }
 };
 
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            return value;
+        }
+    } catch (e) {
+        console.log("business token fetching error." + e);
+    }
+}
+
 export const loadServicesDataFromDb = (gender) => async (dispatch) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside catalogueSlice loadServiceDataFromDb)" + e);
+    }
+
     try {
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/resourceCategory/getListOfAllServicesOfBusiness",
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id:await getBusinessId(),
                 gender: gender,
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -41,15 +64,24 @@ export const loadServicesDataFromDb = (gender) => async (dispatch) => {
 };
 
 export const loadProductsDataFromDb = () => async (dispatch) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside catalogueSLice loadProductsDataFromDb)" + e);
+    }
     try {
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/product/getAllProductsOfBusiness",
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -60,15 +92,24 @@ export const loadProductsDataFromDb = () => async (dispatch) => {
 };
 
 export const loadMembershipsDataFromDb = () => async (dispatch) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside catalogueSlice loadMembershipsDataFromDb)" + e);
+    }
     try {
         const response = await axios.post(
              process.env.EXPO_PUBLIC_API_URI + "/membership/getListOfMembershipByBusiness",
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -79,16 +120,25 @@ export const loadMembershipsDataFromDb = () => async (dispatch) => {
 };
 
 export const loadPackagesDataFromDb = () => async (dispatch) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside catalogueSlice loadPackagesDataFromDb)" + e);
+    }
     try {
         const response = await axios.post(
               process.env.EXPO_PUBLIC_API_URI + "/package/getListOfPackagesByBusiness",
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id:await getBusinessId(),
                 status: true
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );

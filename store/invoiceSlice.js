@@ -1,21 +1,40 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialState = {
     details: {},
     isFetching: false,
+    booking_id1: "",
 };
 
-export const loadBookingDetailsFromDb = () => async (dispatch) => {
+
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            return value;
+        }
+    } catch (e) {
+        console.log("business token fetching error." + e);
+    }
+}
+
+
+export const loadBookingDetailsFromDb = (bookingId) => async (dispatch, getState) => {
+
+    const {invoice} = getState();
+
     let response = "";
     try {
         response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + '/appointment/getPaidBookingDetails',
             {
 
-            business_id: "2db7d255-7797-4cce-9590-fc59d2019577",
-            booking_id: "2e54d6dd-3fd4-4962-b481-b801c8e0c53c"
+            business_id: await getBusinessId(),
+            booking_id: bookingId
 
             },
 
@@ -34,12 +53,13 @@ export const loadBookingDetailsFromDb = () => async (dispatch) => {
             process.env.EXPO_PUBLIC_API_URI + '/appointment/invoice',
             {
 
-            business_id: "2db7d255-7797-4cce-9590-fc59d2019577",
-            booking_id: "2e54d6dd-3fd4-4962-b481-b801c8e0c53c"
+            business_id: await getBusinessId(),
+            booking_id: bookingId
 
             },
 
         );
+
 
         dispatch(updateMoreInvoiceDetails(response1.data.data[0]));
 
@@ -52,12 +72,23 @@ export const loadBookingDetailsFromDb = () => async (dispatch) => {
 };
 
 export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
+
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside invoiceSlice loadWalletPriceFromDb)" + e);
+    }
+
     let response = "";
     try {
         response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + '/wallet/getWalletBalanceForClient',
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
                 client_id: clientId,
 
             },
@@ -73,7 +104,7 @@ export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
 
     }
     catch (e) {
-        console.error(e + "wallet error");
+        console.error(e + " wallet error");
     }
 }
 
@@ -92,6 +123,9 @@ export const invoiceSlice = createSlice({
         updateWalletBalance(state, action) {
             state.details = {...state.details, ...action.payload};
         },
+        updateBookingId(state, action) {
+            state.booking_id1 = action.payload;
+        }
 
     }
 });
@@ -99,7 +133,8 @@ export const invoiceSlice = createSlice({
 export const {
     updateInvoiceDetails,
     updateMoreInvoiceDetails,
-    updateWalletBalance
+    updateWalletBalance,
+    updateBookingId
 } = invoiceSlice.actions;
 
 export default invoiceSlice.reducer;

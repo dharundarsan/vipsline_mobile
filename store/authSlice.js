@@ -1,6 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
-import getBusinessNotificationDetailsAPI from "../util/apis/getBusinessNotificationDetailsAPI";
 
 const initialClientState = {
     isAuthenticated: false,

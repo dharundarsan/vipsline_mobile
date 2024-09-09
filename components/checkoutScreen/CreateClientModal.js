@@ -11,6 +11,7 @@ import createNewClientAPI from "../../util/apis/createNewClientAPI";
 import {formatDate} from "../../util/Helpers";
 import {useDispatch} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -62,12 +63,23 @@ const CreateClientModal = (props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
+        let businessId = ""
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                businessId = value;
+            }
+        } catch (e) {
+            console.log("businessId fetching error. (inside createClientModal)" + e);
+        }
+
+
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
             await createNewClientAPI({
                 address: clientAddress,
                 anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
-                businessId: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                businessId: businessId,
                 city: "",
                 clientNotes: clientNotes,
                 clientSource: clientSource,

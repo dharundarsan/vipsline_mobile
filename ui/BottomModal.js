@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Modal, Pressable, Platform} from 'react-native';
+import {View, Text, StyleSheet, Modal, Pressable, Platform, TouchableOpacity} from 'react-native';
 import Colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
 import PrimaryButton from "./PrimaryButton";
@@ -124,10 +124,15 @@ export default function BottomModal(props) {
         <Modal
             visible={props.visible}
             transparent={true}
-            style={{flex: 1, position: "relative"}}
+            style={{flex: 1, position: "relative", borderWidth: 1}}
             animationType={"fade"}
         >
-            <View style={styles.modalContent}>
+            <Pressable style={{flex: 1}} onPress={props.onCloseModal} />
+
+            <TouchableOpacity
+                style={styles.modalContent}
+                activeOpacity={1}
+            >
                 <View style={styles.titleContainer}>
                     <Text style={[textTheme.titleLarge, styles.titleTextStyle, props.titleTextStyle]}>
                         {props.title}
@@ -185,7 +190,7 @@ export default function BottomModal(props) {
                 </View>
 
 
-            </View>
+            </TouchableOpacity>
         </Modal>
 
     );

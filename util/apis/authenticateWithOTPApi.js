@@ -1,8 +1,10 @@
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI} from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default async function authenticateWithOTPApi(mobileNumber, otp, platform) {
     let isAuthenticated;
+
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
     let message = '';
     try {
@@ -13,6 +15,13 @@ export default async function authenticateWithOTPApi(mobileNumber, otp, platform
             platform: platform,
         });
         message = response.data.message;
+
+        try {
+            await AsyncStorage.setItem('authKey', response.data.other_message);
+        } catch (e) {
+            console.log("error storing auth token" + e);
+        }
+
         if (message === "User authenticated") {
             return true;
         } else {

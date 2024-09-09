@@ -11,8 +11,9 @@ import { useSelector, useDispatch } from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import { loadClientsFromDb } from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import { loadClientInfoFromDb } from "../../store/clientInfoSlice";
+import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AddClientModal = (props) => {
     const pageNo = useSelector(state => state.client.pageNo);
@@ -25,7 +26,29 @@ const AddClientModal = (props) => {
     const queryRef = useRef("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const searchClientFromDB = useCallback(async (query, pageNo) => {F
+    async function getBusinessId() {
+        let businessId = ""
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                return value;
+            }
+        } catch (e) {
+            console.log("business token fetching error." + e);
+        }
+    }
+
+    const searchClientFromDB = useCallback(async (query, pageNo) => {
+        let authToken = ""
+        try {
+            const value = await AsyncStorage.getItem('authKey');
+            if (value !== null) {
+                authToken = value;
+            }
+        } catch (e) {
+            console.log("auth token fetching error. (inside AddClientModal)" + e);
+        }
+
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
 
         setIsLoading(true);
@@ -33,12 +56,12 @@ const AddClientModal = (props) => {
             const response = await axios.post(
                 `${process.env.EXPO_PUBLIC_API_URI}/business/searchCustomersOfBusiness?pageSize=50&pageNo=${pageNo}`,
                 {
-                    business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                    business_id: await getBusinessId(),
                     query,
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                        Authorization: `Bearer ${authToken}`
                     }
                 }
             );
@@ -109,8 +132,10 @@ const AddClientModal = (props) => {
                                 email={item.username}
                                 divider={true}
                                 onPress={(clientId) => {
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                    dispatch(updateClientId(item.id));
+                                    dispatch(loadClientInfoFromDb(item.id));
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
                                 }}
                             />
                         )}
@@ -129,8 +154,9 @@ const AddClientModal = (props) => {
                                 email={item.username}
                                 divider={true}
                                 onPress={(clientId) => {
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id))
+                                    dispatch(loadClientInfoFromDb(item.id));
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
                                 }}
                             />
                         )}
