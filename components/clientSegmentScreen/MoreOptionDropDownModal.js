@@ -8,6 +8,18 @@ import CreateClientModal from "../checkoutScreen/CreateClientModal";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import {useDispatch} from "react-redux";
 
+/**
+ * MoreOptionDropDownModal Component
+ *
+ * This component renders a modal that provides additional options, such as "Edit client" or "Delete client", through a dropdown-style interface.
+ *
+ * Props:
+ * @param {boolean} props.isVisible - Controls the visibility of the modal.
+ * @param {function} props.onCloseModal - Function to close the modal.
+ * @param {Array<string>} props.dropdownItems - An array of string items to display as options in the dropdown.
+ * @param {function} props.setOption - Function to set the selected option ("editClient" or "deleteClient").
+ */
+
 
 const MoreOptionDropDownModal = (props) => {
     const textRef = useRef(null);

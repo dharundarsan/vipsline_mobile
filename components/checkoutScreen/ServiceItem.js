@@ -2,7 +2,7 @@ import {StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {addItemToCart} from "../../store/cartSlice";
+import {addItemToCart, updateCalculatedPrice, updateCalculatedprice} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
 
 const ServiceItem = (props) => {
@@ -50,9 +50,9 @@ const ServiceItem = (props) => {
 
     return <PrimaryButton buttonStyle={styles.selectServiceItemButton}
                           pressableStyle={styles.selectServiceItemPressable}
-                          onPress={() => {
+                          onPress={async () => {
                               props.closeOverallModal();
-                              dispatch(addItemToCart({resource_category: props.data.id, resource_id: ""}));
+                              dispatch(addItemToCart({resource_category: props.data.id, resource_id: ""}))
                           }}
     >
         <View style={styles.leftBar}></View>

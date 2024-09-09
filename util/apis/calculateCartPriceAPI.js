@@ -11,7 +11,8 @@ const calculateCartPriceAPI = async (data) => {
                     Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
                 }
             })
-
+            console.log("123");
+            
         return response.data.data;
     } catch (error) {
     }

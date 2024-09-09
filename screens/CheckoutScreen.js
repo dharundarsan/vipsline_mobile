@@ -1,13 +1,13 @@
-import {Image, Pressable, StyleSheet, Text, View} from "react-native";
+import { Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
 import Cart from "../components/checkoutScreen/Cart";
 import AddClientButton from "../components/checkoutScreen/AddClientButton";
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import title from "react-native-paper/src/components/Typography/v2/Title";
-import {useEffect, useLayoutEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -22,17 +22,19 @@ import AddClientModal from "../components/checkoutScreen/AddClientModal";
 import {
     loadClientFiltersFromDb,
 } from "../store/clientFilterSlice";
-import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
-import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
-import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
-import {loadStaffsFromDB} from "../store/staffSlice";
-import {loadCartFromDB} from "../store/cartSlice";
-import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
+import { clearClientInfo, loadClientInfoFromDb } from "../store/clientInfoSlice";
+import { loadBusinessesListFromDb } from "../store/listOfBusinessSlice";
+import { loadLoginUserDetailsFromDb } from "../store/loginUserSlice";
+import { loadStaffsFromDB } from "../store/staffSlice";
+import { loadCartFromDB } from "../store/cartSlice";
+import { loadBookingDetailsFromDb } from "../store/invoiceSlice";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
 
 
@@ -55,14 +57,16 @@ const CheckoutScreen = () => {
     }, []);
 
     return (
-        <View style={styles.checkoutScreen}>
+        <View style={[styles.checkoutScreen, {
+            paddingBottom: insets.bottom
+        }]}>
             <AddClientModal closeModal={() => {
                 setIsAddClientModalVisible(false)
-            }} isVisible={isAddClientModalVisible}/>
+            }} isVisible={isAddClientModalVisible} />
             <AddClientButton onPress={() => {
                 setIsAddClientModalVisible(true)
-            }}/>
-            <Cart/>
+            }} />
+            <Cart />
         </View>
     );
 }

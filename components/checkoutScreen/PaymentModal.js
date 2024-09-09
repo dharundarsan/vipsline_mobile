@@ -11,6 +11,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import InvoiceModal from "./InvoiceModal";
 import splitPaymentAPI from "../../util/apis/SplitPaymentAPI";
 import DropdownModal from "../../ui/DropdownModal";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PaymentModal = (props) => {
     const [selectedPaymentOption, setSelectedPaymentOption] = useState("cash");
@@ -45,6 +46,9 @@ const PaymentModal = (props) => {
             },
         ]
     )
+    console.log("props");
+    console.log(props);
+    
 
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
@@ -248,15 +252,15 @@ const PaymentModal = (props) => {
         }
         splitApi();
     }
-
+    const insets = useSafeAreaInsets();
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
         }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment}/>
-        <InvoiceModal isVisible={isInvoiceModalVisible} onCloseModal={() => {
+        <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
             setIsInvoiceModalVisible(false)
         }}/>
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -471,7 +475,7 @@ const PaymentModal = (props) => {
             </View>
         </ScrollView>
         <Divider/>
-        <View style={styles.buttonContainer}>
+        <View style={[styles.buttonContainer,{paddingBottom:insets.bottom}]}>
             <PrimaryButton buttonStyle={styles.optionButton}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
@@ -494,7 +498,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingVertical: 15,
         alignItems: "center",
     },

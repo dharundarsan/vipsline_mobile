@@ -2,11 +2,25 @@ import {createSlice} from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 import axios from "axios";
 import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
+import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
 
 const initialCartState = {
     items: [],
     isLoading: false,
-    editedItems: []
+    editedMembership: [],
+    editedCart: [],
+    calculatedPrice: [],
+    customItems: [],
+    additionalDiscounts: [],
+    chargesData: [{
+        name:"",
+        amount:0,
+        index:0
+    }],
+    // client_membership_map:null,
+    salesNotes: "",
+    totalChargeAmount: 0.0,
+
 };
 
 export const addItemToCart = (data) => async (dispatch, getState) => {
@@ -33,12 +47,18 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
     return cart.items.every(item => item.resource_id !== null);
 }
 
-export const loadCartFromDB = () => async (dispatch, getState) => {
+export const loadCartFromDB = (clientMembershipID,clientId) => async (dispatch, getState) => {
+    const {cart} = getState();
+    // if(clientMembershipID === undefined || clientId ===undefined) {
+    //     console.log("clientMembershipID clientMembershipID");
+    //     console.log("clientId clientId");
+    // }
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
                 business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                client_membership_id:clientMembershipID
             },
             {
                 headers: {
@@ -47,37 +67,116 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
             }
         );
         dispatch(updateItem(response.data.data));
-        dispatch(updateEditedItems())
+        console.log("Done response.data.data");
+        
+        dispatch(updateEditedMembership({type:"map"}))
+        console.log("Done type:{map}");
+        dispatch(updateEditedCart());
+        console.log("Done updateEditedCart");
+        console.log(clientMembershipID,clientId);
+        dispatch(updateCalculatedPrice(clientMembershipID,clientId));
+        console.log("Done updateCalculatedPrice "+cart?.calculatedPrice.data[0].extra_charges_value);
+        console.log(cart?.calculatedPrice.data[0].extra_charges_value);
+        dispatch(updateTotalChargeAmount(cart?.calculatedPrice.data[0].extra_charges_value));
+        console.log("Done updateTotalChargeAmount");
     } catch (error) {
     }
+}
+
+export const updateCalculatedPrice = (clientMembershipID,clientId) => async (dispatch, getState) => {
+    const {cart} = getState();
+    console.log("clientMembershipID +"+clientMembershipID );
+    console.log("clientId +"+clientId);
+    
+    calculateCartPriceAPI({
+        additional_discounts: cart.additionalDiscounts,
+        additional_services: cart.customItems,
+        cart: cart.items.map(item => {
+            console.log("item.item_id "+item.item_id);
+            return {id: item.item_id}
+        }),
+        coupon_code: "",
+        edited_cart: [...cart.editedMembership.map(item => {
+            return {
+                amount: item.price,
+                bonus_value: 0,
+                disc_value: 0,
+                itemId: item.item_id,
+                membership_id: item.id,
+                membership_number: "",
+                res_cat_id: 282773,
+                resource_id: item.resource_id,
+                type: "AMOUNT",
+                valid_from: item.valid_from,
+                valid_till: item.valid_until,
+                wallet_amount: 0,
+            }
+        }),
+            // ...cart.editedCart
+            ...cart.editedCart.map(item => {
+                if (item.gender === "Products")
+                    return {
+                        amount: item.amount,
+                        bonus_value: 0,
+                        disc_value: item.disc_value,
+                        itemId: item.item_id,
+                        membership_id: 0,
+                        product_id:item.product_id,
+                        resource_id: item.resource_id,
+                        type: "AMOUNT",
+                        valid_from: "",
+                        valid_till: "",
+                        wallet_amount: 0,
+                    }
+                else
+                    return item
+            })
+        ],
+        extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
+        isWalletSelected: false,
+        client_membership_id: clientMembershipID === undefined ? null : clientMembershipID,
+        // client_membership_id:clientMembershipID,
+        walkInUserId:clientId,
+        promo_code: "",
+        user_coupon: "",
+        walkin: "yes",
+        wallet_amt: 0
+    }).then(response => {
+        console.log("1");
+        console.log(response);
+        
+        dispatch(setCalculatedPrice(response))
+        console.log("2");
+        
+    })
+
 }
 
 export const removeItemFromCart = async (itemId) => async (dispatch, getState) => {
     const {cart} = getState()
 
-    // if (cart.items.some(item => item.item_id === itemId)) {
-        try {
-            const response = await axios.post(
-                `${process.env.EXPO_PUBLIC_API_URI}/cart/removeFromCart2`,
-                {
-                    business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
-                    item_id: itemId
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
-                    }
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/cart/removeFromCart2`,
+            {
+                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                item_id: itemId
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
                 }
-            );
-            if(cart.editedItems.some(ele => ele.itemId === itemId)){
-                dispatch(removeItemFromEditedCart(itemId));
             }
-            dispatch(await loadCartFromDB());
-        } catch (error) {
+        );
+        if (cart.editedMembership.some(ele => ele.itemId === itemId)) {
+            dispatch(removeItemFromEditedMembership(itemId));
         }
-    // } else {
-    //     console.log("Fuck you")
-    // }
+        if (cart.editedCart.some(ele => ele.itemId === itemId)) {
+            dispatch(removeItemFromEditedCart(itemId));
+        }
+        dispatch(await loadCartFromDB());
+    } catch (error) {
+    }
 }
 
 export const cartSlice = createSlice({
@@ -96,34 +195,141 @@ export const cartSlice = createSlice({
         updateLoadingState(state, action) {
             state.isLoading = action.payload;
         },
+        addItemToEditedMembership(state, action) {
+            state.editedMembership = [...state.editedMembership, action.payload];
+        },
         addItemToEditedCart(state, action) {
-            state.editedItems = [...state.editedItems, action.payload];
-        },
-        removeItemFromEditedCart(state, action){
-            state.editedItems = state.editedItems.filter(item => item.itemId !== action.payload);
-        },
-        updateEditedItems(state, action) {
-            // console.log('state.editedItems.map(edited => {')
-
-            state.editedItems = state.editedItems.map(edited => {
-                return state.items.filter(item => item.membership_id === edited.id).map(item => {
-                    return {
-                        ...item,
-                        price: edited.price,
-                        id: edited.id,
-                        valid_from: edited.valid_from,
-                        valid_until: edited.valid_until,
-                        edited: true
+            if (state.editedCart.some(item => item.item_id === action.payload.item_id))
+                state.editedCart = state.editedCart.map(edited => {
+                    if (edited.item_id === action.payload.item_id) {
+                        return {
+                            edited,
+                            ...action.payload
+                        }
                     }
+                    return edited;
                 })
-            }).flat()
-
+            else
+                state.editedCart = [...state.editedCart, action.payload];
+        },
+        removeItemFromEditedCart(state, action) {
+            state.editedCart = state.editedCart.filter(item => item.itemId !== action.payload);
+        },
+        removeItemFromEditedMembership(state, action) {
+            state.editedMembership = state.editedMembership.filter(item => item.itemId !== action.payload);
+        },
+        updateEditedCart(state, action) {
             state.items = state.items.filter(item =>
-                !state.editedItems.some(edited => edited.id === item.membership_id)
-            );
-            // state.items = state.editedItems.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
+                !state.editedCart.some(edited => edited.item_id === item.item_id)
+            )
 
-            // console.log(state.editedItems)
+            // state.editedCart = state.editedCart.map(edited => {
+            //     return state.items.filter(item => {
+            //         return item.item_id === edited.itemId;
+            //     }).map(item => {
+            //         console.log("ITEM NAME")
+            //         console.log(item)
+            //         console.log("EDITED NAME")
+            //         console.log(edited)
+            //         return {
+            //             ...item,
+            //             ...edited,
+            //             price: edited.amount,
+            //             amount: edited.amount,
+            //             name: item.resource_category_name,
+            //             resource_category_name: item.resource_category_name
+            //         }
+            //     })
+            // }).flat();
+
+        },
+        updateCustomItem(state, action) {
+            state.customItems = state.customItems.map(edited => {
+                if (edited.item_id === action.payload.item_id) {
+                    return {
+                        ...edited,
+                        ...action.payload
+                    }
+                }
+                return edited;
+            })
+        },
+        updateEditedMembership(state, action) {
+            if(action.payload.type === "map") {
+                state.editedMembership = state.editedMembership.map(edited => {
+                    return state.items.filter(item => {
+                        return item.membership_id === edited.id
+
+                    }).map(item => {
+                        return {
+                            ...item,
+                            price: edited.price,
+                            id: edited.id,
+                            valid_from: edited.valid_from,
+                            valid_until: edited.valid_until,
+                            edited: true
+                        }
+
+                    })
+                }).flat()
+
+                state.items = state.items.filter(item =>
+                    !state.editedMembership.some(edited => edited.id === item.membership_id)
+                );
+            } else if(action.payload.type === "edit"){
+                state.editedMembership = state.editedMembership.map(edited => {
+                    if(edited.item_id === action.payload.id){
+                        return {
+                            ...edited,
+                            itemId:edited.item_id,
+                            item_Id:edited.item_id,
+                            membership_id: edited.membership_id,
+                            membership_number: "",
+                            res_cat_id: action.payload.data.res_cat_id,
+                            resource_id:edited.resource_id,
+                            disc_value: action.payload.data.disc_value,
+                            amount:action.payload.data.amount,
+                            price: action.payload.data.amount,
+                            total_price: action.payload.data.amount,
+                            type: action.payload.data.type,
+                            valid_from: edited.valid_from,
+                            valid_till: edited.valid_until,
+                            wallet_amount: 0,
+                        }
+                    }
+                    return edited;
+                })
+            }
+            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
+
+            // console.log(state.editedMembership)
+        },
+        setCalculatedPrice(state, action) {
+            state.calculatedPrice = action.payload;
+        },
+        addCustomItems(state, action) {
+            const data = {
+                ...action.payload,
+                id: Math.floor(Math.random() * 90000) + 10000
+            }
+            state.customItems = [...state.customItems, data];
+        },
+        removeCustomItems(state, action) {
+            state.customItems = state.customItems.filter(oldItem => oldItem.id !== action.payload);
+        },
+        //Bhaski reducers
+        updateDiscount(state,action){
+            state.additionalDiscounts.pop();
+            state.additionalDiscounts = [action.payload];
+        },
+        updateChargeData(state,action){
+            state.chargesData = action.payload;
+        },
+        updateSalesNotes(state,action){
+            state.salesNotes = action.payload;
+        },
+        updateTotalChargeAmount(state,action){
+            state.totalChargeAmount = action.payload;
         }
     }
 });
@@ -131,9 +337,19 @@ export const cartSlice = createSlice({
 export const {
     updateItem,
     updateLoadingState,
+    addItemToEditedMembership,
+    updateEditedMembership,
+    removeItemFromEditedMembership,
     addItemToEditedCart,
-    updateEditedItems,
-    removeItemFromEditedCart
+    removeItemFromEditedCart,
+    updateEditedCart,
+    setCalculatedPrice,
+    addCustomItems,
+    removeCustomItems,
+    updateCustomItem,
+    updateDiscount,
+    updateChargeData,
+    updateSalesNotes
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

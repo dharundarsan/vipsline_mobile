@@ -9,7 +9,7 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import {MaterialIcons} from '@expo/vector-icons';
 import {useDispatch, useSelector} from "react-redux";
-import {deleteItemFromCart, removeItemFromCart, updateLoadingState} from "../../store/cartSlice";
+import {deleteItemFromCart, removeCustomItems, removeItemFromCart, updateLoadingState} from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import {updateCartItemStaff} from "../../store/staffSlice";
 import EditCartModal from "./EditCartModal";
@@ -22,17 +22,24 @@ const CartItem = (props) => {
         if (isLoading) return;
         dispatch(updateLoadingState(true));
         dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
-            console.log("hello1")
             dispatch(updateLoadingState(false));
         })
+        dispatch(await removeItemFromCart(props.data.item_id))
     }
 
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
 
+    // console.log("selectedStaff")
+    // console.log(selectedStaff)
+    // console.log("cartItem Props data")
+    // console.log(props.data)
+
     return <>
         <View style={styles.cartItem}>
-            <EditCartModal isVisible={isEditCartModalVisible} onCloseModal={() => setIsEditCartModalVisible(false)}
+            <EditCartModal isVisible={isEditCartModalVisible}
+                           // setCalculatedPrice={props.setCalculatedPrice}
+                           onCloseModal={() => setIsEditCartModalVisible(false)}
                            data={props.data}/>
             <DropdownModal isVisible={isStaffDropdownModalVisible}
                            onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
@@ -52,15 +59,15 @@ const CartItem = (props) => {
                         <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
                         <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.price}</Text>
-                        <PrimaryButton onPress={() => setIsEditCartModalVisible(true)}
-                                       buttonStyle={styles.editAmountButton}
-                                       pressableStyle={styles.editAmountPressable}>
+                        { props.data.gender === "membership" ? null : <PrimaryButton onPress={() => setIsEditCartModalVisible(true)}
+                                        buttonStyle={styles.editAmountButton}
+                                        pressableStyle={styles.editAmountPressable}>
                             <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
                             {/*<Feather  name="edit" size={22} color="black"/>*/}
-                        </PrimaryButton>
+                        </PrimaryButton>}
                     </View>
                     <PrimaryButton buttonStyle={styles.closeIconButton} pressableStyle={styles.closeIconPressable}
-                                   onPress={props.data.category === "custom_item" ? () => props.removeCustomItems(props.data.id) : removeItemHandler}>
+                                   onPress={props.data.category === "custom_item" ? () => dispatch(removeCustomItems(props.data.id)) : removeItemHandler}>
                         <Ionicons name="close" size={24} color="black"/>
                     </PrimaryButton>
                 </View>

@@ -5,22 +5,57 @@ import {Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import Colors from "../../constants/Colors";
 import Feather from '@expo/vector-icons/Feather';
-import {Row, Rows, Table} from "react-native-table-component";
+import {Row, Table} from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from "react-redux";
 import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
+import {useNavigation} from "@react-navigation/native";
+import sendEmailAPI from "../../util/apis/sendEmailAPI";
+import sendSMSAPI from "../../util/apis/sendSMSAPI";
+import BottomModal from "../../ui/BottomModal";
+import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const InvoiceModal = (props) => {
 
     const details = useSelector(state => state.invoice.details);
+    const bookingId = useSelector(state => state.invoice.booking_id1);
+
+    // console.log("details");
+    // console.log(details);
+    const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
     const dispatch = useDispatch();
 
+    // console.log("client: + selectedClientDetails");
+    // console.log(selectedClientDetails)
+    
+    const navigation = useNavigation();
+
     const [actionModalVisibility, setActionModalVisibility] = useState(false);
     const [optionModalVisibility, setOptionModalVisibility] = useState(false);
+
+    const [SMSModalVisibility, setSMSModalVisibility] = useState(false);
+    const [emailModalVisibility, setEmailModalVisibility] = useState(false);
+    const [cancelInvoiceModalVisibility, setCancelInvoiceModalVisibility] = useState(false);
+
+    const phoneNoRef = useRef(null);
+    const emailRef = useRef(null);
+    const cancelReasonRef = useRef(null);
+
+    const [email, setEmail] = useState(selectedClientDetails.username);
+    const [phone, setPhone] = useState(["+91", selectedClientDetails.mobile_1]);
+    const [cancelReason, setCancelReason] = useState("");
+
+    const [isCancelled, setIsCancelled] = useState(false);
+    // const [businessId, setBusinessId] = useState("");
+
+    const calculatedPrice = useSelector(state => state.cart.calculatedPrice);
+
+    const businessId = useSelector(state => state.authDetails.businessId);
 
 
     const actualData = details.organized_list;
@@ -32,8 +67,37 @@ const InvoiceModal = (props) => {
 
     const splitPayment = details.split_payment;
 
-    const selectedBusinessDetails = useSelector(state =>
-        state.businesses.selectedBusiness);
+    async function getBusinessId() {
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                return value;
+            }
+        } catch (e) {
+            console.log("businessId fetching error. (inside getClientListApi)" + e);
+        }
+    }
+
+
+    // console.log("businessId " + businessId);
+    const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
+    // let selectedBusinessDetails = "";
+    // getBusinessId().then(r => {
+    //     console.log("asdlklnhkuidgjkhdb")
+    //     console.log(r)
+    //     setBusinessId(r);
+    // console.log("businessId " + businessId)
+    // });
+    const selectedBusinessDetails = listOfBusinesses.filter((item) => {
+        return item.id === businessId
+    })[0];
+
+    // console.log("businessId " + businessId)
+    // console.log(listOfBusinesses);
+    // console.log("Busones r" + businessId);
+
+    // console.log("selectedBusinessDetails.name");
+    // console.log(selectedBusinessDetails);
 
     const businessName = selectedBusinessDetails.name;
     const businessContact = selectedBusinessDetails.mobile_1;
@@ -41,18 +105,19 @@ const InvoiceModal = (props) => {
     const businessEmail = selectedBusinessDetails.email;
     const GSTIn = selectedBusinessDetails.gstin;
 
-    const selectedClientDetails = useSelector(state =>
-        state.clientInfo.details);
+    // console.log("business")
+    // console.log(selectedBusinessDetails);
+
 
     useEffect(() => {
-        dispatch(loadWalletPriceFromDb(selectedClientDetails.id))
-    }, []);
-
+        dispatch(loadWalletPriceFromDb(selectedClientDetails.id));
+    }, [selectedClientDetails]);
 
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}>
         <View style={styles.headingAndCloseContainer}>
+
             <DropdownModal
                 isVisible={actionModalVisibility}
                 onCloseModal={() => {
@@ -65,6 +130,118 @@ const InvoiceModal = (props) => {
                     "A4 Print",
                     "Cancel Invoice"
                 ]}
+                iconImage={[
+                    require("../../assets/icons/invoiceIcons/send.png"),
+                    require("../../assets/icons/invoiceIcons/mail.png"),
+                    require("../../assets/icons/invoiceIcons/printer.png"),
+                    require("../../assets/icons/invoiceIcons/printer.png"),
+                    require("../../assets/icons/invoiceIcons/cancel.png"),
+                ]}
+                imageHeight={24}
+                imageWidth={24}
+                primaryViewChildrenStyle={styles.dropdownInnerContainer}
+                onChangeValue={(value) => {
+                    if (value === "SMS") {
+                        setSMSModalVisibility(true);
+
+                    } else if (value === "Email") {
+                        setEmailModalVisibility(true);
+
+                    }
+                }}
+            />
+
+            <BottomModal
+                visible={SMSModalVisibility}
+                title={"Send SMS"}
+                placeholder={"Enter Phone Number"}
+                type={"phoneNo"}
+                label={"Client Mobile"}
+                buttonOneName={"Cancel"}
+                buttonTwoName={"Send"}
+                onCloseModal={() => setSMSModalVisibility(false)}
+                onChangeText={(text) => setPhone(text)}
+                value={phone[1]}
+                buttonTwoOnPress={() => {
+                    const phoneNoValid = phoneNoRef.current();
+                    if (phoneNoValid) {
+                        sendSMSAPI(selectedClientDetails.name, phone[1]);
+                        setSMSModalVisibility(false)
+                    }
+                }}
+                onSave={(callback) => {
+                    phoneNoRef.current = callback;
+                }}
+                validator={(text) => text.length !== 10 ? "Phone number is invalid" : true}
+            />
+            <BottomModal
+                visible={emailModalVisibility}
+                title={"Send Email"}
+                placeholder={"Enter email address"}
+                type={"email"}
+                label={"Client email"}
+                buttonOneName={"Cancel"}
+                buttonTwoName={"Send"}
+                onCloseModal={() => setEmailModalVisibility(false)}
+                onChangeText={(text) => setEmail(text)}
+                value={email}
+                buttonTwoOnPress={() => {
+                    const emailValid = emailRef.current();
+                    if (emailValid) {
+                        sendEmailAPI(email);
+                        setEmailModalVisibility(false);
+                    }
+                }}
+                validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
+                onSave={(callback) => {
+                    emailRef.current = callback;
+                }}
+            />
+
+            <BottomModal
+                title={"Cancel Invoice"}
+                visible={cancelInvoiceModalVisibility}
+                placeholder={"Enter the Valid Reason"}
+                onCloseModal={() => setCancelInvoiceModalVisibility(false)}
+                type={"multiLine"}
+                label={"Reason"}
+                buttonOneName={"Cancel Invoice"}
+                validator={(text) => text.trim().length === 0 ? "Provide a valid Reason" : true}
+                onSave={(callback) => {
+                    cancelReasonRef.current = callback;
+                }}
+                value={cancelReason}
+                onChangeText={(text) => setCancelReason(text)}
+                buttonOneOnPress={() => {
+                    const cancelInvoiceValidation = cancelReasonRef.current();
+                    if (cancelInvoiceValidation) {
+                        setIsCancelled(true);
+                        setCancelInvoiceModalVisibility(false);
+                        cancelInvoiceAPI(cancelReason, bookingId);
+                        // props.onCloseModal();
+                    }
+                }}
+                buttonOneStyle={{borderColor: Colors.error, borderWidth: 1.5}}
+                buttonOneTextStyle={{color: Colors.error}}
+
+            />
+
+            <DropdownModal
+                isVisible={optionModalVisibility}
+                onCloseModal={() => {
+                    setOptionModalVisibility(false)
+                }}
+                dropdownItems={[
+                    "Go to Appointment",
+                    "Booking history"
+                ]}
+                iconImage={[
+                    require("../../assets/icons/invoiceIcons/send.png"),
+                    require("../../assets/icons/invoiceIcons/mail.png"),
+                ]}
+                imageHeight={24}
+                imageWidth={24}
+                primaryViewChildrenStyle={styles.dropdownInnerContainer}
 
 
             />
@@ -72,7 +249,8 @@ const InvoiceModal = (props) => {
 styles.heading]}>Invoice</Text>*/}
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={props.onCloseModal}
+                onPress={() => setCancelInvoiceModalVisibility(true)
+            }
             >
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
@@ -80,6 +258,15 @@ styles.heading]}>Invoice</Text>*/}
         <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
+                {
+                    isCancelled ?
+                        <View style={styles.cancelledContainer}>
+                            <Text style={[textTheme.titleMedium, styles.cancelledText]}>
+                                CANCELLED
+                            </Text>
+                        </View> :
+                        null
+                }
                 <View style={styles.logoAndButtonContainer}>
                     <Feather name="check-circle" size={50}
                              color={Colors.highlight}/>
@@ -87,11 +274,19 @@ styles.heading]}>Invoice</Text>*/}
                         Complete!</Text>
                     <View style={styles.backAndDropdownButtonContainer}>
                         <PrimaryButton
-                            buttonStyle={styles.backToCheckoutButton} label={"Back to checkout"}/>
+                            buttonStyle={styles.backToCheckoutButton}
+                            label={"Back to checkout"}
+                            onPress={() => {
+                                props.onCloseModal();
+                            }}
+                        />
                         <PrimaryButton
+                            onPress={() => setOptionModalVisibility(true)}
                             buttonStyle={styles.backToCheckoutOptionsButton}>
                             <MaterialIcons name="keyboard-arrow-down"
-                                           size={24} color={Colors.background}/>
+                                           size={24}
+                                           color={Colors.background}
+                            />
                         </PrimaryButton>
                     </View>
 
@@ -132,8 +327,6 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>Email
                             : </Text>{businessEmail}</Text>
                         <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Contact : </Text></Text>
-                        <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
                         </Text>
                     </View>
@@ -165,8 +358,7 @@ styles.heading]}>Invoice</Text>*/}
                     </View>
                     <Table style={styles.cartItemTable}>
                         <Row
-                            textStyle={StyleSheet.flatten({textAlign:
-                                    "center", fontWeight: "bold"})}
+                            textStyle={StyleSheet.flatten({textAlign: "center", fontWeight: "bold"})}
                             style={styles.cartItemTableHead}
                             data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
                         />
@@ -207,19 +399,18 @@ styles.heading]}>Invoice</Text>*/}
                                 styles.checkoutDetailText]}>₹
                             {(details.sub_total_with_discount).toFixed(2)}</Text>
                     </View>
-                    <View style={styles.calculatepriceRow}>
-                        <Text style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>CGST (9%)</Text>
-                        <Text
-                            style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>₹ {(centralGST).toFixed(2)}</Text>
-                    </View>
-                    <View style={styles.calculatepriceRow}>
-                        <Text style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>SGST (9%)</Text>
-                        <Text style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>₹ {(stateGST).toFixed(2)}</Text>
-                    </View>
+                    {
+                        calculatedPrice[0].tax_details.map((item, index) => (
+                            <View key={index} style={styles.calculatepriceRow}>
+                                <Text style={[textTheme.bodyLarge,
+                                    styles.checkoutDetailText]}>{item.name}</Text>
+                                <Text style={[textTheme.bodyLarge,
+                                    styles.checkoutDetailText]}>₹ {(item.value)}</Text>
+                            </View>
+                        ))
+
+                    }
+
                     <Divider/>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.titleMedium,
@@ -296,6 +487,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         flex: 1,
+        // position: 'relative'
     },
     logoAndButtonContainer: {
         justifyContent: "center",
@@ -311,6 +503,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
         flex: 4,
+
     },
     backToCheckoutOptionsButton: {
         flex: 1,
@@ -402,6 +595,32 @@ const styles = StyleSheet.create({
     thankYouText: {
         textAlign: "center",
         marginBottom: 30,
+    },
+    dropdownInnerContainer: {
+        flexDirection: 'row-reverse',
+        justifyContent: 'space-between',
+        // borderWidth: 1,
+        width: '100%',
+        paddingHorizontal: 32
+    },
+    cancelledContainer: {
+        borderWidth: 1.5,
+        borderColor: Colors.error,
+        borderRadius: 8,
+        position: "absolute",
+        width: "100%",
+        backgroundColor: Colors.white,
+        top: '40%',      // Adjust the placement
+        left: '0%',     // Adjust the placement
+        transform: [{rotate: '-35deg'}],  // Rotate the stamp diagonally
+        // opacity: 0.6,    // Slight transparency
+        alignItems: 'center',
+        paddingVertical: 8,
+        zIndex: 1
+    },
+    cancelledText: {
+        color: Colors.error,
+        letterSpacing: 4
     }
 });
 

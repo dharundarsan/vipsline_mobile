@@ -12,6 +12,35 @@ import {loadClientCountFromDb} from "../../store/clientSlice";
 import updateClientAPI from "../../util/apis/updateClientAPI";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
+/**
+ * UpdateClientModal Component
+ *
+ * This component is a modal that allows users to update client information.
+ * It includes input fields for various client attributes such as name, phone number,
+ * email, and more. The modal also includes options to select dates and provide additional
+ * information. Upon saving, the updated client information is sent to the server.
+ *
+ * Props:
+ * @param {boolean} props.isVisible - Controls the visibility of the modal.
+ * @param {object} props.details - An object containing the existing client details to pre-populate
+ *                            the input fields. The object may include fields such as:
+ *                            - `firstName` (string): The client's first name.
+ *                            - `lastName` (string): The client's last name.
+ *                            - `mobile_1` (string): The client's primary mobile number.
+ *                            - `mobile_2` (string): The client's secondary mobile number.
+ *                            - `username` (string): The client's email address.
+ *                            - `gender` (string): The client's gender.
+ *                            - `customer_gst` (string): The client's GST number.
+ *                            - `client_notes` (string): Notes related to the client.
+ *                            - `address` (string): The client's address.
+ *                            - `dob` (string): The client's date of birth in string format.
+ *                            - `anniversary` (string): The client's anniversary date in string format.
+ *                            - `client_source` (string): The source through which the client was acquired.
+ * @param {Function} props.onCloseModal - Function to close the modal and handle any additional logic
+ *                                  after the modal is closed.
+ */
+
+
 const UpdateClientModal = (props) => {
     // const details = useSelector(state => state.clientInfo.details);
     const details = props.details;

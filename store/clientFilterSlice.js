@@ -72,7 +72,6 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
             }
         );
         dispatch(updateTotalSearchClientCount(response.data.data.pop().count));
-        // console.log(response.data.data);
         dispatch(updateSearchClientList(response.data.data));
         dispatch(updateSearchClientFetchingState(false));
 

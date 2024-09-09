@@ -43,6 +43,7 @@ export default function ClientFiltersCategories(props) {
                 imgSource={require("../../assets/icons/churin.png")}
                 onPress={() => props.changeSelectedFilter("inactive_clients_count")}
                 isPressed={props.filterPressed === "inactive_clients_count"}
+
             />
             <ClientFilterCard
                 clientFilterName ="Churn clients"

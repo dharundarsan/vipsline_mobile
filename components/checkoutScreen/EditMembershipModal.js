@@ -18,13 +18,13 @@ import Divider from "../../ui/Divider";
 import {formatDate} from "../../util/Helpers";
 import RNDateTimePicker, {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {addItemToCart, addItemToEditedCart} from "../../store/cartSlice";
+import {addItemToCart, addItemToEditedMembership} from "../../store/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
 
 const EditMembershipModal = (props) => {
     const dispatch = useDispatch();
-    const editedCart = useSelector(state => state.cart.editedItems);
+    const editedMembership = useSelector(state => state.cart.editedMembership);
     const [date, setDate] = useState(new Date(Date.now()).setHours(0, 0, 0, 0));
     const [validFromDate, setValidFromDate] = useState(date);
     const [validUntilDate, setValidUntilDate] = useState(date + (props.data.duration * 24 * 60 * 60 * 1000));
@@ -32,7 +32,7 @@ const EditMembershipModal = (props) => {
     const [membershipId, setMembershipId] = useState(props.data.id);
 
     const handleSave = () => {
-        if(editedCart.some(ele => ele.id === props.data.id)){
+        if(editedMembership.some(ele => ele.id === props.data.id)){
             ToastAndroid.show("Item already in the cart", ToastAndroid.LONG);
             return;
         }
@@ -42,15 +42,17 @@ const EditMembershipModal = (props) => {
             membershipPrice !== props.data.price ||
             membershipId !== props.data.id) {
             console.log("props.data")
-            dispatch(addItemToEditedCart({
+            dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+            dispatch(addItemToEditedMembership({
                 ...props.data,
                 price: membershipPrice,
+                total_price: membershipPrice,
+                amount: membershipPrice,
                 resource_id:null,
                 "id": membershipId,
                 "valid_from": formatDate(validFromDate, "yyyy-d-m"),
                 "valid_until": formatDate(validUntilDate, "yyyy-d-m"),
             }));
-            dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
             props.onCloseModal();
             props.closeOverallModal()
             return;

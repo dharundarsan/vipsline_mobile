@@ -4,6 +4,24 @@ import textTheme from "../../constants/TextTheme";
 import {useEffect, useState} from "react";
 
 
+/**
+ * ClientStatistics Component
+ *
+ * This component displays a set of client statistics in a grid format. It includes various statistics like total visits, last visit, completed appointments, etc., as well as a card for total sales.
+ *
+ * Props:
+ * @param {string} props.title - The title for the statistics section.
+ * @param {string} props.totalSales - The total sales amount for the client.
+ * @param {string} props.totalVisits - The total number of visits made by the client.
+ * @param {string} props.lastVisit - The date of the client's last visit.
+ * @param {string} props.completedAppointment - The number of completed appointments.
+ * @param {string} props.cancelledAppointment - The number of cancelled appointments.
+ * @param {string} props.noShows - The number of no-show appointments.
+ * @param {string} props.feedbackCount - The number of reviews or feedback given by the client.
+ */
+
+
+
 
 export default function ClientStatistics(props) {
 
