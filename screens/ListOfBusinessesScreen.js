@@ -29,16 +29,16 @@ export default function ListOfBusinessesScreen({navigation}) {
     const dispatch = useDispatch();
 
     useLayoutEffect(() => {
-        // dispatch(loadServicesDataFromDb("women"));
-        // dispatch(loadServicesDataFromDb("men"));
-        // dispatch(loadServicesDataFromDb("kids"));
-        // dispatch(loadServicesDataFromDb("general"));
-        // dispatch(loadProductsDataFromDb());
-        // dispatch(loadPackagesDataFromDb());
-        // dispatch(loadMembershipsDataFromDb());
+        dispatch(loadServicesDataFromDb("women"));
+        dispatch(loadServicesDataFromDb("men"));
+        dispatch(loadServicesDataFromDb("kids"));
+        dispatch(loadServicesDataFromDb("general"));
+        dispatch(loadProductsDataFromDb());
+        dispatch(loadPackagesDataFromDb());
+        dispatch(loadMembershipsDataFromDb());
         // dispatch(loadClientsFromDb());
-        // dispatch(loadClientCountFromDb());
-        // dispatch(loadClientFiltersFromDb(10, "All"));
+        dispatch(loadClientCountFromDb());
+        dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
         dispatch(loadLoginUserDetailsFromDb());
     }, []);

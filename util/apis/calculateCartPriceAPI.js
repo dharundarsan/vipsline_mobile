@@ -24,8 +24,8 @@ const calculateCartPriceAPI = async (data) => {
     }
 
     try {
-        console.log("API DATA")
-        console.log(data)
+        // console.log("API DATA")
+        // console.log(data)
         const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + '/appointment/compute/calculatePriceAtCheckout', {
                 ...data,
                 business_id: businessId,
@@ -35,8 +35,8 @@ const calculateCartPriceAPI = async (data) => {
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        console.log("RESULT")
-        console.log(response.data.data)
+        // console.log("RESULT")
+        // console.log(response.data.data)
         return response.data.data;
     } catch (error) {
     }

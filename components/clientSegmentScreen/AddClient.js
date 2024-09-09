@@ -35,7 +35,7 @@ export default function AddClient() {
                 isVisible={isModalVisible}
                 onCloseModal={() => {
                     setIsModalVisible(false);
-                    dispatch(loadClientsFromDb());
+                    // dispatch(loadClientsFromDb());
                 }}
 
             />

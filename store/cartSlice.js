@@ -26,7 +26,7 @@ async function getBusinessId() {
     try {
         const value = await AsyncStorage.getItem('businessId');
         if (value !== null) {
-            console.log("business token"+ value);
+            // console.log("business token"+ value);
             return value;
         }
     } catch (e) {
@@ -160,8 +160,8 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
         walkin: "yes",
         wallet_amt: 0
     }).then(response => {
-        console.log("RESPONSE")
-        console.log(response)
+        // console.log("RESPONSE")
+        // console.log(response)
         dispatch(setCalculatedPrice(response))
     })
 

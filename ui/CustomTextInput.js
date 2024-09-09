@@ -113,7 +113,7 @@ const CustomTextInput = (props) => {
                     placeholder={props.placeholder}
                     onBlur={() => handleSave()}
                     onChangeText={(text) => {
-                        console.log(text);
+                        // console.log(text);
                         props.onChangeText(text);
                         if (error && props.validator && props.validator(text) === true) {
                             setError(false);

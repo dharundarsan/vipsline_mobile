@@ -85,7 +85,7 @@ export const staffSlice = createSlice({
     reducers: {
         updateStaffs(state, action) {
             state.staffs = action.payload;
-            console.log("state: "+state);
+            // console.log("state: "+state);
         },
     }
 });
