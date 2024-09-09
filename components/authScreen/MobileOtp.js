@@ -42,7 +42,7 @@ export default function MobileOtp() {
 
         }
         catch (error) {
-            console.log("user not found: " + error);
+            // console.log("user not found: " + error);
         }
 
         // console.log(response);
@@ -66,7 +66,7 @@ export default function MobileOtp() {
                 setIsUserFound(true);
             }
             catch (error) {
-                console.log("sendOtp error: " + error);
+                // console.log("sendOtp error: " + error);
             }
 
         }

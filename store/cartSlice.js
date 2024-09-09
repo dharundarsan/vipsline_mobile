@@ -12,8 +12,15 @@ const initialCartState = {
     calculatedPrice: [],
     customItems: [],
     additionalDiscounts: [],
-    chargesData: [],
+    chargesData: [{
+        name:"",
+        amount:0,
+        index:0
+    }],
+    // client_membership_map:null,
     salesNotes: "",
+    totalChargeAmount: 0.0,
+
 };
 
 export const addItemToCart = (data) => async (dispatch, getState) => {
@@ -40,13 +47,18 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
     return cart.items.every(item => item.resource_id !== null);
 }
 
-export const loadCartFromDB = () => async (dispatch, getState) => {
+export const loadCartFromDB = (clientMembershipID,clientId) => async (dispatch, getState) => {
     const {cart} = getState();
+    // if(clientMembershipID === undefined || clientId ===undefined) {
+    //     console.log("clientMembershipID clientMembershipID");
+    //     console.log("clientId clientId");
+    // }
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
                 business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                client_membership_id:clientMembershipID
             },
             {
                 headers: {
@@ -55,19 +67,32 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
             }
         );
         dispatch(updateItem(response.data.data));
+        console.log("Done response.data.data");
+        
         dispatch(updateEditedMembership({type:"map"}))
+        console.log("Done type:{map}");
         dispatch(updateEditedCart());
-        dispatch(updateCalculatedPrice());
+        console.log("Done updateEditedCart");
+        console.log(clientMembershipID,clientId);
+        dispatch(updateCalculatedPrice(clientMembershipID,clientId));
+        console.log("Done updateCalculatedPrice "+cart?.calculatedPrice.data[0].extra_charges_value);
+        console.log(cart?.calculatedPrice.data[0].extra_charges_value);
+        dispatch(updateTotalChargeAmount(cart?.calculatedPrice.data[0].extra_charges_value));
+        console.log("Done updateTotalChargeAmount");
     } catch (error) {
     }
 }
 
-export const updateCalculatedPrice = () => async (dispatch, getState) => {
+export const updateCalculatedPrice = (clientMembershipID,clientId) => async (dispatch, getState) => {
     const {cart} = getState();
+    console.log("clientMembershipID +"+clientMembershipID );
+    console.log("clientId +"+clientId);
+    
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
         cart: cart.items.map(item => {
+            console.log("item.item_id "+item.item_id);
             return {id: item.item_id}
         }),
         coupon_code: "",
@@ -107,16 +132,22 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                     return item
             })
         ],
-        extra_charges: cart.chargesData,
+        extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
         isWalletSelected: false,
+        client_membership_id: clientMembershipID === undefined ? null : clientMembershipID,
+        // client_membership_id:clientMembershipID,
+        walkInUserId:clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
         wallet_amt: 0
     }).then(response => {
-        console.log("RESPONSE")
-        console.log(response)
+        console.log("1");
+        console.log(response);
+        
         dispatch(setCalculatedPrice(response))
+        console.log("2");
+        
     })
 
 }
@@ -296,6 +327,9 @@ export const cartSlice = createSlice({
         },
         updateSalesNotes(state,action){
             state.salesNotes = action.payload;
+        },
+        updateTotalChargeAmount(state,action){
+            state.totalChargeAmount = action.payload;
         }
     }
 });
