@@ -41,6 +41,7 @@ export default async function clearCartAPI() {
             console.log("2")
             
             console.log(response.data);
+
         } catch (e) {
             // throw e.response.data.other_message;
             console.log(e.response.data);

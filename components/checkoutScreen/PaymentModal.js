@@ -15,6 +15,7 @@ import checkoutBooking from "../../util/apis/checkoutBookingAPI";
 import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
 import {useDispatch, useSelector} from "react-redux";
 import {loadBookingDetailsFromDb, updateBookingId} from "../../store/invoiceSlice";
+import updateAPI from "../../util/apis/updateAPI";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -495,10 +496,27 @@ const PaymentModal = (props) => {
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
                            onPress={async () => {
-                               const response = await checkoutBookingAPI(details.id, cartItems);
-                               dispatch(updateBookingId(response[0].booking_id));
-                               dispatch(await loadBookingDetailsFromDb(response[0].booking_id));
-                               setIsInvoiceModalVisible(true);
+                               try {
+                                   console.clear();
+                                   console.log("Before init " + new Date());
+
+                                   const response = await checkoutBookingAPI(details.id, cartItems);
+                                   console.log("After init " + new Date());
+
+                                   dispatch(updateBookingId(response[0].booking_id));
+
+                                   // Assuming dispatch is an asynchronous action creator
+                                   await dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                                   console.log("Loading " + new Date());
+
+                                   await updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
+                                   setIsInvoiceModalVisible(true);
+                                   console.log("Loaded " + new Date());
+
+                               } catch (error) {
+                                   console.error("An error occurred:", error);
+                                   // Handle the error appropriately here
+                               }
                            }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>

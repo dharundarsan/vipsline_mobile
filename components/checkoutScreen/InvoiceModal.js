@@ -19,6 +19,9 @@ import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {log} from "expo/build/devtools/logger";
+import clearCartAPI from "../../util/apis/clearCartAPI";
+import {clearClientInfo} from "../../store/clientInfoSlice";
+import {loadCartFromDB} from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
 
@@ -111,7 +114,14 @@ const InvoiceModal = (props) => {
 
 
     useEffect(() => {
-        dispatch(loadWalletPriceFromDb(selectedClientDetails.id));
+        async function api() {
+            try {
+                dispatch(await loadWalletPriceFromDb(selectedClientDetails.id));
+            } catch (e) {
+                console.log("Get wallet balance api error: " + e.response.data.message)
+            }
+        }
+        api();
     }, [selectedClientDetails]);
 
 
@@ -251,7 +261,7 @@ styles.heading]}>Invoice</Text>*/}
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={() => setCancelInvoiceModalVisibility(true)
-            }
+                }
             >
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
@@ -278,6 +288,9 @@ styles.heading]}>Invoice</Text>*/}
                             buttonStyle={styles.backToCheckoutButton}
                             label={"Back to checkout"}
                             onPress={() => {
+                                clearCartAPI();
+                                dispatch(loadCartFromDB());
+                                dispatch(clearClientInfo());
                                 props.onCloseModal();
                             }}
                         />
