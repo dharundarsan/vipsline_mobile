@@ -22,7 +22,7 @@ const MembershipsAndPackagesList = (props) => {
 
     const searchData = (searchValue) => {
         const lowerCaseFilterValue = searchValue.toLowerCase();
-        console.log(data);
+        // console.log(data);
         setFilteredData(data.filter(item => {
             if (props.category === "memberships")
                 return item.name.toLowerCase().includes(searchValue) || item.price.toString().includes(searchValue)

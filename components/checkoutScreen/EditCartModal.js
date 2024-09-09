@@ -24,8 +24,8 @@ const EditCartModal = (props) => {
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage");
     const [discountValue, setDiscountValue] = useState(0);
     const [discountAmount, setDiscountAmount] = useState(0);
-    console.log("props.dataaaaaa")
-    console.log(props.data)
+    // console.log("props.dataaaaaa")
+    // console.log(props.data)
     const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
     console.log("Price")

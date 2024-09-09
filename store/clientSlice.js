@@ -2,6 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useSelector} from "react-redux";
 
 const initialClientState = {
     pageNo: 0,
@@ -9,7 +10,6 @@ const initialClientState = {
     clientCount: [],
     isFetching: false,
 };
-
 async function getBusinessId() {
     let businessId = ""
     try {
@@ -33,15 +33,31 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
         console.log("auth token fetching error. (inside clientSlice loadClientFromDb)" + e);
     }
 
-    const { client } = getState();
-    if (client.isFetching) return;
+    // let businessId = ""
+    // try {
+    //     const value = await AsyncStorage.getItem('businessId');
+    //     if (value !== null) {
+    //         return value;
+    //     }
+    // } catch (e) {
+    //     console.log("business token fetching error." + e);
+    // }
+
+
+    const { client, authDetails } = getState();
+
+    console.log("client.isFetching "+client.isFetching)
+    console.log("business id insiside slice : " + await getBusinessId());
 
     try {
+    if (client.isFetching) return;
+        console.log("Update Fetch")
         dispatch(updateFetchingState(true));
+        console.log("client.isFetching ++"+ client.isFetching)
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${client.pageNo}&pageSize=20`,
             {
-                business_id: await getBusinessId(),
+                business_id: "2db7d255-7797-4cce-9590-fc59d2019577",
             },
             {
                 headers: {
@@ -49,6 +65,8 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
                 }
             }
         );
+
+        // console.log("business id inside the slice: " + await getBusinessId());
         dispatch(updateClientsList(response.data.data));
         dispatch(updateFetchingState(false));
     } catch (error) {
@@ -97,6 +115,7 @@ export const clientSlice = createSlice({
             state.clientCount = action.payload;
         },
         updateFetchingState(state, action) {
+            console.log("Done done done" + action.payload);
             state.isFetching = action.payload;
         }
     }

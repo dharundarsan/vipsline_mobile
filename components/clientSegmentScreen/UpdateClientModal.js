@@ -93,6 +93,7 @@ const UpdateClientModal = (props) => {
     };
 
     const clientId = useSelector(state => state.clientInfo.clientId);
+    const businessId = useSelector(state => state.authDetails.businessId);
 
 
 
@@ -112,7 +113,7 @@ const UpdateClientModal = (props) => {
             await updateClientAPI(clientId, {
                 address: clientData.clientAddress,
                 anniversary: clientData.isAnniversarySelected ? formatDate(clientData.anniversaryDate, "yyyy-mm-dd") : "",
-                businessId: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                businessId: businessId,
                 city: "",
                 clientNotes: clientData.clientNotes,
                 clientSource: clientData.clientSource,
