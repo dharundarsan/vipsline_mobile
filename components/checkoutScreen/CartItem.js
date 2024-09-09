@@ -14,7 +14,7 @@ import {
     removeCustomItems,
     removeItemFromCart,
     removeItemFromEditedCart, updateEditedCart,
-    updateLoadingState
+    updateLoadingState, updateStaffInEditedCart
 } from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import {updateCartItemStaff} from "../../store/staffSlice";
@@ -46,18 +46,21 @@ const CartItem = (props) => {
 
     return <>
         <View style={styles.cartItem}>
-            <PrepaidModal edited={true} data={props.data} isVisible={isEditPrepaidModalVisible}
-                          onCloseModal={() => setIsEditPrepaidModalVisible(false)}/>
-            <EditCartModal isVisible={isEditCartModalVisible}
-                // setCalculatedPrice={props.setCalculatedPrice}
-                           onCloseModal={() => setIsEditCartModalVisible(false)}
-                           data={props.data}/>
+            {isEditPrepaidModalVisible &&
+                <PrepaidModal edited={true} data={props.data} isVisible={isEditPrepaidModalVisible}
+                              onCloseModal={() => setIsEditPrepaidModalVisible(false)}/>}
+            {isEditCartModalVisible && <EditCartModal isVisible={isEditCartModalVisible}
+                                                      onCloseModal={() => setIsEditCartModalVisible(false)}
+                                                      data={props.data}/>}
+
             <DropdownModal isVisible={isStaffDropdownModalVisible}
                            onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
-                           object={true} objectName={"name"} selectedValue={selectedStaff} onChangeValue={(value) => {
-                dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
-                setSelectedStaff(value)
-            }}/>
+                           object={true} objectName={"name"} selectedValue={selectedStaff}
+                           onChangeValue={(value) => {
+                               dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
+                               dispatch(updateStaffInEditedCart({itemId: props.data.item_id, resource_id: value.id}));
+                               setSelectedStaff(value)
+                           }}/>
             <View style={styles.itemNameAndDetailsContainer}>
                 {props.data.gender === "prepaid" ? <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>Prepaid value

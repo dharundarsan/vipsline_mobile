@@ -247,6 +247,17 @@ export const cartSlice = createSlice({
             else
                 state.editedCart = [...state.editedCart, action.payload];
         },
+        updateStaffInEditedCart(state, action){
+            state.editedCart = state.editedCart.map(item => {
+                if(action.payload.itemId === item.item_id){
+                    return {
+                        ...item,
+                        resource_id: action.payload.resource_id
+                    }
+                }
+                return item;
+            })
+        },
         removeItemFromEditedCart(state, action) {
             state.editedCart = state.editedCart.filter(item => item.itemId !== action.payload);
         },
@@ -257,6 +268,15 @@ export const cartSlice = createSlice({
             state.items = state.items.filter(item =>
                 !state.editedCart.some(edited => edited.item_id === item.item_id)
             )
+        },
+        clearLocalCart(state, action){
+            state.items = [];
+            state.editedCart = [];
+            state.editedMembership = [];
+            state.customItems = [];
+            state.packageCart = [];
+            state.additionalDiscounts = [];
+            state.chargesData = initialCartState.chargesData;
         },
         updateCustomItem(state, action) {
             state.customItems = state.customItems.map(edited => {
@@ -376,6 +396,9 @@ export const cartSlice = createSlice({
             });
 
             state.items = state.items.filter(item => item.gender !== "packages");
+        },
+        clearCalculatedPrice(state, action) {
+            state.calculatedPrice = [];
         }
 
     }
@@ -398,7 +421,10 @@ export const {
     updateChargeData,
     updateSalesNotes,
     addItemsToPackageCart,
-    updatePackageCart
+    updatePackageCart,
+    clearCalculatedPrice,
+    updateStaffInEditedCart,
+    clearLocalCart
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

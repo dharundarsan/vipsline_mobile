@@ -21,7 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {log} from "expo/build/devtools/logger";
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
-import {loadCartFromDB} from "../../store/cartSlice";
+import {clearCalculatedPrice, clearLocalCart, loadCartFromDB} from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
 
@@ -289,8 +289,9 @@ styles.heading]}>Invoice</Text>*/}
                             label={"Back to checkout"}
                             onPress={() => {
                                 clearCartAPI();
-                                dispatch(loadCartFromDB());
+                                dispatch(clearLocalCart());
                                 dispatch(clearClientInfo());
+                                dispatch(clearCalculatedPrice());
                                 props.onCloseModal();
                             }}
                         />
