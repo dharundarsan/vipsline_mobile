@@ -8,27 +8,26 @@ import Divider from "../../ui/Divider";
 import axios from "axios";
 import {formatDate} from "../../util/Helpers";
 import Entypo from '@expo/vector-icons/Entypo';
-import {addItemToCart, loadCartFromDB} from "../../store/cartSlice";
+import {addItemsToPackageCart, addItemToCart, loadCartFromDB} from "../../store/cartSlice";
 import packageSittingItem from "./PackageSittingItem";
 import PackageSittingItem from "./PackageSittingItem";
 import {useDispatch} from "react-redux";
 
-const   PackageModal = (props) => {
+const PackageModal = (props) => {
     const [packageDetails, setPackageDetails] = useState([]);
     const [selectedSittingItems, setSelectedSittingItems] = useState([]);
     const dispatch = useDispatch();
 
     const addSittingItems = (item) => {
         setSelectedSittingItems(prev => [...prev, item]);
-        // console.log(selectedSittingItems);
+        console.log(selectedSittingItems);
     }
 
     // const deleteSittingItems = (item) => {
     //     setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
     // }
     useEffect(() => {
-        // console.log(selectedSittingItems);
-
+        console.log(selectedSittingItems);
     }, [selectedSittingItems]);
 
     useEffect(() => {
@@ -79,13 +78,15 @@ const   PackageModal = (props) => {
                 {packageDetails.length === 0 ? <ActivityIndicator/> :
                     <FlatList scrollEnabled={false} data={packageDetails[0].service_list}
                               renderItem={({item}) => <PackageSittingItem data={item}
-                                                                          addSittingItems={addSittingItems}/>}/>
+                                                                          addSittingItems={addSittingItems}/>
+                              }
+                    />
                 }
             </ScrollView>
         </View>
         <Divider/>
         <View style={styles.saveButtonContainer}>
-            <PrimaryButton onPress={() => {
+            <PrimaryButton onPress={async () => {
                 dispatch(addItemToCart({package_id: props.data.id}));
                 selectedSittingItems.forEach((item) => {
                     dispatch(addItemToCart({

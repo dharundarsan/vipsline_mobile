@@ -19,6 +19,7 @@ const initialCartState = {
         index: 0,
     }],
     salesNotes: "",
+    packageCart: []
 };
 
 async function getBusinessId() {
@@ -60,7 +61,7 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
                 }
             }
         );
-        dispatch(loadCartFromDB());
+        dispatch(await loadCartFromDB())
     } catch (error) {
     }
 }
@@ -98,14 +99,13 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
         dispatch(updateItem(response.data.data));
         dispatch(updateEditedMembership({type: "map"}))
         dispatch(updateEditedCart());
+        dispatch(updatePackageCart());
         dispatch(updateCalculatedPrice());
     } catch (error) {
     }
 }
 
 export const updateCalculatedPrice = () => async (dispatch, getState) => {
-
-
     const {cart} = getState();
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
@@ -144,6 +144,20 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                         valid_from: "",
                         valid_till: "",
                         wallet_amount: 0,
+                    }
+                else if (item.gender === "prepaid")
+                    return {
+                        amount: 0,
+                        bonus_value: item.wallet_bonus,
+                        disc_value: 0,
+                        itemId: item.item_id,
+                        membership_id: 0,
+                        resource_id: item.resource_id,
+                        type: "AMOUNT",
+                        valid_from: "",
+                        valid_till: "",
+                        wallet_amount: item.wallet_amount,
+                        wallet_description: item.wallet_description
                     }
                 else
                     return item
@@ -243,26 +257,6 @@ export const cartSlice = createSlice({
             state.items = state.items.filter(item =>
                 !state.editedCart.some(edited => edited.item_id === item.item_id)
             )
-
-            // state.editedCart = state.editedCart.map(edited => {
-            //     return state.items.filter(item => {
-            //         return item.item_id === edited.itemId;
-            //     }).map(item => {
-            //         console.log("ITEM NAME")
-            //         console.log(item)
-            //         console.log("EDITED NAME")
-            //         console.log(edited)
-            //         return {
-            //             ...item,
-            //             ...edited,
-            //             price: edited.amount,
-            //             amount: edited.amount,
-            //             name: item.resource_category_name,
-            //             resource_category_name: item.resource_category_name
-            //         }
-            //     })
-            // }).flat();
-
         },
         updateCustomItem(state, action) {
             state.customItems = state.customItems.map(edited => {
@@ -348,7 +342,42 @@ export const cartSlice = createSlice({
         },
         updateSalesNotes(state, action) {
             state.salesNotes = action.payload;
+        },
+        addItemsToPackageCart(state, action) {
+            state.packageCart = [...state.packageCart, action.payload];
+        },
+        updatePackageCart(state, action) {
+            state.items.forEach(item => {
+                if (item.gender === "packages" && item.package_name === "" && item.price !== 0) {
+                    const existingPackage = state.packageCart.find(p => p.packageDetails.package_id === item.package_id);
+                    if (!existingPackage) {
+                        state.packageCart.push({
+                            packageDetails: {...item, type: "Package"},
+                            packageItems: []
+                        });
+                    }
+                }
+            });
+            state.items.forEach(item => {
+                if (item.gender === "packages" && item.package_name !== "" && item.price === 0) {
+                    state.packageCart = state.packageCart.map(wholePackage => {
+                        if (wholePackage.packageDetails.package_id === item.package_id) {
+                            // Ensure item is not duplicated
+                            if (!wholePackage.packageItems.find(i => i.item_id === item.item_id)) {
+                                return {
+                                    packageDetails: wholePackage.packageDetails,
+                                    packageItems: [...wholePackage.packageItems, item]
+                                };
+                            }
+                        }
+                        return wholePackage;
+                    });
+                }
+            });
+
+            state.items = state.items.filter(item => item.gender !== "packages");
         }
+
     }
 });
 
@@ -367,7 +396,9 @@ export const {
     updateCustomItem,
     updateDiscount,
     updateChargeData,
-    updateSalesNotes
+    updateSalesNotes,
+    addItemsToPackageCart,
+    updatePackageCart
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
