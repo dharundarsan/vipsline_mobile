@@ -46,12 +46,13 @@ const CartItem = (props) => {
 
     return <>
         <View style={styles.cartItem}>
-            <PrepaidModal edited={true} data={props.data} isVisible={isEditPrepaidModalVisible}
-                          onCloseModal={() => setIsEditPrepaidModalVisible(false)}/>
-            <EditCartModal isVisible={isEditCartModalVisible}
-                // setCalculatedPrice={props.setCalculatedPrice}
-                           onCloseModal={() => setIsEditCartModalVisible(false)}
-                           data={props.data}/>
+            {isEditPrepaidModalVisible &&
+                <PrepaidModal edited={true} data={props.data} isVisible={isEditPrepaidModalVisible}
+                              onCloseModal={() => setIsEditPrepaidModalVisible(false)}/>}
+            {isEditCartModalVisible && <EditCartModal isVisible={isEditCartModalVisible}
+                                                      onCloseModal={() => setIsEditCartModalVisible(false)}
+                                                      data={props.data}/>}
+
             <DropdownModal isVisible={isStaffDropdownModalVisible}
                            onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
                            object={true} objectName={"name"} selectedValue={selectedStaff} onChangeValue={(value) => {
