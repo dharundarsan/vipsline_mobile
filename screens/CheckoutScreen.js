@@ -28,6 +28,7 @@ import {loadStaffsFromDB} from "../store/staffSlice";
 import {loadCartFromDB} from "../store/cartSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
+import clearCartAPI from "../util/apis/clearCartAPI";
 
 
 const CheckoutScreen = () => {
@@ -59,47 +60,46 @@ const CheckoutScreen = () => {
     }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
 
 
-
     useEffect(() => {
-                dispatch(loadServicesDataFromDb("women"));
-                dispatch(loadServicesDataFromDb("men"));
-                dispatch(loadServicesDataFromDb("kids"));
-                dispatch(loadServicesDataFromDb("general"));
-                dispatch(loadProductsDataFromDb());
-                dispatch(loadPackagesDataFromDb());
-                dispatch(loadMembershipsDataFromDb());
-                dispatch(loadClientsFromDb());
-                dispatch(loadClientCountFromDb());
-                dispatch(loadClientFiltersFromDb(10, "All"));
-                dispatch(loadBusinessesListFromDb());
-                dispatch(loadLoginUserDetailsFromDb());
-                dispatch(loadStaffsFromDB());
-                dispatch(loadCartFromDB());
-                dispatch(loadBookingDetailsFromDb());
-                console.log("checkoutscreen useEffeect");
+        clearCartAPI();
+        dispatch(loadServicesDataFromDb("women"));
+        dispatch(loadServicesDataFromDb("men"));
+        dispatch(loadServicesDataFromDb("kids"));
+        dispatch(loadServicesDataFromDb("general"));
+        dispatch(loadProductsDataFromDb());
+        dispatch(loadPackagesDataFromDb());
+        dispatch(loadMembershipsDataFromDb());
+        dispatch(loadClientsFromDb());
+        dispatch(loadClientCountFromDb());
+        dispatch(loadClientFiltersFromDb(10, "All"));
+        dispatch(loadBusinessesListFromDb());
+        dispatch(loadLoginUserDetailsFromDb());
+        dispatch(loadStaffsFromDB());
+        dispatch(loadCartFromDB());
+        // dispatch(loadBookingDetailsFromDb());
+        console.log("checkoutscreen useEffeect");
 
-        }, [businessId]);
+    }, [businessId]);
 
 
-
-        //
-        // useEffect(() => {
-        //     dispatch(loadServicesDataFromDb("women"));
-        //     dispatch(loadServicesDataFromDb("men"));
-        //     dispatch(loadServicesDataFromDb("kids"));
-        //     dispatch(loadServicesDataFromDb("general"));
-        //     dispatch(loadProductsDataFromDb());
-        //     dispatch(loadPackagesDataFromDb());
-        //     dispatch(loadMembershipsDataFromDb());
-        //     dispatch(loadClientsFromDb());
-        //     dispatch(loadClientCountFromDb());
-        //     dispatch(loadClientFiltersFromDb(10, "All"));
-        //     dispatch(loadBusinessesListFromDb());
-        //     dispatch(loadLoginUserDetailsFromDb());
-        //     dispatch(loadStaffsFromDB());
-        //     dispatch(loadCartFromDB());
-        //     dispatch(loadBookingDetailsFromDb());
-        // }, []);
+    //
+    // useEffect(() => {
+    //     dispatch(loadServicesDataFromDb("women"));
+    //     dispatch(loadServicesDataFromDb("men"));
+    //     dispatch(loadServicesDataFromDb("kids"));
+    //     dispatch(loadServicesDataFromDb("general"));
+    //     dispatch(loadProductsDataFromDb());
+    //     dispatch(loadPackagesDataFromDb());
+    //     dispatch(loadMembershipsDataFromDb());
+    //     dispatch(loadClientsFromDb());
+    //     dispatch(loadClientCountFromDb());
+    //     dispatch(loadClientFiltersFromDb(10, "All"));
+    //     dispatch(loadBusinessesListFromDb());
+    //     dispatch(loadLoginUserDetailsFromDb());
+    //     dispatch(loadStaffsFromDB());
+    //     dispatch(loadCartFromDB());
+    //     dispatch(loadBookingDetailsFromDb());
+    // }, []);
 
 
     return (

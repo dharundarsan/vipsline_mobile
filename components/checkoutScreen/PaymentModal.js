@@ -56,7 +56,7 @@ const PaymentModal = (props) => {
         ]
     )
 
-    const cartItems = useSelector((state) => state.cart.items);
+    const cartSliceState = useSelector((state) => state.cart);
     const details = useSelector(state => state.clientInfo.details);
 
     useEffect(() => {
@@ -500,7 +500,7 @@ const PaymentModal = (props) => {
                                    console.clear();
                                    console.log("Before init " + new Date());
 
-                                   const response = await checkoutBookingAPI(details.id, cartItems);
+                                   const response = await checkoutBookingAPI(details.id, cartSliceState);
                                    console.log("After init " + new Date());
 
                                    dispatch(updateBookingId(response[0].booking_id));

@@ -82,7 +82,6 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
     }
 
 
-
     const {cart} = getState();
     try {
         const response = await axios.post(
@@ -97,7 +96,7 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
             }
         );
         dispatch(updateItem(response.data.data));
-        dispatch(updateEditedMembership({type:"map"}))
+        dispatch(updateEditedMembership({type: "map"}))
         dispatch(updateEditedCart());
         dispatch(updateCalculatedPrice());
     } catch (error) {
@@ -105,8 +104,6 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
 }
 
 export const updateCalculatedPrice = () => async (dispatch, getState) => {
-
-
 
 
     const {cart} = getState();
@@ -133,7 +130,6 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                 wallet_amount: 0,
             }
         }),
-            // ...cart.editedCart
             ...cart.editedCart.map(item => {
                 if (item.gender === "Products")
                     return {
@@ -142,7 +138,7 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                         disc_value: item.disc_value,
                         itemId: item.item_id,
                         membership_id: 0,
-                        product_id:item.product_id,
+                        product_id: item.product_id,
                         resource_id: item.resource_id,
                         type: "AMOUNT",
                         valid_from: "",
@@ -280,7 +276,7 @@ export const cartSlice = createSlice({
             })
         },
         updateEditedMembership(state, action) {
-            if(action.payload.type === "map") {
+            if (action.payload.type === "map") {
                 state.editedMembership = state.editedMembership.map(edited => {
                     return state.items.filter(item => {
                         return item.membership_id === edited.id
@@ -301,19 +297,19 @@ export const cartSlice = createSlice({
                 state.items = state.items.filter(item =>
                     !state.editedMembership.some(edited => edited.id === item.membership_id)
                 );
-            } else if(action.payload.type === "edit"){
+            } else if (action.payload.type === "edit") {
                 state.editedMembership = state.editedMembership.map(edited => {
-                    if(edited.item_id === action.payload.id){
+                    if (edited.item_id === action.payload.id) {
                         return {
                             ...edited,
-                            itemId:edited.item_id,
-                            item_Id:edited.item_id,
+                            itemId: edited.item_id,
+                            item_Id: edited.item_id,
                             membership_id: edited.membership_id,
                             membership_number: "",
                             res_cat_id: action.payload.data.res_cat_id,
-                            resource_id:edited.resource_id,
+                            resource_id: edited.resource_id,
                             disc_value: action.payload.data.disc_value,
-                            amount:action.payload.data.amount,
+                            amount: action.payload.data.amount,
                             price: action.payload.data.amount,
                             total_price: action.payload.data.amount,
                             type: action.payload.data.type,
@@ -343,14 +339,14 @@ export const cartSlice = createSlice({
             state.customItems = state.customItems.filter(oldItem => oldItem.id !== action.payload);
         },
         //Bhaski reducers
-        updateDiscount(state,action){
+        updateDiscount(state, action) {
             state.additionalDiscounts.pop();
             state.additionalDiscounts = [action.payload];
         },
-        updateChargeData(state,action){
+        updateChargeData(state, action) {
             state.chargesData = action.payload;
         },
-        updateSalesNotes(state,action){
+        updateSalesNotes(state, action) {
             state.salesNotes = action.payload;
         }
     }

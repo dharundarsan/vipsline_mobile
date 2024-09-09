@@ -10,6 +10,7 @@ const initialClientState = {
     clientCount: [],
     isFetching: false,
 };
+
 async function getBusinessId() {
     let businessId = ""
     try {
@@ -44,16 +45,16 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
     // }
 
 
-    const { client, authDetails } = getState();
+    const {client, authDetails} = getState();
 
-    console.log("client.isFetching "+client.isFetching)
+    console.log("client.isFetching " + client.isFetching)
     console.log("business id insiside slice : " + await getBusinessId());
 
     try {
-    if (client.isFetching) return;
+        if (client.isFetching) return;
         console.log("Update Fetch")
         dispatch(updateFetchingState(true));
-        console.log("client.isFetching ++"+ client.isFetching)
+        console.log("client.isFetching ++" + client.isFetching)
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${client.pageNo}&pageSize=20`,
             {
@@ -117,10 +118,13 @@ export const clientSlice = createSlice({
         updateFetchingState(state, action) {
             console.log("Done done done" + action.payload);
             state.isFetching = action.payload;
+        },
+        clearClientsList(state, action) {
+            state.clients = [];
         }
     }
 });
 
-export const {updateClientsList, updateClientCount, updateFetchingState} = clientSlice.actions;
+export const {updateClientsList, updateClientCount, updateFetchingState, clearClientsList} = clientSlice.actions;
 
 export default clientSlice.reducer;

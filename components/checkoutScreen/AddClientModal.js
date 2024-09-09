@@ -1,17 +1,17 @@
-import { FlatList, Modal, Platform, StyleSheet, Text, View } from "react-native";
+import {FlatList, Modal, Platform, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, {useCallback, useEffect, useState, useRef} from "react";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import SearchBar from "../../ui/SearchBar";
 import Feather from '@expo/vector-icons/Feather';
-import { useSelector, useDispatch } from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
-import { loadClientsFromDb } from "../../store/clientSlice";
+import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import { loadClientInfoFromDb } from "../../store/clientInfoSlice";
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import axios from "axios";
 
 const AddClientModal = (props) => {
@@ -25,8 +25,12 @@ const AddClientModal = (props) => {
     const queryRef = useRef("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const searchClientFromDB = useCallback(async (query, pageNo) => {F
+    const searchClientFromDB = useCallback(async (query, pageNo) => {
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
+
+        useEffect(()=>{
+            dispatch(loadClientsFromDb());
+        },[]);
 
         setIsLoading(true);
         try {
@@ -75,7 +79,10 @@ const AddClientModal = (props) => {
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     pressableStyle={styles.closeButtonPressable}
-                    onPress={props.closeModal}
+                    onPress={() => {
+                        setSearchClientQuery("");
+                        props.closeModal()
+                    }}
                 >
                     <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
@@ -101,7 +108,7 @@ const AddClientModal = (props) => {
                         keyExtractor={(item) => item.id.toString()}
                         onEndReachedThreshold={0.7}
                         onEndReached={() => dispatch(loadClientsFromDb(pageNo))}
-                        renderItem={({ item }) => (
+                        renderItem={({item}) => (
                             <ClientCard
                                 clientId={item.id}
                                 name={item.name}
@@ -121,7 +128,7 @@ const AddClientModal = (props) => {
                         keyExtractor={(item) => item.id.toString()}
                         onEndReachedThreshold={0.7}
                         onEndReached={loadMoreClients}
-                        renderItem={({ item }) => (
+                        renderItem={({item}) => (
                             <ClientCard
                                 clientId={item.id}
                                 name={item.name}

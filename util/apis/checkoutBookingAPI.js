@@ -42,8 +42,9 @@
 
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useSelector} from "react-redux";
 
-export default async function checkoutBookingAPI(clientId, cart) {
+export default async function checkoutBookingAPI(clientId, cartSliceState) {
     let authToken = "";
     let businessId = "";
 
@@ -55,27 +56,16 @@ export default async function checkoutBookingAPI(clientId, cart) {
         throw e; // Ensure that the error is propagated
     }
 
+
     try {
         const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + '/appointment/checkoutBooking', {
             COD: 1,
-            additional_discounts: [],
-            additional_services: [],
+            additional_discounts: cartSliceState.additionalDiscounts,
+            additional_services: cartSliceState.customItems,
             appointment_date: "2024-09-09",
             business_id: businessId,
-            cart: cart.map(item => {
+            cart: cartSliceState.items.map(item => {
                 return {
-                    // ...item,
-                    // item_id: undefined,
-                    // resource_category_id: undefined,
-                    // resource_category_name: undefined,
-                    // price: undefined,
-                    // discounted_price: undefined,
-                    // business_name: undefined,
-                    // total_price: undefined,
-                    // parent_resource_category_id: undefined,
-                    // parent_resource_category_name: undefined,
-                    // service_discount: undefined,
-                    //
                     id: item.item_id,
                     resource_id: item.resource_id,
                 }
@@ -84,9 +74,43 @@ export default async function checkoutBookingAPI(clientId, cart) {
             covid_declaration: "true",
             device: "BUSINESS_WEB",
             editedPurchasedMemberShipId: [],
-            edited_cart: [],
+            edited_cart: [...cartSliceState.editedMembership.map(item => {
+                return {
+                    amount: item.price,
+                    bonus_value: 0,
+                    disc_value: 0,
+                    itemId: item.item_id,
+                    membership_id: item.id,
+                    membership_number: "",
+                    res_cat_id: 282773,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: item.valid_from,
+                    valid_till: item.valid_until,
+                    wallet_amount: 0,
+                }
+            }),
+                ...cartSliceState.editedCart.map(item => {
+                    if (item.gender === "Products")
+                        return {
+                            amount: item.amount,
+                            bonus_value: 0,
+                            disc_value: item.disc_value,
+                            itemId: item.item_id,
+                            membership_id: 0,
+                            product_id: item.product_id,
+                            resource_id: item.resource_id,
+                            type: "AMOUNT",
+                            valid_from: "",
+                            valid_till: "",
+                            wallet_amount: 0,
+                        }
+                    else
+                        return item
+                })
+            ],
             endtime: "17:17:00",
-            extra_charges: [],
+            extra_charges: cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
             isWalletSelected: false,

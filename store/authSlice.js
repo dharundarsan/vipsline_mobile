@@ -22,7 +22,6 @@ export const authSlice = createSlice({
             state.authToken = action.payload;
         },
         updateBusinessId(state, action) {
-
             state.businessId = action.payload;
         },
         updateBusinessName(state, action) {

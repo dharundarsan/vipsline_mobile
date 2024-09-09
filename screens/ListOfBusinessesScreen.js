@@ -17,7 +17,7 @@ import {
     loadProductsDataFromDb,
     loadServicesDataFromDb
 } from "../store/catalogueSlice";
-import {loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
+import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
 import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -36,7 +36,7 @@ export default function ListOfBusinessesScreen({navigation}) {
         dispatch(loadProductsDataFromDb());
         dispatch(loadPackagesDataFromDb());
         dispatch(loadMembershipsDataFromDb());
-        // dispatch(loadClientsFromDb());
+        dispatch(loadClientsFromDb());
         dispatch(loadClientCountFromDb());
         dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
@@ -79,6 +79,8 @@ export default function ListOfBusinessesScreen({navigation}) {
                     dispatch(updateBusinessId(itemData.item.id));
                     dispatch(updateIsBusinessSelected(true));
                     dispatch(updateSelectedBusinessDetails(itemData.item));
+                    dispatch(clearClientsList());
+                    // dispatch(loadClientsFromDb());
                     navigation.navigate("Checkout");
                 }}
             />
