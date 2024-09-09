@@ -9,7 +9,7 @@ import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
 import { clearClientInfo } from "../../store/clientInfoSlice";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
@@ -24,8 +24,24 @@ const AddClientButton = (props) => {
     const [isMembershipModalVisible, setIsMembershipModalVisible] = useState(false)
     const [storeMembershipId, setStoreMembershipId] = useState(null)
     const dispatch = useDispatch();
+    useEffect(() => {
+        function singleMembershipApply(){
+            if (clientInfo.membershipDetails?.length === 1) {
+                if(clientInfo.membershipDetails[0].id === undefined || clientInfo.membershipDetails[0].client_id === undefined){
+                    console.log("undefined undefined");
+                }
+                else{
+                    onApplyMembership(clientInfo.membershipDetails[0].id,clientInfo.membershipDetails[0].client_id)
+                }
+            }
+        }
+        singleMembershipApply();
+        console.log(clientInfo.membershipDetails[0]?.membership_id);
+        console.log("clientInfo.membershipDetails.client_id "+clientInfo.membershipDetails[0]?.client_id);
+    }, [clientInfo.isClientSelected])
+    
     async function onApplyMembership(clientMembershipId, clientId) {
-        console.log(clientMembershipId);
+        console.log("43214321");
         setStoreMembershipId(clientMembershipId)
         dispatch(loadCartFromDB(clientMembershipId, clientId))
         // dispatch(updateCalculatedPrice())

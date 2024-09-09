@@ -60,8 +60,8 @@ export default function ListOfBusinessesScreen(props) {
     const token = useSelector(state => state.authDetails.authToken);
     const id = useSelector(state => state.authDetails.businessId);
 
-    console.log("token: " + token);
-    console.log("business id: " + id);
+    // console.log("token: " + token);
+    // console.log("business id: " + id);
 
 
 

@@ -49,7 +49,10 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
 
 export const loadCartFromDB = (clientMembershipID,clientId) => async (dispatch, getState) => {
     const {cart} = getState();
-    
+    // if(clientMembershipID === undefined || clientId ===undefined) {
+    //     console.log("clientMembershipID clientMembershipID");
+    //     console.log("clientId clientId");
+    // }
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
@@ -64,20 +67,32 @@ export const loadCartFromDB = (clientMembershipID,clientId) => async (dispatch, 
             }
         );
         dispatch(updateItem(response.data.data));
+        console.log("Done response.data.data");
+        
         dispatch(updateEditedMembership({type:"map"}))
+        console.log("Done type:{map}");
         dispatch(updateEditedCart());
+        console.log("Done updateEditedCart");
+        console.log(clientMembershipID,clientId);
         dispatch(updateCalculatedPrice(clientMembershipID,clientId));
+        console.log("Done updateCalculatedPrice "+cart?.calculatedPrice.data[0].extra_charges_value);
+        console.log(cart?.calculatedPrice.data[0].extra_charges_value);
         dispatch(updateTotalChargeAmount(cart?.calculatedPrice.data[0].extra_charges_value));
+        console.log("Done updateTotalChargeAmount");
     } catch (error) {
     }
 }
 
 export const updateCalculatedPrice = (clientMembershipID,clientId) => async (dispatch, getState) => {
     const {cart} = getState();
+    console.log("clientMembershipID +"+clientMembershipID );
+    console.log("clientId +"+clientId);
+    
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
         cart: cart.items.map(item => {
+            console.log("item.item_id "+item.item_id);
             return {id: item.item_id}
         }),
         coupon_code: "",
@@ -119,15 +134,20 @@ export const updateCalculatedPrice = (clientMembershipID,clientId) => async (dis
         ],
         extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
         isWalletSelected: false,
-        // client_membership_id: clientMembershipID === undefined ? null : clientMembershipID,
-        client_membership_id:clientMembershipID,
+        client_membership_id: clientMembershipID === undefined ? null : clientMembershipID,
+        // client_membership_id:clientMembershipID,
         walkInUserId:clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
         wallet_amt: 0
     }).then(response => {
+        console.log("1");
+        console.log(response);
+        
         dispatch(setCalculatedPrice(response))
+        console.log("2");
+        
     })
 
 }

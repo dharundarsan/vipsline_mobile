@@ -89,7 +89,7 @@ const MiniActionTextModal = React.memo((props) => {
                     }
                     // Close the modal regardless of clickedValue
                     props.onCloseModal();
-                    console.log(props.chargesInputData);
+                    // console.log(props.chargesInputData);
 
                   }}
                 >
@@ -335,7 +335,7 @@ const MiniActionTextModal = React.memo((props) => {
                       props.addDiscount(selectedDiscountMode);
                     }
                     else if (props.clickedValue === "Add Charges") {
-                      console.log("Done:0");
+                      // console.log("Done:0");
 
                       const updatedChargesErrors = props.chargesInputData.map((item) => {
                         return {
@@ -349,9 +349,9 @@ const MiniActionTextModal = React.memo((props) => {
                         ...prev,
                         charges: updatedChargesErrors,
                       }));
-                      console.log("321");
+                      // console.log("321");
 
-                      console.log(props.chargesInputData);
+                      // console.log(props.chargesInputData);
 
                       const hasAmountError = errorHandler.charges.every(element =>
                         element.amountError !== undefined && element.amountError === false
@@ -363,19 +363,19 @@ const MiniActionTextModal = React.memo((props) => {
                       const hasContents = props.chargesInputData.every(element =>
                         element.amount !== undefined && element.name !== undefined
                       )
-                      console.log("hasAmountError " + hasAmountError);
-                      console.log(props.chargesInputData[0].amount);
-                      console.log("hasNameError " + hasNameError);
-                      console.log("hasAll " + hasContents);
+                      // console.log("hasAmountError " + hasAmountError);
+                      // console.log(props.chargesInputData[0].amount);
+                      // console.log("hasNameError " + hasNameError);
+                      // console.log("hasAll " + hasContents);
 
 
-                      console.log(props.chargesInputData);
+                      // console.log(props.chargesInputData);
 
                       if (hasAmountError && hasNameError && hasContents) {
                         await props.addCharges();
                         await props.updateCharges();
                       }
-                      console.log("Done:1");
+                      // console.log("Done:1");
                     }
                     else if (props.clickedValue === "Add Sales Notes") {
                       if (props.salesNote.trim().length === 0) {

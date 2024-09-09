@@ -156,7 +156,7 @@ const CheckoutSection = (props) => {
         const updatedCharges = chargesInputData.map((item) => {
             // Convert `amount` to a number, default to 0 if conversion fails
             const convertedAmount = parseFloat(item.amount);
-            console.log(convertedAmount);
+            // console.log(convertedAmount);
 
             return {
                 ...item, amount: isNaN(convertedAmount) ? 0 : convertedAmount,
@@ -229,7 +229,7 @@ const CheckoutSection = (props) => {
             }}
             dropdownItems={["Apply Discount", "Add Charges", "Add Sales Notes", "Cancel Sales"]}
             onChangeValue={(value) => {
-                console.log(value)
+                // console.log(value)
                 if (value === "Apply Discount") {
                     openModal("Add Discount", value)
                     setData([{

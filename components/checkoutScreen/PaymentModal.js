@@ -45,6 +45,9 @@ const PaymentModal = (props) => {
             },
         ]
     )
+    console.log("props");
+    console.log(props);
+    
 
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);

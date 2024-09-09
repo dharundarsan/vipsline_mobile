@@ -64,7 +64,6 @@ const InvoiceModal = (props) => {
 
 
 
-
     useEffect(() => {
         dispatch(loadWalletPriceFromDb(selectedClientDetails.id));
     }, [selectedClientDetails]);

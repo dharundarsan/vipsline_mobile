@@ -98,9 +98,9 @@ const CheckoutStack = () => (
 const AppNavigator = () => {
     let isAuthenticated = false;
     const isFetching = useSelector(state => state.authDetails.isFetching);
-    console.log("isFetching " + isFetching)
+    // console.log("isFetching " + isFetching)
     isAuthenticated = useSelector((state) => state.authDetails.isAuthenticated);
-    console.log("isAuthenticated " + !!isAuthenticated);
+    // console.log("isAuthenticated " + !!isAuthenticated);
 
     return (
         <NavigationContainer>

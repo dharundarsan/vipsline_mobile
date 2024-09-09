@@ -65,7 +65,7 @@ export default function EmailLogin() {
                 dispatch(updateAuthToken(response.data.other_message));
             }
             catch (error) {
-                console.log("could not authenticate with email: " + error);
+                // console.log("could not authenticate with email: " + error);
                 setIsLoading(false);
                 setIsPasswordValid(false);
             }
