@@ -1,7 +1,10 @@
 import ClientFilterCard from "./ClientFilterCard";
 import Colors from "../../constants/Colors";
-import {ScrollView, StyleSheet} from "react-native";
+import {ScrollView, StyleSheet, ToastAndroid} from "react-native";
 import {useSelector} from "react-redux";
+
+
+
 
 export default function ClientFiltersCategories(props) {
 
@@ -12,6 +15,9 @@ export default function ClientFiltersCategories(props) {
     const leadsClientCount = useSelector(state => state.client.clientCount[0].leads_clients_count)
 
 
+    function fetchingToast() {
+        ToastAndroid.show("fetching please wait!", 0.1);
+    }
 
     return (
         <ScrollView
@@ -24,7 +30,7 @@ export default function ClientFiltersCategories(props) {
                 color={Colors.totalClients}
                 imgSource={require("../../assets/icons/total_clients.png")}
                 iconSize={{width: 38, height: 38}}
-                onPress={() => props.changeSelectedFilter("all_clients_count")}
+                onPress={() => props.isLoading || props.searchLoading ? fetchingToast() :  props.changeSelectedFilter("all_clients_count")}
                 isPressed={props.filterPressed === "all_clients_count"}
             />
             <ClientFilterCard
@@ -32,7 +38,7 @@ export default function ClientFiltersCategories(props) {
                 totalClients={activeClientCount}
                 color={Colors.activeClient}
                 imgSource={require("../../assets/icons/activeClients.png")}
-                onPress={() => props.changeSelectedFilter("active_clients_count")}
+                onPress={() => props.isLoading || props.searchLoading ? fetchingToast() : props.changeSelectedFilter("active_clients_count")}
                 isPressed={props.filterPressed === "active_clients_count"}
                 iconSize={{width: 21}}
             />
@@ -41,7 +47,7 @@ export default function ClientFiltersCategories(props) {
                 totalClients={inactiveClientCount}
                 color={Colors.inactiveClient}
                 imgSource={require("../../assets/icons/churin.png")}
-                onPress={() => props.changeSelectedFilter("inactive_clients_count")}
+                onPress={() => props.isLoading || props.searchLoading ? fetchingToast() : props.changeSelectedFilter("inactive_clients_count")}
                 isPressed={props.filterPressed === "inactive_clients_count"}
 
             />
@@ -50,7 +56,7 @@ export default function ClientFiltersCategories(props) {
                 totalClients={churnClientCount}
                 color={Colors.churnClient}
                 imgSource={require("../../assets/icons/churin.png")}
-                onPress={() => props.changeSelectedFilter("churn_clients_count")}
+                onPress={() => props.isLoading || props.searchLoading ? fetchingToast() : props.changeSelectedFilter("churn_clients_count")}
                 isPressed={props.filterPressed === "churn_clients_count"}
             />
             <ClientFilterCard
@@ -59,7 +65,7 @@ export default function ClientFiltersCategories(props) {
                 color={Colors.allLeads}
                 imgSource={require("../../assets/icons/allLeads.png")}
                 iconSize={{width: 24, height: 18}}
-                onPress={() => props.changeSelectedFilter("leads_clients_count")}
+                onPress={() => props.isLoading || props.searchLoading ? fetchingToast() : props.changeSelectedFilter("leads_clients_count")}
                 isPressed={props.filterPressed === "leads_clients_count"}
             />
         </ScrollView>
