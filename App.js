@@ -109,8 +109,7 @@ async function isAuthenticatedFunc() {
         const value = await AsyncStorage.getItem('authKey');
         if (value !== null) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     } catch (e) {
@@ -121,7 +120,7 @@ async function isAuthenticatedFunc() {
 }
 
 
-const AppNavigator =  () => {
+const AppNavigator = () => {
 
     const dispatch = useDispatch();
 
@@ -134,7 +133,7 @@ const AppNavigator =  () => {
             const authKey = await AsyncStorage.getItem('authKey');
             if (authKey !== null) {
                 setIsAuthenticated(true); // Update local state if the user is authenticated
-                console.log("authkeyStatu" + authKey);
+                // console.log("authkeyStatu" + authKey);
                 dispatch(updateAuthStatus(true));
             } else {
                 setIsAuthenticated(false);
@@ -151,20 +150,19 @@ const AppNavigator =  () => {
     useEffect(() => {
         checkAuthentication(); // Initial auth check
 
-        console.log("useEffuect in app.js")
-        console.log(reduxAuthStatus);
+        // console.log("useEffuect in app.js")
+        // console.log(reduxAuthStatus);
     }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
 
-    console.log("status ---------------------------------" + isAuthenticated)
-
+    // console.log("status ---------------------------------" + isAuthenticated)
 
 
     return (
         <NavigationContainer>
             {
                 isAuthenticated ?
-                    <MainDrawerNavigator /> :
-                    <AuthNavigator />
+                    <MainDrawerNavigator/> :
+                    <AuthNavigator/>
             }
         </NavigationContainer>
     );
@@ -188,113 +186,111 @@ const LandingScreen = () => (
 );
 
 const MainDrawerNavigator = () => (
-
-
-        <Drawer.Navigator
-            initialRouteName="List of Business"
-            drawerContent={(props) => <CustomDrawer {...props} />}
-            screenOptions={{
-                drawerActiveTintColor: Colors.highlight,
-                drawerInactiveTintColor: Colors.white,
-                drawerStyle: {backgroundColor: Colors.darkBlue},
-                headerTitleStyle: [textTheme.titleLarge]
+    <Drawer.Navigator
+        initialRouteName="List of Business"
+        drawerContent={(props) => <CustomDrawer {...props} />}
+        screenOptions={{
+            drawerActiveTintColor: Colors.highlight,
+            drawerInactiveTintColor: Colors.white,
+            drawerStyle: {backgroundColor: Colors.darkBlue},
+            headerTitleStyle: [textTheme.titleLarge]
+        }}
+    >
+        <Drawer.Screen
+            name="Dashboard"
+            component={CheckoutStack}
+            options={{
+                drawerIcon: () => <Image
+                    source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25} height={25}
+                    style={{resizeMode: "contain"}}/>
             }}
-        >
-            <Drawer.Screen
-                name="Dashboard"
-                component={CheckoutStack}
-                options={{
-                    drawerIcon: () => <Image
-                        source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25} height={25}
-                        style={{resizeMode: "contain"}}/>
-                }}
-            />
-            <Drawer.Screen
-                name="Appointments"
-                component={CheckoutStack}
-                options={{
-                    drawerIcon: () => <Image
-                        source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25} height={25}
-                        style={{resizeMode: "contain"}}/>
-                }}
-            />
-            <Drawer.Screen
-                name="Checkout"
-                component={CheckoutStack}
-                options={{
-                    drawerLabel: 'Checkout',
-                    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(checkout_icon).uri}}
-                                             width={25} height={25} style={{resizeMode: "contain"}}/>,
-                    headerTitle: "Add to cart",
-                    headerTitleAlign: "center",
-                }}
-            />
-            <Drawer.Screen
-                name="Clients"
-                component={ClientSegmentScreen} // Use the modal stack here
-                options={{
-                    drawerIcon: () => (
-                        <Image
-                            source={{uri: Image.resolveAssetSource(clients_icon).uri}}
-                            width={25}
-                            height={25}
-                            style={{resizeMode: 'contain'}}
-                        />
-                    ),
-                    headerTitle: 'Client Segment',
-                    headerTitleAlign: 'center',
-                }}
-            />
-            <Drawer.Screen name="Marketing" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="Expenses" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(expenses_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen
-                name="Reports"
-                component={CheckoutStack}
-                options={{
-                    drawerIcon: () => <Image
-                        source={{uri: Image.resolveAssetSource(reports_icon).uri}} width={25} height={25}
-                        style={{resizeMode: "contain"}}/>
-                }}
-            />
-            <Drawer.Screen name="Catalogue" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(catalogue_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="Discounts" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(discounts_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="Settings" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(settings_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="Staffs" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="List of Business" component={ListOfBusinessesScreen} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(list_of_businesses_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="Add Business" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(add_businesses_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="Feedback" component={CheckoutStack} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(feedback_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-            }}/>
-            <Drawer.Screen name="Sign Out" component={signOutScreen} options={{
-                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(logout_icon).uri}}
-                                         width={25} height={25} style={{resizeMode: "contain", tintColor: Colors.white}}/>
-            }}/>
-        </Drawer.Navigator>
+        />
+        <Drawer.Screen
+            name="Appointments"
+            component={CheckoutStack}
+            options={{
+                drawerIcon: () => <Image
+                    source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25} height={25}
+                    style={{resizeMode: "contain"}}/>
+            }}
+        />
+        <Drawer.Screen
+            name="Checkout"
+            component={CheckoutStack}
+            options={{
+                drawerLabel: 'Checkout',
+                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(checkout_icon).uri}}
+                                         width={25} height={25} style={{resizeMode: "contain"}}/>,
+                headerTitle: "Add to cart",
+                headerTitleAlign: "center",
+            }}
+        />
+        <Drawer.Screen
+            name="Clients"
+            component={ClientSegmentScreen} // Use the modal stack here
+            options={{
+                drawerIcon: () => (
+                    <Image
+                        source={{uri: Image.resolveAssetSource(clients_icon).uri}}
+                        width={25}
+                        height={25}
+                        style={{resizeMode: 'contain'}}
+                    />
+                ),
+                headerTitle: 'Client Segment',
+                headerTitleAlign: 'center',
+            }}
+        />
+        <Drawer.Screen name="Marketing" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="Expenses" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(expenses_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen
+            name="Reports"
+            component={CheckoutStack}
+            options={{
+                drawerIcon: () => <Image
+                    source={{uri: Image.resolveAssetSource(reports_icon).uri}} width={25} height={25}
+                    style={{resizeMode: "contain"}}/>
+            }}
+        />
+        <Drawer.Screen name="Catalogue" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(catalogue_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="Discounts" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(discounts_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="Settings" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(settings_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="Staffs" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="List of Business" component={ListOfBusinessesScreen} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(list_of_businesses_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="Add Business" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(add_businesses_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="Feedback" component={CheckoutStack} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(feedback_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        <Drawer.Screen name="Sign Out" component={signOutScreen} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(logout_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain", tintColor: Colors.white}}/>
+        }}/>
+    </Drawer.Navigator>
 );
 
 const styles = StyleSheet.create({

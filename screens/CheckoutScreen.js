@@ -16,7 +16,6 @@ import {
 } from '../store/catalogueSlice';
 import {
     loadClientCountFromDb,
-    loadClientsFromDb
 } from '../store/clientSlice';
 import AddClientModal from "../components/checkoutScreen/AddClientModal";
 import {
@@ -34,9 +33,10 @@ const CheckoutScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
-    const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated); // Redux state
+    const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    const businessId = useSelector(state => state.authDetails.businessId);
 
     const checkAuthentication = async () => {
         try {
@@ -67,7 +67,7 @@ const CheckoutScreen = () => {
                 dispatch(loadProductsDataFromDb());
                 dispatch(loadPackagesDataFromDb());
                 dispatch(loadMembershipsDataFromDb());
-                dispatch(loadClientsFromDb());
+                // dispatch(loadClientsFromDb());
                 dispatch(loadClientCountFromDb());
                 dispatch(loadClientFiltersFromDb(10, "All"));
                 dispatch(loadBusinessesListFromDb());
@@ -75,8 +75,9 @@ const CheckoutScreen = () => {
                 dispatch(loadStaffsFromDB());
                 dispatch(loadCartFromDB());
                 // dispatch(loadBookingDetailsFromDb());
+                console.log("checkoutscreen useEffeect");
 
-        }, []);
+        }, [businessId]);
 
 
 

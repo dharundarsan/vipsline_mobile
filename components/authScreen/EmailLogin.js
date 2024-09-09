@@ -168,6 +168,7 @@ export default function EmailLogin() {
         <View style={styles.emailContainer}>
                 <Text style={[textTheme.titleSmall, styles.inputLabel]}>Email Address</Text>
                 <TextInput
+                    autoCapitalize={"none"}
                 placeholder="Enter email Address"
                 style={[textTheme.titleSmall, styles.emailInput]}
                 onChangeText={setEmail}

@@ -15,8 +15,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
         }
 
         const api = process.env.EXPO_PUBLIC_API_URI + "/client/editClient";
-        console.log(data);
-        console.log("clientId: "+clientId);
+        // console.log(data);
+        // console.log("clientId: "+clientId);
         try {
             const response = await axios.put(api,
                 {
@@ -29,9 +29,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
                     }
                 });
 
-            console.log(response.data)
+            // console.log(response.data)
         } catch (e) {
             // throw e.response.data.other_message;
-            console.log(e.response.data);
+            // console.log(e.response.data);
         }
 }

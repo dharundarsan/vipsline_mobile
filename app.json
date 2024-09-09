@@ -18,7 +18,9 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/Inter/static/Inter_18pt-Medium.ttf"]
+          "fonts": [
+            "./assets/fonts/Inter/static/Inter_18pt-Medium.ttf"
+          ]
         }
       ]
     ],
@@ -45,6 +47,12 @@
       "eas": {
         "projectId": "30ce7e4b-1125-4bfa-8087-ca869e132c68"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/30ce7e4b-1125-4bfa-8087-ca869e132c68"
     }
   }
 }

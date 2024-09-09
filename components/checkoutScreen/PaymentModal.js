@@ -69,8 +69,8 @@ const PaymentModal = (props) => {
             //     return item.shown ? acc + 1 : acc;
             // }, 0);
             if (split.name === addedSplitPayment) {
-                console.log(addedSplitPayment)
-                console.log(split.name === addedSplitPayment)
+                // console.log(addedSplitPayment)
+                // console.log(split.name === addedSplitPayment)
                 if (shownCount === 0) {
                     return ({
                         ...split,
@@ -125,7 +125,7 @@ const PaymentModal = (props) => {
                 // const shownCount = splitUpState.reduce((acc, item) => {
                 //     return item.shown ? acc + 1 : acc;
                 // }, 0);
-                console.log(shownCount)
+                // console.log(shownCount)
                 const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
                 console.log("aiyoda");
                 console.log(aiyoda);

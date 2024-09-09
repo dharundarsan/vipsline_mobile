@@ -51,7 +51,7 @@ const ProductsList = (props) => {
                 <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
                 <SearchBar filter={true}
                            onPressFilter={() => {
-                               console.log("Filter pressed");
+                               // console.log("Filter pressed");
                            }}
                            onChangeText={filterProductsData}
                            placeholder={"Search by product name or prices"}/>

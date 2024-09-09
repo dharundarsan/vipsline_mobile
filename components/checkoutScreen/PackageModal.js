@@ -20,14 +20,14 @@ const   PackageModal = (props) => {
 
     const addSittingItems = (item) => {
         setSelectedSittingItems(prev => [...prev, item]);
-        console.log(selectedSittingItems);
+        // console.log(selectedSittingItems);
     }
 
     // const deleteSittingItems = (item) => {
     //     setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
     // }
     useEffect(() => {
-        console.log(selectedSittingItems);
+        // console.log(selectedSittingItems);
 
     }, [selectedSittingItems]);
 
