@@ -15,7 +15,7 @@ import {
     loadServicesDataFromDb,
 } from '../store/catalogueSlice';
 import {
-    loadClientCountFromDb,
+    loadClientCountFromDb, loadClientsFromDb,
 } from '../store/clientSlice';
 import AddClientModal from "../components/checkoutScreen/AddClientModal";
 import {
@@ -27,6 +27,7 @@ import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
 import {loadCartFromDB} from "../store/cartSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 
 
 const CheckoutScreen = () => {
@@ -67,14 +68,14 @@ const CheckoutScreen = () => {
                 dispatch(loadProductsDataFromDb());
                 dispatch(loadPackagesDataFromDb());
                 dispatch(loadMembershipsDataFromDb());
-                // dispatch(loadClientsFromDb());
+                dispatch(loadClientsFromDb());
                 dispatch(loadClientCountFromDb());
                 dispatch(loadClientFiltersFromDb(10, "All"));
                 dispatch(loadBusinessesListFromDb());
                 dispatch(loadLoginUserDetailsFromDb());
                 dispatch(loadStaffsFromDB());
                 dispatch(loadCartFromDB());
-                // dispatch(loadBookingDetailsFromDb());
+                dispatch(loadBookingDetailsFromDb());
                 console.log("checkoutscreen useEffeect");
 
         }, [businessId]);
