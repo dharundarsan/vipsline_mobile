@@ -50,6 +50,7 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
         if (client.isFetching) return;
         dispatch(updateFetchingState(true));
         const response = await axios.post(
+
             `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${0}&pageSize=40`,
             {
                 business_id: await getBusinessId(),

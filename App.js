@@ -194,7 +194,17 @@ const MainDrawerNavigator = () => (
             drawerActiveTintColor: Colors.highlight,
             drawerInactiveTintColor: Colors.white,
             drawerStyle: { backgroundColor: Colors.darkBlue },
-            headerTitleStyle: [textTheme.titleLarge]
+            headerTitleStyle: [textTheme.titleLarge],
+            headerStyle:{
+                elevation: 4,             // Shadow strength
+                backgroundColor: '#fff',  // Background color
+                shadowColor: '#000',      // Shadow color
+                shadowOffset: {width: 0, height: 10}, // Offset for bottom shadow
+                shadowOpacity: 0.1,       // Opacity (optional for cross-platform)
+                shadowRadius: 3.84,       // Blur radius (optional for cross-platform)
+                borderBottomWidth: 0.5,     // Helps define a stronger bottom line
+                borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
+            }
         }}
     >
         {/*<Drawer.Screen*/}

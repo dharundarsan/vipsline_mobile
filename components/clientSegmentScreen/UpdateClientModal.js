@@ -92,7 +92,7 @@ const UpdateClientModal = (props) => {
         });
     };
 
-    const clientId = useSelector(state => state.clientInfo.clientId);
+    const clientDetails = useSelector(state => state.clientInfo.details);
     const businessId = useSelector(state => state.authDetails.businessId);
 
 
@@ -110,7 +110,7 @@ const UpdateClientModal = (props) => {
 
         if (!firstNameValid || !lastNameValid || !phoneNoValid || !emailValid) return;
         try {
-            await updateClientAPI(clientId, {
+            await updateClientAPI(clientDetails.id, {
                 address: clientData.clientAddress,
                 anniversary: clientData.isAnniversarySelected ? formatDate(clientData.anniversaryDate, "yyyy-mm-dd") : "",
                 businessId: businessId,
@@ -131,7 +131,7 @@ const UpdateClientModal = (props) => {
                 state: "Tamilnadu",
             });
             dispatch(loadClientCountFromDb());
-            dispatch(loadClientInfoFromDb(clientId));
+            dispatch(loadClientInfoFromDb(clientDetails.id));
             props.onCloseModal();
             ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
             // props.onUpdate();
