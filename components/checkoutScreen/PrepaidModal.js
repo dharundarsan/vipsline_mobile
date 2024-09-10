@@ -8,6 +8,7 @@ import Divider from "../../ui/Divider";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {addItemToCart, addItemToEditedCart, updateCalculatedPrice, updateEditedCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import {shadowStyling} from "../../util/Helpers";
 
 const PrepaidModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
@@ -18,7 +19,7 @@ const PrepaidModal = (props) => {
     const dispatch = useDispatch();
     const prepaidAmountRef = useRef(null);
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}>
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Prepaid</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -27,7 +28,6 @@ const PrepaidModal = (props) => {
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <View style={styles.modalContent}>
             <ScrollView>
                 <CustomTextInput label={"Date"} type={"date"} value={selectedDate} onChangeValue={setSelectedDate}/>

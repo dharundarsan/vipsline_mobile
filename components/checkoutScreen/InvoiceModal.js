@@ -8,7 +8,7 @@ import Feather from '@expo/vector-icons/Feather';
 import {Row, Table} from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from "react-redux";
-import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
+import {checkNullUndefined, dateFormatter, shadowStyling} from "../../util/Helpers";
 import {useEffect, useRef, useState} from "react";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
@@ -59,6 +59,8 @@ const InvoiceModal = (props) => {
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
+    const walletBalance = useSelector(state => state.invoice.walletBalance);
+
 
     const actualData = details.organized_list;
 
@@ -95,7 +97,6 @@ const InvoiceModal = (props) => {
     const businessContact = selectedBusinessDetails.mobile_1;
     const businessAddress = selectedBusinessDetails.address;
     const businessEmail = selectedBusinessDetails.email;
-    const GSTIn = selectedBusinessDetails.gstin;
 
 
 
@@ -112,7 +113,7 @@ const InvoiceModal = (props) => {
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}>
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -262,7 +263,6 @@ styles.heading]}>Invoice</Text>*/}
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 {
@@ -301,15 +301,20 @@ styles.heading]}>Invoice</Text>*/}
                             />
                         </PrimaryButton>
                     </View>
+                    {
+                        !isCancelled ?
+                            <PrimaryButton
+                                buttonStyle={styles.actionsButton}
+                                textStyle={styles.actionsButtonText}
+                                label={"Actions"}
+                                onPress={() => {
+                                    setActionModalVisibility(true);
+                                }}
+                            /> :
+                            null
+                    }
 
-                    <PrimaryButton
-                        buttonStyle={styles.actionsButton}
-                        textStyle={styles.actionsButtonText}
-                        label={"Actions"}
-                        onPress={() => {
-                            setActionModalVisibility(true);
-                        }}
-                    />
+
 
                 </View>
                 <Divider/>
@@ -342,7 +347,7 @@ styles.heading]}>Invoice</Text>*/}
                         //     style={textTheme.titleMedium}>Contact : </Text>
                         // </Text>
                         // <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
+                            style={textTheme.titleMedium}>GSTIN : </Text>{selectedBusinessDetails.gstin}
                         </Text>
                     </View>
                     <View style={styles.invoiceNumberAndDateContainer}>
@@ -366,14 +371,14 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}>
                             <Text
                                 style={textTheme.titleMedium}>Prepaid :
-                            </Text> {details.wallet_balance}</Text>
+                            </Text> {walletBalance.wallet_balance}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN
                             : </Text>{selectedClientDetails.customer_gst}</Text>
                     </View>
                     <Table style={styles.cartItemTable}>
                         <Row
-                            textStyle={StyleSheet.flatten({textAlign: "center", fontWeight: "bold"})}
+                            // textStyle={{textAlign: "center", fontWeight: "bold"}}
                             style={styles.cartItemTableHead}
                             data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
                         />
@@ -392,7 +397,7 @@ styles.heading]}>Invoice</Text>*/}
                                             (innerItem.service_cost).toFixed(2)]}
                                         style={styles.cartItemTableRow}
 
-                                        textStyle={StyleSheet.flatten({textAlign: "center"})}
+                                        // textStyle={{textAlign: "center"}}
                                     />
 
                                 })
@@ -441,7 +446,8 @@ styles.heading]}>Invoice</Text>*/}
                         <Table style={styles.paymentModeTable}>
                             <Row style={styles.paymentModeTableHead}
                                  data={["Date & Time", "Mode", "Amount", "Status"]}
-                                 textStyle={{textAlign: "center"}}/>
+                                 // textStyle={{textAlign: "center"}}
+                            />
                             {
                                 splitPayment.map((item, index) => (
                                     <Row
@@ -449,7 +455,7 @@ styles.heading]}>Invoice</Text>*/}
                                         data={[dateFormatter(item.date, 'short') + " " + item.time,
                                             item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
                                         style={styles.paymentModeTableRow}
-                                        textStyle={{textAlign: "center"}}
+                                        // textStyle={{textAlign: "center"}}
                                     />
                                 ))
                             }

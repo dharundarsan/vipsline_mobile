@@ -15,7 +15,11 @@ import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MemberShipDetailModal from "./MemberShipDetailModal";
+
 import { loadCartFromDB, modifyClientMembershipId, updateCalculatedPrice } from "../../store/cartSlice";
+
+import {loadClientFiltersFromDb} from "../../store/clientFilterSlice";
+
 
 const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
@@ -72,6 +76,7 @@ const AddClientButton = (props) => {
                                 setVisible={setIsVisibleModal}
                                 closeModal={() => {
                                     setIsVisibleModal(false);
+                                    dispatch(clearClientInfo());
                                 }}
                                 onClose={() => {
                                     setIsVisibleModal(false);
@@ -79,6 +84,8 @@ const AddClientButton = (props) => {
                                 phone={clientInfo.details?.mobile_1}
                                 name={clientInfo.details?.firstName}
                                 id={clientInfo.details?.id}
+                                onClose={() => setIsVisibleModal(false)}
+
                             />
                         )}
                         <View style={styles.clientCardContainer}>

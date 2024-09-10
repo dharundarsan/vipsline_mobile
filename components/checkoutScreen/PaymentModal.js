@@ -18,6 +18,7 @@ import {loadBookingDetailsFromDb, updateBookingId} from "../../store/invoiceSlic
 import updateAPI from "../../util/apis/updateAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
+import {shadowStyling} from "../../util/Helpers";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -266,7 +267,7 @@ const PaymentModal = (props) => {
                 null
         }
 
-        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}]}>
+        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -275,7 +276,6 @@ const PaymentModal = (props) => {
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 <View style={styles.paymentOptionsContainer}>
@@ -472,15 +472,18 @@ const PaymentModal = (props) => {
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
-                           onPress={async () => {
-                               try {
-                                   console.clear();
-                                   await updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
-                                   dispatch(updateBookingId(response[0].booking_id));
-                                   await updateLiveStatusAPI(response[0].booking_id);
-                                   // Assuming dispatch is an asynchronous action creator
-                                   dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                           onPress={ () => {
                                    setIsInvoiceModalVisible(true);
+                               try {
+                                   checkoutBookingAPI(details.id, cartSliceState).then(response => {
+                                    updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
+                                    updateLiveStatusAPI(response[0].booking_id);
+                                   dispatch(updateBookingId(response[0].booking_id));
+                                   dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+
+                                   })
+                                   console.clear();
+                                   // Assuming dispatch is an asynchronous action creator
                                } catch (error) {
                                    console.error("An error occurred:", error);
                                    // Handle the error appropriately here

@@ -10,7 +10,8 @@ import {
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
-import {useCallback, useEffect, useLayoutEffect} from "react";
+import {useCallback, useEffect, useLayoutEffect, useState} from "react";
+
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -29,6 +30,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
 
+
     useLayoutEffect(() => {
         // dispatch(loadServicesDataFromDb("women"));
         // dispatch(loadServicesDataFromDb("men"));
@@ -45,14 +47,17 @@ export default function ListOfBusinessesScreen({navigation}) {
     }, []);
 
 
-    useFocusEffect(
-        useCallback(() => {
-            dispatch(clearClientsList())
-
-            return () => dispatch(loadClientsFromDb());
-        }, [])
-    );
-
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         // Function to execute whenever the drawer screen is opened
+    //         dispatch(clearClientsList());
+    //
+    //         // Optional cleanup function when screen is unfocused
+    //         return () => {
+    //             dispatch(loadClientsFromDb());
+    //         };
+    //     }, [])
+    // );
 
     async function authToken() {
 
@@ -87,8 +92,6 @@ export default function ListOfBusinessesScreen({navigation}) {
                     dispatch(updateBusinessId(itemData.item.id));
                     dispatch(updateIsBusinessSelected(true));
                     dispatch(updateSelectedBusinessDetails(itemData.item));
-                    dispatch(clearClientsList());
-                    // dispatch(loadClientsFromDb());
                     navigation.navigate("Checkout");
                 }}
             />
