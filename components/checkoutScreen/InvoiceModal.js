@@ -375,7 +375,7 @@ styles.heading]}>Invoice</Text>*/}
                     </View>
                     <Table style={styles.cartItemTable}>
                         <Row
-                            textStyle={StyleSheet.flatten({textAlign: "center", fontWeight: "bold"})}
+                            // textStyle={{textAlign: "center", fontWeight: "bold"}}
                             style={styles.cartItemTableHead}
                             data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
                         />
@@ -394,7 +394,7 @@ styles.heading]}>Invoice</Text>*/}
                                             (innerItem.service_cost).toFixed(2)]}
                                         style={styles.cartItemTableRow}
 
-                                        textStyle={StyleSheet.flatten({textAlign: "center"})}
+                                        // textStyle={{textAlign: "center"}}
                                     />
 
                                 })
@@ -443,7 +443,8 @@ styles.heading]}>Invoice</Text>*/}
                         <Table style={styles.paymentModeTable}>
                             <Row style={styles.paymentModeTableHead}
                                  data={["Date & Time", "Mode", "Amount", "Status"]}
-                                 textStyle={{textAlign: "center"}}/>
+                                 // textStyle={{textAlign: "center"}}
+                            />
                             {
                                 splitPayment.map((item, index) => (
                                     <Row
@@ -451,7 +452,7 @@ styles.heading]}>Invoice</Text>*/}
                                         data={[dateFormatter(item.date, 'short') + " " + item.time,
                                             item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
                                         style={styles.paymentModeTableRow}
-                                        textStyle={{textAlign: "center"}}
+                                        // textStyle={{textAlign: "center"}}
                                     />
                                 ))
                             }
