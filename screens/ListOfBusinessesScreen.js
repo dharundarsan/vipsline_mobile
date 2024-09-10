@@ -43,21 +43,21 @@ export default function ListOfBusinessesScreen({navigation}) {
         // dispatch(loadClientCountFromDb());
         // dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
-        // dispatch(loadLoginUserDetailsFromDb());
+        dispatch(loadLoginUserDetailsFromDb());
     }, []);
 
 
-    useFocusEffect(
-        useCallback(() => {
-            // Function to execute whenever the drawer screen is opened
-            dispatch(clearClientsList());
-
-            // Optional cleanup function when screen is unfocused
-            return () => {
-                dispatch(loadClientsFromDb());
-            };
-        }, [])
-    );
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         // Function to execute whenever the drawer screen is opened
+    //         dispatch(clearClientsList());
+    //
+    //         // Optional cleanup function when screen is unfocused
+    //         return () => {
+    //             dispatch(loadClientsFromDb());
+    //         };
+    //     }, [])
+    // );
 
     async function authToken() {
 

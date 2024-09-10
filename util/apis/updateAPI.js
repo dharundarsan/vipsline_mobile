@@ -55,10 +55,10 @@ export default async function updateAPI(bookingId, mode_of_payment, splitUpState
                 }
             }
         );
-        ToastAndroid.show("Email sent successfully!", ToastAndroid.LONG);
+        ToastAndroid.show("updated successfully!", ToastAndroid.LONG);
     } catch (error) {
         console.error("Error during updateAPI call:", error);
-        ToastAndroid.show("Failed to send email.", ToastAndroid.LONG);
+        ToastAndroid.show("not updated successfully!", ToastAndroid.LONG);
         throw error; // Ensure that the error is propagated
     }
 }

@@ -11,9 +11,10 @@ import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {shadowStyling} from "../../util/Helpers";
 
 const AddClientModal = (props) => {
     // const pageNo = useSelector(state => state.client.pageNo);
@@ -96,7 +97,7 @@ const AddClientModal = (props) => {
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 setIsCreateClientModalVisible(false);
             }}/>
-            <View style={styles.closeAndHeadingContainer}>
+            <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
@@ -109,7 +110,6 @@ const AddClientModal = (props) => {
                     <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
-            <Divider/>
             <View style={styles.modalContent}>
                 <SearchBar placeholder={"Search by email or mobile"} onChangeText={(text) => {
                     setSearchClientQuery(text);
@@ -138,7 +138,8 @@ const AddClientModal = (props) => {
                                 divider={true}
                                 onPress={(clientId) => {
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
+                                    dispatch(loadClientInfoFromDb(item.id));
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
                                 }}
                             />
                         )}
@@ -158,7 +159,7 @@ const AddClientModal = (props) => {
                                 divider={true}
                                 onPress={(clientId) => {
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
+                                    dispatch(loadClientInfoFromDb(item.id));
                                 }}
                             />
                         )}

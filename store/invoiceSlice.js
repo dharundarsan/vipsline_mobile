@@ -8,6 +8,7 @@ const initialState = {
     isFetching: false,
     booking_id1: "",
     invoiceDetails: {},
+    walletBalance: {},
 };
 
 
@@ -106,7 +107,7 @@ export const invoiceSlice = createSlice({
             state.invoiceDetails = action.payload;
         },
         updateWalletBalance(state, action) {
-            state.details = {...state.details, ...action.payload};
+            state.walletBalance = action.payload;
         },
         updateBookingId(state, action) {
             state.booking_id1 = action.payload;

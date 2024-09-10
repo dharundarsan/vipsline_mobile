@@ -134,8 +134,6 @@ const Cart = () => {
         closeContainer: {},
         closeIcon: {}
     });
-    console.log(cartItems)
-    console.log("cartItems")
     return (
         <View style={styles.cart}>
             <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>

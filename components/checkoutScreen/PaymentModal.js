@@ -18,6 +18,7 @@ import {loadBookingDetailsFromDb, updateBookingId} from "../../store/invoiceSlic
 import updateAPI from "../../util/apis/updateAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
+import {shadowStyling} from "../../util/Helpers";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -266,7 +267,7 @@ const PaymentModal = (props) => {
                 null
         }
 
-        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}]}>
+        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -275,7 +276,6 @@ const PaymentModal = (props) => {
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 <View style={styles.paymentOptionsContainer}>
@@ -474,6 +474,7 @@ const PaymentModal = (props) => {
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
                            onPress={async () => {
                                try {
+                                    const response = await checkoutBookingAPI(details.id, cartSliceState);
                                    console.clear();
                                    await updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
                                    dispatch(updateBookingId(response[0].booking_id));

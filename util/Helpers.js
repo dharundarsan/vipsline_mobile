@@ -1,3 +1,5 @@
+import {StyleSheet} from "react-native";
+
 export const capitalizeFirstLetter = (string) => {
     if (string === undefined) return;
     return string[0].toUpperCase() + string.slice(1, string.length);
@@ -55,6 +57,16 @@ export const checkNullUndefined = (value) => {
     return value !== null;
 }
 
+export const shadowStyling = StyleSheet.create({
+    elevation: 4,             // Shadow strength
+    backgroundColor: '#fff',  // Background color
+    shadowColor: '#000',      // Shadow color
+    shadowOffset: {width: 0, height: 10}, // Offset for bottom shadow
+    shadowOpacity: 0.1,       // Opacity (optional for cross-platform)
+    shadowRadius: 3.84,       // Blur radius (optional for cross-platform)
+    borderBottomWidth: 0.5,     // Helps define a stronger bottom line
+    borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
+})
 
 
 
