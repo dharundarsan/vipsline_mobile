@@ -134,6 +134,7 @@ const Cart = () => {
         closeContainer: {},
         closeIcon: {}
     });
+
     return (
         <View style={styles.cart}>
             <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>

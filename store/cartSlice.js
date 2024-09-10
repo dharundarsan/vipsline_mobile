@@ -1,7 +1,7 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 import axios from "axios";
-import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
+import { updateClientsList, updateFetchingState } from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -20,7 +20,7 @@ const initialCartState = {
     }],
     salesNotes: "",
     totalChargeAmount: 0.0,
-
+    clientMembershipID: undefined,
     packageCart: []
 };
 
@@ -67,11 +67,14 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
 }
 
 export const checkStaffOnCartItems = () => (dispatch, getState) => {
-    const {cart} = getState();
+    const { cart } = getState();
     return cart.items.every(item => item.resource_id !== null);
 }
 
-export const loadCartFromDB = (clientMembershipID, clientId) => async (dispatch, getState) => {
+export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
+    const { clientInfo } = getState();
+    console.log("clientInfo.clientId ");
+    console.log(clientInfo.clientId);
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
@@ -82,13 +85,13 @@ export const loadCartFromDB = (clientMembershipID, clientId) => async (dispatch,
         console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
     }
 
-    const {cart} = getState();
+    const { cart } = getState();
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
                 business_id: `${await getBusinessId()}`,
-                client_membership_id: clientMembershipID
+                client_membership_id: cart.clientMembershipID
             },
             {
                 headers: {
@@ -97,22 +100,24 @@ export const loadCartFromDB = (clientMembershipID, clientId) => async (dispatch,
             }
         );
         dispatch(updateItem(response.data.data));
-        dispatch(updateEditedMembership({type: "map"}))
+        dispatch(updateEditedMembership({ type: "map" }))
         dispatch(updateEditedCart());
         dispatch(updatePackageCart());
-        dispatch(updateCalculatedPrice(clientMembershipID, clientId));
-        dispatch(updateTotalChargeAmount(cart?.calculatedPrice.data[0].extra_charges_value));
+        dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId ));
+        dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
     }
 }
 
-export const updateCalculatedPrice = (clientMembershipID, clientId) => async (dispatch, getState) => {
-    const {cart} = getState();
+export const updateCalculatedPrice = (clientId) => async (dispatch, getState) => {
+    const { cart } = getState();
+    // console.log("cart.clientMembershipID " + cart.clientMembershipID);
+    console.log("cart.clientId " + clientId);
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
         cart: cart.items.map(item => {
-            return {id: item.item_id}
+            return { id: item.item_id }
         }),
         coupon_code: "",
         edited_cart: [...cart.editedMembership.map(item => {
@@ -131,42 +136,42 @@ export const updateCalculatedPrice = (clientMembershipID, clientId) => async (di
                 wallet_amount: 0,
             }
         }),
-            ...cart.editedCart.map(item => {
-                if (item.gender === "Products")
-                    return {
-                        amount: item.amount,
-                        bonus_value: 0,
-                        disc_value: item.disc_value,
-                        itemId: item.item_id,
-                        membership_id: 0,
-                        product_id: item.product_id,
-                        resource_id: item.resource_id,
-                        type: "AMOUNT",
-                        valid_from: "",
-                        valid_till: "",
-                        wallet_amount: 0,
-                    }
-                else if (item.gender === "prepaid")
-                    return {
-                        amount: 0,
-                        bonus_value: item.wallet_bonus,
-                        disc_value: 0,
-                        itemId: item.item_id,
-                        membership_id: 0,
-                        resource_id: item.resource_id,
-                        type: "AMOUNT",
-                        valid_from: "",
-                        valid_till: "",
-                        wallet_amount: item.wallet_amount,
-                        wallet_description: item.wallet_description
-                    }
-                else
-                    return item
-            })
+        ...cart.editedCart.map(item => {
+            if (item.gender === "Products")
+                return {
+                    amount: item.amount,
+                    bonus_value: 0,
+                    disc_value: item.disc_value,
+                    itemId: item.item_id,
+                    membership_id: 0,
+                    product_id: item.product_id,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: "",
+                    valid_till: "",
+                    wallet_amount: 0,
+                }
+            else if (item.gender === "prepaid")
+                return {
+                    amount: 0,
+                    bonus_value: item.wallet_bonus,
+                    disc_value: 0,
+                    itemId: item.item_id,
+                    membership_id: 0,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: "",
+                    valid_till: "",
+                    wallet_amount: item.wallet_amount,
+                    wallet_description: item.wallet_description
+                }
+            else
+                return item
+        })
         ],
         extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
         isWalletSelected: false,
-        client_membership_id: clientMembershipID === undefined ? null : clientMembershipID,
+        client_membership_id: cart.clientMembershipID === undefined || null ? null : cart.clientMembershipID,
         // client_membership_id:clientMembershipID,
         walkInUserId: clientId,
         promo_code: "",
@@ -180,7 +185,7 @@ export const updateCalculatedPrice = (clientMembershipID, clientId) => async (di
 }
 
 export const removeItemFromCart = async (itemId) => async (dispatch, getState) => {
-    const {cart} = getState();
+    const { cart } = getState();
 
     let authToken = ""
     try {
@@ -379,7 +384,7 @@ export const cartSlice = createSlice({
                     const existingPackage = state.packageCart.find(p => p.packageDetails.package_id === item.package_id);
                     if (!existingPackage) {
                         state.packageCart.push({
-                            packageDetails: {...item, type: "Package"},
+                            packageDetails: { ...item, type: "Package" },
                             packageItems: []
                         });
                     }
@@ -406,8 +411,18 @@ export const cartSlice = createSlice({
         },
         clearCalculatedPrice(state, action) {
             state.calculatedPrice = [];
+        },
+        modifyClientMembershipId(state, action) {
+            const { type, payload } = action.payload;
+            switch (type) {
+                case "clear":
+                    state.clientMembershipID = undefined;
+                    break;
+                case "add":
+                    state.clientMembershipID = payload;
+                    break;
+            }
         }
-
     }
 });
 
@@ -433,7 +448,8 @@ export const {
     updateStaffInEditedCart,
     clearLocalCart,
     clearSalesNotes,
-    updateTotalChargeAmount
+    updateTotalChargeAmount,
+    modifyClientMembershipId,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
