@@ -32,7 +32,7 @@ export default function MobileOtp() {
     }
 
     async function findUser() {
-        let response = "sometng went wrong"
+        let response = "something went wrong"
         try {
             response = await axios.post(BaseURL + '/user/findUser', {
                 platform: platform,

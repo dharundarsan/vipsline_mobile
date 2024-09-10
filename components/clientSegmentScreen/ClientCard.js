@@ -9,7 +9,7 @@ import textTheme from "../../constants/TextTheme";
  *
  * Displays a card with client information, including a profile avatar (initial), name, phone number,
  * and email address. The card is pressable and can trigger an action when pressed. Optionally, a divider
- * can be added below the card. The component is ghly customizable through props.
+ * can be added below the card. The component is highly customizable through props.
  *
  * Props:
  * @param {string} [props.name] - The client's name. Displays the first letter as an avatar if provided.

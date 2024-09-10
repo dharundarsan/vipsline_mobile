@@ -22,6 +22,7 @@ import EditCartModal from "./EditCartModal";
 import PrepaidModal from "./PrepaidModal";
 
 const CartItem = (props) => {
+    // console.log(props)
     const dispatch = useDispatch();
     const isLoading = useSelector(state => state.cart.isLoading);
     const [isEditCartModalVisible, setIsEditCartModalVisible] = useState(false);

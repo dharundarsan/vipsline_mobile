@@ -130,7 +130,7 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
                 }
             }
         );
-        //         dispatch(updateFeedback(response.data.data[0].no_of_feedbacks));
+        dispatch(updateFeedback(response.data.data[0].no_of_feedbacks));
     }
     catch (e) {
             }

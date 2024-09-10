@@ -39,6 +39,6 @@ export default async function clearCartAPI() {
 
 
     } catch (e) {
-        throw e.response.data.other_message;
+        // throw e.response.data.other_message;
     }
 }

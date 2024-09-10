@@ -337,7 +337,7 @@ export const cartSlice = createSlice({
                     return edited;
                 })
             }
-            state.items = state.editedMembership.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
+            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
 
         },
         setCalculatedPrice(state, action) {

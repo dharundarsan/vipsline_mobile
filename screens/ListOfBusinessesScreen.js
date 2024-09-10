@@ -98,7 +98,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     const token = useSelector(state => state.authDetails.authToken);
     const id = useSelector(state => state.authDetails.businessId);
 
-    //     //
+
 
 
     return (

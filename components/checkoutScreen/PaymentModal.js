@@ -71,7 +71,7 @@ const PaymentModal = (props) => {
             //     return item.shown ? acc + 1 : acc;
             // }, 0);
             if (split.name === addedSplitPayment) {
-                                                if (shownCount === 0) {
+                if (shownCount === 0) {
                     return ({
                         ...split,
                         amount: props.price,
@@ -358,8 +358,7 @@ const PaymentModal = (props) => {
                         // const shownCount = splitUpState.reduce((acc, item) => {
                         //     return item.shown ? acc + 1 : acc;
                         // }, 0);
-                                                                                                                        if (item.shown) {
-                                                                                                                console.log(paymentOrder.at(-1))
+                        if (item.shown) {
                             return <View style={styles.splitInputAndCloseContainer}>
                                 <CustomTextInput
                                     textInputStyle={isError ? {borderColor: Colors.error} : {borderColor: Colors.green}}
@@ -476,21 +475,12 @@ const PaymentModal = (props) => {
                            onPress={async () => {
                                try {
                                    console.clear();
-                                   // console.log("Before init " + new Date());
-                                                                                                                                                                               const response = await checkoutBookingAPI(details.id, cartSliceState);
-                                   // console.log("After init " + new Date());
-
                                    await updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
                                    dispatch(updateBookingId(response[0].booking_id));
-
                                    await updateLiveStatusAPI(response[0].booking_id);
                                    // Assuming dispatch is an asynchronous action creator
                                    dispatch(loadBookingDetailsFromDb(response[0].booking_id));
-                                   // console.log("Loading " + new Date());
-
                                    setIsInvoiceModalVisible(true);
-                                   // console.log("Loaded " + new Date());
-
                                } catch (error) {
                                    console.error("An error occurred:", error);
                                    // Handle the error appropriately here

@@ -28,6 +28,6 @@ export default async function updateClientAPI(clientId, data) {
             });
 
     } catch (e) {
-        throw e.response.data.other_message;
+        // throw e.response.data.other_message;
     }
 }

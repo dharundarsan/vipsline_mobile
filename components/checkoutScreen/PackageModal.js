@@ -68,7 +68,7 @@ const PackageModal = (props) => {
                 <View style={styles.details}>
                     <Text style={[textTheme.titleSmall, styles.packageName]}>Transformation Package</Text>
                     <Text style={[textTheme.bodySmall, styles.serviceCount]}>10 Services</Text>
-                    <Text style={[textTheme.bodySmall, styles.expireText]}>Ts package will expire on <Text
+                    <Text style={[textTheme.bodySmall, styles.expireText]}>This package will expire on <Text
                         style={styles.expireDate}>30 November
                         2023</Text></Text>
                     <Text style={[textTheme.bodyMedium, styles.price]}>₹ 2500</Text>

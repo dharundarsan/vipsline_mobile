@@ -232,7 +232,7 @@ const InvoiceModal = (props) => {
                 }}
                 dropdownItems={[
                     "Go to Appointment",
-                    "Booking story"
+                    "Booking history"
                 ]}
                 iconImage={[
                     require("../../assets/icons/invoiceIcons/send.png"),
@@ -254,7 +254,6 @@ styles.heading]}>Invoice</Text>*/}
                     dispatch(clearLocalCart());
                     dispatch(clearClientInfo());
                     dispatch(clearCalculatedPrice());
-                    props.onCloseModal();
                     props.onCloseModal();
                 }
                 }
