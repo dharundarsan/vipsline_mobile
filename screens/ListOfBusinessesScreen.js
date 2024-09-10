@@ -41,7 +41,7 @@ export default function ListOfBusinessesScreen({navigation}) {
         // dispatch(loadClientCountFromDb());
         // dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
-        // dispatch(loadLoginUserDetailsFromDb());
+        dispatch(loadLoginUserDetailsFromDb());
     }, []);
 
 

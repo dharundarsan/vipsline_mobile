@@ -7,7 +7,6 @@ import Divider from "../../ui/Divider";
 import PrimaryButton from "../../ui/PrimaryButton";
 import React, {useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
-import {updateClientMembershipId} from "../../store/cartSlice";
 
 const MemberShipDetailModal = React.memo((props) => {
     const insets = useSafeAreaInsets();
@@ -19,8 +18,9 @@ const MemberShipDetailModal = React.memo((props) => {
 
     useEffect(() => {
         if (isModalVisible && props.membershipDetails.length === 1) {
-            dispatch(updateClientMembershipId(props.membershipDetails[0].id))
-            props.onApplyMembership( props.membershipDetails[0].client_id);
+            console.log("length: 1");
+            
+            props.onApplyMembership( props.membershipDetails[0].id,props.membershipDetails[0].client_id);
         }
     }, [props.membershipDetails, isModalVisible]);
 
