@@ -72,6 +72,9 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
 }
 
 export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
+    const { clientInfo } = getState();
+    console.log("clientInfo.clientId ");
+    console.log(clientInfo.clientId);
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
@@ -100,7 +103,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
         dispatch(updateEditedMembership({ type: "map" }))
         dispatch(updateEditedCart());
         dispatch(updatePackageCart());
-        dispatch(updateCalculatedPrice(clientId));
+        dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId ));
         dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
     }

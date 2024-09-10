@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
-import { clearClientInfo, loadClientInfoFromDb } from "../../store/clientInfoSlice";
+import { clearClientInfo, loadClientInfoFromDb, updateClientId } from "../../store/clientInfoSlice";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import React, { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -19,7 +19,6 @@ import { loadCartFromDB, modifyClientMembershipId, updateCalculatedPrice } from 
 
 const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
-    const cart = useSelector(state => state.cart);
     const [isClientInfo, setIsClientInfo] = useState(false)
     const [isVisibileModal, setIsVisibleModal] = useState(false)
     const [isMembershipModalVisible, setIsMembershipModalVisible] = useState(false)
@@ -28,10 +27,10 @@ const AddClientButton = (props) => {
     const storeMembershipId = useSelector(state => state.cart.clientMembershipID);
     async function onApplyMembership(clientMembershipId, clientId) {
         // setStoreMembershipId(clientMembershipId)
-        console.log("clientId " + clientId);
-
+        // console.log("clientId " + clientInfo.client_id);
+        dispatch(updateClientId(clientId))
         dispatch(modifyClientMembershipId({ type: "add", payload: clientMembershipId }))
-        dispatch(loadCartFromDB(clientId))
+        dispatch(loadCartFromDB(clientInfo.client_id))
         // dispatch(updateCalculatedPrice())
     }
     // console.log("clientInfo.membershipDetails.length ");
