@@ -20,7 +20,7 @@ import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
-import {clearCalculatedPrice, clearLocalCart, loadCartFromDB} from "../../store/cartSlice";
+import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, loadCartFromDB, modifyClientMembershipId} from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
 
@@ -251,6 +251,8 @@ styles.heading]}>Invoice</Text>*/}
                 onPress={() => {
                     // setCancelInvoiceModalVisibility(true)
                     clearCartAPI();
+                    dispatch(modifyClientMembershipId({type:"clear"}))
+                    dispatch(clearSalesNotes());
                     dispatch(clearLocalCart());
                     dispatch(clearClientInfo());
                     dispatch(clearCalculatedPrice());
@@ -283,6 +285,7 @@ styles.heading]}>Invoice</Text>*/}
                             label={"Back to checkout"}
                             onPress={() => {
                                 clearCartAPI();
+                                dispatch(clearSalesNotes());
                                 dispatch(clearLocalCart());
                                 dispatch(clearClientInfo());
                                 dispatch(clearCalculatedPrice());

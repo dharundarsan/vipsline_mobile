@@ -17,6 +17,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     checkStaffOnCartItems, clearCalculatedPrice,
     clearLocalCart,
+    clearSalesNotes,
     loadCartFromDB,
     setCalculatedPrice,
     updateCalculatedPrice
@@ -37,13 +38,15 @@ const CheckoutSection = (props) => {
     const tot = useSelector(state => state.cart.calculatedPrice);
     // const totalChargeAmount = useSelector(state => state.cart.calculatedPrice[0]?.extra_charges_value);
     const totalChargeAmount = tot === undefined || tot === null ? 0 : tot[0].extra_charges_value;
+    const cart = useSelector(state => state.cart);
+    // console.log(cart);
 
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
     const dispatch = useDispatch();
     const clientInfo = useSelector(state => state.clientInfo);
     const centralGST = 30;
     const stateGST = 30;
-    const calculatedPrice = useSelector(state => state.cart.calculatedPrice)
+    const calculatedPrice = useSelector(state => state.cart.calculatedPrice) || []
     // console.log("const calculatedPrice = useSelector(state => state.cart.calculatedPrice)")
     const customItems = useSelector(state => state.cart.customItems);
 
@@ -161,8 +164,8 @@ const CheckoutSection = (props) => {
             return null;
         }
         // if (!chargesInputData || chargesInputData.length === 0) {
-
-        dispatch(updateChargeData(chargesInputData));
+            dispatch(updateChargeData(chargesInputData));
+        // }
     }
 
 
@@ -193,8 +196,8 @@ const CheckoutSection = (props) => {
     }
 
     function clearCharges() {
-        setChargesInputData([{index: 0}])
-        dispatch(updateChargeData([]));
+        setChargesInputData([{index:0}])
+        dispatch(updateChargeData([{index:0,name: "",amount: 0,}]));
         dispatch(updateCalculatedPrice());
         setActionModal(false);
     }
@@ -219,7 +222,7 @@ const CheckoutSection = (props) => {
                                              addCharges={addCharges}
                                              updateCharges={updateCharges}
                                              UpdateSalesNotes={UpdateSalesNotes}
-                                             clearCharges={clearCharges}
+                                             clearCharges = {clearCharges}
         />}
         {isDelete && <DeleteClient
             isVisible={isDelete}
@@ -235,6 +238,7 @@ const CheckoutSection = (props) => {
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
                 clearCartAPI();
+                dispatch(clearSalesNotes());
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
                 dispatch(clearCalculatedPrice())
