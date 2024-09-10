@@ -65,6 +65,7 @@ export default function ClientSegmentScreen() {
     const leadsClientCountHelper = useSelector(state => state.client.clientCount)
 
 
+
     const allClientCount = checkNullUndefined(allClientCountHelper) ? allClientCountHelper[0].all_clients_count : 0;
     const activeClientCount = checkNullUndefined(activeClientCountHelper) ? activeClientCountHelper[0].active_clients_count : 0;
     const inActiveClientCount = checkNullUndefined(inActiveClientCountHelper) ? inActiveClientCountHelper[0].inactive_clients_count : 0;
