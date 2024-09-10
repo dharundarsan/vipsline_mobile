@@ -33,9 +33,7 @@ export const loadBusinessesListFromDb = () => async (dispatch) => {
                 }
             }
         );
-        // console.log("businesssssssssssss")
-        // console.log(response.data.data);
-        dispatch(updateListOfBusinesses(response.data.data));
+                 dispatch(updateListOfBusinesses(response.data.data));
 
     } catch (e) {
         console.error(e);

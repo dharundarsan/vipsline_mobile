@@ -19,6 +19,8 @@ const initialCartState = {
         index: 0,
     }],
     salesNotes: "",
+    totalChargeAmount: 0.0,
+
     packageCart: []
 };
 
@@ -27,11 +29,9 @@ async function getBusinessId() {
     try {
         const value = await AsyncStorage.getItem('businessId');
         if (value !== null) {
-            // console.log("business token"+ value);
             return value;
         }
     } catch (e) {
-        console.log("business token fetching error." + e);
     }
 }
 
@@ -71,7 +71,7 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
     return cart.items.every(item => item.resource_id !== null);
 }
 
-export const loadCartFromDB = () => async (dispatch, getState) => {
+export const loadCartFromDB = (clientMembershipID, clientId) => async (dispatch, getState) => {
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
@@ -82,13 +82,13 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
         console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
     }
 
-
     const {cart} = getState();
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
                 business_id: `${await getBusinessId()}`,
+                client_membership_id: clientMembershipID
             },
             {
                 headers: {
@@ -100,12 +100,13 @@ export const loadCartFromDB = () => async (dispatch, getState) => {
         dispatch(updateEditedMembership({type: "map"}))
         dispatch(updateEditedCart());
         dispatch(updatePackageCart());
-        dispatch(updateCalculatedPrice());
+        dispatch(updateCalculatedPrice(clientMembershipID, clientId));
+        dispatch(updateTotalChargeAmount(cart?.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
     }
 }
 
-export const updateCalculatedPrice = () => async (dispatch, getState) => {
+export const updateCalculatedPrice = (clientMembershipID, clientId) => async (dispatch, getState) => {
     const {cart} = getState();
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
@@ -163,15 +164,16 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                     return item
             })
         ],
-        extra_charges: cart.chargesData,
+        extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
         isWalletSelected: false,
+        client_membership_id: clientMembershipID === undefined ? null : clientMembershipID,
+        // client_membership_id:clientMembershipID,
+        walkInUserId: clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
         wallet_amt: 0
     }).then(response => {
-        // console.log("RESPONSE")
-        // console.log(response)
         dispatch(setCalculatedPrice(response))
     })
 
@@ -247,9 +249,9 @@ export const cartSlice = createSlice({
             else
                 state.editedCart = [...state.editedCart, action.payload];
         },
-        updateStaffInEditedCart(state, action){
+        updateStaffInEditedCart(state, action) {
             state.editedCart = state.editedCart.map(item => {
-                if(action.payload.itemId === item.item_id){
+                if (action.payload.itemId === item.item_id) {
                     return {
                         ...item,
                         resource_id: action.payload.resource_id
@@ -269,7 +271,7 @@ export const cartSlice = createSlice({
                 !state.editedCart.some(edited => edited.item_id === item.item_id)
             )
         },
-        clearLocalCart(state, action){
+        clearLocalCart(state, action) {
             state.items = [];
             state.editedCart = [];
             state.editedMembership = [];
@@ -335,9 +337,8 @@ export const cartSlice = createSlice({
                     return edited;
                 })
             }
-            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
+            state.items = state.editedMembership.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
 
-            // console.log(state.editedMembership)
         },
         setCalculatedPrice(state, action) {
             state.calculatedPrice = action.payload;
@@ -362,6 +363,12 @@ export const cartSlice = createSlice({
         },
         updateSalesNotes(state, action) {
             state.salesNotes = action.payload;
+        },
+        clearSalesNotes(state, action) {
+            state.salesNotes = "";
+        },
+        updateTotalChargeAmount(state, action) {
+            state.totalChargeAmount = action.payload;
         },
         addItemsToPackageCart(state, action) {
             state.packageCart = [...state.packageCart, action.payload];
@@ -424,7 +431,9 @@ export const {
     updatePackageCart,
     clearCalculatedPrice,
     updateStaffInEditedCart,
-    clearLocalCart
+    clearLocalCart,
+    clearSalesNotes,
+    updateTotalChargeAmount
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     noteContainer: {
         borderRadius: 5,
         backgroundColor: Colors.grey100,
-        overflow: "hidden",
+        overflow: "dden",
         padding: 10,
     },
     noteLeftBar: {

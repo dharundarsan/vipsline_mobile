@@ -1,10 +1,9 @@
-import {View, Text, StyleSheet, Modal, Pressable, Platform, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, Modal, Pressable, Platform, TouchableOpacity, KeyboardAvoidingView} from 'react-native';
 import Colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
 import PrimaryButton from "./PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
 import CustomTextInput from "./CustomTextInput";
-
 
 
 /**
@@ -61,7 +60,7 @@ export default function BottomModal(props) {
             elevation: 4,             // Shadow strength
             backgroundColor: '#fff',  // Background color
             shadowColor: '#000',      // Shadow color
-            shadowOffset: { width: 0, height: 10 }, // Offset for bottom shadow
+            shadowOffset: {width: 0, height: 10}, // Offset for bottom shadow
             shadowOpacity: 0.1,       // Opacity (optional for cross-platform)
             shadowRadius: 3.84,       // Blur radius (optional for cross-platform)
             borderBottomWidth: 0.5,     // Helps define a stronger bottom line
@@ -70,7 +69,7 @@ export default function BottomModal(props) {
         titleTextStyle: {
             margin: 'auto'
         },
-        closeButton:{
+        closeButton: {
             position: "absolute",
             top: 16,
             right: 16,
@@ -112,9 +111,7 @@ export default function BottomModal(props) {
         cancelTextStyle: {
             color: Colors.black
         },
-        sendTextStyle: {
-
-        }
+        sendTextStyle: {}
 
 
     })
@@ -127,70 +124,74 @@ export default function BottomModal(props) {
             style={{flex: 1, position: "relative", borderWidth: 1}}
             animationType={"fade"}
         >
-            <Pressable style={{flex: 1}} onPress={props.onCloseModal} />
+            <Pressable style={{flex: 1}} onPress={props.onCloseModal}/>
 
-            <TouchableOpacity
-                style={styles.modalContent}
-                activeOpacity={1}
+            <KeyboardAvoidingView
+                behavior="position"
+                style={{
+                    // maxHeight: "80%", backgroundColor: Colors.white,
+                    // paddingBottom: insets.bottom
+                }}
             >
-                <View style={styles.titleContainer}>
-                    <Text style={[textTheme.titleLarge, styles.titleTextStyle, props.titleTextStyle]}>
-                        {props.title}
-                    </Text>
-                    <Pressable
-                        onPress={props.onCloseModal}
-                        android_ripple={{color: Colors.ripple}}
-                        style={({pressed}) =>
-                            pressed && Platform.OS === "ios" ?
-                                [styles.closeButton, { opacity: 0.4}] :
-                                styles.closeButton}
-                    >
-                        <Ionicons name="close" size={30} color="black"/>
-                    </Pressable>
-                </View>
-                <View style={styles.textInputContainer}>
-                    <CustomTextInput
-                        label={props.label}
-                        textInputStyle={styles.textInput}
-                        type={props.type}
-                        labelTextStyle={[textTheme.titleSmall]}
-                        onChangeText={props.onChangeText}
-                        value={props.value}
-                        onSave={props.onSave}
-                        validator={props.validator}
-                        placeholder={props.placeholder}
-                    />
-                </View>
-                <View style={styles.buttonContainer}>
-                    <View style={styles.buttonInnerContainer}>
-                        {
-                            props.buttonOneName ?
-                                <PrimaryButton
-                                    label={props.buttonOneName}
-                                    buttonStyle={[styles.cancelButton, props.buttonOneStyle]}
-                                    textStyle={[textTheme.bodyMedium, styles.cancelTextStyle, props.buttonOneTextStyle]}
-                                    onPress={props.buttonOneOnPress}
-                                /> :
-                                null
-                        }
-                        {
-                            props.buttonTwoName ?
-                                <PrimaryButton
-                                    label={props.buttonTwoName}
-                                    buttonStyle={[styles.sendButton, props.buttonTwoStyle]}
-                                    textStyle={[textTheme.bodyMedium, styles.sendTextStyle, props.buttonTwoTextStyle]}
-                                    onPress={props.buttonTwoOnPress}
-                                /> :
-                                null
-                        }
-
-
+                <TouchableOpacity
+                    style={styles.modalContent}
+                    activeOpacity={1}
+                >
+                    <View style={styles.titleContainer}>
+                        <Text style={[textTheme.titleLarge, styles.titleTextStyle, props.titleTextStyle]}>
+                            {props.title}
+                        </Text>
+                        <Pressable
+                            onPress={props.onCloseModal}
+                            android_ripple={{color: Colors.ripple}}
+                            style={({pressed}) =>
+                                pressed && Platform.OS === "ios" ?
+                                    [styles.closeButton, {opacity: 0.4}] :
+                                    styles.closeButton}
+                        >
+                            <Ionicons name="close" size={30} color="black"/>
+                        </Pressable>
+                    </View>
+                    <View style={styles.textInputContainer}>
+                        <CustomTextInput
+                            label={props.label}
+                            textInputStyle={styles.textInput}
+                            type={props.type}
+                            labelTextStyle={[textTheme.titleSmall]}
+                            onChangeText={props.onChangeText}
+                            value={props.value}
+                            onSave={props.onSave}
+                            validator={props.validator}
+                            placeholder={props.placeholder}
+                        />
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <View style={styles.buttonInnerContainer}>
+                            {
+                                props.buttonOneName ?
+                                    <PrimaryButton
+                                        label={props.buttonOneName}
+                                        buttonStyle={[styles.cancelButton, props.buttonOneStyle]}
+                                        textStyle={[textTheme.bodyMedium, styles.cancelTextStyle, props.buttonOneTextStyle]}
+                                        onPress={props.buttonOneOnPress}
+                                    /> :
+                                    null
+                            }
+                            {
+                                props.buttonTwoName ?
+                                    <PrimaryButton
+                                        label={props.buttonTwoName}
+                                        buttonStyle={[styles.sendButton, props.buttonTwoStyle]}
+                                        textStyle={[textTheme.bodyMedium, styles.sendTextStyle, props.buttonTwoTextStyle]}
+                                        onPress={props.buttonTwoOnPress}
+                                    /> :
+                                    null
+                            }
+                        </View>
                     </View>
 
-                </View>
-
-
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </KeyboardAvoidingView>
         </Modal>
 
     );

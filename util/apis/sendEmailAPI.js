@@ -42,7 +42,6 @@ export default async function sendEmailAPI(email) {
 
         ToastAndroid.show("Email sent successfully!", ToastAndroid.LONG);
     } catch (error) {
-        console.log(error);
-        ToastAndroid.show("Failed to send email.", ToastAndroid.LONG);
+                ToastAndroid.show("Failed to send email.", ToastAndroid.LONG);
     }
 }

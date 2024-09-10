@@ -16,6 +16,8 @@ import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
 import {useDispatch, useSelector} from "react-redux";
 import {loadBookingDetailsFromDb, updateBookingId} from "../../store/invoiceSlice";
 import updateAPI from "../../util/apis/updateAPI";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -69,9 +71,7 @@ const PaymentModal = (props) => {
             //     return item.shown ? acc + 1 : acc;
             // }, 0);
             if (split.name === addedSplitPayment) {
-                // console.log(addedSplitPayment)
-                // console.log(split.name === addedSplitPayment)
-                if (shownCount === 0) {
+                                                if (shownCount === 0) {
                     return ({
                         ...split,
                         amount: props.price,
@@ -125,11 +125,8 @@ const PaymentModal = (props) => {
                 // const shownCount = splitUpState.reduce((acc, item) => {
                 //     return item.shown ? acc + 1 : acc;
                 // }, 0);
-                // console.log(shownCount)
-                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
-                console.log("aiyoda");
-                console.log(aiyoda);
-                // return;
+                                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
+                                                // return;
                 data = {
                     booking_amount: props.price,
                     paid_amount: splitUpState.map(split => {
@@ -191,14 +188,9 @@ const PaymentModal = (props) => {
                 }
             }
 
-            // console.log(splitUpState);
-            // console.log("DATA")
-            // console.log(data)
 
             const response = await splitPaymentAPI(data);
-            // console.log("response")
-            // console.log(response)
-            setSplitResponse(response[0]);
+                                    setSplitResponse(response[0]);
             setStopAPI(true);
         }
         splitApi();
@@ -257,11 +249,10 @@ const PaymentModal = (props) => {
                 });
                 setSplitResponse(response);
             }
-            // console.log(response);
-        }
+                    }
         splitApi();
     }
-
+    const insets = useSafeAreaInsets();
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
@@ -275,7 +266,7 @@ const PaymentModal = (props) => {
                 null
         }
 
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -341,9 +332,7 @@ const PaymentModal = (props) => {
                     <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
                                      placeholder={"Price"}
                                      onChangeText={(price) => {
-                                         console.log(price)
-                                         console.log(price.length)
-                                         if (price.trim().length === 0) {
+                                                                                                                           if (price.trim().length === 0) {
                                              setTotalPrice(0)
                                              return
                                          }
@@ -369,15 +358,8 @@ const PaymentModal = (props) => {
                         // const shownCount = splitUpState.reduce((acc, item) => {
                         //     return item.shown ? acc + 1 : acc;
                         // }, 0);
-                        console.log("INDEX")
-                        console.log(index)
-                        console.log(shownCount)
-                        console.log(index + 1 === shownCount)
-                        if (item.shown) {
-                            console.log("item.mode")
-                            console.log(item.mode)
-                            console.log(paymentOrder)
-                            console.log(paymentOrder.at(-1))
+                                                                                                                        if (item.shown) {
+                                                                                                                console.log(paymentOrder.at(-1))
                             return <View style={styles.splitInputAndCloseContainer}>
                                 <CustomTextInput
                                     textInputStyle={isError ? {borderColor: Colors.error} : {borderColor: Colors.green}}
@@ -408,11 +390,7 @@ const PaymentModal = (props) => {
                                                 else return [...prev, item.mode]
                                             }
                                         );
-                                        console.log("ONCHANGETEXT");
-                                        console.log(text);
-                                        console.log("ONCHANGE");
-                                        console.log(splitUpState);
-                                    }}
+                                                                                                                                                                                                    }}
                                     onEndEditing={(text) => {
                                         const totalValue = splitUpState.reduce((acc, ele) => {
                                             if (ele.shown) {
@@ -490,7 +468,7 @@ const PaymentModal = (props) => {
             </View>
         </ScrollView>
         <Divider/>
-        <View style={styles.buttonContainer}>
+        <View style={[styles.buttonContainer,{paddingBottom:insets.bottom}]}>
             <PrimaryButton buttonStyle={styles.optionButton}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
@@ -498,20 +476,20 @@ const PaymentModal = (props) => {
                            onPress={async () => {
                                try {
                                    console.clear();
-                                   console.log("Before init " + new Date());
-
-                                   const response = await checkoutBookingAPI(details.id, cartSliceState);
-                                   console.log("After init " + new Date());
-
-                                   dispatch(updateBookingId(response[0].booking_id));
-
-                                   // Assuming dispatch is an asynchronous action creator
-                                   await dispatch(loadBookingDetailsFromDb(response[0].booking_id));
-                                   console.log("Loading " + new Date());
+                                   // console.log("Before init " + new Date());
+                                                                                                                                                                               const response = await checkoutBookingAPI(details.id, cartSliceState);
+                                   // console.log("After init " + new Date());
 
                                    await updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
+                                   dispatch(updateBookingId(response[0].booking_id));
+
+                                   await updateLiveStatusAPI(response[0].booking_id);
+                                   // Assuming dispatch is an asynchronous action creator
+                                   dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                                   // console.log("Loading " + new Date());
+
                                    setIsInvoiceModalVisible(true);
-                                   console.log("Loaded " + new Date());
+                                   // console.log("Loaded " + new Date());
 
                                } catch (error) {
                                    console.error("An error occurred:", error);
@@ -533,7 +511,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingVertical: 15,
         alignItems: "center",
     },

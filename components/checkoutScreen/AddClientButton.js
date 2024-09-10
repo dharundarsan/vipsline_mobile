@@ -1,41 +1,67 @@
 import PrimaryButton from "../../ui/PrimaryButton";
-import {FontAwesome6, Ionicons} from "@expo/vector-icons";
-import {Pressable, StyleSheet, Text, View} from "react-native";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
 import {clearClientInfo, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MemberShipDetailModal from "./MemberShipDetailModal";
+import { loadCartFromDB, updateCalculatedPrice } from "../../store/cartSlice";
 
 const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
     const [isClientInfo, setIsClientInfo] = useState(false)
     const [isVisibileModal, setIsVisibleModal] = useState(false)
+    const [isMembershipModalVisible, setIsMembershipModalVisible] = useState(false)
+    const [storeMembershipId, setStoreMembershipId] = useState(null)
     const dispatch = useDispatch();
+    useEffect(() => {
+        function singleMembershipApply(){
+            if (clientInfo.membershipDetails?.length === 1) {
+                if(clientInfo.membershipDetails[0].id === undefined || clientInfo.membershipDetails[0].client_id === undefined){
+                                    }
+                else{
+                    onApplyMembership(clientInfo.membershipDetails[0].id,clientInfo.membershipDetails[0].client_id)
+                }
+            }
+            if((storeMembershipId!==null || storeMembershipId !== "") && (clientInfo.membershipDetails[0] !== undefined && storeMembershipId !== null)){
+                            dispatch(loadCartFromDB(storeMembershipId, clientInfo.membershipDetails[0]?.client_id))
+                        }
+        }
+        singleMembershipApply();
+                    }, [clientInfo.isClientSelected])
+
+    async function onApplyMembership(clientMembershipId, clientId) {
+                setStoreMembershipId(clientMembershipId)
+        dispatch(loadCartFromDB(clientMembershipId, clientId))
+        // dispatch(updateCalculatedPrice())
+    }
     return (
         <>
             {
                 clientInfo.isClientSelected ?
                     <View style={{borderBottomWidth: 1, borderColor: Colors.highlight}}>
-                        <ClientInfoModal
-                            visible={isVisibileModal}
-                            setVisible={setIsVisibleModal}
-                            closeModal={() => {
-                                setIsVisibleModal(false);
-                            }}
-                            phone={clientInfo.details.mobile_1}
-                            name={clientInfo.details.firstName}
-                            id={clientInfo.details.id}
-                            onClose={() => setIsVisibleModal(false)}
-                        />
+                        {isVisibileModal && (
+                            <ClientInfoModal
+                                visible={isVisibileModal}
+                                setVisible={setIsVisibleModal}
+                                closeModal={() => {
+                                    setIsVisibleModal(false);
+                                }}
+                                phone={clientInfo.details?.mobile_1}
+                                name={clientInfo.details?.firstName}
+                                id={clientInfo.details?.id}
+                            />
+                        )}
                         <View style={styles.clientCardContainer}>
                             <ClientCard
                                 phone={clientInfo.details.mobile_1}
@@ -50,45 +76,51 @@ const AddClientButton = (props) => {
 
                             />
                             <View style={styles.actionMenu}>
-                                {clientInfo.details &&
-                                clientInfo.details.wallet_balance !== 0 &&
-                                clientInfo.membershipDetails.length !==0 &&
-                                clientInfo.packageDetails.length !== 0 ? (
-                                    isClientInfo ? (
-                                        <Pressable style={[styles.activePlan,{flexDirection:'row',alignItems:"center",
-                                            borderColor: Colors.transparent}]} onPress={() => {
+                                {
+                                    clientInfo.details ? (
+                                        isClientInfo ? (
+                                            <Pressable style={[styles.activePlan, {
+                                                flexDirection: 'row', alignItems: "center",
+                                                borderColor: Colors.transparent
+                                            }]} onPress={() => {
+                                                setIsVisibleModal(true);
+                                            }}>
+                                                <MaterialIcons name="sort" size={17} color={Colors.highlight} />
+                                                <Text
+                                                    style={{ color: Colors.highlight }}
+                                                >
+                                                    client info
+                                                </Text>
+                                            </Pressable>
+                                        ) : (
+                                            <SimpleLineIcons
+                                                name="options"
+                                                size={24}
+                                                color="black"
+                                                onPress={() => setIsClientInfo(true)}
+                                            />
+                                        )
+                                    ) :
+                                        <Pressable style={[styles.activePlan, {
+                                            flexDirection: 'row', alignItems: "center",
+                                            borderColor: Colors.transparent
+                                        }]} onPress={() => {
                                             setIsVisibleModal(true);
                                         }}>
                                             <MaterialIcons name="sort" size={17} color={Colors.highlight} />
                                             <Text
-                                                style={{color: Colors.highlight}}
+                                                style={{ color: Colors.highlight }}
                                             >
                                                 client info
                                             </Text>
                                         </Pressable>
-                                    ) : (
-                                        <SimpleLineIcons
-                                            name="options"
-                                            size={24}
-                                            color="black"
-                                            onPress={() => setIsClientInfo(true)}
-                                        />
-                                    )
-                                ) :
-                                    <Pressable style={[styles.activePlan,{flexDirection:'row',alignItems:"center",
-                                        borderColor: Colors.transparent}]} onPress={() => {
-                                        setIsVisibleModal(true);
-                                    }}>
-                                        <MaterialIcons name="sort" size={17} color={Colors.highlight} />
-                                        <Text
-                                            style={{color: Colors.highlight}}
-                                        >
-                                            client info
-                                        </Text>
-                                    </Pressable>
                                 }
 
-                                <Ionicons name="close" size={24} color="black" onPress={() => dispatch(clearClientInfo())}/>
+                                <Ionicons name="close" size={24} color="black" onPress={() => {
+                                    setStoreMembershipId(null);
+                                    onApplyMembership(undefined,undefined)
+                                    dispatch(clearClientInfo())
+                                }}/>
 
 
                             </View>
@@ -99,23 +131,31 @@ const AddClientButton = (props) => {
                                     clientInfo.details.wallet_balance !== 0 &&
                                     clientInfo.details.wallet_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}>
+                                        pressableStyle={styles.activePlanPressable}>
                                         <Text style={styles.activePlanText}>
-                                            Bal <Text style={{color: Colors.highlight}}> -
-                                            ₹{clientInfo.details.wallet_balance}</Text>
+                                            Bal <Text style={{ color: Colors.highlight }}> -
+                                                ₹{clientInfo.details.wallet_balance}</Text>
                                         </Text>
                                     </PrimaryButton>
                                 }
+                                <MemberShipDetailModal isMembershipModalVisible={isMembershipModalVisible}
+                                    membershipDetails={clientInfo.membershipDetails}
+                                    closeModal={() => setIsMembershipModalVisible(false)}
+                                    onApplyMembership={onApplyMembership}
+                                    storedMembershipId={storeMembershipId}
+                                />
                                 {clientInfo.membershipDetails.length !== 0 &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}>
-                                        <Feather name="user-check" size={17} color="black"/>
+                                        pressableStyle={styles.activePlanPressable}
+                                        onPress={() => setIsMembershipModalVisible(true)}
+                                    >
+                                        <Feather name="user-check" size={17} color="black" />
                                         <Text> Membership</Text>
                                     </PrimaryButton>}
                                 {clientInfo.packageDetails.length !== 0 &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}>
-                                        <MaterialCommunityIcons name="clipboard-list-outline" size={17} color="black"/>
+                                        pressableStyle={styles.activePlanPressable}>
+                                        <MaterialCommunityIcons name="clipboard-list-outline" size={17} color="black" />
                                         <Text style={styles.activePlanText}> Package</Text>
                                     </PrimaryButton>
                                 }
@@ -126,11 +166,11 @@ const AddClientButton = (props) => {
                     :
                     <PrimaryButton buttonStyle={styles.addClientButton} onPress={props.onPress}>
                         <View style={styles.addClientButtonInnerContainer}>
-                            <FontAwesome name="plus-square-o" size={24} color={Colors.highlight}/>
+                            <FontAwesome name="plus-square-o" size={24} color={Colors.highlight} />
                             <Text
                                 style={[TextTheme.bodyLarge, styles.addClientButtonText]}>{
-                                clientInfo.isClientSelected ?
-                                clientInfo.details.name : "Add Client"}</Text>
+                                    clientInfo.isClientSelected ?
+                                        clientInfo.details.name : "Add Client"}</Text>
                         </View>
                     </PrimaryButton>
             }

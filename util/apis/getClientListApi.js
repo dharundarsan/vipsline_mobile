@@ -45,8 +45,7 @@ export default async function getClientListApi() {
         return response.data;
     }
     catch (error){
-        console.log(error);
-    }
+            }
 
     return "not found"
 

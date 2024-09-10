@@ -32,7 +32,6 @@ export default async function cancelInvoiceAPI(status, bookingId) {
 
         ToastAndroid.show("Invoice Cancelled successfully!", ToastAndroid.LONG);
     } catch (error) {
-        console.log(error);
-        ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
+                ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
     }
 }

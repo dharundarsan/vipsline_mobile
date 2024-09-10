@@ -136,8 +136,7 @@ const UpdateClientModal = (props) => {
             ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
             // props.onUpdate();
         } catch (e) {
-            console.log(e);
-            ToastAndroid.show(e + "error", ToastAndroid.LONG);
+                        ToastAndroid.show(e + "error", ToastAndroid.LONG);
         }
     };
 

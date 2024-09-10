@@ -27,8 +27,7 @@ export default async function getBusinessNotificationDetailsAPI() {
     }
 
     const dispatch = useDispatch();
-    // console.log("fun ction callledddddd")
-    try{
+    //     try{
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/business/getBusinessNotificationDetails",
             {
@@ -40,9 +39,7 @@ export default async function getBusinessNotificationDetailsAPI() {
                 }
             }
         );
-        // console.log("APIIIIIIII")
-        // console.log(response.data.data[0]);
-    }
+             }
     catch(error){
         console.error("Error business notification details data:", error);
     }

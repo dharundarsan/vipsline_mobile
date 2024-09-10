@@ -16,9 +16,6 @@ export default async function splitPaymentAPI(data) {
     }
 
 
-
-    // console.log("DATA")
-    // console.log(data)
     try {
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/appointment/getDifferenceInAmount",
@@ -29,10 +26,7 @@ export default async function splitPaymentAPI(data) {
                 }
             }
         )
-        // console.log("API")
-        console.log(response.data.data)
-        return(response.data.data)
+        return (response.data.data)
     } catch (error) {
-        console.log("sendOtp error: " + error.response.message);
     }
 }

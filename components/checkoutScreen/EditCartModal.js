@@ -24,13 +24,9 @@ const EditCartModal = (props) => {
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage");
     const [discountValue, setDiscountValue] = useState(0);
     const [discountAmount, setDiscountAmount] = useState(0);
-    // console.log("props.dataaaaaa")
-    // console.log(props.data)
-    const [price, setPrice] = useState(props.data.price);
+            const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
-    console.log("Price")
-    console.log(price)
-    const cartItems = useSelector((state) => state.cart.items);
+            const cartItems = useSelector((state) => state.cart.items);
     const editedMembership = useSelector((state) => state.cart.editedMembership);
     const editedCart = useSelector((state) => state.cart.editedCart);
 
@@ -140,9 +136,7 @@ const EditCartModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={async () => {
                 if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
-                    console.log("props.datafucker");
-                    console.log(props.data);
-                    if (props.data.gender === "Women") {
+                                                            if (props.data.gender === "Women") {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
                             amount: price,

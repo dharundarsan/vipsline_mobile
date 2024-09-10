@@ -7,6 +7,7 @@ const initialState = {
     details: {},
     isFetching: false,
     booking_id1: "",
+    invoiceDetails: {},
 };
 
 
@@ -18,8 +19,7 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-        console.log("business token fetching error." + e);
-    }
+            }
 }
 
 
@@ -103,7 +103,7 @@ export const invoiceSlice = createSlice({
             state.details = action.payload;
         },
         updateMoreInvoiceDetails(state, action) {
-            state.details = {...state.details, ...action.payload};
+            state.invoiceDetails = action.payload;
         },
         updateWalletBalance(state, action) {
             state.details = {...state.details, ...action.payload};

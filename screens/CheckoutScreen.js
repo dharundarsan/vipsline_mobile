@@ -1,13 +1,13 @@
-import {Image, Pressable, StyleSheet, Text, View} from "react-native";
+import { Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
 import Cart from "../components/checkoutScreen/Cart";
 import AddClientButton from "../components/checkoutScreen/AddClientButton";
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import title from "react-native-paper/src/components/Typography/v2/Title";
-import {useEffect, useLayoutEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -28,12 +28,14 @@ import {loadStaffsFromDB} from "../store/staffSlice";
 import {loadCartFromDB} from "../store/cartSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
-import clearCartAPI from "../util/apis/clearCartAPI";
+import clearCartAPI from "../util/apis/clearCartAPI";2
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -49,8 +51,7 @@ const CheckoutScreen = () => {
                 setIsAuthenticated(false);
             }
         } catch (e) {
-            console.log('Error checking authentication:', e);
-            setIsAuthenticated(false);
+                        setIsAuthenticated(false);
         }
     };
 
@@ -69,15 +70,13 @@ const CheckoutScreen = () => {
         dispatch(loadProductsDataFromDb());
         dispatch(loadPackagesDataFromDb());
         dispatch(loadMembershipsDataFromDb());
-        // dispatch(loadClientsFromDb());
-        dispatch(loadClientCountFromDb());
+
         dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
         dispatch(loadLoginUserDetailsFromDb());
         dispatch(loadStaffsFromDB());
         dispatch(loadCartFromDB());
         // dispatch(loadBookingDetailsFromDb());
-        console.log("checkoutscreen useEffeect");
 
     }, [businessId]);
 
@@ -103,14 +102,16 @@ const CheckoutScreen = () => {
 
 
     return (
-        <View style={styles.checkoutScreen}>
+        <View style={[styles.checkoutScreen, {
+            paddingBottom: insets.bottom
+        }]}>
             <AddClientModal closeModal={() => {
                 setIsAddClientModalVisible(false)
-            }} isVisible={isAddClientModalVisible}/>
+            }} isVisible={isAddClientModalVisible} />
             <AddClientButton onPress={() => {
                 setIsAddClientModalVisible(true)
-            }}/>
-            <Cart/>
+            }} />
+            <Cart />
         </View>
     );
 }

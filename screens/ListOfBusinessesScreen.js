@@ -11,6 +11,7 @@ import {
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
 import {useCallback, useEffect, useLayoutEffect, useState} from "react";
+
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -29,38 +30,34 @@ export default function ListOfBusinessesScreen({navigation}) {
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
 
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
+    useLayoutEffect(() => {
+        // dispatch(loadServicesDataFromDb("women"));
+        // dispatch(loadServicesDataFromDb("men"));
+        // dispatch(loadServicesDataFromDb("kids"));
+        // dispatch(loadServicesDataFromDb("general"));
+        // dispatch(loadProductsDataFromDb());
+        // dispatch(loadPackagesDataFromDb());
+        // dispatch(loadMembershipsDataFromDb());
+        // dispatch(loadClientsFromDb());
+        // dispatch(loadClientCountFromDb());
+        // dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
-        dispatch(loadLoginUserDetailsFromDb());
-        console.log("list of busness rendering");
+        // dispatch(loadLoginUserDetailsFromDb());
     }, []);
 
 
     useFocusEffect(
         useCallback(() => {
             // Function to execute whenever the drawer screen is opened
-            console.log('Drawer screen opened');
             dispatch(clearClientsList());
 
             // Optional cleanup function when screen is unfocused
             return () => {
-                console.log('Drawer screen closed');
                 dispatch(loadClientsFromDb());
             };
         }, [])
     );
-
-
 
     async function authToken() {
 
@@ -71,8 +68,7 @@ export default function ListOfBusinessesScreen({navigation}) {
                 businessId = value;
             }
         } catch (e) {
-            console.log("auth token fetching error." + e);
-        }
+                    }
 
     }
 
@@ -80,8 +76,7 @@ export default function ListOfBusinessesScreen({navigation}) {
         try {
             await AsyncStorage.setItem('businessId', value);
         } catch (e) {
-            console.log("error storing business id save", e);
-        }
+                    }
     };
 
     function renderItem(itemData) {
@@ -106,9 +101,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     const token = useSelector(state => state.authDetails.authToken);
     const id = useSelector(state => state.authDetails.businessId);
 
-    console.log("token: " + token);
-    console.log("business id: " + id);
-
+    //     //
 
 
     return (

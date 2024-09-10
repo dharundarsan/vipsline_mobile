@@ -29,8 +29,7 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-        console.log("business token fetching error." + e);
-    }
+            }
 }
 
 export const loadServicesDataFromDb = (gender) => async (dispatch) => {

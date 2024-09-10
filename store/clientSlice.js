@@ -19,7 +19,6 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-        console.log("business token fetching error." + e);
     }
 }
 
@@ -41,22 +40,18 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
     //         return value;
     //     }
     // } catch (e) {
-    //     console.log("business token fetching error." + e);
     // }
 
 
     const {client, authDetails} = getState();
 
-    console.log("client.isFetching " + client.isFetching)
-    console.log("business id insiside slice : " + await getBusinessId());
 
     try {
         if (client.isFetching) return;
-        console.log("Update Fetch")
         dispatch(updateFetchingState(true));
-        console.log("client.isFetching ++" + client.isFetching)
         const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${0}&pageSize=20`,
+
+            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${0}&pageSize=40`,
             {
                 business_id: await getBusinessId(),
             },
@@ -67,7 +62,6 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
             }
         );
 
-        // console.log("business id inside the slice: " + await getBusinessId());
         dispatch(updateClientsList(response.data.data));
         dispatch(updateFetchingState(false));
     } catch (error) {
@@ -100,7 +94,6 @@ export const loadClientCountFromDb = () => async (dispatch) => {
         )
         dispatch(updateClientCount(response.data.data));
     } catch (error) {
-        console.log("fetching the client count error: " + error)
     }
 }
 
@@ -116,7 +109,6 @@ export const clientSlice = createSlice({
             state.clientCount = action.payload;
         },
         updateFetchingState(state, action) {
-            console.log("Done done done" + action.payload);
             state.isFetching = action.payload;
         },
         clearClientsList(state, action) {

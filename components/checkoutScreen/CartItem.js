@@ -30,8 +30,7 @@ const CartItem = (props) => {
         if (isLoading) return;
         dispatch(updateLoadingState(true));
         dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
-            // console.log("hello1")
-            dispatch(updateLoadingState(false));
+                        dispatch(updateLoadingState(false));
         })
         dispatch(await removeItemFromCart(props.data.item_id))
     }
@@ -39,10 +38,6 @@ const CartItem = (props) => {
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
 
-    // console.log("selectedStaff")
-    // console.log(selectedStaff)
-    // console.log("cartItem Props data")
-    // console.log(props.data)
 
     return <>
         <View style={styles.cartItem}>
@@ -89,8 +84,6 @@ const CartItem = (props) => {
                                    onPress={
                                        async () => {
                                            if (props.data.gender === "prepaid" && props.data) {
-                                               console.clear()
-                                               console.log("HEEEE")
                                                dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
                                                    dispatch(updateLoadingState(false));
                                                    dispatch(removeItemFromEditedCart(props.data.item_id))

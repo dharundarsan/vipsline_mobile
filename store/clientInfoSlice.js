@@ -21,8 +21,7 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-        console.log("business token fetching error." + e);
-    }
+            }
 }
 
 export const loadClientInfoFromDb = (clientId) => async (dispatch) => {
@@ -116,8 +115,7 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
         dispatch(updateAnalyticDetails(response.data.data[0]));
     }
     catch (e) {
-        console.log(e);
-    }
+            }
 
     try {
         const response = await axios.post(
@@ -132,12 +130,10 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
                 }
             }
         );
-        // console.log(response.data.data[0].no_of_feedbacks);
-        dispatch(updateFeedback(response.data.data[0].no_of_feedbacks));
+        //         dispatch(updateFeedback(response.data.data[0].no_of_feedbacks));
     }
     catch (e) {
-        console.log(e);
-    }
+            }
 
 }
 

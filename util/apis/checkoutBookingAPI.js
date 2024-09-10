@@ -31,10 +31,7 @@
 //                 Authorization: `Bearer ${authToken}`
 //             }
 //         })
-//         console.log(response.data.data);
-//         console.log(cart)
-//         console.log(clientId)
-//         return Promise.resolve(response.data.data);
+//                   return Promise.resolve(response.data.data);
 //
 //     } catch (error) {
 //     }
@@ -43,6 +40,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useSelector} from "react-redux";
+import {formatDate} from "../Helpers";
 
 export default async function checkoutBookingAPI(clientId, cartSliceState) {
     let authToken = "";
@@ -56,13 +54,12 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
         throw e; // Ensure that the error is propagated
     }
 
-
     try {
         const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + '/appointment/checkoutBooking', {
             COD: 1,
             additional_discounts: cartSliceState.additionalDiscounts,
             additional_services: cartSliceState.customItems,
-            appointment_date: "2024-09-09",
+            appointment_date: formatDate(Date.now(), "yyyy-mm-dd"),
             business_id: businessId,
             cart: cartSliceState.items.map(item => {
                 return {
@@ -109,7 +106,7 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
                         return item
                 })
             ],
-            endtime: "17:17:00",
+            endtime: "18:17:00",
             extra_charges: cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
@@ -121,7 +118,7 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
             notes: "",
             prepaid_wallet: [],
             promo_code: "",
-            sales_notes: "",
+            sales_notes: cartSliceState.salesNotes,
             starttime: "17:35:00",
             user_coupon: "",
             user_id: clientId,

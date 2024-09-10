@@ -41,7 +41,6 @@ export default async function sendSMSAPI(name, mobile) {
 
         ToastAndroid.show("SMS send successfully!", ToastAndroid.LONG);
     } catch (error) {
-        console.log(error + "SMS");
-        ToastAndroid.show("Failed to send SMS.", ToastAndroid.LONG);
+                ToastAndroid.show("Failed to send SMS.", ToastAndroid.LONG);
     }
 }

@@ -2,7 +2,7 @@ import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_AUTH_KEY, EXPO_PUBLIC_BUSINESS_ID} from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default async function updateClientAPI(clientId, data) {
+export default async function updateLiveStatusAPI(bookingId) {
 
     let authToken = ""
     try {
@@ -11,15 +11,15 @@ export default async function updateClientAPI(clientId, data) {
             authToken = value;
         }
     } catch (e) {
-        console.log("auth token fetching error. (inside update client api)" + e);
+        console.log("auth token fetching error. (inside update updatelivestatus api)" + e);
     }
 
-    const api = process.env.EXPO_PUBLIC_API_URI + "/client/editClient";
+    const api = process.env.EXPO_PUBLIC_API_URI + "/appointment/updateLiveStatusUsingBookingId";
     try {
-        const response = await axios.put(api,
+        const response = await axios.post(api,
             {
-                client_id: clientId,
-                data: data
+                booking_id: bookingId,
+                status: "COMPLETED"
             },
             {
                 headers: {
@@ -28,6 +28,5 @@ export default async function updateClientAPI(clientId, data) {
             });
 
     } catch (e) {
-        throw e.response.data.other_message;
-    }
+            }
 }

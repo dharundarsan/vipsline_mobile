@@ -28,14 +28,13 @@ const InvoiceModal = (props) => {
     const details = useSelector(state => state.invoice.details);
     const bookingId = useSelector(state => state.invoice.booking_id1);
 
-    console.log("details");
-    console.log(details);
-    const selectedClientDetails = useSelector(state => state.clientInfo.details);
+    const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
+
+
+            const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
     const dispatch = useDispatch();
 
-    console.log("client: + selectedClientDetails");
-    console.log(selectedClientDetails)
 
     const navigation = useNavigation();
 
@@ -78,30 +77,20 @@ const InvoiceModal = (props) => {
                 return value;
             }
         } catch (e) {
-            console.log("businessId fetching error. (inside getClientListApi)" + e);
         }
     }
 
 
-    console.log("businessId " + businessId);
-    const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
+        const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     // let selectedBusinessDetails = "";
     // getBusinessId().then(r => {
-    //     console.log("asdlklnhkuidgjkhdb")
-    //     console.log(r)
-    //     setBusinessId(r);
-    // console.log("businessId " + businessId)
-    // });
+             //     setBusinessId(r);
+        // });
     const selectedBusinessDetails = listOfBusinesses.filter((item) => {
         return item.id === businessId
     })[0];
 
-    console.log("businessId " + businessId)
-    console.log(listOfBusinesses);
-    console.log("Busones r" + businessId);
 
-    console.log("selectedBusinessDetails.name");
-    console.log(selectedBusinessDetails);
 
     const businessName = selectedBusinessDetails.name;
     const businessContact = selectedBusinessDetails.mobile_1;
@@ -109,8 +98,6 @@ const InvoiceModal = (props) => {
     const businessEmail = selectedBusinessDetails.email;
     const GSTIn = selectedBusinessDetails.gstin;
 
-    console.log("business")
-    console.log(selectedBusinessDetails);
 
 
     useEffect(() => {
@@ -118,8 +105,7 @@ const InvoiceModal = (props) => {
             try {
                 dispatch(await loadWalletPriceFromDb(selectedClientDetails.id));
             } catch (e) {
-                console.log("Get wallet balance api error: " + e.response.data.message)
-            }
+                            }
         }
         api();
     }, [selectedClientDetails]);
@@ -157,7 +143,9 @@ const InvoiceModal = (props) => {
 
                     } else if (value === "Email") {
                         setEmailModalVisibility(true);
-
+                    }
+                    else if(value === "Cancel Invoice") {
+                        setCancelInvoiceModalVisibility(true);
                     }
                 }}
             />
@@ -244,7 +232,7 @@ const InvoiceModal = (props) => {
                 }}
                 dropdownItems={[
                     "Go to Appointment",
-                    "Booking history"
+                    "Booking story"
                 ]}
                 iconImage={[
                     require("../../assets/icons/invoiceIcons/send.png"),
@@ -260,7 +248,15 @@ const InvoiceModal = (props) => {
 styles.heading]}>Invoice</Text>*/}
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={() => setCancelInvoiceModalVisibility(true)
+                onPress={() => {
+                    // setCancelInvoiceModalVisibility(true)
+                    clearCartAPI();
+                    dispatch(clearLocalCart());
+                    dispatch(clearClientInfo());
+                    dispatch(clearCalculatedPrice());
+                    props.onCloseModal();
+                    props.onCloseModal();
+                }
                 }
             >
                 <Ionicons name="close" size={25} color="black"/>
@@ -342,16 +338,19 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>Email
                             : </Text>{businessEmail}</Text>
                         <Text style={textTheme.bodyLarge}><Text
+                        //     style={textTheme.titleMedium}>Contact : </Text>
+                        // </Text>
+                        // <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
                         </Text>
                     </View>
                     <View style={styles.invoiceNumberAndDateContainer}>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice no :
-                        </Text>{details.business_invoice_num}</Text>
+                        </Text>{invoiceDetails.business_invoice_num}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice date :
-                        </Text>{details.invoice_created_date}</Text>
+                        </Text>{invoiceDetails.invoice_created_date}</Text>
                     </View>
                     <View style={styles.invoiceDetailsOutlineCard}>
                         <Text style={textTheme.bodyLarge}><Text
@@ -366,7 +365,7 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}>
                             <Text
                                 style={textTheme.titleMedium}>Prepaid :
-                            </Text>{details.wallet_balance}</Text>
+                            </Text> {details.wallet_balance}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN
                             : </Text>{selectedClientDetails.customer_gst}</Text>
@@ -458,24 +457,24 @@ styles.heading]}>Invoice</Text>*/}
                 </View>
                 <Divider color={Colors.highlight}/>
                 {
-                    checkNullUndefined(details.footer_message_1) &&
-                    details.footer_message_1.trim().length !== 0 ?
+                    checkNullUndefined(invoiceDetails.footer_message_1) &&
+                    invoiceDetails.footer_message_1.trim().length !== 0 ?
                         <View style={styles.termsAndConditions}>
                             <Text
                                 style={[textTheme.titleMedium]}>Terms & conditions: </Text>
                             <Text
-                                style={[textTheme.bodyMedium]}>{details.footer_message_1}</Text>
+                                style={[textTheme.bodyMedium]}>{invoiceDetails.footer_message_1}</Text>
 
                         </View> :
                         null
                 }
             </View>
             {
-                checkNullUndefined(details.footer_message_2) &&
-                details.footer_message_2.trim().length !== 0 ?
+                checkNullUndefined(invoiceDetails.footer_message_2) &&
+                invoiceDetails.footer_message_2.trim().length !== 0 ?
                     <Text
                         style={[textTheme.titleMedium,
-                            styles.thankYouText]}>{details.footer_message_2}</Text> :
+                            styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
                     null
             }
         </ScrollView>

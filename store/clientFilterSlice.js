@@ -26,8 +26,7 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-        console.log("business token fetching error." + e);
-    }
+            }
 }
 
 
@@ -63,11 +62,7 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
                 }
             }
         );
-        // console.log( "current page number: "+ clientFilter.pageNo);
-        // console.log("current page size: " + pageSize);
-        // console.log("current max entry size: " + clientFilter.maxEntry);
-        // console.log(response.data.data);
-        dispatch(updateTotalClientCount(response.data.data.pop().count));
+                          dispatch(updateTotalClientCount(response.data.data.pop().count));
         dispatch(updateClientsList(response.data.data));
         dispatch(updateFetchingState(false));
     } catch (error) {

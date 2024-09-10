@@ -30,6 +30,7 @@ const AddClientModal = (props) => {
     const searchClientFromDB = useCallback(async (query, pageNo) => {
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
 
+
         let authToken = ""
         try {
             const value = await AsyncStorage.getItem('authKey');
@@ -49,6 +50,7 @@ const AddClientModal = (props) => {
         } catch (e) {
             console.log("business token fetching error." + e);
         }
+
 
         setIsLoading(true);
         try {
@@ -127,7 +129,6 @@ const AddClientModal = (props) => {
                         data={clientsList}
                         keyExtractor={(item) => item.id.toString()}
                         // onEndReachedThreshold={0.7}
-                        // onEndReached={() => dispatch(loadClientsFromDb())}
                         renderItem={({item}) => (
                             <ClientCard
                                 clientId={item.id}
