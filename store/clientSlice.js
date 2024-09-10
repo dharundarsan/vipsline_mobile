@@ -56,9 +56,9 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
         dispatch(updateFetchingState(true));
         console.log("client.isFetching ++" + client.isFetching)
         const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${client.pageNo}&pageSize=20`,
+            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${0}&pageSize=20`,
             {
-                business_id: "2db7d255-7797-4cce-9590-fc59d2019577",
+                business_id: await getBusinessId(),
             },
             {
                 headers: {

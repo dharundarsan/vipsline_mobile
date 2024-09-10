@@ -10,7 +10,7 @@ import {
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
-import {useEffect, useLayoutEffect} from "react";
+import {useCallback, useEffect, useLayoutEffect, useState} from "react";
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -21,6 +21,7 @@ import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../sto
 import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useFocusEffect} from "@react-navigation/native";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -28,7 +29,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         dispatch(loadServicesDataFromDb("women"));
         dispatch(loadServicesDataFromDb("men"));
         dispatch(loadServicesDataFromDb("kids"));
@@ -36,12 +37,29 @@ export default function ListOfBusinessesScreen({navigation}) {
         dispatch(loadProductsDataFromDb());
         dispatch(loadPackagesDataFromDb());
         dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb());
+
         dispatch(loadClientCountFromDb());
         dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
         dispatch(loadLoginUserDetailsFromDb());
+        console.log("list of busness rendering");
     }, []);
+
+
+    useFocusEffect(
+        useCallback(() => {
+            // Function to execute whenever the drawer screen is opened
+            console.log('Drawer screen opened');
+            dispatch(clearClientsList());
+
+            // Optional cleanup function when screen is unfocused
+            return () => {
+                console.log('Drawer screen closed');
+                dispatch(loadClientsFromDb());
+            };
+        }, [])
+    );
+
 
 
     async function authToken() {
@@ -79,8 +97,6 @@ export default function ListOfBusinessesScreen({navigation}) {
                     dispatch(updateBusinessId(itemData.item.id));
                     dispatch(updateIsBusinessSelected(true));
                     dispatch(updateSelectedBusinessDetails(itemData.item));
-                    dispatch(clearClientsList());
-                    // dispatch(loadClientsFromDb());
                     navigation.navigate("Checkout");
                 }}
             />
