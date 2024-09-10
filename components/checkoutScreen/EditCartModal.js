@@ -136,7 +136,7 @@ const EditCartModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={async () => {
                 if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
-                                                            if (props.data.gender === "Women") {
+                    if (props.data.gender === "Women") {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
                             amount: price,

@@ -161,6 +161,8 @@ const CheckoutSection = (props) => {
         if(calculatedPrice[0]){
             return null;
         }
+        // if (!chargesInputData || chargesInputData.length === 0) {
+
                 dispatch(updateChargeData(chargesInputData));
     }
 

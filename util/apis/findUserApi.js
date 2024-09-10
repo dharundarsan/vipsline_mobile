@@ -25,6 +25,6 @@ export default async function findUser(email, platform) {
                 isFound = false;
     }
 
-    //     return isFound;
+    return isFound;
 }
 
