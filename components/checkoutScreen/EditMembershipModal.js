@@ -15,7 +15,7 @@ import React, {useState} from "react";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import Divider from "../../ui/Divider";
-import {formatDate} from "../../util/Helpers";
+import {checkNullUndefined, formatDate} from "../../util/Helpers";
 import RNDateTimePicker, {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {addItemToCart, addItemToEditedMembership} from "../../store/cartSlice";
@@ -62,6 +62,7 @@ const EditMembershipModal = (props) => {
                 total_price: membershipPrice,
                 amount: membershipPrice,
                 resource_id:null,
+                item_id: checkNullUndefined(props.data.item_id) ? Math.floor(Math.random() * 90000) + 10000 : props.data.item_id,
                 "id": membershipId,
                 "valid_from": formatDate(validFromDate, "yyyy-d-m"),
                 "valid_until": formatDate(validUntilDate, "yyyy-d-m"),

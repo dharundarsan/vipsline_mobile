@@ -134,8 +134,6 @@ const Cart = () => {
         closeContainer: {},
         closeIcon: {}
     });
-    console.log(cartItems)
-    console.log("cartItems")
     return (
         <View style={styles.cart}>
             <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>
@@ -151,7 +149,9 @@ const Cart = () => {
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}}
                                   data={[...cartItems, ...editedCart, ...customItems, ...editedMembership]}
-                                  keyExtractor={(item, index) => item}
+                                  keyExtractor={(item, index) => {
+                                      return item;
+                                  }}
                                   renderItem={({item}) => <CartItem staffs={staffs} data={item}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>

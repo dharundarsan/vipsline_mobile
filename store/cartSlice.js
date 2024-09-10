@@ -4,6 +4,7 @@ import axios from "axios";
 import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {formatDate} from "../util/Helpers";
 
 const initialCartState = {
     items: [],
@@ -99,7 +100,7 @@ export const loadCartFromDB = (clientMembershipID, clientId) => async (dispatch,
         dispatch(updateItem(response.data.data));
         dispatch(updateEditedMembership({type: "map"}))
         dispatch(updateEditedCart());
-        dispatch(updatePackageCart());
+        // dispatch(updatePackageCart());
         dispatch(updateCalculatedPrice(clientMembershipID, clientId));
         dispatch(updateTotalChargeAmount(cart?.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
@@ -108,6 +109,7 @@ export const loadCartFromDB = (clientMembershipID, clientId) => async (dispatch,
 
 export const updateCalculatedPrice = (clientMembershipID, clientId) => async (dispatch, getState) => {
     const {cart} = getState();
+
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
@@ -123,11 +125,11 @@ export const updateCalculatedPrice = (clientMembershipID, clientId) => async (di
                 itemId: item.item_id,
                 membership_id: item.id,
                 membership_number: "",
-                res_cat_id: 282773,
+                res_cat_id: item.resource_category_id,
                 resource_id: item.resource_id,
                 type: "AMOUNT",
-                valid_from: item.valid_from,
-                valid_till: item.valid_until,
+                valid_from: formatDate(item.valid_from, "yyyy-mm-dd"),
+                valid_till: formatDate(item.valid_until, "yyyy-mm-dd"),
                 wallet_amount: 0,
             }
         }),
@@ -281,14 +283,15 @@ export const cartSlice = createSlice({
             state.chargesData = initialCartState.chargesData;
         },
         updateCustomItem(state, action) {
-            state.customItems = state.customItems.map(edited => {
-                if (edited.item_id === action.payload.item_id) {
+            console.log(action.payload);
+            state.customItems = state.customItems.map(item => {
+                if (item.item_id === action.payload.item_id) {
                     return {
-                        ...edited,
+                        ...item,
                         ...action.payload
                     }
                 }
-                return edited;
+                return item;
             })
         },
         updateEditedMembership(state, action) {
@@ -311,42 +314,43 @@ export const cartSlice = createSlice({
                 }).flat()
 
                 state.items = state.items.filter(item =>
-                    !state.editedMembership.some(edited => edited.id === item.membership_id)
+                    !state.editedMembership.some(edited => edited.item_id === item.item_id)
                 );
             } else if (action.payload.type === "edit") {
-                state.editedMembership = state.editedMembership.map(edited => {
-                    if (edited.item_id === action.payload.id) {
+                state.editedMembership = state.editedMembership.map(item => {
+                    if (item.item_id === action.payload.id) {
                         return {
-                            ...edited,
-                            itemId: edited.item_id,
-                            item_Id: edited.item_id,
-                            membership_id: edited.membership_id,
+                            ...item,
+                            itemId: item.item_id,
+                            item_Id: item.item_id,
+                            membership_id: item.membership_id,
                             membership_number: "",
                             res_cat_id: action.payload.data.res_cat_id,
-                            resource_id: edited.resource_id,
+                            resource_id: item.resource_id,
                             disc_value: action.payload.data.disc_value,
                             amount: action.payload.data.amount,
                             price: action.payload.data.amount,
                             total_price: action.payload.data.amount,
                             type: action.payload.data.type,
-                            valid_from: edited.valid_from,
-                            valid_till: edited.valid_until,
+                            valid_from: item.valid_from,
+                            valid_till: item.valid_until,
                             wallet_amount: 0,
                         }
                     }
-                    return edited;
+                    return item;
                 })
             }
-            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
-
+            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.item_id !== edited.item_id)).flat();
         },
         setCalculatedPrice(state, action) {
             state.calculatedPrice = action.payload;
         },
         addCustomItems(state, action) {
+            const id = Math.floor(Math.random() * 90000) + 10000;
             const data = {
                 ...action.payload,
-                id: Math.floor(Math.random() * 90000) + 10000
+                id: id,
+                item_id: id
             }
             state.customItems = [...state.customItems, data];
         },

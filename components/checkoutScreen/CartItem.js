@@ -22,7 +22,6 @@ import EditCartModal from "./EditCartModal";
 import PrepaidModal from "./PrepaidModal";
 
 const CartItem = (props) => {
-    // console.log(props)
     const dispatch = useDispatch();
     const isLoading = useSelector(state => state.cart.isLoading);
     const [isEditCartModalVisible, setIsEditCartModalVisible] = useState(false);
@@ -31,9 +30,9 @@ const CartItem = (props) => {
         if (isLoading) return;
         dispatch(updateLoadingState(true));
         dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
-                        dispatch(updateLoadingState(false));
+            dispatch(updateLoadingState(false));
         })
-        dispatch(await removeItemFromCart(props.data.item_id))
+        // dispatch(await removeItemFromCart(props.data.item_id))
     }
 
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
@@ -69,17 +68,18 @@ const CartItem = (props) => {
                         <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
                         <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.price}</Text>
-                        <PrimaryButton onPress={() => {
-                            if (props.data.gender === "prepaid")
+                        {props.data.gender === "packages" ? null : <PrimaryButton onPress={() => {
+                            if (props.data.gender === "prepaid") {
                                 setIsEditPrepaidModalVisible(true)
-                            else
+                            } else {
                                 setIsEditCartModalVisible(true)
+                            }
                         }}
-                                       buttonStyle={styles.editAmountButton}
-                                       pressableStyle={styles.editAmountPressable}>
+                                                                                  buttonStyle={styles.editAmountButton}
+                                                                                  pressableStyle={styles.editAmountPressable}>
                             <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
                             {/*<Feather  name="edit" size={22} color="black"/>*/}
-                        </PrimaryButton>
+                        </PrimaryButton>}
                     </View>
                     <PrimaryButton buttonStyle={styles.closeIconButton} pressableStyle={styles.closeIconPressable}
                                    onPress={
