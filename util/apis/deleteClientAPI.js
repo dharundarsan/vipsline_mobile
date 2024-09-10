@@ -31,12 +31,9 @@ export default async function deleteClientAPI(clientId) {
                 }
             }
         )
-        // console.log(response.data.message);
-        if(response.data.message === "Client deleted ") {
+        if (response.data.message === "Client deleted ") {
             showToast();
         }
-    }
-    catch (error) {
-        console.log(error);
+    } catch (error) {
     }
 }

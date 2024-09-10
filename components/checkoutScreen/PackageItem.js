@@ -18,7 +18,7 @@ const PackageItem = (props) => {
             borderWidth: 1,
             borderColor: props.selected ? Colors.blue : Colors.grey400,
             borderRadius: 8,
-            overflow: "hidden",
+            overflow: "dden",
             backgroundColor: Colors.transparent,
         },
         packageItemPressable: {

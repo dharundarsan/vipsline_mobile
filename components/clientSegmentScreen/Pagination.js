@@ -79,8 +79,7 @@ export default function Pagination(props) {
         }
 
         if(upperCount === totalCount) {
-            // console.log(upperCount + "  " + totalCount);
-            setIsForwardButtonDisabled(true);
+                        setIsForwardButtonDisabled(true);
         }
         else {
             setIsForwardButtonDisabled(false);
@@ -115,23 +114,19 @@ export default function Pagination(props) {
             if(upperCountAfter > totalCount && lowerCountAfter < 0) {
                 setLowerCount(totalCount - maxEntry);
                 setUpperCount(totalCount);
-                // console.log("both are out of bound");
-            }
+                            }
             else if(upperCountAfter <= totalCount && lowerCountAfter >= 0) {
-                // console.log("both are good not out of bound");
-                setLowerCount(lowerCountAfter);
+                                setLowerCount(lowerCountAfter);
                 setUpperCount(upperCountAfter);
                 dispatch(incrementPageNumber());
             }
             else if(upperCountAfter > totalCount && upperCountAfter >= 0) {
-                // console.log("upper bound is out of bound");
-                dispatch(incrementPageNumber());
+                                dispatch(incrementPageNumber());
                 setUpperCount(totalCount);
                 setLowerCount(lowerCountAfter)
             }
             else if(lowerCountAfter < 0 && upperCountAfter < totalCount) {
-                // console.log("lower bound is out of bound");
-                dispatch(incrementPageNumber());
+                                dispatch(incrementPageNumber());
                 setUpperCount(upperCountAfter)
                 setLowerCount(0)
             }
@@ -144,20 +139,17 @@ export default function Pagination(props) {
             let upperCountAfter = upperCount - maxEntry;
 
             if (lowerCountAfter === 1 && upperCountAfter < maxEntry) {
-                // console.log("lower bound ==== 1 and upper bound is under of bound while dec");
-                setLowerCount(1);
+                                setLowerCount(1);
                 setUpperCount(maxEntry);
                 dispatch(decrementPageNumber());
             }
             else if(lowerCountAfter < 1 && upperCountAfter < maxEntry) {
-                // console.log("lower bound is out of bound and upper bound is under of bound while dec");
-                setLowerCount(1);
+                                setLowerCount(1);
                 setUpperCount(maxEntry);
                 dispatch(decrementPageNumber());
             }
             else if(upperCountAfter >= 1 && upperCountAfter >= maxEntry) {
-                // console.log("bother are good not out of bound while decrement");
-                setLowerCount(lowerCountAfter);
+                                setLowerCount(lowerCountAfter);
                 setUpperCount(upperCountAfter);
                 dispatch(decrementPageNumber());
             }

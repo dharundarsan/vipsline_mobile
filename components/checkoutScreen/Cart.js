@@ -35,8 +35,7 @@ const Cart = () => {
     //
     //     if (editedCart.length > 1) return;
     //
-    //     console.log(customItems);
-    //
+
     //     calculateCartPriceAPI({
     //         additional_discounts: [],
     //         additional_services: customItems,
@@ -135,12 +134,6 @@ const Cart = () => {
         closeContainer: {},
         closeIcon: {}
     });
-// console.log("cartItems.length === 0 && customItems.length === 0 && editedCart.length === 0 && editedMembership.length === 0 ?")
-// console.log(cartItems.length === 0)
-// console.log(customItems.length === 0)
-// console.log(customItems)
-// console.log(editedCart.length === 0)
-// console.log(editedMembership.length === 0)
     return (
         <View style={styles.cart}>
             <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>
@@ -156,7 +149,7 @@ const Cart = () => {
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}}
                                   data={[...cartItems, ...editedCart, ...customItems, ...editedMembership]}
-                                  keyExtractor={(item, index) => item}
+                                  keyExtractor={(item, index) => index}
                                   renderItem={({item}) => <CartItem staffs={staffs} data={item}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>

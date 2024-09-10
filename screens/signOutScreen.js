@@ -16,14 +16,12 @@ const SignOutPrompt = ({ navigation }) => {
             await AsyncStorage.removeItem('authKey');
             dispatch(updateAuthStatus(false));
         } catch (e) {
-            console.log("error storing auth token" + e);
-        }
+                    }
         try {
             await AsyncStorage.removeItem('businessId');
             dispatch(updateAuthStatus(false));
         } catch (e) {
-            console.log("error storing auth token" + e);
-        }
+                    }
         Alert.alert("Signed out", "You have been signed out successfully.");
         navigation.navigate("Checkout");
 

@@ -28,9 +28,6 @@ const AddClientModal = (props) => {
     const searchClientFromDB = useCallback(async (query, pageNo) => {
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
 
-        useEffect(()=>{
-            dispatch(loadClientsFromDb());
-        },[]);
 
         setIsLoading(true);
         try {
@@ -47,8 +44,10 @@ const AddClientModal = (props) => {
                 }
             );
             setSearchedClients(prev => [...prev, ...response.data.data]);
+            setIsLoading(false);
         } catch (e) {
             console.error("Error fetching clients:", e);
+            setIsLoading(false);
         } finally {
             setIsLoading(false); // Ensure loading state is reset after completion or failure
         }
@@ -106,8 +105,8 @@ const AddClientModal = (props) => {
                     <FlatList
                         data={clientsList}
                         keyExtractor={(item) => item.id.toString()}
-                        onEndReachedThreshold={0.7}
-                        onEndReached={() => dispatch(loadClientsFromDb(pageNo))}
+                        // onEndReachedThreshold={0.7}
+                        // onEndReached={() => dispatch(loadClientsFromDb(pageNo))}
                         renderItem={({item}) => (
                             <ClientCard
                                 clientId={item.id}

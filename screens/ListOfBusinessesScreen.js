@@ -10,7 +10,7 @@ import {
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
-import {useEffect, useLayoutEffect} from "react";
+import {useCallback, useEffect, useLayoutEffect} from "react";
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -21,6 +21,7 @@ import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../sto
 import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useFocusEffect} from "@react-navigation/native";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -29,19 +30,28 @@ export default function ListOfBusinessesScreen({navigation}) {
     const dispatch = useDispatch();
 
     useLayoutEffect(() => {
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb());
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
+        // dispatch(loadServicesDataFromDb("women"));
+        // dispatch(loadServicesDataFromDb("men"));
+        // dispatch(loadServicesDataFromDb("kids"));
+        // dispatch(loadServicesDataFromDb("general"));
+        // dispatch(loadProductsDataFromDb());
+        // dispatch(loadPackagesDataFromDb());
+        // dispatch(loadMembershipsDataFromDb());
+        // dispatch(loadClientsFromDb());
+        // dispatch(loadClientCountFromDb());
+        // dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
-        dispatch(loadLoginUserDetailsFromDb());
+        // dispatch(loadLoginUserDetailsFromDb());
     }, []);
+
+
+    useFocusEffect(
+        useCallback(() => {
+            dispatch(clearClientsList())
+
+            return () => dispatch(loadClientsFromDb());
+        }, [])
+    );
 
 
     async function authToken() {
@@ -53,8 +63,7 @@ export default function ListOfBusinessesScreen({navigation}) {
                 businessId = value;
             }
         } catch (e) {
-            console.log("auth token fetching error." + e);
-        }
+                    }
 
     }
 
@@ -62,8 +71,7 @@ export default function ListOfBusinessesScreen({navigation}) {
         try {
             await AsyncStorage.setItem('businessId', value);
         } catch (e) {
-            console.log("error storing business id save", e);
-        }
+                    }
     };
 
     function renderItem(itemData) {
@@ -90,9 +98,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     const token = useSelector(state => state.authDetails.authToken);
     const id = useSelector(state => state.authDetails.businessId);
 
-    console.log("token: " + token);
-    console.log("business id: " + id);
-
+    //     //
 
 
     return (

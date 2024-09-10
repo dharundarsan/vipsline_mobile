@@ -32,7 +32,7 @@ export default function MobileOtp() {
     }
 
     async function findUser() {
-        let response = "something went wrong"
+        let response = "sometng went wrong"
         try {
             response = await axios.post(BaseURL + '/user/findUser', {
                 platform: platform,
@@ -40,37 +40,31 @@ export default function MobileOtp() {
             })
             responseUserMessage = response.data.message;
 
-        }
-        catch (error) {
-            console.log("user not found: " + error);
+        } catch (error) {
         }
 
-        // console.log(response);
         return responseUserMessage;
     }
 
     async function sendOtp() {
         setIsLoading(true);
-        if(await findUser() === "user found") {
+        if (await findUser() === "user found") {
             try {
                 const response = await axios.post(
                     BaseURL + "/user/sendOtp",
                     {
-                        userName:mobileNumber,
-                        platform:platform,
+                        userName: mobileNumber,
+                        platform: platform,
                     })
                 navigation.navigate('VerificationCodeScreen',
                     {
                         mobileNumber: mobileNumber
                     });
                 setIsUserFound(true);
-            }
-            catch (error) {
-                console.log("sendOtp error: " + error);
+            } catch (error) {
             }
 
-        }
-        else {
+        } else {
             setIsUserFound(false);
         }
 
@@ -86,14 +80,14 @@ export default function MobileOtp() {
             width: '100%',
             borderWidth: 2,
             paddingVertical: 8,
-            borderColor: isFocussed ? isUserFound ? Colors.highlight : Colors.error : !isUserFound ? Colors.error :Colors.grey400,
+            borderColor: isFocussed ? isUserFound ? Colors.highlight : Colors.error : !isUserFound ? Colors.error : Colors.grey400,
             borderRadius: 6,
             paddingHorizontal: 12,
         },
         mobileNumberContainer: {
             alignItems: "flex-start",
             // borderWidth: 2,
-            width:'100%',
+            width: '100%',
         },
         sendOtpButton: {
             width: '100%',
@@ -105,7 +99,7 @@ export default function MobileOtp() {
 
     return (
         <View style={styles.mobileOtpContainer}>
-            <View style={{marginTop: 30, marginBottom: 8, width: '82%', }}>
+            <View style={{marginTop: 30, marginBottom: 8, width: '82%',}}>
                 <Text style={[textTheme.titleSmall]}>Mobile number</Text>
             </View>
             <View style={styles.mobileNumberContainer}>
@@ -114,7 +108,7 @@ export default function MobileOtp() {
                 <TextInput
                     style={[textTheme.titleSmall, styles.mobileNumberInput]}
                     placeholder='Enter mobile number'
-                    keyboardType= "number-pad"
+                    keyboardType="number-pad"
                     onFocus={onFocusHandler}
                     onBlur={onFocusOutHandler}
                     value={mobileNumber}
@@ -127,12 +121,12 @@ export default function MobileOtp() {
                 {
                     !isUserFound ?
                         <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number</Text> :
-                        <Text > </Text>
+                        <Text> </Text>
                 }
                 <PrimaryButton
                     buttonStyle={styles.sendOtpButton}
                     onPress={sendOtp}
-                    >
+                >
                     {
                         !isLoading ?
                             <Text style={[textTheme.titleSmall, {color: Colors.onHighlight}]}>Send OTP</Text> :

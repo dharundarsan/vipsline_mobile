@@ -29,6 +29,5 @@ export default async function getDiscountAPI(data) {
         )
         return(response.data.data[0].percent_amount);
     } catch (error) {
-        console.log("sendOtp error: " + error.response.message);
-    }
+            }
 }

@@ -4,7 +4,7 @@ import {loadCartFromDB} from "./cartSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialStaffState = {
-    staffs:[]
+    staffs: []
 };
 
 
@@ -16,7 +16,6 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-        console.log("business token fetching error." + e);
     }
 }
 
@@ -65,7 +64,7 @@ export const updateCartItemStaff = (res_list) => async (dispatch, getState) => {
             `${process.env.EXPO_PUBLIC_API_URI}/cart/updateMultipleResourceInCart2`,
             {
                 business_id: `${await getBusinessId()}`,
-                res_list:res_list
+                res_list: res_list
 
             },
             {
@@ -85,7 +84,6 @@ export const staffSlice = createSlice({
     reducers: {
         updateStaffs(state, action) {
             state.staffs = action.payload;
-            // console.log("state: "+state);
         },
     }
 });

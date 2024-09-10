@@ -11,7 +11,7 @@ import UpdateClientModal from "./UpdateClientModal";
 /**
  * ClientDetails Component
  *
- * This component displays detailed information about a client in a scrollable view.
+ * Ts component displays detailed information about a client in a scrollable view.
  * It includes sections for client info and personal details, and allows users to edit
  * client information via a modal. The modal is toggled by pressing the 'Edit' button.
  *

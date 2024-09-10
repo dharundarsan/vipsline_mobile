@@ -41,8 +41,7 @@ const EditMembershipModal = (props) => {
         //     new Date(validUntilDate).getTime() !== new Date(date + (props.data.duration * 24 * 60 * 60 * 1000)).getTime() ||
         //     membershipPrice !== props.data.price ||
         //     membershipId !== props.data.id) {
-        //     console.log("props.data")
-        //     dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+        //             //     dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
         //     dispatch(addItemToEditedMembership({
         //         ...props.data,
         //         price: membershipPrice,

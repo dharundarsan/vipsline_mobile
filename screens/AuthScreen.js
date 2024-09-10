@@ -44,8 +44,7 @@ function AuthScreen() {
 
 
     function signUpHandler() {
-        console.log("signUpHandler");
-    }
+            }
 
     const [isMobileOtp, setIsMobileOtp] = useState(true);
 
