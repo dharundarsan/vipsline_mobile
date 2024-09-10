@@ -202,10 +202,9 @@ export default function ClientSegmentScreen() {
     }
 
     const changeSelectedFilter = (filter) => {
-        //         setFilterPressed(filter);
+        setFilterPressed(filter);
     }
 
-    //     //     //     //
 
 
     return (

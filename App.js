@@ -114,7 +114,7 @@ async function isAuthenticatedFunc() {
             return false;
         }
     } catch (e) {
-        console.log8("auth token fetching error. (inside invoiceSlice loadBookingDetailsFromDb)" + e);
+        console.log("auth token fetching error. (inside invoiceSlice loadBookingDetailsFromDb)" + e);
         return false;
     }
 

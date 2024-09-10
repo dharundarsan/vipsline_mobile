@@ -22,7 +22,7 @@ import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../stor
 /**
  * ClientInfoModal Component
  *
- * Ts component is a modal that displays detailed information about a client.
+ * This component is a modal that displays detailed information about a client.
  * It includes options to view and manage client details, such as viewing statistics,
  * editing, or deleting the client. The modal dynamically updates its content based
  * on the selected category (e.g., client details, bill activity, appointments, etc.).
@@ -74,9 +74,9 @@ export default function clientInfoModal(props) {
     useEffect(() => {
         setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
         setLastVisit(
-            analyticDetails.story_appointmentList !== undefined ?
-            analyticDetails.story_appointmentList.length !== 0 ?
-                dateFormatter(analyticDetails.story_appointmentList[0].appointment_date, 'short') :
+            analyticDetails.history_appointmentList !== undefined ?
+            analyticDetails.history_appointmentList.length !== 0 ?
+                dateFormatter(analyticDetails.history_appointmentList[0].appointment_date, 'short') :
                 "" : "");
         setCompletedAppointment(analyticDetails.completed_appointments === undefined ? "" : analyticDetails.completed_appointments);
         setCancelledAppointment(analyticDetails.cancelled_appointments === undefined ? "" : analyticDetails.cancelled_appointments);
@@ -154,7 +154,7 @@ export default function clientInfoModal(props) {
 
                 }}
                 header={"Delete Client"}
-                content={"Are you sure? Ts action cannot be undone."}
+                content={"Are you sure? This action cannot be undone."}
                 onCloseClientInfoAfterDeleted={() => {
                     props.setVisible(false);
                     props.setSearchQuery("");
