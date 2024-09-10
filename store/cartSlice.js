@@ -173,7 +173,7 @@ export const updateCalculatedPrice = (clientId) => async (dispatch, getState) =>
         isWalletSelected: false,
         client_membership_id: cart.clientMembershipID === undefined || null ? null : cart.clientMembershipID,
         // client_membership_id:clientMembershipID,
-        walkInUserId: clientId,
+        walkInUserId: clientId === "" ? undefined : clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
