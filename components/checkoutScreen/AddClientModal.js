@@ -11,11 +11,13 @@ import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {shadowStyling} from "../../util/Helpers";
 
 const AddClientModal = (props) => {
-    const pageNo = useSelector(state => state.client.pageNo);
+    // const pageNo = useSelector(state => state.client.pageNo);
     const clientsList = useSelector(state => state.client.clients);
     const [isCreateClientModalVisible, setIsCreateClientModalVisible] = useState(false);
     const dispatch = useDispatch();
@@ -24,9 +26,31 @@ const AddClientModal = (props) => {
     const [searchClientPageNo, setSearchClientPageNo] = useState(0);
     const queryRef = useRef("");
     const [isLoading, setIsLoading] = useState(false);
+    // const businessId = useSelector(state => state.authDetails.businessId);
 
     const searchClientFromDB = useCallback(async (query, pageNo) => {
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
+
+
+        let authToken = ""
+        try {
+            const value = await AsyncStorage.getItem('authKey');
+            if (value !== null) {
+                authToken = value;
+            }
+        } catch (e) {
+            console.log("auth token fetching error. (inside calculateCartPriceAPI)" + e);
+        }
+
+        let businessId = ""
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                businessId = value;
+            }
+        } catch (e) {
+            console.log("business token fetching error." + e);
+        }
 
 
         setIsLoading(true);
@@ -34,12 +58,12 @@ const AddClientModal = (props) => {
             const response = await axios.post(
                 `${process.env.EXPO_PUBLIC_API_URI}/business/searchCustomersOfBusiness?pageSize=50&pageNo=${pageNo}`,
                 {
-                    business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                    business_id: businessId,
                     query,
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                        Authorization: `Bearer ${authToken}`
                     }
                 }
             );
@@ -58,14 +82,14 @@ const AddClientModal = (props) => {
             queryRef.current = searchClientQuery;
             setSearchedClients([]);
             setSearchClientPageNo(0);
-            searchClientFromDB(searchClientQuery, 0);
+            searchClientFromDB(searchClientQuery, 0).then(r => null);
         }
     }, [searchClientQuery, searchClientFromDB]);
 
     const loadMoreClients = () => {
         const newPageNo = searchClientPageNo + 1;
         setSearchClientPageNo(newPageNo);
-        searchClientFromDB(searchClientQuery, newPageNo);
+        searchClientFromDB(searchClientQuery, newPageNo).then(r => null);
     };
 
     return (
@@ -73,7 +97,7 @@ const AddClientModal = (props) => {
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 setIsCreateClientModalVisible(false);
             }}/>
-            <View style={styles.closeAndHeadingContainer}>
+            <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
@@ -86,7 +110,6 @@ const AddClientModal = (props) => {
                     <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
-            <Divider/>
             <View style={styles.modalContent}>
                 <SearchBar placeholder={"Search by email or mobile"} onChangeText={(text) => {
                     setSearchClientQuery(text);
@@ -106,7 +129,6 @@ const AddClientModal = (props) => {
                         data={clientsList}
                         keyExtractor={(item) => item.id.toString()}
                         // onEndReachedThreshold={0.7}
-                        // onEndReached={() => dispatch(loadClientsFromDb(pageNo))}
                         renderItem={({item}) => (
                             <ClientCard
                                 clientId={item.id}
@@ -116,7 +138,8 @@ const AddClientModal = (props) => {
                                 divider={true}
                                 onPress={(clientId) => {
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
+                                    dispatch(loadClientInfoFromDb(item.id));
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
                                 }}
                             />
                         )}
@@ -136,7 +159,7 @@ const AddClientModal = (props) => {
                                 divider={true}
                                 onPress={(clientId) => {
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
+                                    dispatch(loadClientInfoFromDb(item.id));
                                 }}
                             />
                         )}

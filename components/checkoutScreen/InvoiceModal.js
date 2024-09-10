@@ -8,7 +8,7 @@ import Feather from '@expo/vector-icons/Feather';
 import {Row, Table} from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from "react-redux";
-import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
+import {checkNullUndefined, dateFormatter, shadowStyling} from "../../util/Helpers";
 import {useEffect, useRef, useState} from "react";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
@@ -18,7 +18,6 @@ import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {log} from "expo/build/devtools/logger";
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import {clearCalculatedPrice, clearLocalCart, loadCartFromDB} from "../../store/cartSlice";
@@ -60,6 +59,8 @@ const InvoiceModal = (props) => {
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
+    const walletBalance = useSelector(state => state.invoice.walletBalance);
+
 
     const actualData = details.organized_list;
 
@@ -96,7 +97,6 @@ const InvoiceModal = (props) => {
     const businessContact = selectedBusinessDetails.mobile_1;
     const businessAddress = selectedBusinessDetails.address;
     const businessEmail = selectedBusinessDetails.email;
-    const GSTIn = selectedBusinessDetails.gstin;
 
 
 
@@ -113,7 +113,7 @@ const InvoiceModal = (props) => {
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}>
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -261,7 +261,6 @@ styles.heading]}>Invoice</Text>*/}
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 {
@@ -299,15 +298,20 @@ styles.heading]}>Invoice</Text>*/}
                             />
                         </PrimaryButton>
                     </View>
+                    {
+                        !isCancelled ?
+                            <PrimaryButton
+                                buttonStyle={styles.actionsButton}
+                                textStyle={styles.actionsButtonText}
+                                label={"Actions"}
+                                onPress={() => {
+                                    setActionModalVisibility(true);
+                                }}
+                            /> :
+                            null
+                    }
 
-                    <PrimaryButton
-                        buttonStyle={styles.actionsButton}
-                        textStyle={styles.actionsButtonText}
-                        label={"Actions"}
-                        onPress={() => {
-                            setActionModalVisibility(true);
-                        }}
-                    />
+
 
                 </View>
                 <Divider/>
@@ -340,7 +344,7 @@ styles.heading]}>Invoice</Text>*/}
                         //     style={textTheme.titleMedium}>Contact : </Text>
                         // </Text>
                         // <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
+                            style={textTheme.titleMedium}>GSTIN : </Text>{selectedBusinessDetails.gstin}
                         </Text>
                     </View>
                     <View style={styles.invoiceNumberAndDateContainer}>
@@ -364,7 +368,7 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}>
                             <Text
                                 style={textTheme.titleMedium}>Prepaid :
-                            </Text> {details.wallet_balance}</Text>
+                            </Text> {walletBalance.wallet_balance}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN
                             : </Text>{selectedClientDetails.customer_gst}</Text>
