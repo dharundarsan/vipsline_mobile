@@ -106,6 +106,7 @@ export default function ListOfBusinessesScreen({navigation}) {
 
     return (
         <ScrollView style={styles.listOfBusinesses} contentContainerStyle={{alignItems: "center"}}>
+
             <Divider />
             <View style={styles.body}>
                 <Text style={[textTheme.titleMedium]}>
