@@ -9,44 +9,53 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import {MaterialIcons} from '@expo/vector-icons';
 import {useDispatch, useSelector} from "react-redux";
-import {deleteItemFromCart, removeCustomItems, removeItemFromCart, updateLoadingState} from "../../store/cartSlice";
+import {
+    deleteItemFromCart,
+    removeCustomItems,
+    removeItemFromCart,
+    removeItemFromEditedCart, updateEditedCart,
+    updateLoadingState, updateStaffInEditedCart
+} from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import {updateCartItemStaff} from "../../store/staffSlice";
 import EditCartModal from "./EditCartModal";
+import PrepaidModal from "./PrepaidModal";
 
 const CartItem = (props) => {
     const dispatch = useDispatch();
     const isLoading = useSelector(state => state.cart.isLoading);
     const [isEditCartModalVisible, setIsEditCartModalVisible] = useState(false);
+    const [isEditPrepaidModalVisible, setIsEditPrepaidModalVisible] = useState(false);
     const removeItemHandler = async () => {
         if (isLoading) return;
         dispatch(updateLoadingState(true));
         dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
             dispatch(updateLoadingState(false));
         })
-        dispatch(await removeItemFromCart(props.data.item_id))
+        // dispatch(await removeItemFromCart(props.data.item_id))
     }
 
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
 
-    // console.log("selectedStaff")
-    // console.log(selectedStaff)
-    // console.log("cartItem Props data")
-    // console.log(props.data)
 
     return <>
         <View style={styles.cartItem}>
-            <EditCartModal isVisible={isEditCartModalVisible}
-                           // setCalculatedPrice={props.setCalculatedPrice}
-                           onCloseModal={() => setIsEditCartModalVisible(false)}
-                           data={props.data}/>
+            {isEditPrepaidModalVisible &&
+                <PrepaidModal edited={true} data={props.data} isVisible={isEditPrepaidModalVisible}
+                              onCloseModal={() => setIsEditPrepaidModalVisible(false)}/>}
+            {isEditCartModalVisible && <EditCartModal isVisible={isEditCartModalVisible}
+                                                      onCloseModal={() => setIsEditCartModalVisible(false)}
+                                                      data={props.data}/>}
+
             <DropdownModal isVisible={isStaffDropdownModalVisible}
                            onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
-                           object={true} objectName={"name"} selectedValue={selectedStaff} onChangeValue={(value) => {
-                dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
-                setSelectedStaff(value)
-            }}/>
+                           object={true} objectName={"name"} selectedValue={selectedStaff}
+                           onChangeValue={(value) => {
+                               dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
+                               dispatch(updateStaffInEditedCart({itemId: props.data.item_id, resource_id: value.id}));
+                               setSelectedStaff(value)
+                           }}/>
             <View style={styles.itemNameAndDetailsContainer}>
                 {props.data.gender === "prepaid" ? <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>Prepaid value
@@ -59,15 +68,32 @@ const CartItem = (props) => {
                         <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
                         <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.price}</Text>
-                        { props.data.gender === "membership" ? null : <PrimaryButton onPress={() => setIsEditCartModalVisible(true)}
-                                        buttonStyle={styles.editAmountButton}
-                                        pressableStyle={styles.editAmountPressable}>
+                        {props.data.gender === "packages" ? null : <PrimaryButton onPress={() => {
+                            if (props.data.gender === "prepaid") {
+                                setIsEditPrepaidModalVisible(true)
+                            } else {
+                                setIsEditCartModalVisible(true)
+                            }
+                        }}
+                                                                                  buttonStyle={styles.editAmountButton}
+                                                                                  pressableStyle={styles.editAmountPressable}>
                             <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
                             {/*<Feather  name="edit" size={22} color="black"/>*/}
                         </PrimaryButton>}
                     </View>
                     <PrimaryButton buttonStyle={styles.closeIconButton} pressableStyle={styles.closeIconPressable}
-                                   onPress={props.data.category === "custom_item" ? () => dispatch(removeCustomItems(props.data.id)) : removeItemHandler}>
+                                   onPress={
+                                       async () => {
+                                           if (props.data.gender === "prepaid" && props.data) {
+                                               dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
+                                                   dispatch(updateLoadingState(false));
+                                                   dispatch(removeItemFromEditedCart(props.data.item_id))
+                                               })
+                                           } else if (props.data.gender === "custom_item")
+                                               dispatch(removeCustomItems(props.data.id))
+                                           else
+                                               removeItemHandler()
+                                       }}>
                         <Ionicons name="close" size={24} color="black"/>
                     </PrimaryButton>
                 </View>

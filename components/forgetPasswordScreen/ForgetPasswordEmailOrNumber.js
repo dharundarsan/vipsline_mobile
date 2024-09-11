@@ -43,11 +43,9 @@ export default function ForgetPasswordEmailOrNumber(props) {
 
         }
         catch (error) {
-            console.log("user not found: " + error);
-        }
+                    }
 
-        // console.log(response);
-        return responseUserMessage;
+                return responseUserMessage;
     }
 
     async function sendOtp() {
@@ -66,8 +64,7 @@ export default function ForgetPasswordEmailOrNumber(props) {
                 props.setMobileNumber(mobileNumber);
             }
             catch (error) {
-                console.log("sendOtp error: " + error);
-            }
+                            }
 
         }
         else {

@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useState ,useEffect } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import CheckoutScreen from './screens/CheckoutScreen';
 import CustomDrawer from './components/common/CustomDrawer';
@@ -18,6 +18,7 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 // import ClientSegmentScreen from "./screens/ClientSegmentScreen";
 //Font And SplashScreen Imports
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Font from 'expo-font';
 
 SplashScreen.preventAutoHideAsync();
@@ -32,6 +33,7 @@ import clients_icon from "./assets/icons/drawerIcons/clients.png";
 import discounts_icon from "./assets/icons/drawerIcons/discounts.png";
 import expenses_icon from "./assets/icons/drawerIcons/expenses.png";
 import feedback_icon from "./assets/icons/drawerIcons/feedback.png";
+import logout_icon from "./assets/icons/drawerIcons/logout.png";
 import list_of_businesses_icon from "./assets/icons/drawerIcons/list_of_businesses.png";
 import marketing_icon from "./assets/icons/drawerIcons/marketing.png";
 import staffs_icon from "./assets/icons/drawerIcons/staffs.png";
@@ -41,13 +43,19 @@ import ClientSegmentScreen from "./screens/ClientSegmentScreen";
 import { useFonts } from "expo-font";
 import textTheme from "./constants/TextTheme";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import signOutScreen from "./screens/signOutScreen";
+import checkoutScreen from "./screens/CheckoutScreen";
+import {updateAuthStatus} from "./store/authSlice";
 
-enableScreens(false);
+enableScreens();
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const AuthStack = createNativeStackNavigator();
+const LandingStack = createNativeStackNavigator();
+
+
 // const MainStack = createNativeStackNavigator();
 
 export default function App() {
@@ -67,10 +75,11 @@ export default function App() {
     return (
 
         <Provider store={store}>
-            <StatusBar style="dark" />
-            <AppNavigator />
+            {/*<SafeAreaView style={styles.safeAreaView}>*/}
+                <StatusBar style="dark"/>
+                <AppNavigator/>
+            {/*</SafeAreaView>*/}
         </Provider>
-        // </SafeAreaProvider>
     );
 }
 
@@ -95,12 +104,59 @@ const CheckoutStack = () => (
 );
 
 
+async function isAuthenticatedFunc() {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside invoiceSlice loadBookingDetailsFromDb)" + e);
+        return false;
+    }
+
+}
+
+
 const AppNavigator = () => {
-    let isAuthenticated = false;
-    const isFetching = useSelector(state => state.authDetails.isFetching);
-    // console.log("isFetching " + isFetching)
-    isAuthenticated = useSelector((state) => state.authDetails.isAuthenticated);
-    // console.log("isAuthenticated " + !!isAuthenticated);
+
+    const dispatch = useDispatch();
+
+    const [isAuthenticated, setIsAuthenticated] = useState(false); // Local state for auth status
+    const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated); // Redux state
+    const businessChosen = useSelector(state => state.businesses.isBusinessSelected);
+
+    const checkAuthentication = async () => {
+        try {
+            const authKey = await AsyncStorage.getItem('authKey');
+            if (authKey !== null) {
+                setIsAuthenticated(true); // Update local state if the user is authenticated
+                // console.log("authkeyStatu" + authKey);
+                dispatch(updateAuthStatus(true));
+            } else {
+                setIsAuthenticated(false);
+                dispatch(updateAuthStatus(false));
+            }
+        } catch (e) {
+            console.log('Error checking authentication:', e);
+            setIsAuthenticated(false);
+        }
+
+
+    };
+
+    useEffect(() => {
+        checkAuthentication(); // Initial auth check
+
+        // console.log("useEffuect in app.js")
+        // console.log(reduxAuthStatus);
+    }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
+
+    // console.log("status ---------------------------------" + isAuthenticated)
+
 
     return (
         <NavigationContainer>
@@ -114,43 +170,61 @@ const AppNavigator = () => {
 };
 
 const AuthNavigator = () => (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-        {/*<AuthStack.Screen name="AuthScreen" component={AuthScreen}/>*/}
-        {/*<AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>*/}
-        {/*<AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>*/}
-        <AuthStack.Screen name="ListOfBusinessesScreen" component={ListOfBusinessesScreen} />
+    <AuthStack.Navigator screenOptions={{headerShown: false}}>
+        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
+        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
+        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
     </AuthStack.Navigator>
+);
+
+const LandingScreen = () => (
+    <LandingStack.Navigator screenOptions={{headerShown: false}}>
+        <LandingStack.Screen
+            name="ListOfBusinessesScreen"
+            component={ListOfBusinessesScreen}
+        />
+    </LandingStack.Navigator>
 );
 
 const MainDrawerNavigator = () => (
     <Drawer.Navigator
-        initialRouteName="Checkout"
+        initialRouteName="List of Business"
         drawerContent={(props) => <CustomDrawer {...props} />}
         screenOptions={{
             drawerActiveTintColor: Colors.highlight,
             drawerInactiveTintColor: Colors.white,
             drawerStyle: { backgroundColor: Colors.darkBlue },
-            headerTitleStyle: [textTheme.titleLarge]
+            headerTitleStyle: [textTheme.titleLarge],
+            headerStyle:{
+                elevation: 4,             // Shadow strength
+                backgroundColor: '#fff',  // Background color
+                shadowColor: '#000',      // Shadow color
+                shadowOffset: {width: 0, height: 10}, // Offset for bottom shadow
+                shadowOpacity: 0.1,       // Opacity (optional for cross-platform)
+                shadowRadius: 3.84,       // Blur radius (optional for cross-platform)
+                borderBottomWidth: 0.5,     // Helps define a stronger bottom line
+                borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
+            }
         }}
     >
-        <Drawer.Screen
-            name="Dashboard"
-            component={CheckoutStack}
-            options={{
-                drawerIcon: () => <Image
-                    source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
-                    style={{ resizeMode: "contain" }} />
-            }}
-        />
-        <Drawer.Screen
-            name="Appointments"
-            component={CheckoutStack}
-            options={{
-                drawerIcon: () => <Image
-                    source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
-                    style={{ resizeMode: "contain" }} />
-            }}
-        />
+        {/*<Drawer.Screen*/}
+        {/*    name="Dashboard"*/}
+        {/*    component={CheckoutStack}*/}
+        {/*    options={{*/}
+        {/*        drawerIcon: () => <Image*/}
+        {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
+        {/*            style={{ resizeMode: "contain" }} />*/}
+        {/*    }}*/}
+        {/*/>*/}
+        {/*<Drawer.Screen*/}
+        {/*    name="Appointments"*/}
+        {/*    component={CheckoutStack}*/}
+        {/*    options={{*/}
+        {/*        drawerIcon: () => <Image*/}
+        {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
+        {/*            style={{ resizeMode: "contain" }} />*/}
+        {/*    }}*/}
+        {/*/>*/}
         <Drawer.Screen
             name="Checkout"
             component={CheckoutStack}
@@ -178,51 +252,55 @@ const MainDrawerNavigator = () => (
                 headerTitleAlign: 'center',
             }}
         />
-        <Drawer.Screen name="Marketing" component={ListOfBusinessesScreen} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(marketing_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen name="Expenses" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen
-            name="Reports"
-            component={CheckoutStack}
-            options={{
-                drawerIcon: () => <Image
-                    source={{ uri: Image.resolveAssetSource(reports_icon).uri }} width={25} height={25}
-                    style={{ resizeMode: "contain" }} />
-            }}
-        />
-        <Drawer.Screen name="Catalogue" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(catalogue_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen name="Discounts" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(discounts_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen name="Settings" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(settings_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen name="Staffs" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(staffs_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen name="List of Business" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(list_of_businesses_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen name="Add Business" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(add_businesses_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
-        <Drawer.Screen name="Feedback" component={CheckoutStack} options={{
-            drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(feedback_icon).uri }}
-                width={25} height={25} style={{ resizeMode: "contain" }} />
-        }} />
+        {/*<Drawer.Screen name="Marketing" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}*/}
+        {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
+        {/*}}/>*/}
+        {/*<Drawer.Screen name="Expenses" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}*/}
+        {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
+        {/*}} />*/}
+        {/*<Drawer.Screen*/}
+        {/*    name="Reports"*/}
+        {/*    component={CheckoutStack}*/}
+        {/*    options={{*/}
+        {/*        drawerIcon: () => <Image*/}
+        {/*            source={{ uri: Image.resolveAssetSource(reports_icon).uri }} width={25} height={25}*/}
+        {/*            style={{ resizeMode: "contain" }} />*/}
+        {/*    }}*/}
+        {/*/>*/}
+        {/*<Drawer.Screen name="Catalogue" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(catalogue_icon).uri }}*/}
+        {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
+        {/*}} />*/}
+        {/*<Drawer.Screen name="Discounts" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(discounts_icon).uri }}*/}
+        {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
+        {/*}} />*/}
+        {/*<Drawer.Screen name="Settings" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(settings_icon).uri }}*/}
+        {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
+        {/*}} />*/}
+        {/*<Drawer.Screen name="Staffs" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}*/}
+        {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
+        {/*}}/>*/}
+        <Drawer.Screen name="List of Business" component={ListOfBusinessesScreen} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(list_of_businesses_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain"}}/>
+        }}/>
+        {/*<Drawer.Screen name="Add Business" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(add_businesses_icon).uri }}*/}
+        {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
+        {/*}} />*/}
+        {/*<Drawer.Screen name="Feedback" component={CheckoutStack} options={{*/}
+        {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(feedback_icon).uri}}*/}
+        {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
+        {/*}}/>*/}
+        <Drawer.Screen name="Sign Out" component={signOutScreen} options={{
+            drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(logout_icon).uri}}
+                                     width={25} height={25} style={{resizeMode: "contain", tintColor: Colors.white}}/>
+        }}/>
     </Drawer.Navigator>
 );
 

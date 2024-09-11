@@ -8,7 +8,7 @@ import Feather from '@expo/vector-icons/Feather';
 import {Row, Table} from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from "react-redux";
-import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
+import {checkNullUndefined, dateFormatter, shadowStyling} from "../../util/Helpers";
 import {useEffect, useRef, useState} from "react";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
@@ -18,21 +18,23 @@ import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import clearCartAPI from "../../util/apis/clearCartAPI";
+import {clearClientInfo} from "../../store/clientInfoSlice";
+import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, loadCartFromDB, modifyClientMembershipId} from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
 
     const details = useSelector(state => state.invoice.details);
     const bookingId = useSelector(state => state.invoice.booking_id1);
 
-    // console.log("details");
-    // console.log(details);
-    const selectedClientDetails = useSelector(state => state.clientInfo.details);
+    const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
+
+
+            const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
     const dispatch = useDispatch();
 
-    // console.log("client: + selectedClientDetails");
-    // console.log(selectedClientDetails)
-    
+
     const navigation = useNavigation();
 
     const [actionModalVisibility, setActionModalVisibility] = useState(false);
@@ -57,6 +59,8 @@ const InvoiceModal = (props) => {
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
+    const walletBalance = useSelector(state => state.invoice.walletBalance);
+
 
     const actualData = details.organized_list;
 
@@ -65,7 +69,7 @@ const InvoiceModal = (props) => {
     let centralGST = (details.total * 0.09);
     let stateGST = (details.total * 0.09);
 
-    const splitPayment = details.split_payment;
+    const splitPayment = invoiceDetails.split_payment;
 
     async function getBusinessId() {
         try {
@@ -74,49 +78,42 @@ const InvoiceModal = (props) => {
                 return value;
             }
         } catch (e) {
-            console.log("businessId fetching error. (inside getClientListApi)" + e);
         }
     }
 
 
-    // console.log("businessId " + businessId);
-    const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
+        const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     // let selectedBusinessDetails = "";
     // getBusinessId().then(r => {
-    //     console.log("asdlklnhkuidgjkhdb")
-    //     console.log(r)
-    //     setBusinessId(r);
-    // console.log("businessId " + businessId)
-    // });
+             //     setBusinessId(r);
+        // });
     const selectedBusinessDetails = listOfBusinesses.filter((item) => {
         return item.id === businessId
     })[0];
 
-    // console.log("businessId " + businessId)
-    // console.log(listOfBusinesses);
-    // console.log("Busones r" + businessId);
 
-    // console.log("selectedBusinessDetails.name");
-    // console.log(selectedBusinessDetails);
 
     const businessName = selectedBusinessDetails.name;
     const businessContact = selectedBusinessDetails.mobile_1;
     const businessAddress = selectedBusinessDetails.address;
     const businessEmail = selectedBusinessDetails.email;
-    const GSTIn = selectedBusinessDetails.gstin;
 
-    // console.log("business")
-    // console.log(selectedBusinessDetails);
 
 
     useEffect(() => {
-        dispatch(loadWalletPriceFromDb(selectedClientDetails.id));
+        async function api() {
+            try {
+                dispatch(await loadWalletPriceFromDb(selectedClientDetails.id));
+            } catch (e) {
+                            }
+        }
+        api();
     }, [selectedClientDetails]);
 
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}>
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -146,7 +143,9 @@ const InvoiceModal = (props) => {
 
                     } else if (value === "Email") {
                         setEmailModalVisibility(true);
-
+                    }
+                    else if(value === "Cancel Invoice") {
+                        setCancelInvoiceModalVisibility(true);
                     }
                 }}
             />
@@ -249,13 +248,21 @@ const InvoiceModal = (props) => {
 styles.heading]}>Invoice</Text>*/}
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={() => setCancelInvoiceModalVisibility(true)
-            }
+                onPress={() => {
+                    // setCancelInvoiceModalVisibility(true)
+                    clearCartAPI();
+                    dispatch(modifyClientMembershipId({type:"clear"}))
+                    dispatch(clearSalesNotes());
+                    dispatch(clearLocalCart());
+                    dispatch(clearClientInfo());
+                    dispatch(clearCalculatedPrice());
+                    props.onCloseModal();
+                }
+                }
             >
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 {
@@ -277,6 +284,11 @@ styles.heading]}>Invoice</Text>*/}
                             buttonStyle={styles.backToCheckoutButton}
                             label={"Back to checkout"}
                             onPress={() => {
+                                clearCartAPI();
+                                dispatch(clearSalesNotes());
+                                dispatch(clearLocalCart());
+                                dispatch(clearClientInfo());
+                                dispatch(clearCalculatedPrice());
                                 props.onCloseModal();
                             }}
                         />
@@ -289,15 +301,20 @@ styles.heading]}>Invoice</Text>*/}
                             />
                         </PrimaryButton>
                     </View>
+                    {
+                        !isCancelled ?
+                            <PrimaryButton
+                                buttonStyle={styles.actionsButton}
+                                textStyle={styles.actionsButtonText}
+                                label={"Actions"}
+                                onPress={() => {
+                                    setActionModalVisibility(true);
+                                }}
+                            /> :
+                            null
+                    }
 
-                    <PrimaryButton
-                        buttonStyle={styles.actionsButton}
-                        textStyle={styles.actionsButtonText}
-                        label={"Actions"}
-                        onPress={() => {
-                            setActionModalVisibility(true);
-                        }}
-                    />
+
 
                 </View>
                 <Divider/>
@@ -327,16 +344,19 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>Email
                             : </Text>{businessEmail}</Text>
                         <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
+                        //     style={textTheme.titleMedium}>Contact : </Text>
+                        // </Text>
+                        // <Text style={textTheme.bodyLarge}><Text
+                            style={textTheme.titleMedium}>GSTIN : </Text>{selectedBusinessDetails.gstin}
                         </Text>
                     </View>
                     <View style={styles.invoiceNumberAndDateContainer}>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice no :
-                        </Text>{details.business_invoice_num}</Text>
+                        </Text>{invoiceDetails.business_invoice_num}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice date :
-                        </Text>{details.invoice_created_date}</Text>
+                        </Text>{invoiceDetails.invoice_created_date}</Text>
                     </View>
                     <View style={styles.invoiceDetailsOutlineCard}>
                         <Text style={textTheme.bodyLarge}><Text
@@ -351,14 +371,14 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}>
                             <Text
                                 style={textTheme.titleMedium}>Prepaid :
-                            </Text>{details.wallet_balance}</Text>
+                            </Text> {walletBalance.wallet_balance}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN
                             : </Text>{selectedClientDetails.customer_gst}</Text>
                     </View>
                     <Table style={styles.cartItemTable}>
                         <Row
-                            textStyle={StyleSheet.flatten({textAlign: "center", fontWeight: "bold"})}
+                            // textStyle={{textAlign: "center", fontWeight: "bold"}}
                             style={styles.cartItemTableHead}
                             data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
                         />
@@ -377,7 +397,7 @@ styles.heading]}>Invoice</Text>*/}
                                             (innerItem.service_cost).toFixed(2)]}
                                         style={styles.cartItemTableRow}
 
-                                        textStyle={StyleSheet.flatten({textAlign: "center"})}
+                                        // textStyle={{textAlign: "center"}}
                                     />
 
                                 })
@@ -426,7 +446,8 @@ styles.heading]}>Invoice</Text>*/}
                         <Table style={styles.paymentModeTable}>
                             <Row style={styles.paymentModeTableHead}
                                  data={["Date & Time", "Mode", "Amount", "Status"]}
-                                 textStyle={{textAlign: "center"}}/>
+                                 // textStyle={{textAlign: "center"}}
+                            />
                             {
                                 splitPayment.map((item, index) => (
                                     <Row
@@ -434,7 +455,7 @@ styles.heading]}>Invoice</Text>*/}
                                         data={[dateFormatter(item.date, 'short') + " " + item.time,
                                             item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
                                         style={styles.paymentModeTableRow}
-                                        textStyle={{textAlign: "center"}}
+                                        // textStyle={{textAlign: "center"}}
                                     />
                                 ))
                             }
@@ -443,24 +464,24 @@ styles.heading]}>Invoice</Text>*/}
                 </View>
                 <Divider color={Colors.highlight}/>
                 {
-                    checkNullUndefined(details.footer_message_1) &&
-                    details.footer_message_1.trim().length !== 0 ?
+                    checkNullUndefined(invoiceDetails.footer_message_1) &&
+                    invoiceDetails.footer_message_1.trim().length !== 0 ?
                         <View style={styles.termsAndConditions}>
                             <Text
                                 style={[textTheme.titleMedium]}>Terms & conditions: </Text>
                             <Text
-                                style={[textTheme.bodyMedium]}>{details.footer_message_1}</Text>
+                                style={[textTheme.bodyMedium]}>{invoiceDetails.footer_message_1}</Text>
 
                         </View> :
                         null
                 }
             </View>
             {
-                checkNullUndefined(details.footer_message_2) &&
-                details.footer_message_2.trim().length !== 0 ?
+                checkNullUndefined(invoiceDetails.footer_message_2) &&
+                invoiceDetails.footer_message_2.trim().length !== 0 ?
                     <Text
                         style={[textTheme.titleMedium,
-                            styles.thankYouText]}>{details.footer_message_2}</Text> :
+                            styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
                     null
             }
         </ScrollView>

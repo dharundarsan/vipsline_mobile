@@ -9,6 +9,7 @@ import sendOTPApi from "../../util/apis/sendOTPApi";
 import {useDispatch} from "react-redux";
 import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
 import {useNavigation} from "@react-navigation/native";
+import {updateAuthStatus} from "../../store/authSlice";
 
 export default function ForgetPasswordOTP(props) {
     const [otp, setOtp] = useState("");
@@ -88,7 +89,7 @@ export default function ForgetPasswordOTP(props) {
                     setIsAuthenticated(authStatus);
                     setChanging(true);
                     if(authStatus === true) {
-                        navigation.navigate("ListOfBusinessesScreen");
+                        dispatch(updateAuthStatus(true));
                     }
                 }}
             />

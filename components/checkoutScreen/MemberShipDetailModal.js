@@ -1,23 +1,26 @@
-import { Modal, View, StyleSheet, Text, FlatList, Platform, BackHandler } from "react-native";
+import {Modal, View, StyleSheet, Text, FlatList, Platform, BackHandler} from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Divider from "../../ui/Divider";
 import PrimaryButton from "../../ui/PrimaryButton";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
+import {useDispatch} from "react-redux";
 
 const MemberShipDetailModal = React.memo((props) => {
     const insets = useSafeAreaInsets();
     const [isModalVisible, setIsModalVisible] = useState(props.isMembershipModalVisible);
-
+    const dispatch = useDispatch();
     useEffect(() => {
         setIsModalVisible(props.isMembershipModalVisible);
     }, [props.isMembershipModalVisible]);
 
     useEffect(() => {
         if (isModalVisible && props.membershipDetails.length === 1) {
-            props.onApplyMembership(props.membershipDetails[0].id, props.membershipDetails[0].client_id);
+            console.log("length: 1");
+            
+            props.onApplyMembership( props.membershipDetails[0].id,props.membershipDetails[0].client_id);
         }
     }, [props.membershipDetails, isModalVisible]);
 
@@ -42,7 +45,7 @@ const MemberShipDetailModal = React.memo((props) => {
                 <View style={[
                     styles.modalContainer,
                     {
-                        paddingTop: Platform.OS === 'ios' ? insets.top : 0, 
+                        paddingTop: Platform.OS === 'ios' ? insets.top : 0,
                         paddingBottom: insets.bottom, // Apply bottom padding on both platforms
                     },
                 ]}>
@@ -52,28 +55,27 @@ const MemberShipDetailModal = React.memo((props) => {
                             name="close"
                             size={24}
                             color="black"
-                            style={{ position: "absolute", right: 10 }}
+                            style={{position: "absolute", right: 10}}
                             onPress={() => {
                                 setIsModalVisible(false);
                                 props.closeModal();
                             }}
                         />
                     </View>
-                    <Divider />
+                    <Divider/>
                     <FlatList
                         data={props.membershipDetails}
-                        renderItem={({ item }) => {
-                            console.log(item);
-                            
+                        renderItem={({item}) => {
+
                             return <View style={styles.membershipDetails} key={item.membership_id}>
                                 <View style={styles.membershipNameAndButton}>
                                     <Text style={TextTheme.titleSmall}>{item.membership_name}</Text>
                                     <Text>This Membership will expire on
-                                        <Text style={{ color: Colors.error }}> {item.validTill}</Text>
+                                        <Text style={{color: Colors.error}}> {item.validTill}</Text>
                                     </Text>
                                 </View>
                                 <PrimaryButton
-                                    pressableStyle={{ flex: 1 }}
+                                    pressableStyle={{flex: 1}}
                                     buttonStyle={props.storedMembershipId === item.id ? styles.selectedMembership : styles.primaryButtonStyle}
                                     onPress={() => {
                                         props.onApplyMembership(item.id, item.client_id);
@@ -84,9 +86,9 @@ const MemberShipDetailModal = React.memo((props) => {
                                     <Text
                                         style={[
                                             props.storedMembershipId === item.id
-                                                ? { color: Colors.white }
-                                                : { color: Colors.black },
-                                            { alignItems: "center", alignContent: "center", alignSelf: "center" }
+                                                ? {color: Colors.white}
+                                                : {color: Colors.black},
+                                            {alignItems: "center", alignContent: "center", alignSelf: "center"}
                                         ]}
                                     >
                                         {props.storedMembershipId === item.id ? "Applied" : "Apply"}

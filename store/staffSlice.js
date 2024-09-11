@@ -1,21 +1,45 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {loadCartFromDB} from "./cartSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialStaffState = {
-    staffs:[]
+    staffs: []
 };
 
+
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            return value;
+        }
+    } catch (e) {
+    }
+}
+
 export const loadStaffsFromDB = () => async (dispatch, getState) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside staffSlice loadStaffsFromDb)" + e);
+    }
+
+
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/resource/getByBusiness`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -25,17 +49,27 @@ export const loadStaffsFromDB = () => async (dispatch, getState) => {
 }
 
 export const updateCartItemStaff = (res_list) => async (dispatch, getState) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside staffSLice updateCartItemsStaff)" + e);
+    }
+
     try {
         const response = await axios.put(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/updateMultipleResourceInCart2`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
-                res_list:res_list
+                business_id: `${await getBusinessId()}`,
+                res_list: res_list
 
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -50,7 +84,6 @@ export const staffSlice = createSlice({
     reducers: {
         updateStaffs(state, action) {
             state.staffs = action.payload;
-            console.log("state: "+state);
         },
     }
 });
