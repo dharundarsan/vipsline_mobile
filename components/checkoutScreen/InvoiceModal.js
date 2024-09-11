@@ -27,6 +27,8 @@ import {
     loadCartFromDB,
     modifyClientMembershipId
 } from "../../store/cartSlice";
+import { clearClientInfo } from "../../store/clientInfoSlice";
+import { clearCalculatedPrice, clearLocalCart, clearSalesNotes, loadCartFromDB, modifyClientMembershipId } from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
 
@@ -34,7 +36,6 @@ const InvoiceModal = (props) => {
     const bookingId = useSelector(state => state.invoice.booking_id1);
 
     const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
-
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
@@ -86,8 +87,8 @@ const InvoiceModal = (props) => {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     // let selectedBusinessDetails = "";
     // getBusinessId().then(r => {
-    //     setBusinessId(r);
-    // });
+             //     setBusinessId(r);
+        // });
     const selectedBusinessDetails = listOfBusinesses.filter((item) => {
         return item.id === businessId
     })[0];
@@ -112,7 +113,7 @@ const InvoiceModal = (props) => {
 
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
-                  visible={props.isVisible}>
+        visible={props.isVisible}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
             <DropdownModal
@@ -259,7 +260,7 @@ styles.heading]}>Invoice</Text>*/}
                 }
                 }
             >
-                <Ionicons name="close" size={25} color="black"/>
+                <Ionicons name="close" size={25} color="black" />
             </PrimaryButton>
         </View>
         <ScrollView>
@@ -275,7 +276,7 @@ styles.heading]}>Invoice</Text>*/}
                 }
                 <View style={styles.logoAndButtonContainer}>
                     <Feather name="check-circle" size={50}
-                             color={Colors.highlight}/>
+                        color={Colors.highlight} />
                     <Text style={[textTheme.titleMedium]}>Checkout
                         Complete!</Text>
                     <View style={styles.backAndDropdownButtonContainer}>
@@ -284,6 +285,7 @@ styles.heading]}>Invoice</Text>*/}
                             label={"Back to checkout"}
                             onPress={() => {
                                 clearCartAPI();
+                                dispatch(modifyClientMembershipId({ type: "clear" }))
                                 dispatch(clearSalesNotes());
                                 dispatch(clearLocalCart());
                                 dispatch(clearClientInfo());
@@ -315,14 +317,14 @@ styles.heading]}>Invoice</Text>*/}
 
 
                 </View>
-                <Divider/>
+                <Divider />
                 <View style={styles.invoiceHeadingContainer}>
                     <View style={styles.invoiceHeading}>
                         <Text style={[textTheme.titleMedium,
-                            styles.invoiceHeadingText]}>Invoice</Text>
+                        styles.invoiceHeadingText]}>Invoice</Text>
                     </View>
                 </View>
-                <Divider thickness={0.5} color={Colors.highlight}/>
+                <Divider thickness={0.5} color={Colors.highlight} />
                 <View style={styles.invoice}>
                     <View style={{
                         paddingVertical: 10,
@@ -333,8 +335,6 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>{businessName}</Text>
                         <Text
                             style={textTheme.bodyLarge}>{businessAddress}</Text>
-                        {/*<Text style={textTheme.bodyLarge}>Chennai
-600119, Tamilnadu</Text>*/}
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Contact
                             : </Text>{businessContact}</Text>
@@ -440,7 +440,7 @@ styles.heading]}>Invoice</Text>*/}
                     </Table>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>Discount</Text>
+                        styles.checkoutDetailText]}>Discount</Text>
                         <Text
                             style={[textTheme.bodyLarge,
                                 styles.checkoutDetailText]}>₹ {details.total * (totalDiscount)}</Text>
@@ -511,7 +511,7 @@ styles.heading]}>Invoice</Text>*/}
             </View>
             {
                 checkNullUndefined(invoiceDetails.footer_message_2) &&
-                invoiceDetails.footer_message_2.trim().length !== 0 ?
+                    invoiceDetails.footer_message_2.trim().length !== 0 ?
                     <Text
                         style={[textTheme.titleMedium,
                             styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     invoiceNumberAndDateContainer: {
         borderWidth: 1,
         borderColor: Colors.grey300,
-// borderRadius:0,
+        // borderRadius:0,
         paddingVertical: 10,
         paddingHorizontal: 15,
         gap: 5,

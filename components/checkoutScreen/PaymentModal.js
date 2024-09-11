@@ -14,7 +14,12 @@ import DropdownModal from "../../ui/DropdownModal";
 import checkoutBooking from "../../util/apis/checkoutBookingAPI";
 import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
 import {useDispatch, useSelector} from "react-redux";
-import {loadBookingDetailsFromDb, loadInvoiceDetailsFromDb, updateBookingId} from "../../store/invoiceSlice";
+import {
+    loadBookingDetailsFromDb,
+    loadInvoiceDetailsFromDb,
+    loadWalletPriceFromDb,
+    updateBookingId
+} from "../../store/invoiceSlice";
 import updateAPI from "../../util/apis/updateAPI";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
@@ -624,6 +629,7 @@ const PaymentModal = (props) => {
                                     updateLiveStatusAPI(response[0].booking_id);
                                     dispatch(updateBookingId(response[0].booking_id));
                                     dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                                    dispatch(loadWalletPriceFromDb(details.id))
                                     dispatch(loadInvoiceDetailsFromDb(response[0].booking_id));
                                    })
                                    console.clear();

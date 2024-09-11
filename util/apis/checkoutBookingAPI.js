@@ -130,8 +130,6 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
                 Authorization: `Bearer ${authToken}`
             }
         });
-        console.log("hello")
-        console.log(response.data.other_message);
         return response.data.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);
