@@ -27,8 +27,6 @@ import {
     loadCartFromDB,
     modifyClientMembershipId
 } from "../../store/cartSlice";
-import { clearClientInfo } from "../../store/clientInfoSlice";
-import { clearCalculatedPrice, clearLocalCart, clearSalesNotes, loadCartFromDB, modifyClientMembershipId } from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
 
