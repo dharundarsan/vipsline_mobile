@@ -69,7 +69,7 @@ const InvoiceModal = (props) => {
     let centralGST = (details.total * 0.09);
     let stateGST = (details.total * 0.09);
 
-    const splitPayment = details.split_payment;
+    const splitPayment = invoiceDetails.split_payment;
 
     async function getBusinessId() {
         try {

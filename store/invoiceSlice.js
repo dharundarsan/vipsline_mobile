@@ -80,7 +80,7 @@ export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
 
