@@ -5,7 +5,10 @@ import { ToastAndroid } from "react-native";
 export default async function updateAPI(bookingId, mode_of_payment, splitUpState) {
     let authToken = "";
     let businessId = "";
-
+    console.log("Booking Id "+bookingId);
+    console.log("Mode Of Payement"+mode_of_payment);
+    console.log("splitUpState "+splitUpState);
+    
     try {
         authToken = await AsyncStorage.getItem('authKey') || "";
         businessId = await AsyncStorage.getItem('businessId') || "";

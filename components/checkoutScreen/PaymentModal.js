@@ -472,15 +472,14 @@ const PaymentModal = (props) => {
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
-                           onPress={ () => {
+                           onPress={ async() => {
                                    setIsInvoiceModalVisible(true);
                                try {
-                                   checkoutBookingAPI(details.id, cartSliceState).then(response => {
+                                   await checkoutBookingAPI(details.id, cartSliceState).then(response => {
                                     updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
                                     updateLiveStatusAPI(response[0].booking_id);
-                                   dispatch(updateBookingId(response[0].booking_id));
-                                   dispatch(loadBookingDetailsFromDb(response[0].booking_id));
-
+                                    dispatch(updateBookingId(response[0].booking_id));
+                                    dispatch(loadBookingDetailsFromDb(response[0].booking_id));
                                    })
                                    console.clear();
                                    // Assuming dispatch is an asynchronous action creator

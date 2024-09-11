@@ -84,8 +84,6 @@ const AddClientButton = (props) => {
                                 phone={clientInfo.details?.mobile_1}
                                 name={clientInfo.details?.firstName}
                                 id={clientInfo.details?.id}
-                                onClose={() => setIsVisibleModal(false)}
-
                             />
                         )}
                         <View style={styles.clientCardContainer}>

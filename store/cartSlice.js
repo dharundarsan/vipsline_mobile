@@ -73,8 +73,6 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
 
 export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
     const { clientInfo } = getState();
-    console.log("clientInfo.clientId ");
-    console.log(clientInfo.clientId);
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
@@ -112,7 +110,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
 export const updateCalculatedPrice = (clientId) => async (dispatch, getState) => {
     const { cart } = getState();
     // console.log("cart.clientMembershipID " + cart.clientMembershipID);
-    console.log("cart.clientId " + clientId);
+    // console.log("cart.clientId " + clientId);
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
@@ -173,7 +171,7 @@ export const updateCalculatedPrice = (clientId) => async (dispatch, getState) =>
         isWalletSelected: false,
         client_membership_id: cart.clientMembershipID === undefined || null ? null : cart.clientMembershipID,
         // client_membership_id:clientMembershipID,
-        walkInUserId: clientId,
+        walkInUserId: clientId === "" ? undefined : clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
