@@ -158,8 +158,6 @@ export const clientInfoSlice = createSlice({
             state.analyticDetails["feedbacks"] = action.payload;
         },
         updateClientId(state, action) {
-            console.log("details");
-            console.log(state.details);
             state.clientId = action.payload;
         }
     }

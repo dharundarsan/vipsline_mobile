@@ -14,7 +14,7 @@ import {
     removeCustomItems,
     removeItemFromCart,
     removeItemFromEditedCart, updateEditedCart,
-    updateLoadingState, updateStaffInEditedCart
+    updateLoadingState, updateStaffInEditedCart,updateStaffInCustomItemsCart
 } from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import {updateCartItemStaff} from "../../store/staffSlice";
@@ -53,7 +53,11 @@ const CartItem = (props) => {
                            object={true} objectName={"name"} selectedValue={selectedStaff}
                            onChangeValue={(value) => {
                                dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
-                               dispatch(updateStaffInEditedCart({itemId: props.data.item_id, resource_id: value.id}));
+                               if(props.data.gender === "custom_item") {
+                                   dispatch(updateStaffInCustomItemsCart({itemId: props.data.item_id, resource_id: value.id}));
+                               } else {
+                                   dispatch(updateStaffInEditedCart({itemId: props.data.item_id, resource_id: value.id}));
+                               }
                                setSelectedStaff(value)
                            }}/>
             <View style={styles.itemNameAndDetailsContainer}>

@@ -101,7 +101,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
         dispatch(updateItem(response.data.data));
         dispatch(updateEditedMembership({ type: "map" }))
         dispatch(updateEditedCart());
-        dispatch(updatePackageCart());
+        // dispatch(updatePackageCart());
         dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId ));
         dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
@@ -354,6 +354,17 @@ export const cartSlice = createSlice({
             }
             state.customItems = [...state.customItems, data];
         },
+        updateStaffInCustomItemsCart(state, action) {
+            state.customItems = state.customItems.map(item => {
+                if (action.payload.itemId === item.item_id) {
+                    return {
+                        ...item,
+                        resource_id: action.payload.resource_id
+                    }
+                }
+                return item;
+            })
+        },
         removeCustomItems(state, action) {
             state.customItems = state.customItems.filter(oldItem => oldItem.id !== action.payload);
         },
@@ -445,6 +456,7 @@ export const {
     updatePackageCart,
     clearCalculatedPrice,
     updateStaffInEditedCart,
+    updateStaffInCustomItemsCart,
     clearLocalCart,
     clearSalesNotes,
     updateTotalChargeAmount,
