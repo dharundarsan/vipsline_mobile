@@ -5,7 +5,7 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import React, {useState} from "react";
 import Colors from "../../constants/Colors";
-import {formatDate} from "../../util/Helpers";
+import {formatDate, shadowStyling} from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {addCustomItems, addItemToCart, updateCalculatedPrice} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
@@ -16,7 +16,7 @@ const AddCustomItemModal = (props) => {
     const dispatch = useDispatch();
 
     return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}>
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Custom Item</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -25,7 +25,6 @@ const AddCustomItemModal = (props) => {
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <View style={styles.modalContent}>
             <Text style={[textTheme.labelLarge]}>Custom Item Name</Text>
             <View style={[styles.inputContainer, styles.nameInputContainer]}>

@@ -17,8 +17,7 @@ export default async function sendOTPApi(mobileNumber, platform) {
             otpSend = true
         }
         catch (error) {
-            console.log("sendOtp error: " + error);
-            otpSend = false;
+                        otpSend = false;
         }
         return otpSend;
     }

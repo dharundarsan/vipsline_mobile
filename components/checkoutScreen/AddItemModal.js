@@ -27,7 +27,7 @@ import ServicesList from "./ServicesList";
 import ProductsList from "./ProductsList";
 import MembershipsAndPackagesList from "./MembershipsAndPackagesList";
 import textTheme from "../../constants/TextTheme";
-import {capitalizeFirstLetter, formatDate} from "../../util/Helpers";
+import {capitalizeFirstLetter, formatDate, shadowStyling} from "../../util/Helpers";
 import AddCustomItemModal from "./AddCustomItemModal";
 import PrepaidModal from "./PrepaidModal";
 
@@ -229,7 +229,7 @@ const AddItemModal = (props) => {
             visible={props.visible}
             onRequestClose={props.closeModal}
         >
-            <View style={styles.backAndCloseContainer}>
+            <View style={[styles.backAndCloseContainer, shadowStyling]}>
                 {
                     selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
                         buttonStyle={styles.backButton}
@@ -254,7 +254,6 @@ const AddItemModal = (props) => {
                     <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
-            <Divider/>
             {content}
         </Modal>
     );

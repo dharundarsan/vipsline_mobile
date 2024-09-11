@@ -1,38 +1,56 @@
-import {Modal, Platform, ScrollView, StyleSheet, Text, View} from "react-native";
+import { Modal, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import Colors from "../../constants/Colors";
 import Feather from '@expo/vector-icons/Feather';
-import {Row, Table} from "react-native-table-component";
+import { Row, Table } from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import {useDispatch, useSelector} from "react-redux";
-import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
-import {useEffect, useRef, useState} from "react";
-import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { checkNullUndefined, dateFormatter, shadowStyling } from "../../util/Helpers";
+import { useEffect, useRef, useState } from "react";
+import { loadWalletPriceFromDb } from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import clearCartAPI from "../../util/apis/clearCartAPI";
+import { clearClientInfo } from "../../store/clientInfoSlice";
+import { clearCalculatedPrice, clearLocalCart, clearSalesNotes, loadCartFromDB, modifyClientMembershipId } from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
+    console.log("props");
+    console.log(props);
 
     const details = useSelector(state => state.invoice.details);
     const bookingId = useSelector(state => state.invoice.booking_id1);
 
-    // console.log("details");
-    // console.log(details);
+    const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
+
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
+
+    console.log("details");
+    console.log(details);
+
+
+    console.log("bookingId");
+    console.log(bookingId);
+
+    console.log("invoiceDetails");
+    console.log(invoiceDetails);
+
+
+    console.log("selectedClientDetails");
+    console.log(selectedClientDetails);
+
 
     const dispatch = useDispatch();
 
-    // console.log("client: + selectedClientDetails");
-    // console.log(selectedClientDetails)
-    
+
     const navigation = useNavigation();
 
     const [actionModalVisibility, setActionModalVisibility] = useState(false);
@@ -57,6 +75,16 @@ const InvoiceModal = (props) => {
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
+    const walletBalance = useSelector(state => state.invoice.walletBalance);
+
+    console.log("calculatedPrice");
+    console.log(calculatedPrice);
+
+    console.log("businessId");
+    console.log(businessId);
+
+    console.log("walletBalance");
+    console.log(walletBalance);
 
     const actualData = details.organized_list;
 
@@ -74,49 +102,41 @@ const InvoiceModal = (props) => {
                 return value;
             }
         } catch (e) {
-            console.log("businessId fetching error. (inside getClientListApi)" + e);
         }
     }
 
 
-    // console.log("businessId " + businessId);
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     // let selectedBusinessDetails = "";
     // getBusinessId().then(r => {
-    //     console.log("asdlklnhkuidgjkhdb")
-    //     console.log(r)
     //     setBusinessId(r);
-    // console.log("businessId " + businessId)
     // });
     const selectedBusinessDetails = listOfBusinesses.filter((item) => {
         return item.id === businessId
     })[0];
 
-    // console.log("businessId " + businessId)
-    // console.log(listOfBusinesses);
-    // console.log("Busones r" + businessId);
 
-    // console.log("selectedBusinessDetails.name");
-    // console.log(selectedBusinessDetails);
 
     const businessName = selectedBusinessDetails.name;
     const businessContact = selectedBusinessDetails.mobile_1;
     const businessAddress = selectedBusinessDetails.address;
     const businessEmail = selectedBusinessDetails.email;
-    const GSTIn = selectedBusinessDetails.gstin;
-
-    // console.log("business")
-    // console.log(selectedBusinessDetails);
 
 
     useEffect(() => {
-        dispatch(loadWalletPriceFromDb(selectedClientDetails.id));
+        async function api() {
+            try {
+                dispatch(await loadWalletPriceFromDb(selectedClientDetails.id));
+            } catch (e) {
+            }
+        }
+        api();
     }, [selectedClientDetails]);
 
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
-                  visible={props.isVisible}>
-        <View style={styles.headingAndCloseContainer}>
+        visible={props.isVisible}>
+        <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -146,7 +166,9 @@ const InvoiceModal = (props) => {
 
                     } else if (value === "Email") {
                         setEmailModalVisibility(true);
-
+                    }
+                    else if (value === "Cancel Invoice") {
+                        setCancelInvoiceModalVisibility(true);
                     }
                 }}
             />
@@ -221,8 +243,8 @@ const InvoiceModal = (props) => {
                         // props.onCloseModal();
                     }
                 }}
-                buttonOneStyle={{borderColor: Colors.error, borderWidth: 1.5}}
-                buttonOneTextStyle={{color: Colors.error}}
+                buttonOneStyle={{ borderColor: Colors.error, borderWidth: 1.5 }}
+                buttonOneTextStyle={{ color: Colors.error }}
 
             />
 
@@ -249,13 +271,21 @@ const InvoiceModal = (props) => {
 styles.heading]}>Invoice</Text>*/}
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={() => setCancelInvoiceModalVisibility(true)
-            }
+                onPress={() => {
+                    // setCancelInvoiceModalVisibility(true)
+                    clearCartAPI();
+                    dispatch(modifyClientMembershipId({ type: "clear" }))
+                    dispatch(clearSalesNotes());
+                    dispatch(clearLocalCart());
+                    dispatch(clearClientInfo());
+                    dispatch(clearCalculatedPrice());
+                    props.onCloseModal();
+                }
+                }
             >
-                <Ionicons name="close" size={25} color="black"/>
+                <Ionicons name="close" size={25} color="black" />
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 {
@@ -269,7 +299,7 @@ styles.heading]}>Invoice</Text>*/}
                 }
                 <View style={styles.logoAndButtonContainer}>
                     <Feather name="check-circle" size={50}
-                             color={Colors.highlight}/>
+                        color={Colors.highlight} />
                     <Text style={[textTheme.titleMedium]}>Checkout
                         Complete!</Text>
                     <View style={styles.backAndDropdownButtonContainer}>
@@ -277,6 +307,12 @@ styles.heading]}>Invoice</Text>*/}
                             buttonStyle={styles.backToCheckoutButton}
                             label={"Back to checkout"}
                             onPress={() => {
+                                clearCartAPI();
+                                dispatch(modifyClientMembershipId({ type: "clear" }))
+                                dispatch(clearSalesNotes());
+                                dispatch(clearLocalCart());
+                                dispatch(clearClientInfo());
+                                dispatch(clearCalculatedPrice());
                                 props.onCloseModal();
                             }}
                         />
@@ -284,30 +320,35 @@ styles.heading]}>Invoice</Text>*/}
                             onPress={() => setOptionModalVisibility(true)}
                             buttonStyle={styles.backToCheckoutOptionsButton}>
                             <MaterialIcons name="keyboard-arrow-down"
-                                           size={24}
-                                           color={Colors.background}
+                                size={24}
+                                color={Colors.background}
                             />
                         </PrimaryButton>
                     </View>
+                    {
+                        !isCancelled ?
+                            <PrimaryButton
+                                buttonStyle={styles.actionsButton}
+                                textStyle={styles.actionsButtonText}
+                                label={"Actions"}
+                                onPress={() => {
+                                    setActionModalVisibility(true);
+                                }}
+                            /> :
+                            null
+                    }
 
-                    <PrimaryButton
-                        buttonStyle={styles.actionsButton}
-                        textStyle={styles.actionsButtonText}
-                        label={"Actions"}
-                        onPress={() => {
-                            setActionModalVisibility(true);
-                        }}
-                    />
+
 
                 </View>
-                <Divider/>
+                <Divider />
                 <View style={styles.invoiceHeadingContainer}>
                     <View style={styles.invoiceHeading}>
                         <Text style={[textTheme.titleMedium,
-                            styles.invoiceHeadingText]}>Invoice</Text>
+                        styles.invoiceHeadingText]}>Invoice</Text>
                     </View>
                 </View>
-                <Divider thickness={0.5} color={Colors.highlight}/>
+                <Divider thickness={0.5} color={Colors.highlight} />
                 <View style={styles.invoice}>
                     <View style={{
                         paddingVertical: 10,
@@ -318,8 +359,6 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>{businessName}</Text>
                         <Text
                             style={textTheme.bodyLarge}>{businessAddress}</Text>
-                        {/*<Text style={textTheme.bodyLarge}>Chennai
-600119, Tamilnadu</Text>*/}
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Contact
                             : </Text>{businessContact}</Text>
@@ -327,16 +366,19 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>Email
                             : </Text>{businessEmail}</Text>
                         <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
+                            //     style={textTheme.titleMedium}>Contact : </Text>
+                            // </Text>
+                            // <Text style={textTheme.bodyLarge}><Text
+                            style={textTheme.titleMedium}>GSTIN : </Text>{selectedBusinessDetails.gstin}
                         </Text>
                     </View>
                     <View style={styles.invoiceNumberAndDateContainer}>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice no :
-                        </Text>{details.business_invoice_num}</Text>
+                        </Text>{invoiceDetails.business_invoice_num}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice date :
-                        </Text>{details.invoice_created_date}</Text>
+                        </Text>{invoiceDetails.invoice_created_date}</Text>
                     </View>
                     <View style={styles.invoiceDetailsOutlineCard}>
                         <Text style={textTheme.bodyLarge}><Text
@@ -351,116 +393,120 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}>
                             <Text
                                 style={textTheme.titleMedium}>Prepaid :
-                            </Text>{details.wallet_balance}</Text>
+                            </Text> { }</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN
                             : </Text>{selectedClientDetails.customer_gst}</Text>
                     </View>
-                    <Table style={styles.cartItemTable}>
-                        <Row
-                            textStyle={StyleSheet.flatten({textAlign: "center", fontWeight: "bold"})}
-                            style={styles.cartItemTableHead}
-                            data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
-                        />
+                    { actualData && actualData.length > 0 &&
+                        <Table style={styles.cartItemTable}>
+                            <Row
+                                // textStyle={{textAlign: "center", fontWeight: "bold"}}
+                                style={styles.cartItemTableHead}
+                                data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
+                            />
 
 
-                        {actualData && actualData.length > 0 &&
-                            actualData.map((item) => (
-                                item.list && item.list.length > 0 &&
-                                item.list.map((innerItem, index) => {
-                                    totalDiscount +=
-                                        (innerItem.service_cost * innerItem.discount_percent) / 100;
-                                    return <Row
-                                        key={index}
-                                        data={[innerItem.resource_service,
+
+                            {actualData && actualData.length > 0 &&
+                                actualData.map((item) => (
+                                    item.list && item.list.length > 0 &&
+                                    item.list.map((innerItem, index) => {
+                                        totalDiscount +=
+                                            (innerItem.service_cost * innerItem.discount_percent) / 100;
+                                        return <Row
+                                            key={index}
+                                            data={[innerItem.resource_service,
                                             innerItem.resource_name, innerItem.count,
                                             (innerItem.service_cost).toFixed(2)]}
-                                        style={styles.cartItemTableRow}
+                                            style={styles.cartItemTableRow}
 
-                                        textStyle={StyleSheet.flatten({textAlign: "center"})}
-                                    />
+                                        // textStyle={{textAlign: "center"}}
+                                        />
 
-                                })
-                            ))}
+                                    })
+                                ))}
 
-                    </Table>
+                        </Table>
+                    }
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>Discount</Text>
+                        styles.checkoutDetailText]}>Discount</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>₹ {(totalDiscount).toFixed(2)}</Text>
+                            styles.checkoutDetailText]}>₹ {(totalDiscount).toFixed(2)}</Text>
                     </View>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>Sub Total</Text>
+                        styles.checkoutDetailText]}>Sub Total</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>₹
+                            styles.checkoutDetailText]}>₹
                             {(details.sub_total_with_discount).toFixed(2)}</Text>
                     </View>
                     {
                         calculatedPrice[0].tax_details.map((item, index) => (
                             <View key={index} style={styles.calculatepriceRow}>
                                 <Text style={[textTheme.bodyLarge,
-                                    styles.checkoutDetailText]}>{item.name}</Text>
+                                styles.checkoutDetailText]}>{item.name}</Text>
                                 <Text style={[textTheme.bodyLarge,
-                                    styles.checkoutDetailText]}>₹ {(item.value)}</Text>
+                                styles.checkoutDetailText]}>₹ {(item.value)}</Text>
                             </View>
                         ))
 
                     }
 
-                    <Divider/>
+                    <Divider />
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.titleMedium,
-                            styles.checkoutDetailText]}>Total</Text>
+                        styles.checkoutDetailText]}>Total</Text>
                         <Text
                             style={[textTheme.titleMedium,
-                                styles.checkoutDetailText]}>₹ {(details.total + centralGST +
-                            stateGST).toFixed(2)}</Text>
+                            styles.checkoutDetailText]}>₹ {(details.total + centralGST +
+                                stateGST).toFixed(2)}</Text>
                     </View>
                     <View style={styles.paymentModeContainer}>
                         <Text style={[textTheme.titleMedium]}>Payment
                             Mode</Text>
                         <Table style={styles.paymentModeTable}>
                             <Row style={styles.paymentModeTableHead}
-                                 data={["Date & Time", "Mode", "Amount", "Status"]}
-                                 textStyle={{textAlign: "center"}}/>
+                                data={["Date & Time", "Mode", "Amount", "Status"]}
+                            // textStyle={{textAlign: "center"}}
+                            />
                             {
                                 splitPayment.map((item, index) => (
                                     <Row
                                         key={index}
                                         data={[dateFormatter(item.date, 'short') + " " + item.time,
-                                            item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
+                                        item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
                                         style={styles.paymentModeTableRow}
-                                        textStyle={{textAlign: "center"}}
+                                    // textStyle={{textAlign: "center"}}
                                     />
                                 ))
                             }
                         </Table>
                     </View>
                 </View>
-                <Divider color={Colors.highlight}/>
+                <Divider color={Colors.highlight} />
                 {
-                    checkNullUndefined(details.footer_message_1) &&
-                    details.footer_message_1.trim().length !== 0 ?
+                    checkNullUndefined(invoiceDetails.footer_message_1) &&
+                        invoiceDetails.footer_message_1.trim().length !== 0 ?
                         <View style={styles.termsAndConditions}>
                             <Text
                                 style={[textTheme.titleMedium]}>Terms & conditions: </Text>
                             <Text
-                                style={[textTheme.bodyMedium]}>{details.footer_message_1}</Text>
+                                style={[textTheme.bodyMedium]}>{invoiceDetails.footer_message_1}</Text>
 
                         </View> :
                         null
                 }
             </View>
             {
-                checkNullUndefined(details.footer_message_2) &&
-                details.footer_message_2.trim().length !== 0 ?
+                checkNullUndefined(invoiceDetails.footer_message_2) &&
+                    invoiceDetails.footer_message_2.trim().length !== 0 ?
                     <Text
                         style={[textTheme.titleMedium,
-                            styles.thankYouText]}>{details.footer_message_2}</Text> :
+                        styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
                     null
             }
         </ScrollView>
@@ -534,7 +580,7 @@ const styles = StyleSheet.create({
     invoiceNumberAndDateContainer: {
         borderWidth: 1,
         borderColor: Colors.grey300,
-// borderRadius:0,
+        // borderRadius:0,
         paddingVertical: 10,
         paddingHorizontal: 15,
         gap: 5,
@@ -612,7 +658,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         top: '40%',      // Adjust the placement
         left: '0%',     // Adjust the placement
-        transform: [{rotate: '-35deg'}],  // Rotate the stamp diagonally
+        transform: [{ rotate: '-35deg' }],  // Rotate the stamp diagonally
         // opacity: 0.6,    // Slight transparency
         alignItems: 'center',
         paddingVertical: 8,

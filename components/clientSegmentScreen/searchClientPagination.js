@@ -56,10 +56,8 @@ export default function SearchClientPagination(props) {
 
     useEffect(() => {
         dispatch(updateSearchClientMaxEntry(10))
-        // console.log("inside the props max entry: " + maxEntry);
-        dispatch(resetSearchClientFilter());
-        // console.log("1st");
-        dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
+                dispatch(resetSearchClientFilter());
+                dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
         // setTotalCount(totalCount);
         setLowerCount(1);
         setUpperCount(10 > getTotalCount ? getTotalCount : 10);
@@ -67,8 +65,7 @@ export default function SearchClientPagination(props) {
     }, [props.filterPressed]);
 
     useEffect(() => {
-        // console.log("2st");
-        dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
+                dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
         if(lowerCount === 1) {
             setIsBackwardButtonDisabled(true);
         }
@@ -77,8 +74,7 @@ export default function SearchClientPagination(props) {
         }
 
         if(upperCount === getTotalCount) {
-            // console.log(upperCount + "  " + getTotalCount);
-            setIsForwardButtonDisabled(true);
+                        setIsForwardButtonDisabled(true);
         }
         else {
             setIsForwardButtonDisabled(false);
@@ -95,8 +91,7 @@ export default function SearchClientPagination(props) {
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
 
         let upper_count = 0;
-        // console.log("total count", getTotalCount);
-        if(maxEntry > getTotalCount) {
+                if(maxEntry > getTotalCount) {
             upper_count = getTotalCount;
         }
         else {
@@ -119,23 +114,19 @@ export default function SearchClientPagination(props) {
             if(upperCountAfter > getTotalCount && lowerCountAfter < 0) {
                 setLowerCount(getTotalCount - maxEntry);
                 setUpperCount(getTotalCount);
-                // console.log("both are out of bound");
-            }
+                            }
             else if(upperCountAfter <= getTotalCount && lowerCountAfter >= 0) {
-                // console.log("both are good not out of bound");
-                setLowerCount(lowerCountAfter);
+                                setLowerCount(lowerCountAfter);
                 setUpperCount(upperCountAfter);
                 dispatch(incrementSearchClientPageNumber());
             }
             else if(upperCountAfter > getTotalCount && upperCountAfter >= 0) {
-                // console.log("upper bound is out of bound");
-                dispatch(incrementSearchClientPageNumber());
+                                dispatch(incrementSearchClientPageNumber());
                 setUpperCount(getTotalCount);
                 setLowerCount(lowerCountAfter)
             }
             else if(lowerCountAfter < 0 && upperCountAfter < getTotalCount) {
-                // console.log("lower bound is out of bound");
-                dispatch(incrementSearchClientPageNumber());
+                                dispatch(incrementSearchClientPageNumber());
                 setUpperCount(upperCountAfter)
                 setLowerCount(0)
             }
@@ -148,20 +139,17 @@ export default function SearchClientPagination(props) {
             let upperCountAfter = upperCount - maxEntry;
 
             if (lowerCountAfter === 1 && upperCountAfter < maxEntry) {
-                // console.log("lower bound ==== 1 and upper bound is under of bound while dec");
-                setLowerCount(1);
+                                setLowerCount(1);
                 setUpperCount(maxEntry);
                 dispatch(decrementSearchPageNumber());
             }
             else if(lowerCountAfter < 1 && upperCountAfter < maxEntry) {
-                // console.log("lower bound is out of bound and upper bound is under of bound while dec");
-                setLowerCount(1);
+                                setLowerCount(1);
                 setUpperCount(maxEntry);
                 dispatch(decrementSearchPageNumber());
             }
             else if(upperCountAfter >= 1 && upperCountAfter >= maxEntry) {
-                // console.log("bother are good not out of bound while decrement");
-                setLowerCount(lowerCountAfter);
+                                setLowerCount(lowerCountAfter);
                 setUpperCount(upperCountAfter);
                 dispatch(decrementSearchPageNumber());
             }

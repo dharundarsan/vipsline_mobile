@@ -11,9 +11,19 @@ import Entypo from '@expo/vector-icons/Entypo';
 import InvoiceModal from "./InvoiceModal";
 import splitPaymentAPI from "../../util/apis/SplitPaymentAPI";
 import DropdownModal from "../../ui/DropdownModal";
+import checkoutBooking from "../../util/apis/checkoutBookingAPI";
+import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
+import {useDispatch, useSelector} from "react-redux";
+import {loadBookingDetailsFromDb, loadWalletPriceFromDb, updateBookingId} from "../../store/invoiceSlice";
+import updateAPI from "../../util/apis/updateAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
+import {shadowStyling} from "../../util/Helpers";
 
 const PaymentModal = (props) => {
+    const dispatch = useDispatch();
+
+
     const [selectedPaymentOption, setSelectedPaymentOption] = useState("cash");
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
@@ -26,6 +36,8 @@ const PaymentModal = (props) => {
     const [isError, setIsError] = useState(false);
     const [bodyData, setBodyData] = useState([])
     const [shownCount, setShownCount] = useState(0)
+    const invoiceDetails = useSelector(state => state.invoice.details);
+
 
     const [splitUpState, setSplitUpState] = useState([
             {
@@ -46,9 +58,9 @@ const PaymentModal = (props) => {
             },
         ]
     )
-    console.log("props");
-    console.log(props);
-    
+
+    const cartSliceState = useSelector((state) => state.cart);
+    const details = useSelector(state => state.clientInfo.details);
 
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
@@ -60,8 +72,6 @@ const PaymentModal = (props) => {
             //     return item.shown ? acc + 1 : acc;
             // }, 0);
             if (split.name === addedSplitPayment) {
-                console.log(addedSplitPayment)
-                console.log(split.name === addedSplitPayment)
                 if (shownCount === 0) {
                     return ({
                         ...split,
@@ -116,11 +126,8 @@ const PaymentModal = (props) => {
                 // const shownCount = splitUpState.reduce((acc, item) => {
                 //     return item.shown ? acc + 1 : acc;
                 // }, 0);
-                console.log(shownCount)
-                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
-                console.log("aiyoda");
-                console.log(aiyoda);
-                // return;
+                                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
+                                                // return;
                 data = {
                     booking_amount: props.price,
                     paid_amount: splitUpState.map(split => {
@@ -182,14 +189,9 @@ const PaymentModal = (props) => {
                 }
             }
 
-            console.log(splitUpState);
-            console.log("DATA")
-            console.log(data)
 
             const response = await splitPaymentAPI(data);
-            console.log("response")
-            console.log(response)
-            setSplitResponse(response[0]);
+                                    setSplitResponse(response[0]);
             setStopAPI(true);
         }
         splitApi();
@@ -248,8 +250,7 @@ const PaymentModal = (props) => {
                 });
                 setSplitResponse(response);
             }
-            console.log(response);
-        }
+                    }
         splitApi();
     }
     const insets = useSafeAreaInsets();
@@ -257,10 +258,16 @@ const PaymentModal = (props) => {
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
         }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment}/>
-        <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
-            setIsInvoiceModalVisible(false)
-        }}/>
-        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}]}>
+        {
+            isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 ?
+                <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
+                    setIsInvoiceModalVisible(false);
+                    props.onCloseModal();
+                }}/> :
+                null
+        }
+
+        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -269,7 +276,6 @@ const PaymentModal = (props) => {
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 <View style={styles.paymentOptionsContainer}>
@@ -326,9 +332,7 @@ const PaymentModal = (props) => {
                     <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
                                      placeholder={"Price"}
                                      onChangeText={(price) => {
-                                         console.log(price)
-                                         console.log(price.length)
-                                         if (price.trim().length === 0) {
+                                                                                                                           if (price.trim().length === 0) {
                                              setTotalPrice(0)
                                              return
                                          }
@@ -354,15 +358,7 @@ const PaymentModal = (props) => {
                         // const shownCount = splitUpState.reduce((acc, item) => {
                         //     return item.shown ? acc + 1 : acc;
                         // }, 0);
-                        console.log("INDEX")
-                        console.log(index)
-                        console.log(shownCount)
-                        console.log(index + 1 === shownCount)
                         if (item.shown) {
-                            console.log("item.mode")
-                            console.log(item.mode)
-                            console.log(paymentOrder)
-                            console.log(paymentOrder.at(-1))
                             return <View style={styles.splitInputAndCloseContainer}>
                                 <CustomTextInput
                                     textInputStyle={isError ? {borderColor: Colors.error} : {borderColor: Colors.green}}
@@ -393,11 +389,7 @@ const PaymentModal = (props) => {
                                                 else return [...prev, item.mode]
                                             }
                                         );
-                                        console.log("ONCHANGETEXT");
-                                        console.log(text);
-                                        console.log("ONCHANGE");
-                                        console.log(splitUpState);
-                                    }}
+                                                                                                                                                                                                    }}
                                     onEndEditing={(text) => {
                                         const totalValue = splitUpState.reduce((acc, ele) => {
                                             if (ele.shown) {
@@ -463,7 +455,7 @@ const PaymentModal = (props) => {
                             </View>
                         }
                     }}/>
-                    { shownCount !== 3 ? <View style={styles.addPaymentButtonContainer}>
+                    {shownCount !== 3 ? <View style={styles.addPaymentButtonContainer}>
                         <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
                                        buttonStyle={styles.addPaymentButton}
                                        pressableStyle={styles.addPaymentButtonPressable}>
@@ -480,8 +472,28 @@ const PaymentModal = (props) => {
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
-                           onPress={() => {
-                               setIsInvoiceModalVisible(true);
+                           onPress={ async() => {
+                                   setIsInvoiceModalVisible(true);
+                               try {
+                                   await checkoutBookingAPI(details.id, cartSliceState).then(response => {
+                                    console.log(1);
+                                    
+                                    updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
+                                    console.log(2);
+                                    updateLiveStatusAPI(response[0].booking_id);
+                                    console.log(3);
+                                    dispatch(updateBookingId(response[0].booking_id));
+                                    console.log(4);
+                                    dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                                    console.log(5);
+                                    dispatch(loadWalletPriceFromDb(details.id))
+                                   })
+                                   console.clear();
+                                   // Assuming dispatch is an asynchronous action creator
+                               } catch (error) {
+                                   console.error("An error occurred:", error);
+                                   // Handle the error appropriately here
+                               }
                            }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>

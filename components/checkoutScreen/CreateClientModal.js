@@ -11,6 +11,8 @@ import createNewClientAPI from "../../util/apis/createNewClientAPI";
 import {formatDate} from "../../util/Helpers";
 import {useDispatch} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {shadowStyling} from "../../util/Helpers";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -62,12 +64,23 @@ const CreateClientModal = (props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
+        let businessId = ""
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                businessId = value;
+            }
+        } catch (e) {
+            console.log("businessId fetching error. (inside createClientModal)" + e);
+        }
+
+
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
             await createNewClientAPI({
                 address: clientAddress,
                 anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
-                businessId: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                businessId: businessId,
                 city: "",
                 clientNotes: clientNotes,
                 clientSource: clientSource,
@@ -96,7 +109,7 @@ const CreateClientModal = (props) => {
 
     return (
         <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} >
-            <View style={styles.closeAndHeadingContainer}>
+            <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Add a new client</Text>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
@@ -106,7 +119,6 @@ const CreateClientModal = (props) => {
                     <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
-            <Divider/>
             <ScrollView>
                 <View style={styles.modalContent}>
                     <Text style={[textTheme.bodyMedium, styles.headingText]}>Basic Information</Text>
@@ -243,6 +255,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         height: 60,
         flexDirection: "row",
+
     },
     closeButton: {
         position: "absolute",
