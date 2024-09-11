@@ -19,6 +19,7 @@ import {
     clearLocalCart,
     clearSalesNotes,
     loadCartFromDB,
+    modifyClientMembershipId,
     setCalculatedPrice,
     updateCalculatedPrice
 } from "../../store/cartSlice";
@@ -249,6 +250,7 @@ const CheckoutSection = (props) => {
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
                 clearCartAPI();
+                dispatch(modifyClientMembershipId({type:"clear"}))
                 dispatch(clearSalesNotes());
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
