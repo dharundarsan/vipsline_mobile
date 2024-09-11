@@ -65,14 +65,7 @@ const EditCartModal = (props) => {
                                      else setPrice(parseFloat(value));
                                  }
                              }
-                             onEndEditing={async (value) => {
-                                 if (selectedDiscountMode === "percentage") {
-                                     setDiscountAmount(await getDiscountAPI({
-                                         price: price,
-                                         disc_percent: discountValue
-                                     }))
-                                 }
-                             }}
+
             />
             {props.data.gender === "membership" ? null :
                 <>
@@ -136,7 +129,7 @@ const EditCartModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={async () => {
                 if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
-                    if (props.data.gender === "Women") {
+                    if (props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" ) {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
                             amount: price,
@@ -182,9 +175,10 @@ const EditCartModal = (props) => {
                             amount: price,
                             price: price,
                             total_price: price,
+                            item_id: props.data.item_id,
                         }))
                     } else if (props.data.gender === "membership") {
-                        dispatch(updateEditedMembership({
+                        await dispatch(updateEditedMembership({
                             type: "edit", id: props.data.item_id, data: {
                                 amount: price,
                                 bonus_value: 0,
@@ -193,10 +187,9 @@ const EditCartModal = (props) => {
                                 res_cat_id: props.data.resource_category_id
                             }
                         }))
-
+                        await dispatch(loadCartFromDB());
                     }
                     dispatch(updateCalculatedPrice());
-
                     props.onCloseModal()
                 } else {
                     props.onCloseModal()
