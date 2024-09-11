@@ -1,14 +1,14 @@
-import {Modal, Platform, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
+import { Modal, Platform, ScrollView, StyleSheet, Text, ToastAndroid, View } from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
-import React, {useRef, useState} from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useRef, useState } from "react";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import CustomTextInput from "../../ui/CustomTextInput";
-import {addItemToCart, addItemToEditedCart, updateCalculatedPrice, updateEditedCart} from "../../store/cartSlice";
-import {useDispatch} from "react-redux";
-import {shadowStyling} from "../../util/Helpers";
+import { addItemToCart, addItemToEditedCart, modifyPrepaidDetails, updateCalculatedPrice, updateEditedCart } from "../../store/cartSlice";
+import { useDispatch } from "react-redux";
+import { shadowStyling } from "../../util/Helpers";
 
 const PrepaidModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
@@ -18,6 +18,29 @@ const PrepaidModal = (props) => {
     const [description, setDescription] = useState(props.edited ? props.data.wallet_bonus : "")
     const dispatch = useDispatch();
     const prepaidAmountRef = useRef(null);
+
+    console.log("selectedDate ");
+    console.log(selectedDate.toString());
+
+    console.log("prepaidAmount " + prepaidAmount);
+    console.log("prepaidSource " + prepaidSource);
+    console.log("prepaidBonus " + prepaidBonus);
+    console.log("description " + description);
+
+    function formatDateToISO() {
+        const date = new Date(selectedDate);
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const hours = String(date.getUTCHours()).padStart(2, '0');
+        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+        const milliseconds = String(date.getUTCMilliseconds()).padStart(3, '0');
+        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+0000`;
+
+        return formattedDate;
+    }
+
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Prepaid</Text>
@@ -25,36 +48,36 @@ const PrepaidModal = (props) => {
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}
             >
-                <Ionicons name="close" size={25} color="black"/>
+                <Ionicons name="close" size={25} color="black" />
             </PrimaryButton>
         </View>
         <View style={styles.modalContent}>
             <ScrollView>
-                <CustomTextInput label={"Date"} type={"date"} value={selectedDate} onChangeValue={setSelectedDate}/>
+                <CustomTextInput label={"Date"} type={"date"} value={selectedDate} onChangeValue={setSelectedDate} />
                 <CustomTextInput label={"Prepaid Source"} type={"dropdown"}
-                                 dropdownItems={["Add prepaid", "Balance carry forward"]} value={prepaidSource}
-                                 onChangeValue={setPrepaidSource}/>
+                    dropdownItems={["Add prepaid", "Balance carry forward"]} value={prepaidSource}
+                    onChangeValue={setPrepaidSource} />
                 <CustomTextInput label={"Prepaid amount"} type={"price"} placeholder={"0.00"}
-                                 value={prepaidAmount.toString()}
-                                 validator={(text) => {
-                                     if (parseFloat(text) === 0) return "Price is required";
-                                     else return true;
-                                 }}
-                                 onSave={(callback) => {
-                                     prepaidAmountRef.current = callback;
-                                 }}
-                                 onChangeText={(price) => {
-                                     if (price === "") setPrepaidAmount(0)
-                                     else setPrepaidAmount(parseFloat(price))
-                                 }}/>
+                    value={prepaidAmount.toString()}
+                    validator={(text) => {
+                        if (parseFloat(text) === 0) return "Price is required";
+                        else return true;
+                    }}
+                    onSave={(callback) => {
+                        prepaidAmountRef.current = callback;
+                    }}
+                    onChangeText={(price) => {
+                        if (price === "") setPrepaidAmount(0)
+                        else setPrepaidAmount(parseFloat(price))
+                    }} />
                 <CustomTextInput label={"Prepaid Bonus"} type={"price"} placeholder={"0.00"}
-                                 value={prepaidBonus.toString()}
-                                 onChangeText={(price) => {
-                                     if (price === "") setPrepaidBonus(0)
-                                     else setPrepaidBonus(parseFloat(price))
-                                 }}/>
+                    value={prepaidBonus.toString()}
+                    onChangeText={(price) => {
+                        if (price === "") setPrepaidBonus(0)
+                        else setPrepaidBonus(parseFloat(price))
+                    }} />
                 <CustomTextInput label={"Description"} type={"multiLine"} value={description}
-                                 onChangeText={setDescription}/>
+                    onChangeText={setDescription} />
                 <View style={styles.noteContainer}>
                     <View style={styles.noteLeftBar}></View>
                     <Text style={[textTheme.bodyMedium]}>Note: Total Prepaid Credit = (Prepaid amount + Bonus
@@ -64,7 +87,7 @@ const PrepaidModal = (props) => {
                     ₹{prepaidAmount + prepaidBonus}</Text>
             </ScrollView>
         </View>
-        <Divider/>
+        <Divider />
         <View style={styles.saveButtonContainer}>
             <PrimaryButton onPress={() => {
                 if (!prepaidAmountRef.current()) return;
@@ -76,8 +99,8 @@ const PrepaidModal = (props) => {
                     dispatch(addItemToEditedCart({
                         ...props.data,
                         itemId: props.data.item_id,
-                        total_price:prepaidAmount,
-                        price:prepaidAmount,
+                        total_price: prepaidAmount,
+                        price: prepaidAmount,
                         description: description,
                         wallet_amount: prepaidAmount,
                         wallet_bonus: prepaidBonus
@@ -91,10 +114,20 @@ const PrepaidModal = (props) => {
                         wallet_amount: prepaidAmount,
                         wallet_bonus: prepaidBonus
                     }));
+                    dispatch(modifyPrepaidDetails({
+                        type: "add", payload: [{
+                            bonus_value: prepaidBonus.toString(),
+                            description: description,
+                            mobile:"",
+                            resource_id:"",
+                            source:prepaidSource,
+                            wallet_amount: prepaidAmount.toString(),
+                        }]
+                    }))
                     props.onCloseModal();
                     props.closeOverallModal()
                 }
-            }} label={"Save"}/>
+            }} label={"Save"} />
         </View>
     </Modal>
 }

@@ -37,7 +37,6 @@
     "react-native-check-box": "^2.1.7",
     "react-native-dotenv": "^3.4.11",
     "react-native-easy-content-loader": "^0.3.2",
-    "react-native-flipper": "^0.265.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-otp-entry": "^1.7.0",
     "react-native-otp-textinput": "^1.1.6",

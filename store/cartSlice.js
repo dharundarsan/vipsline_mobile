@@ -22,7 +22,8 @@ const initialCartState = {
     salesNotes: "",
     totalChargeAmount: 0.0,
     clientMembershipID: undefined,
-    packageCart: []
+    packageCart: [],
+    prepaid_wallet:[]
 };
 
 async function getBusinessId() {
@@ -421,7 +422,27 @@ export const cartSlice = createSlice({
                     state.clientMembershipID = payload;
                     break;
             }
-        }
+        },
+        modifyPrepaidDetails(state, action) {
+            const { type, payload } = action.payload;
+            console.log(payload);
+            switch (type) {
+                case "clear":
+                    state.prepaid_wallet = [];
+                    break;
+                case "add":
+                    state.prepaid_wallet = payload;
+                    break;
+                case "updateMobile":
+                    state.prepaid_wallet[0].mobile = payload;
+                    break;
+                case "updateResourceId":
+                    console.log(payload);
+                    state.prepaid_wallet[0].resource_id = payload;
+                    break;
+            }
+        },
+        
     }
 });
 
@@ -449,6 +470,7 @@ export const {
     clearSalesNotes,
     updateTotalChargeAmount,
     modifyClientMembershipId,
+    modifyPrepaidDetails
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -1,9 +1,9 @@
-import {FlatList, Modal, Platform, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
+import { FlatList, Modal, Platform, ScrollView, StyleSheet, Text, ToastAndroid, View } from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Feather, Ionicons} from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CustomTextInput from "../../ui/CustomTextInput";
@@ -13,12 +13,13 @@ import splitPaymentAPI from "../../util/apis/SplitPaymentAPI";
 import DropdownModal from "../../ui/DropdownModal";
 import checkoutBooking from "../../util/apis/checkoutBookingAPI";
 import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
-import {useDispatch, useSelector} from "react-redux";
-import {loadBookingDetailsFromDb, loadWalletPriceFromDb, updateBookingId} from "../../store/invoiceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loadBookingDetailsFromDb, loadWalletPriceFromDb, updateBookingId } from "../../store/invoiceSlice";
 import updateAPI from "../../util/apis/updateAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
-import {shadowStyling} from "../../util/Helpers";
+import { shadowStyling } from "../../util/Helpers";
+import { modifyPrepaidDetails } from "../../store/cartSlice";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -40,23 +41,23 @@ const PaymentModal = (props) => {
 
 
     const [splitUpState, setSplitUpState] = useState([
-            {
-                mode: "cash",
-                shown: true,
-                amount: 0,
-                name: "Cash"
-            }, {
-                mode: "card",
-                shown: true,
-                amount: 0,
-                name: "Credit / Debit Card"
-            }, {
-                mode: "digital payments",
-                shown: false,
-                amount: 0,
-                name: "Digital payment"
-            },
-        ]
+        {
+            mode: "cash",
+            shown: true,
+            amount: 0,
+            name: "Cash"
+        }, {
+            mode: "card",
+            shown: true,
+            amount: 0,
+            name: "Credit / Debit Card"
+        }, {
+            mode: "digital payments",
+            shown: false,
+            amount: 0,
+            name: "Digital payment"
+        },
+    ]
     )
 
     const cartSliceState = useSelector((state) => state.cart);
@@ -126,8 +127,8 @@ const PaymentModal = (props) => {
                 // const shownCount = splitUpState.reduce((acc, item) => {
                 //     return item.shown ? acc + 1 : acc;
                 // }, 0);
-                                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
-                                                // return;
+                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
+                // return;
                 data = {
                     booking_amount: props.price,
                     paid_amount: splitUpState.map(split => {
@@ -191,7 +192,7 @@ const PaymentModal = (props) => {
 
 
             const response = await splitPaymentAPI(data);
-                                    setSplitResponse(response[0]);
+            setSplitResponse(response[0]);
             setStopAPI(true);
         }
         splitApi();
@@ -240,40 +241,43 @@ const PaymentModal = (props) => {
             if (selectedPaymentOption === "cash") {
                 const response = await splitPaymentAPI({
                     booking_amount: props.price,
-                    paid_amount: [{mode: "CASH", amount: totalPrice}]
+                    paid_amount: [{ mode: "CASH", amount: totalPrice }]
                 });
                 setSplitResponse(response);
             } else if (selectedPaymentOption === "split_payment") {
                 const response = await splitPaymentAPI({
                     booking_amount: props.price,
-                    paid_amount: [{mode: "CASH", amount: totalPrice}]
+                    paid_amount: [{ mode: "CASH", amount: totalPrice }]
                 });
                 setSplitResponse(response);
             }
-                    }
+        }
         splitApi();
     }
     const insets = useSafeAreaInsets();
+    const findIsPrepaid = () => {
+        return cartSliceState.items.find(item =>item.gender === "prepaid");
+    }
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
-        }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment}/>
+        }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment} />
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 ?
                 <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
                     setIsInvoiceModalVisible(false);
                     props.onCloseModal();
-                }}/> :
+                }} /> :
                 null
         }
 
-        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}, shadowStyling]}>
+        <View style={[styles.headingAndCloseContainer, { marginTop: insets.top }, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}
             >
-                <Ionicons name="close" size={25} color="black"/>
+                <Ionicons name="close" size={25} color="black" />
             </PrimaryButton>
         </View>
         <ScrollView>
@@ -286,9 +290,9 @@ const PaymentModal = (props) => {
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "cash" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                                        color={Colors.highlight}/>
+                                    color={Colors.highlight} />
                             </View> : null}
-                            <MaterialCommunityIcons name="cash" size={30} color={Colors.green}/>
+                            <MaterialCommunityIcons name="cash" size={30} color={Colors.green} />
                             <Text>Cash</Text>
                         </PrimaryButton>
                         <PrimaryButton
@@ -297,9 +301,9 @@ const PaymentModal = (props) => {
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "card" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                                        color={Colors.highlight}/>
+                                    color={Colors.highlight} />
                             </View> : null}
-                            <Ionicons name="card-outline" size={30} color={Colors.green}/>
+                            <Ionicons name="card-outline" size={30} color={Colors.green} />
                             <Text>Debit / Credit card</Text>
                         </PrimaryButton>
                     </View>
@@ -310,9 +314,9 @@ const PaymentModal = (props) => {
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "digital payments" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                                        color={Colors.highlight}/>
+                                    color={Colors.highlight} />
                             </View> : null}
-                            <MaterialCommunityIcons name="contactless-payment" size={30} color={Colors.green}/>
+                            <MaterialCommunityIcons name="contactless-payment" size={30} color={Colors.green} />
                             <Text>Digital Payments</Text>
                         </PrimaryButton>
                         <PrimaryButton
@@ -321,47 +325,47 @@ const PaymentModal = (props) => {
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "split_payment" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                                        color={Colors.highlight}/>
+                                    color={Colors.highlight} />
                             </View> : null}
-                            <MaterialCommunityIcons name="table-split-cell" size={30} color={Colors.green}/>
+                            <MaterialCommunityIcons name="table-split-cell" size={30} color={Colors.green} />
                             <Text>Split Payment</Text>
                         </PrimaryButton>
                     </View>
                 </View>
                 {selectedPaymentOption === "cash" || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" ? <>
                     <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
-                                     placeholder={"Price"}
-                                     onChangeText={(price) => {
-                                                                                                                           if (price.trim().length === 0) {
-                                             setTotalPrice(0)
-                                             return
-                                         }
-                                         if (price.split(" ").length > 1) return;
-                                         if (price.split(".").length > 2) return;
+                        placeholder={"Price"}
+                        onChangeText={(price) => {
+                            if (price.trim().length === 0) {
+                                setTotalPrice(0)
+                                return
+                            }
+                            if (price.split(" ").length > 1) return;
+                            if (price.split(".").length > 2) return;
 
-                                         setTotalPrice(price);
-                                     }}
-                                     onEndEditing={(value) => {
-                                         if (parseFloat(value) < props.price) {
-                                             setSelectedPaymentOption("split_payment")
-                                         }
-                                         callCashAPI()
-                                     }}
+                            setTotalPrice(price);
+                        }}
+                        onEndEditing={(value) => {
+                            if (parseFloat(value) < props.price) {
+                                setSelectedPaymentOption("split_payment")
+                            }
+                            callCashAPI()
+                        }}
                     />
                     {selectedPaymentOption === "cash" && splitResponse.length > 0 && splitResponse[0] !== undefined ?
                         <CustomTextInput type={"number"} label={"Change"}
-                                         value={splitResponse[0].change_to_be_given === undefined ? "" : splitResponse[0].change_to_be_given.toString()}
-                                         readOnly={true}/> : null}
+                            value={splitResponse[0].change_to_be_given === undefined ? "" : splitResponse[0].change_to_be_given.toString()}
+                            readOnly={true} /> : null}
                 </> : null}
                 {selectedPaymentOption === "split_payment" ? <View>
-                    <FlatList scrollEnabled={false} data={splitUpState} renderItem={({item, index}) => {
+                    <FlatList scrollEnabled={false} data={splitUpState} renderItem={({ item, index }) => {
                         // const shownCount = splitUpState.reduce((acc, item) => {
                         //     return item.shown ? acc + 1 : acc;
                         // }, 0);
                         if (item.shown) {
                             return <View style={styles.splitInputAndCloseContainer}>
                                 <CustomTextInput
-                                    textInputStyle={isError ? {borderColor: Colors.error} : {borderColor: Colors.green}}
+                                    textInputStyle={isError ? { borderColor: Colors.error } : { borderColor: Colors.green }}
                                     type={"number"} label={item.name} value={item.amount.toString()} flex={1}
                                     readOnly={shownCount === 3 && item.name === paymentOrder.at(-1)}
                                     onChangeText={(text) => {
@@ -385,11 +389,11 @@ const PaymentModal = (props) => {
                                         }))
                                         setStopAPI(false);
                                         setRecentlyChanged(prev => {
-                                                if (prev.at(-1) === item.mode) return prev
-                                                else return [...prev, item.mode]
-                                            }
+                                            if (prev.at(-1) === item.mode) return prev
+                                            else return [...prev, item.mode]
+                                        }
                                         );
-                                                                                                                                                                                                    }}
+                                    }}
                                     onEndEditing={(text) => {
                                         const totalValue = splitUpState.reduce((acc, ele) => {
                                             if (ele.shown) {
@@ -450,55 +454,74 @@ const PaymentModal = (props) => {
 
 
                                 }}>
-                                    <Ionicons name="close" size={24} color="black"/>
+                                    <Ionicons name="close" size={24} color="black" />
                                 </PrimaryButton>
                             </View>
                         }
-                    }}/>
+                    }} />
                     {shownCount !== 3 ? <View style={styles.addPaymentButtonContainer}>
                         <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
-                                       buttonStyle={styles.addPaymentButton}
-                                       pressableStyle={styles.addPaymentButtonPressable}>
-                            <Entypo name="plus" size={15} color="black"/>
+                            buttonStyle={styles.addPaymentButton}
+                            pressableStyle={styles.addPaymentButtonPressable}>
+                            <Entypo name="plus" size={15} color="black" />
                             <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
                         </PrimaryButton>
                     </View> : null}
                 </View> : null}
             </View>
         </ScrollView>
-        <Divider/>
-        <View style={[styles.buttonContainer,{paddingBottom:insets.bottom}]}>
+        <Divider />
+        <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
             <PrimaryButton buttonStyle={styles.optionButton}>
-                <Entypo name="dots-three-horizontal" size={24} color="black"/>
+                <Entypo name="dots-three-horizontal" size={24} color="black" />
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
-                           onPress={ async() => {
-                                   setIsInvoiceModalVisible(true);
-                               try {
-                                   await checkoutBookingAPI(details.id, cartSliceState).then(response => {
-                                    console.log(1);
-                                    
-                                    updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
-                                    console.log(2);
-                                    updateLiveStatusAPI(response[0].booking_id);
-                                    console.log(3);
-                                    dispatch(updateBookingId(response[0].booking_id));
-                                    console.log(4);
-                                    dispatch(loadBookingDetailsFromDb(response[0].booking_id));
-                                    console.log(5);
-                                    dispatch(loadWalletPriceFromDb(details.id))
-                                   })
-                                   console.clear();
-                                   // Assuming dispatch is an asynchronous action creator
-                               } catch (error) {
-                                   console.error("An error occurred:", error);
-                                   // Handle the error appropriately here
-                               }
-                           }}>
+                onPress={async () => {
+                    setIsInvoiceModalVisible(true);
+                    try {
+                        const prepaidItem = findIsPrepaid();
+                        if (!!prepaidItem) {
+                            console.log("Its true");
+                            console.log(prepaidItem);
+
+                            console.log(-2);
+                            dispatch(modifyPrepaidDetails({ type: "updateResourceId", payload: prepaidItem.resource_id }));
+                            console.log(-1);
+                            dispatch(modifyPrepaidDetails({ type: "updateMobile", payload: details.mobile_1 }))
+                            console.log(0);
+                            
+                        }
+                        else {
+                            console.log("Its false");
+                            console.log(findIsPrepaid());
+                            dispatch(modifyPrepaidDetails({ type: "clear" }))
+                        }
+                        console.log(1);
+                        await checkoutBookingAPI(details, cartSliceState).then(response => {
+                            console.log(2);
+
+                            updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
+                            console.log(3);
+                            updateLiveStatusAPI(response[0].booking_id);
+                            console.log(4);
+                            dispatch(updateBookingId(response[0].booking_id));
+                            console.log(5);
+                            dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                            console.log(6);
+                            dispatch(loadWalletPriceFromDb(details.id))
+                            console.log(7);
+                        })
+                        console.clear();
+                        // Assuming dispatch is an asynchronous action creator
+                    } catch (error) {
+                        console.error("An error occurred:", error);
+                        // Handle the error appropriately here
+                    }
+                }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
                     <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price}</Text>
-                    <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
+                    <Feather name="arrow-right-circle" size={24} color={Colors.white} />
                 </View>
             </PrimaryButton>
         </View>
