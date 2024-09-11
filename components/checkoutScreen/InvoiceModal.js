@@ -372,7 +372,9 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>GSTIN
                             : </Text>{selectedClientDetails.customer_gst}</Text>
                     </View>
-                    <Table style={styles.cartItemTable}>
+                    {
+                        details.organized_list && details.organized_list.length > 0 &&
+                        <Table style={styles.cartItemTable}>
                         <Row
                             textStyle={{textAlign: "center", fontWeight: "bold"}}
                             style={styles.cartItemTableHead}
@@ -408,7 +410,8 @@ styles.heading]}>Invoice</Text>*/}
                                                             Duration: {innerItem.duration} days
                                                         </Text>
                                                         <Text>
-                                                            Start date: {innerItem.valid_from} | Expiry date: {innerItem.valid_till}
+                                                            Start date: {innerItem.valid_from} | Expiry
+                                                            date: {innerItem.valid_till}
                                                         </Text>
                                                     </View> :
                                                     <></>
@@ -420,7 +423,8 @@ styles.heading]}>Invoice</Text>*/}
                                                             Duration: {innerItem.duration} days
                                                         </Text>
                                                         <Text>
-                                                            Start date: {innerItem.valid_from} | Expiry date: {innerItem.valid_till}
+                                                            Start date: {innerItem.valid_from} | Expiry
+                                                            date: {innerItem.valid_till}
                                                         </Text>
                                                     </View> :
                                                     <></>
@@ -433,9 +437,7 @@ styles.heading]}>Invoice</Text>*/}
                                 )
                             )
                         }
-
-
-                    </Table>
+                    </Table>}
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
                         styles.checkoutDetailText]}>Discount</Text>
