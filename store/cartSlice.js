@@ -74,8 +74,6 @@ export const checkStaffOnCartItems = () => (dispatch, getState) => {
 
 export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
     const { clientInfo } = getState();
-    console.log("clientInfo.clientId ");
-    console.log(clientInfo.clientId);
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
