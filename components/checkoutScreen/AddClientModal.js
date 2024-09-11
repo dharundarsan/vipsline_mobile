@@ -11,7 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import { loadClientsFromDb } from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import { loadClientInfoFromDb } from "../../store/clientInfoSlice";
+import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
 import axios from "axios";
 
 const AddClientModal = (props) => {
@@ -25,7 +25,7 @@ const AddClientModal = (props) => {
     const queryRef = useRef("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const searchClientFromDB = useCallback(async (query, pageNo) => {F
+    const searchClientFromDB = useCallback(async (query, pageNo) => {
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
 
         setIsLoading(true);
@@ -109,8 +109,10 @@ const AddClientModal = (props) => {
                                 email={item.username}
                                 divider={true}
                                 onPress={(clientId) => {
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                    dispatch(updateClientId(item.id));
+                                    dispatch(loadClientInfoFromDb(item.id));
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
                                 }}
                             />
                         )}
@@ -129,8 +131,9 @@ const AddClientModal = (props) => {
                                 email={item.username}
                                 divider={true}
                                 onPress={(clientId) => {
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id))
+                                    dispatch(loadClientInfoFromDb(item.id));
                                     props.closeModal();
-                                    dispatch(loadClientInfoFromDb(clientId));
                                 }}
                             />
                         )}
