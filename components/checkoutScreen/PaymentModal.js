@@ -14,7 +14,7 @@ import DropdownModal from "../../ui/DropdownModal";
 import checkoutBooking from "../../util/apis/checkoutBookingAPI";
 import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
 import {useDispatch, useSelector} from "react-redux";
-import {loadBookingDetailsFromDb, updateBookingId} from "../../store/invoiceSlice";
+import {loadBookingDetailsFromDb, loadInvoiceDetailsFromDb, updateBookingId} from "../../store/invoiceSlice";
 import updateAPI from "../../util/apis/updateAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
@@ -476,10 +476,13 @@ const PaymentModal = (props) => {
                                    setIsInvoiceModalVisible(true);
                                try {
                                    await checkoutBookingAPI(details.id, cartSliceState).then(response => {
+                                       console.log(response[0].booking_id);
+                                       const response1 = response[0];
                                     updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
                                     updateLiveStatusAPI(response[0].booking_id);
                                     dispatch(updateBookingId(response[0].booking_id));
                                     dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                                    dispatch(loadInvoiceDetailsFromDb(response[0].booking_id));
                                    })
                                    console.clear();
                                    // Assuming dispatch is an asynchronous action creator

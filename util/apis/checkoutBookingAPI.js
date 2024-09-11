@@ -72,6 +72,7 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
             device: "BUSINESS_WEB",
             editedPurchasedMemberShipId: [],
             edited_cart: [...cartSliceState.editedMembership.map(item => {
+                console.log(item)
                 return {
                     amount: item.price,
                     bonus_value: 0,
@@ -79,7 +80,7 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
                     itemId: item.item_id,
                     membership_id: item.id,
                     membership_number: "",
-                    res_cat_id: 282773,
+                    res_cat_id: item.resource_category_id,
                     resource_id: item.resource_id,
                     type: "AMOUNT",
                     valid_from: item.valid_from,
@@ -130,9 +131,8 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
                 Authorization: `Bearer ${authToken}`
             }
         });
-        console.log(11);
-        console.log(response.data.data);
-        
+        console.log("hello")
+        console.log(response.data.other_message);
         return response.data.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);

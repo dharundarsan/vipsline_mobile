@@ -101,7 +101,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
         dispatch(updateItem(response.data.data));
         dispatch(updateEditedMembership({ type: "map" }))
         dispatch(updateEditedCart());
-        dispatch(updatePackageCart());
+        // dispatch(updatePackageCart());
         dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId ));
         dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
@@ -129,8 +129,8 @@ export const updateCalculatedPrice = (clientId) => async (dispatch, getState) =>
                 res_cat_id: item.resource_category_id,
                 resource_id: item.resource_id,
                 type: "AMOUNT",
-                valid_from: formatDate(item.valid_from, "yyyy-mm-dd"),
-                valid_till: formatDate(item.valid_until, "yyyy-mm-dd"),
+                valid_from: item.valid_from,
+                valid_till: item.valid_until,
                 wallet_amount: 0,
             }
         }),
@@ -333,7 +333,7 @@ export const cartSlice = createSlice({
                             total_price: action.payload.data.amount,
                             type: action.payload.data.type,
                             valid_from: item.valid_from,
-                            valid_till: item.valid_until,
+                            valid_until: item.valid_until,
                             wallet_amount: 0,
                         }
                     }

@@ -20,12 +20,12 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-            }
+    }
 }
 
 
 export const loadBookingDetailsFromDb = (bookingId) => async (dispatch, getState) => {
-    const { invoice } = getState();
+    const {invoice} = getState();
     let response;
 
     try {
@@ -39,22 +39,25 @@ export const loadBookingDetailsFromDb = (bookingId) => async (dispatch, getState
         dispatch(updateInvoiceDetails(response.data.data[0]));
     } catch (e) {
         console.error("Error fetching booking details:", e);
-        throw e; // Ensure that the error is propagated
+        throw e;
     }
+};
 
+export const loadInvoiceDetailsFromDb = (bookingId) => async (dispatch, getState) => {
     try {
-        const response1 = await axios.post(
+        const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + '/appointment/invoice',
             {
                 business_id: await getBusinessId(),
                 booking_id: bookingId
             }
         );
-        dispatch(updateMoreInvoiceDetails(response1.data.data[0]));
+        dispatch(updateMoreInvoiceDetails(response.data.data[0]));
     } catch (e) {
         console.error("Error fetching invoice details:", e);
-        // Handle errors if necessary
+        throw e;
     }
+
 };
 
 export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
@@ -83,17 +86,14 @@ export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
                     Authorization: `Bearer ${authToken}`
                 }
             }
-
         );
 
         dispatch(updateWalletBalance(response.data.data[0]));
 
-    }
-    catch (e) {
+    } catch (e) {
         // console.error(e + " wallet error");
     }
 }
-
 
 
 export const invoiceSlice = createSlice({
