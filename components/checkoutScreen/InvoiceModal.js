@@ -383,9 +383,10 @@ styles.heading]}>Invoice</Text>*/}
 
 
                         {
-                            details.organized_list && details.organized_list.length > 0 &&
+                            checkNullUndefined(details) ?
+                            checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
                             details.organized_list.map((item) => (
-                                    item.list && item.list.length > 0 &&
+                                    checkNullUndefined(item.list) && checkNullUndefined(item.list.length) &&
                                     item.list.map((innerItem, index) => {
                                         // setTotalDiscount(prev => prev + innerItem.discount_percent);
                                         return (<>
@@ -404,7 +405,7 @@ styles.heading]}>Invoice</Text>*/}
                                                 textStyle={{textAlign: "center"}}
                                             />
                                             {
-                                                item.gender === "Membership" ?
+                                                checkNullUndefined(item.gender === "Membership") &&  item.gender === "Membership"?
                                                     <View style={styles.durationDetails}>
                                                         <Text>
                                                             Duration: {innerItem.duration} days
@@ -416,7 +417,7 @@ styles.heading]}>Invoice</Text>*/}
                                                     <></>
                                             }
                                             {
-                                                item.gender === "Packages" ?
+                                                checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" ?
                                                     <View style={styles.durationDetails}>
                                                         <Text>
                                                             Duration: {innerItem.duration} days
@@ -433,7 +434,7 @@ styles.heading]}>Invoice</Text>*/}
                                     })
 
                                 )
-                            )
+                            ) : <></>
                         }
 
 
