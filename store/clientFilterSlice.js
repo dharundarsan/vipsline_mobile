@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initial = {
     clients: [],
@@ -17,7 +18,29 @@ const initial = {
 
 }
 
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            return value;
+        }
+    } catch (e) {
+            }
+}
+
+
 export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, getState) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside loadClientFilterFromDb)" + e);
+    }
+
     const { clientFilter } = getState();
     if (clientFilter.isFetching) return;
 
@@ -26,7 +49,7 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/client/getClientReportBySegmentForBusiness?pageNo=${clientFilter.pageNo}&pageSize=${pageSize}`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
                 fromDate: "",
                 sortItem: "name",
                 sortOrder: "asc",
@@ -35,24 +58,30 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
-        // console.log( "current page number: "+ clientFilter.pageNo);
-        // console.log("current page size: " + pageSize);
-        // console.log("current max entry size: " + clientFilter.maxEntry);
-        // console.log(response.data.data);
-        dispatch(updateTotalClientCount(response.data.data.pop().count));
+                          dispatch(updateTotalClientCount(response.data.data.pop().count));
         dispatch(updateClientsList(response.data.data));
         dispatch(updateFetchingState(false));
     } catch (error) {
-        console.error("Error fetching data1: ", error);
+        console.error("Error fetching data11: ", error);
         dispatch(updateFetchingState(false));
     }
 };
 
 export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async (dispatch, getState) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside clientFilterSlice loadSearchClientFilterFromDb)" + e);
+    }
+
     const { clientFilter } = getState();
     if (clientFilter.isFetchingSearchClient) return;
 
@@ -61,13 +90,13 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/client/searchClientSegment?pageNo=${clientFilter.searchPageNo}&pageSize=${pageSize}`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
                 query: query,
                 type: filter,
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
-import { clearClientInfo } from "../../store/clientInfoSlice";
+import { clearClientInfo, loadClientInfoFromDb, updateClientId } from "../../store/clientInfoSlice";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import React, { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -15,50 +15,89 @@ import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MemberShipDetailModal from "./MemberShipDetailModal";
-import { loadCartFromDB, updateCalculatedPrice } from "../../store/cartSlice";
+
+import { loadCartFromDB, modifyClientMembershipId, updateCalculatedPrice } from "../../store/cartSlice";
+
+import {loadClientFiltersFromDb} from "../../store/clientFilterSlice";
+
 
 const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
     const [isClientInfo, setIsClientInfo] = useState(false)
     const [isVisibileModal, setIsVisibleModal] = useState(false)
     const [isMembershipModalVisible, setIsMembershipModalVisible] = useState(false)
-    const [storeMembershipId, setStoreMembershipId] = useState(null)
+    // const [storeMembershipId, setStoreMembershipId] = useState(useSelector(state => state.cart.clientMembershipID));
     const dispatch = useDispatch();
+    const storeMembershipId = useSelector(state => state.cart.clientMembershipID);
+    async function onApplyMembership(clientMembershipId, clientId) {
+        // setStoreMembershipId(clientMembershipId)
+        // console.log("clientId " + clientInfo.client_id);
+        dispatch(updateClientId(clientId))
+        dispatch(modifyClientMembershipId({ type: "add", payload: clientMembershipId }))
+        dispatch(loadCartFromDB(clientInfo.client_id))
+        // dispatch(updateCalculatedPrice())
+    }
+    // console.log("clientInfo.membershipDetails.length ");
+    // console.log(clientInfo.membershipDetails.length);
+
     useEffect(() => {
-        function singleMembershipApply(){
-            if (clientInfo.membershipDetails?.length === 1) {
-                if(clientInfo.membershipDetails[0].id === undefined || clientInfo.membershipDetails[0].client_id === undefined){
-                    console.log("undefined undefined");
+        function singleMembershipApply() {
+            
+            if (clientInfo.membershipDetails.length === 1 && clientInfo.isClientSelected ) {
+                console.log("clientInfo.membershipDetails[0]");
+
+                console.log(clientInfo.membershipDetails[0]);
+
+                if (clientInfo.membershipDetails[0].id !== undefined || clientInfo.membershipDetails[0].client_id !== undefined) {
+                    dispatch(modifyClientMembershipId({ type: "add", payload: clientInfo.membershipDetails[0].id }))
+                    onApplyMembership(clientInfo.membershipDetails[0].id, clientInfo.membershipDetails[0].client_id)
                 }
-                else{
-                    onApplyMembership(clientInfo.membershipDetails[0].id,clientInfo.membershipDetails[0].client_id)
-                }
+            }
+            // console.log("storeMembershipId " + storeMembershipId);
+
+            if (((storeMembershipId !== undefined) && clientInfo.membershipDetails[0] !== undefined)) {
+                // console.log("storeMembershipId " + storeMembershipId);
+                console.log("clientInfo.membershipDetails[0].client_id " + clientInfo.membershipDetails[0].client_id);
+                dispatch(modifyClientMembershipId({ type: "add", payload: clientInfo.membershipDetails[0].id }))
+                onApplyMembership(clientInfo.membershipDetails[0].id, clientInfo.membershipDetails[0].client_id)
             }
         }
         singleMembershipApply();
-        console.log(clientInfo.membershipDetails[0]?.membership_id);
-        console.log("clientInfo.membershipDetails.client_id "+clientInfo.membershipDetails[0]?.client_id);
     }, [clientInfo.isClientSelected])
-    
-    async function onApplyMembership(clientMembershipId, clientId) {
-        console.log("43214321");
-        setStoreMembershipId(clientMembershipId)
-        dispatch(loadCartFromDB(clientMembershipId, clientId))
-        // dispatch(updateCalculatedPrice())
-    }
+
     return (
         <>
             {
                 clientInfo.isClientSelected ?
                     <View style={{ borderBottomWidth: 1, borderColor: Colors.highlight }}>
+                        {isVisibileModal && (
+                            <ClientInfoModal
+                                visible={isVisibileModal}
+                                setVisible={setIsVisibleModal}
+                                closeModal={() => {
+                                    setIsVisibleModal(false);
+                                    dispatch(clearClientInfo());
+                                }}
+                                onClose={() => {
+                                    setIsVisibleModal(false);
+                                }}
+                                phone={clientInfo.details?.mobile_1}
+                                name={clientInfo.details?.firstName}
+                                id={clientInfo.details?.id}
+                            />
+                        )}
                         <View style={styles.clientCardContainer}>
                             <ClientCard
                                 phone={clientInfo.details.mobile_1}
                                 name={clientInfo.details.firstName}
                                 email={clientInfo.details.username}
-                                onPress={() => null}
+                                onPress={() => {
+                                    return null;
+                                }}
                                 rippleColor={Colors.transparent}
                                 card={styles.clientCard}
+
+
                             />
                             <View style={styles.actionMenu}>
                                 {
@@ -101,20 +140,14 @@ const AddClientButton = (props) => {
                                         </Pressable>
                                 }
 
-                                <Ionicons name="close" size={24} color="black" />
+                                <Ionicons name="close" size={24} color="black" onPress={() => {
+                                    onApplyMembership(null, undefined)
+                                    // setStoreMembershipId(null);
+                                    dispatch(modifyClientMembershipId({ type: "clear" }));
+                                    dispatch(clearClientInfo())
+                                }} />
 
-                                {isVisibileModal && (
-                                    <ClientInfoModal
-                                        visible={isVisibileModal}
-                                        setVisible={setIsVisibleModal}
-                                        closeModal={() => {
-                                            setIsVisibleModal(false);
-                                        }}
-                                        phone={clientInfo.details?.mobile_1}
-                                        name={clientInfo.details?.firstName}
-                                        id={clientInfo.details?.id}
-                                    />
-                                )}
+
                             </View>
                         </View>
                         {isClientInfo ?

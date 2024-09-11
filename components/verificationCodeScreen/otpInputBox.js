@@ -219,8 +219,7 @@ export default function OtpInputBox(props) {
         //         otp: ,
         //     }))
         // }
-        console.log(index, text);
-    };
+            };
 
     const handleFocus = (index) => {
         setState(prevState => ({

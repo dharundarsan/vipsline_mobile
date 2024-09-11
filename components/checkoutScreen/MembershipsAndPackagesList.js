@@ -22,8 +22,7 @@ const MembershipsAndPackagesList = (props) => {
 
     const searchData = (searchValue) => {
         const lowerCaseFilterValue = searchValue.toLowerCase();
-        console.log(data);
-        setFilteredData(data.filter(item => {
+                setFilteredData(data.filter(item => {
             if (props.category === "memberships")
                 return item.name.toLowerCase().includes(searchValue) || item.price.toString().includes(searchValue)
             else
@@ -40,8 +39,7 @@ const MembershipsAndPackagesList = (props) => {
                         style={[textTheme.titleMedium, styles.headingText]}>Select {props.category === "packages" ? "Package" : "Membership"}</Text>
                     <SearchBar filter={true}
                                onPressFilter={() => {
-                                   console.log("Filter pressed");
-                               }}
+                                                                  }}
                                onChangeText={searchData}
                                placeholder={"Search by name or prices"}/>
                 </View>

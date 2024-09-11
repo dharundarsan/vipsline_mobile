@@ -24,13 +24,9 @@ const EditCartModal = (props) => {
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage");
     const [discountValue, setDiscountValue] = useState(0);
     const [discountAmount, setDiscountAmount] = useState(0);
-    // console.log("props.dataaaaaa")
-    // console.log(props.data)
-    const [price, setPrice] = useState(props.data.price);
+            const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
-    // console.log("Price")
-    // console.log(price)
-    const cartItems = useSelector((state) => state.cart.items);
+            const cartItems = useSelector((state) => state.cart.items);
     const editedMembership = useSelector((state) => state.cart.editedMembership);
     const editedCart = useSelector((state) => state.cart.editedCart);
 
@@ -69,77 +65,71 @@ const EditCartModal = (props) => {
                                      else setPrice(parseFloat(value));
                                  }
                              }
-                             onEndEditing={async (value) => {
-                                 if (selectedDiscountMode === "percentage") {
-                                     setDiscountAmount(await getDiscountAPI({
-                                         price: price,
-                                         disc_percent: discountValue
-                                     }))
-                                 }
-                             }}
+
             />
-            <View style={styles.editDiscountContainer}>
-                <CustomTextInput labelTextStyle={textTheme.titleMedium} flex={1} type={"number"}
-                                 label={"Enter discount"}
-                                 value={discountValue.toString()}
-                                 onChangeText={(value) => {
-                                     if (value === "") {
-                                         setDiscountValue(0)
-                                         setDiscountAmount(0);
-                                         return;
-                                     } else if (selectedDiscountMode === "percentage" && parseFloat(value) > 100) setDiscountValue(prev => prev);
-                                     else if (selectedDiscountMode === "cash" && parseFloat(value) > parseFloat(price)) {
-                                         setDiscountValue(prev => prev);
-                                         return;
-                                     } else setDiscountValue(parseFloat(value));
-                                     if (selectedDiscountMode === "cash") {
-                                         setDiscountAmount(parseFloat(value));
-                                     }
-                                 }}
-                                 onEndEditing={async (value) => {
-                                     if (selectedDiscountMode === "percentage") {
-                                         setDiscountAmount(await getDiscountAPI({
-                                             price: price,
-                                             disc_percent: discountValue
-                                         }))
-                                     }
-                                 }}
-                />
-                <PrimaryButton
-                    onPress={() => {
-                        setSelectedDiscountMode("percentage")
-                    }}
-                    buttonStyle={[styles.percentAndAmountButton, selectedDiscountMode === "percentage" ? {backgroundColor: Colors.highlight} : {}, {
-                        borderTopRightRadius: 0,
-                        borderBottomRightRadius: 0,
-                        marginLeft: 10
-                    }]} pressableStyle={styles.percentAndAmountPressable}>
-                    <Feather name="percent" size={20}
-                             color={selectedDiscountMode === "percentage" ? Colors.white : Colors.black}/>
-                </PrimaryButton>
-                <PrimaryButton
-                    onPress={() => {
-                        setSelectedDiscountMode("cash")
-                    }}
-                    buttonStyle={[styles.percentAndAmountButton, selectedDiscountMode === "cash" ? {backgroundColor: Colors.highlight} : {}, {
-                        borderTopLeftRadius: 0,
-                        borderBottomLeftRadius: 0
-                    }]} pressableStyle={styles.percentAndAmountPressable}>
-                    <MaterialIcons name="currency-rupee" size={20}
-                                   color={selectedDiscountMode === "cash" ? Colors.white : Colors.black}/>
-                </PrimaryButton>
-            </View>
-            <CustomTextInput labelTextStyle={textTheme.titleMedium} type={"price"} label={"Discount amount"}
-                             value={discountAmount.toString()}
-                             readOnly={true}/>
+            {props.data.gender === "membership" ? null :
+                <>
+                    <View style={styles.editDiscountContainer}>
+                        <CustomTextInput labelTextStyle={textTheme.titleMedium} flex={1} type={"number"}
+                                         label={"Enter discount"}
+                                         value={discountValue.toString()}
+                                         onChangeText={(value) => {
+                                             if (value === "") {
+                                                 setDiscountValue(0)
+                                                 setDiscountAmount(0);
+                                                 return;
+                                             } else if (selectedDiscountMode === "percentage" && parseFloat(value) > 100) setDiscountValue(prev => prev);
+                                             else if (selectedDiscountMode === "cash" && parseFloat(value) > parseFloat(price)) {
+                                                 setDiscountValue(prev => prev);
+                                                 return;
+                                             } else setDiscountValue(parseFloat(value));
+                                             if (selectedDiscountMode === "cash") {
+                                                 setDiscountAmount(parseFloat(value));
+                                             }
+                                         }}
+                                         onEndEditing={async (value) => {
+                                             if (selectedDiscountMode === "percentage") {
+                                                 setDiscountAmount(await getDiscountAPI({
+                                                     price: price,
+                                                     disc_percent: discountValue
+                                                 }))
+                                             }
+                                         }}
+                        />
+                        <PrimaryButton
+                            onPress={() => {
+                                setSelectedDiscountMode("percentage")
+                            }}
+                            buttonStyle={[styles.percentAndAmountButton, selectedDiscountMode === "percentage" ? {backgroundColor: Colors.highlight} : {}, {
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
+                                marginLeft: 10
+                            }]} pressableStyle={styles.percentAndAmountPressable}>
+                            <Feather name="percent" size={20}
+                                     color={selectedDiscountMode === "percentage" ? Colors.white : Colors.black}/>
+                        </PrimaryButton>
+                        <PrimaryButton
+                            onPress={() => {
+                                setSelectedDiscountMode("cash")
+                            }}
+                            buttonStyle={[styles.percentAndAmountButton, selectedDiscountMode === "cash" ? {backgroundColor: Colors.highlight} : {}, {
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0
+                            }]} pressableStyle={styles.percentAndAmountPressable}>
+                            <MaterialIcons name="currency-rupee" size={20}
+                                           color={selectedDiscountMode === "cash" ? Colors.white : Colors.black}/>
+                        </PrimaryButton>
+                    </View>
+                    <CustomTextInput labelTextStyle={textTheme.titleMedium} type={"price"} label={"Discount amount"}
+                                     value={discountAmount.toString()}
+                                     readOnly={true}/>
+                </>}
         </View>
         <Divider/>
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={async () => {
                 if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
-                    // console.log("props.datafucker");
-                    // console.log(props.data);
-                    if (props.data.gender === "Women") {
+                    if (props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" ) {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
                             amount: price,
@@ -185,9 +175,10 @@ const EditCartModal = (props) => {
                             amount: price,
                             price: price,
                             total_price: price,
+                            item_id: props.data.item_id,
                         }))
                     } else if (props.data.gender === "membership") {
-                        dispatch(updateEditedMembership({
+                        await dispatch(updateEditedMembership({
                             type: "edit", id: props.data.item_id, data: {
                                 amount: price,
                                 bonus_value: 0,
@@ -196,10 +187,9 @@ const EditCartModal = (props) => {
                                 res_cat_id: props.data.resource_category_id
                             }
                         }))
-
+                        await dispatch(loadCartFromDB());
                     }
                     dispatch(updateCalculatedPrice());
-
                     props.onCloseModal()
                 } else {
                     props.onCloseModal()
@@ -212,44 +202,67 @@ const EditCartModal = (props) => {
 const styles = StyleSheet.create({
     editCartModal: {
         flex: 1,
-    },
+    }
+    ,
     headingAndCloseContainer: {
         marginTop: Platform.OS === "ios" ? 50 : 0,
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
+        paddingHorizontal:
+            20,
+        paddingVertical:
+            15,
+    }
+    ,
     heading: {
         textAlign: "center",
-        fontWeight: 500
-    },
+        fontWeight:
+            500
+    }
+    ,
     closeButton: {
         position: "absolute",
-        right: 0,
-        top: 5,
-        backgroundColor: Colors.background,
-    },
+        right:
+            0,
+        top:
+            5,
+        backgroundColor:
+        Colors.background,
+    }
+    ,
     modalContent: {
         flex: 1,
-        padding: 30,
-    },
+        padding:
+            30,
+    }
+    ,
     editDiscountContainer: {
         flexDirection: "row",
-        alignItems: "center",
-        alignContent: "center",
+        alignItems:
+            "center",
+        alignContent:
+            "center",
         // alignSelf:"center",
-    },
+    }
+    ,
     percentAndAmountButton: {
         marginTop: 10,
-        borderColor: Colors.grey400,
-        borderWidth: 1,
-        backgroundColor: Colors.background,
-        alignSelf: "center",
-    },
-    percentAndAmountPressable: {},
+        borderColor:
+        Colors.grey400,
+        borderWidth:
+            1,
+        backgroundColor:
+        Colors.background,
+        alignSelf:
+            "center",
+    }
+    ,
+    percentAndAmountPressable: {}
+    ,
     addToCartButtonContainer: {
         marginHorizontal: 30,
-        marginTop: 20,
-        marginBottom: 20,
+        marginTop:
+            20,
+        marginBottom:
+            20,
     }
 });
 

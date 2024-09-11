@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialClientInfoState = {
     isClientSelected: false,
@@ -12,17 +13,38 @@ const initialClientInfoState = {
     clientId: "",
 };
 
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            return value;
+        }
+    } catch (e) {
+            }
+}
+
 export const loadClientInfoFromDb = (clientId) => async (dispatch) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside clientInfoSlice loadClientInfoFromDb)" + e);
+    }
+
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailById`,
             {
                 client_id: clientId,
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -30,11 +52,11 @@ export const loadClientInfoFromDb = (clientId) => async (dispatch) => {
             `${process.env.EXPO_PUBLIC_API_URI}/membership/getListOfActiveMembershipForClient`,
             {
                 client_id: clientId,
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -42,11 +64,11 @@ export const loadClientInfoFromDb = (clientId) => async (dispatch) => {
             `${process.env.EXPO_PUBLIC_API_URI}/package/getListOfActiveClientPackageDetailByClientId`,
             {
                 client_id: clientId,
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -66,16 +88,26 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
     // const {clientFilter} = getState();
     // if(clientFilter.fetchingAnalytics) return;
 
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside clientInfoSlice loadAnalyticDataFromDb)" + e);
+    }
+
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/analytics/getAnalyticsForBusinessByCustomer?pageSize=${pageSize}&pageNo=${pageNo}`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
                 user_id: user_id,
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -83,28 +115,25 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
         dispatch(updateAnalyticDetails(response.data.data[0]));
     }
     catch (e) {
-        console.log(e);
-    }
+            }
 
     try {
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/analytics/getFeedbackByClient?pageNo=0&pageSize=100",
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
                 client_id: user_id,
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`,
+                    Authorization: `Bearer ${authToken}`,
                 }
             }
         );
-        // console.log(response.data.data[0].no_of_feedbacks);
         dispatch(updateFeedback(response.data.data[0].no_of_feedbacks));
     }
     catch (e) {
-        console.log(e);
-    }
+            }
 
 }
 
@@ -129,6 +158,8 @@ export const clientInfoSlice = createSlice({
             state.analyticDetails["feedbacks"] = action.payload;
         },
         updateClientId(state, action) {
+            console.log("details");
+            console.log(state.details);
             state.clientId = action.payload;
         }
     }

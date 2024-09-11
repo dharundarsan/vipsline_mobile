@@ -22,11 +22,9 @@ export default async function findUser(email, platform) {
         isFound = true;
     }
     catch (error) {
-        console.log("user not found: " + error);
-        isFound = false;
+                isFound = false;
     }
 
-    // console.log(response);
     return isFound;
 }
 

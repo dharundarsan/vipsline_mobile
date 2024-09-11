@@ -1,6 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useSelector} from "react-redux";
 
 const initialClientState = {
     pageNo: 0,
@@ -9,23 +11,57 @@ const initialClientState = {
     isFetching: false,
 };
 
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            return value;
+        }
+    } catch (e) {
+    }
+}
+
 export const loadClientsFromDb = () => async (dispatch, getState) => {
-    const { client } = getState();
-    if (client.isFetching) return;
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside clientSlice loadClientFromDb)" + e);
+    }
+
+    // let businessId = ""
+    // try {
+    //     const value = await AsyncStorage.getItem('businessId');
+    //     if (value !== null) {
+    //         return value;
+    //     }
+    // } catch (e) {
+    // }
+
+
+    const {client, authDetails} = getState();
+
 
     try {
+        if (client.isFetching) return;
         dispatch(updateFetchingState(true));
         const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${client.pageNo}&pageSize=20`,
+
+            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${0}&pageSize=40`,
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                business_id: await getBusinessId(),
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
+
         dispatch(updateClientsList(response.data.data));
         dispatch(updateFetchingState(false));
     } catch (error) {
@@ -35,20 +71,29 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
 };
 
 export const loadClientCountFromDb = () => async (dispatch) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside clientSlice loadClientCountFromDb)" + e);
+    }
+
     try {
         const response = await axios.post(
             process.env.EXPO_PUBLIC_API_URI + "/client/getClientCountBySegmentForBusiness",
             {
-                business_id: process.env.EXPO_PUBLIC_BUSINESS_ID
+                business_id: await getBusinessId()
             }, {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         )
         dispatch(updateClientCount(response.data.data));
     } catch (error) {
-        console.log("fetching the client count error: " + error)
     }
 }
 
@@ -65,10 +110,13 @@ export const clientSlice = createSlice({
         },
         updateFetchingState(state, action) {
             state.isFetching = action.payload;
+        },
+        clearClientsList(state, action) {
+            state.clients = [];
         }
     }
 });
 
-export const {updateClientsList, updateClientCount, updateFetchingState} = clientSlice.actions;
+export const {updateClientsList, updateClientCount, updateFetchingState, clearClientsList} = clientSlice.actions;
 
 export default clientSlice.reducer;

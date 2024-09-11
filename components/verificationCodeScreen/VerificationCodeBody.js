@@ -5,7 +5,7 @@ import OtpInputBox from "./otpInputBox";
 import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
-import {authenticateWithOTP} from "../../store/authSlice";
+import {updateAuthStatus} from "../../store/authSlice";
 import {useNavigation} from "@react-navigation/native";
 import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
 
@@ -110,7 +110,7 @@ export default function VerificationCodeBody(props) {
                     setIsAuthenticated(authStatus);
                     setChanging(true);
                     if(authStatus === true) {
-                        navigation.navigate("ListOfBusinessesScreen");
+                        dispatch(updateAuthStatus(true));
                     }
                 }}
             />
