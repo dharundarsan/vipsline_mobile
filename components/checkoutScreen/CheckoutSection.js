@@ -38,7 +38,13 @@ import {clearClientInfo} from "../../store/clientInfoSlice";
 const CheckoutSection = (props) => {
     const tot = useSelector(state => state.cart.calculatedPrice);
             // const totalChargeAmount = useSelector(state => state.cart.calculatedPrice[0]?.extra_charges_value);
-    const totalChargeAmount = tot === undefined || tot === null ? 0 : tot[0].extra_charges_value;
+    const totalChargeAmount = checkNullUndefined(tot) ?
+        checkNullUndefined(tot[0]) ?
+            checkNullUndefined(tot[0].extra_charges_value) ?
+            tot[0].extra_charges_value :
+                0 :
+            0 :
+        0;
     const cart = useSelector(state => state.cart);
     // console.log(cart);
     
@@ -141,7 +147,6 @@ const CheckoutSection = (props) => {
         setTitle(title);
         setClickedValue(value);
     }
-    console.log("calculatedPrice " + calculatedPrice);
     
 
     const checkoutDiscount = useSelector(state => state.checkoutAction.additionalDiscounts)
@@ -199,14 +204,14 @@ const CheckoutSection = (props) => {
     }
 
     function clearCharges() {
-        console.log(1);
+        // console.log(1);
         
         setChargesInputData([{index:0}])
-        console.log(2);
+        // console.log(2);
         dispatch(updateChargeData([{index:0,name: "",amount: 0,}]));
-        console.log(3);
+        // console.log(3);
         dispatch(updateCalculatedPrice());
-        console.log(4);
+        // console.log(4);
         setActionModal(false);
     }
 
