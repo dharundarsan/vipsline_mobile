@@ -1,13 +1,13 @@
-import {Image, Pressable, StyleSheet, Text, View} from "react-native";
+import { Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
 import Cart from "../components/checkoutScreen/Cart";
 import AddClientButton from "../components/checkoutScreen/AddClientButton";
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import title from "react-native-paper/src/components/Typography/v2/Title";
-import {useEffect, useLayoutEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useCallback, useEffect, useLayoutEffect, useState} from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -15,8 +15,8 @@ import {
     loadServicesDataFromDb,
 } from '../store/catalogueSlice';
 import {
-    loadClientCountFromDb,
-    loadClientsFromDb
+    clearClientsList,
+    loadClientCountFromDb, loadClientsFromDb,
 } from '../store/clientSlice';
 import AddClientModal from "../components/checkoutScreen/AddClientModal";
 import {
@@ -26,17 +26,45 @@ import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
 import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
-import {loadCartFromDB} from "../store/cartSlice";
+import {clearSalesNotes, loadCartFromDB} from "../store/cartSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
+import clearCartAPI from "../util/apis/clearCartAPI";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
+    const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const businessId = useSelector(state => state.authDetails.businessId);
+
+    const checkAuthentication = async () => {
+        try {
+            const authKey = await AsyncStorage.getItem('authKey');
+            if (authKey !== null) {
+                setIsAuthenticated(true); // Update local state if the user is authenticated
+            } else {
+                setIsAuthenticated(false);
+            }
+        } catch (e) {
+                        setIsAuthenticated(false);
+        }
+    };
 
 
     useEffect(() => {
+        checkAuthentication(); // Initial auth check
+    }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
+
+
+    useEffect(() => {
+        clearCartAPI();
+        dispatch(clearSalesNotes());
         dispatch(loadServicesDataFromDb("women"));
         dispatch(loadServicesDataFromDb("men"));
         dispatch(loadServicesDataFromDb("kids"));
@@ -44,25 +72,65 @@ const CheckoutScreen = () => {
         dispatch(loadProductsDataFromDb());
         dispatch(loadPackagesDataFromDb());
         dispatch(loadMembershipsDataFromDb());
+
         dispatch(loadClientsFromDb());
+
         dispatch(loadClientCountFromDb());
         dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
         dispatch(loadLoginUserDetailsFromDb());
         dispatch(loadStaffsFromDB());
         dispatch(loadCartFromDB());
-        dispatch(loadBookingDetailsFromDb());
-    }, []);
+        // dispatch(loadBookingDetailsFromDb());
+
+    }, [businessId]);
+
+
+    useFocusEffect(
+        useCallback(() => {
+            // Function to execute whenever the drawer screen is opened
+
+            dispatch(loadClientsFromDb());
+
+            // Optional cleanup function when screen is unfocused
+            return () => {
+                dispatch(clearClientsList());
+            };
+        }, [businessId])
+    );
+
+
+    //
+    // useEffect(() => {
+    //     dispatch(loadServicesDataFromDb("women"));
+    //     dispatch(loadServicesDataFromDb("men"));
+    //     dispatch(loadServicesDataFromDb("kids"));
+    //     dispatch(loadServicesDataFromDb("general"));
+    //     dispatch(loadProductsDataFromDb());
+    //     dispatch(loadPackagesDataFromDb());
+    //     dispatch(loadMembershipsDataFromDb());
+    //     dispatch(loadClientsFromDb());
+    //     dispatch(loadClientCountFromDb());
+    //     dispatch(loadClientFiltersFromDb(10, "All"));
+    //     dispatch(loadBusinessesListFromDb());
+    //     dispatch(loadLoginUserDetailsFromDb());
+    //     dispatch(loadStaffsFromDB());
+    //     dispatch(loadCartFromDB());
+    //     dispatch(loadBookingDetailsFromDb());
+    // }, []);
+
 
     return (
-        <View style={styles.checkoutScreen}>
+        <View style={[styles.checkoutScreen, {
+            paddingBottom: insets.bottom
+        }]}>
             <AddClientModal closeModal={() => {
                 setIsAddClientModalVisible(false)
-            }} isVisible={isAddClientModalVisible}/>
+            }} isVisible={isAddClientModalVisible} />
             <AddClientButton onPress={() => {
                 setIsAddClientModalVisible(true)
-            }}/>
-            <Cart/>
+            }} />
+            <Cart />
         </View>
     );
 }

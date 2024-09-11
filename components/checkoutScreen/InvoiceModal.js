@@ -8,7 +8,7 @@ import Feather from '@expo/vector-icons/Feather';
 import {Row, Table} from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from "react-redux";
-import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
+import {checkNullUndefined, dateFormatter, shadowStyling} from "../../util/Helpers";
 import {useEffect, useRef, useState} from "react";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
@@ -17,13 +17,29 @@ import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import clearCartAPI from "../../util/apis/clearCartAPI";
+import {clearClientInfo} from "../../store/clientInfoSlice";
+import {
+    clearCalculatedPrice,
+    clearLocalCart,
+    clearSalesNotes,
+    loadCartFromDB,
+    modifyClientMembershipId
+} from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
 
     const details = useSelector(state => state.invoice.details);
+    const bookingId = useSelector(state => state.invoice.booking_id1);
+
+    const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
+
+
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
     const dispatch = useDispatch();
+
 
     const navigation = useNavigation();
 
@@ -39,40 +55,65 @@ const InvoiceModal = (props) => {
     const cancelReasonRef = useRef(null);
 
     const [email, setEmail] = useState(selectedClientDetails.username);
-    const [phone, setPhone] = useState(selectedClientDetails.mobile_1);
+    const [phone, setPhone] = useState(["+91", selectedClientDetails.mobile_1]);
     const [cancelReason, setCancelReason] = useState("");
 
     const [isCancelled, setIsCancelled] = useState(false);
+    const [totalDiscount, setTotalDiscount] = useState(0);
+    // const [businessId, setBusinessId] = useState("");
 
+    const calculatedPrice = useSelector(state => state.cart.calculatedPrice);
 
-    const actualData = details.organized_list;
+    const businessId = useSelector(state => state.authDetails.businessId);
 
-    let totalDiscount = 0;
+    const walletBalance = useSelector(state => state.invoice.walletBalance);
+
 
     let centralGST = (details.total * 0.09);
     let stateGST = (details.total * 0.09);
 
-    const splitPayment = details.split_payment;
+    async function getBusinessId() {
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                return value;
+            }
+        } catch (e) {
+        }
+    }
 
-    const selectedBusinessDetails = useSelector(state => state.businesses.selectedBusiness);
+
+    const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
+    // let selectedBusinessDetails = "";
+    // getBusinessId().then(r => {
+    //     setBusinessId(r);
+    // });
+    const selectedBusinessDetails = listOfBusinesses.filter((item) => {
+        return item.id === businessId
+    })[0];
+
 
     const businessName = selectedBusinessDetails.name;
     const businessContact = selectedBusinessDetails.mobile_1;
     const businessAddress = selectedBusinessDetails.address;
     const businessEmail = selectedBusinessDetails.email;
-    const GSTIn = selectedBusinessDetails.gstin;
-
-
 
 
     useEffect(() => {
-        dispatch(loadWalletPriceFromDb(selectedClientDetails.id));
+        async function api() {
+            try {
+                dispatch(await loadWalletPriceFromDb(selectedClientDetails.id));
+            } catch (e) {
+            }
+        }
+
+        api();
     }, [selectedClientDetails]);
 
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}>
-        <View style={styles.headingAndCloseContainer}>
+        <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -97,13 +138,13 @@ const InvoiceModal = (props) => {
                 imageWidth={24}
                 primaryViewChildrenStyle={styles.dropdownInnerContainer}
                 onChangeValue={(value) => {
-                    if(value === "SMS") {
+                    if (value === "SMS") {
                         setSMSModalVisibility(true);
 
-                    }
-                    else if(value === "Email") {
+                    } else if (value === "Email") {
                         setEmailModalVisibility(true);
-
+                    } else if (value === "Cancel Invoice") {
+                        setCancelInvoiceModalVisibility(true);
                     }
                 }}
             />
@@ -121,12 +162,14 @@ const InvoiceModal = (props) => {
                 value={phone[1]}
                 buttonTwoOnPress={() => {
                     const phoneNoValid = phoneNoRef.current();
-                    if(phoneNoValid) {
+                    if (phoneNoValid) {
                         sendSMSAPI(selectedClientDetails.name, phone[1]);
                         setSMSModalVisibility(false)
                     }
                 }}
-                onSave={(callback) => { emailRef.current = callback; }}
+                onSave={(callback) => {
+                    phoneNoRef.current = callback;
+                }}
                 validator={(text) => text.length !== 10 ? "Phone number is invalid" : true}
             />
             <BottomModal
@@ -142,13 +185,15 @@ const InvoiceModal = (props) => {
                 value={email}
                 buttonTwoOnPress={() => {
                     const emailValid = emailRef.current();
-                    if(emailValid) {
+                    if (emailValid) {
                         sendEmailAPI(email);
                         setEmailModalVisibility(false);
                     }
                 }}
                 validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
-                onSave={(callback) => { emailRef.current = callback; }}
+                onSave={(callback) => {
+                    emailRef.current = callback;
+                }}
             />
 
             <BottomModal
@@ -160,16 +205,18 @@ const InvoiceModal = (props) => {
                 label={"Reason"}
                 buttonOneName={"Cancel Invoice"}
                 validator={(text) => text.trim().length === 0 ? "Provide a valid Reason" : true}
-                onSave={(callback) => { cancelReasonRef.current = callback; }}
+                onSave={(callback) => {
+                    cancelReasonRef.current = callback;
+                }}
                 value={cancelReason}
                 onChangeText={(text) => setCancelReason(text)}
                 buttonOneOnPress={() => {
                     const cancelInvoiceValidation = cancelReasonRef.current();
-                    if(cancelInvoiceValidation) {
-                        // props.onCloseModal();
+                    if (cancelInvoiceValidation) {
                         setIsCancelled(true);
                         setCancelInvoiceModalVisibility(false);
-                        cancelInvoiceAPI(cancelReason, "5860d887-a7cc-4d37-8fdb-d025168490d3");
+                        cancelInvoiceAPI(cancelReason, bookingId);
+                        // props.onCloseModal();
                     }
                 }}
                 buttonOneStyle={{borderColor: Colors.error, borderWidth: 1.5}}
@@ -200,12 +247,21 @@ const InvoiceModal = (props) => {
 styles.heading]}>Invoice</Text>*/}
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={() => setCancelInvoiceModalVisibility(true)}
+                onPress={() => {
+                    // setCancelInvoiceModalVisibility(true)
+                    clearCartAPI();
+                    dispatch(modifyClientMembershipId({type: "clear"}))
+                    dispatch(clearSalesNotes());
+                    dispatch(clearLocalCart());
+                    dispatch(clearClientInfo());
+                    dispatch(clearCalculatedPrice());
+                    props.onCloseModal();
+                }
+                }
             >
-                <Ionicons name="close" size={25} color="black" />
+                <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
-        <Divider/>
         <ScrollView>
             <View style={styles.modalContent}>
                 {
@@ -215,7 +271,7 @@ styles.heading]}>Invoice</Text>*/}
                                 CANCELLED
                             </Text>
                         </View> :
-                        null
+                        <></>
                 }
                 <View style={styles.logoAndButtonContainer}>
                     <Feather name="check-circle" size={50}
@@ -226,9 +282,14 @@ styles.heading]}>Invoice</Text>*/}
                         <PrimaryButton
                             buttonStyle={styles.backToCheckoutButton}
                             label={"Back to checkout"}
-                            // onPress={() => {
-                            //     props.navigation.navigate("CheckoutScreen");
-                            // }}
+                            onPress={() => {
+                                clearCartAPI();
+                                dispatch(clearSalesNotes());
+                                dispatch(clearLocalCart());
+                                dispatch(clearClientInfo());
+                                dispatch(clearCalculatedPrice());
+                                props.onCloseModal();
+                            }}
                         />
                         <PrimaryButton
                             onPress={() => setOptionModalVisibility(true)}
@@ -239,15 +300,19 @@ styles.heading]}>Invoice</Text>*/}
                             />
                         </PrimaryButton>
                     </View>
+                    {
+                        !isCancelled ?
+                            <PrimaryButton
+                                buttonStyle={styles.actionsButton}
+                                textStyle={styles.actionsButtonText}
+                                label={"Actions"}
+                                onPress={() => {
+                                    setActionModalVisibility(true);
+                                }}
+                            /> :
+                            <></>
+                    }
 
-                    <PrimaryButton
-                        buttonStyle={styles.actionsButton}
-                        textStyle={styles.actionsButtonText}
-                        label={"Actions"}
-                        onPress={() => {
-                            setActionModalVisibility(true);
-                        }}
-                    />
 
                 </View>
                 <Divider/>
@@ -277,18 +342,19 @@ styles.heading]}>Invoice</Text>*/}
                             style={textTheme.titleMedium}>Email
                             : </Text>{businessEmail}</Text>
                         <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Contact : </Text></Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN : </Text>{GSTIn}
+                            //     style={textTheme.titleMedium}>Contact : </Text>
+                            // </Text>
+                            // <Text style={textTheme.bodyLarge}><Text
+                            style={textTheme.titleMedium}>GSTIN : </Text>{selectedBusinessDetails.gstin}
                         </Text>
                     </View>
                     <View style={styles.invoiceNumberAndDateContainer}>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice no :
-                        </Text>{details.business_invoice_num}</Text>
+                        </Text>{invoiceDetails.business_invoice_num}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Invoice date :
-                        </Text>{details.invoice_created_date}</Text>
+                        </Text>{invoiceDetails.invoice_created_date}</Text>
                     </View>
                     <View style={styles.invoiceDetailsOutlineCard}>
                         <Text style={textTheme.bodyLarge}><Text
@@ -303,38 +369,73 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}>
                             <Text
                                 style={textTheme.titleMedium}>Prepaid :
-                            </Text>{details.wallet_balance}</Text>
+                            </Text> {walletBalance.wallet_balance}</Text>
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>GSTIN
                             : </Text>{selectedClientDetails.customer_gst}</Text>
                     </View>
                     <Table style={styles.cartItemTable}>
                         <Row
-                            textStyle={StyleSheet.flatten({textAlign:
-                                    "center", fontWeight: "bold"})}
+                            textStyle={{textAlign: "center", fontWeight: "bold"}}
                             style={styles.cartItemTableHead}
                             data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
                         />
 
 
-                        {actualData && actualData.length > 0 &&
-                            actualData.map((item) => (
-                                item.list && item.list.length > 0 &&
-                                item.list.map((innerItem, index) => {
-                                    totalDiscount +=
-                                        (innerItem.service_cost * innerItem.discount_percent) / 100;
-                                    return <Row
-                                        key={index}
-                                        data={[innerItem.resource_service,
-                                            innerItem.resource_name, innerItem.count,
-                                            (innerItem.service_cost).toFixed(2)]}
-                                        style={styles.cartItemTableRow}
+                        {
+                            details.organized_list && details.organized_list.length > 0 &&
+                            details.organized_list.map((item) => (
+                                    item.list && item.list.length > 0 &&
+                                    item.list.map((innerItem, index) => {
+                                        // setTotalDiscount(prev => prev + innerItem.discount_percent);
+                                        return (<>
+                                            <Row
+                                                key={index}
+                                                data={
+                                                    [
+                                                        innerItem.resource_service,
+                                                        innerItem.resource_name,
+                                                        innerItem.count,
+                                                        (innerItem.service_cost).toFixed(2)
 
-                                        textStyle={StyleSheet.flatten({textAlign: "center"})}
-                                    />
+                                                    ]
+                                                }
+                                                style={styles.cartItemTableRow}
+                                                textStyle={{textAlign: "center"}}
+                                            />
+                                            {
+                                                item.gender === "Membership" ?
+                                                    <View style={styles.durationDetails}>
+                                                        <Text>
+                                                            Duration: {innerItem.duration} days
+                                                        </Text>
+                                                        <Text>
+                                                            Start date: {innerItem.valid_from} | Expiry date: {innerItem.valid_till}
+                                                        </Text>
+                                                    </View> :
+                                                    <></>
+                                            }
+                                            {
+                                                item.gender === "Packages" ?
+                                                    <View style={styles.durationDetails}>
+                                                        <Text>
+                                                            Duration: {innerItem.duration} days
+                                                        </Text>
+                                                        <Text>
+                                                            Start date: {innerItem.valid_from} | Expiry date: {innerItem.valid_till}
+                                                        </Text>
+                                                    </View> :
+                                                    <></>
+                                            }
 
-                                })
-                            ))}
+                                        </>)
+
+                                    })
+
+                                )
+                            )
+                        }
+
 
                     </Table>
                     <View style={styles.calculatepriceRow}>
@@ -342,7 +443,7 @@ styles.heading]}>Invoice</Text>*/}
                             styles.checkoutDetailText]}>Discount</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>₹ {(totalDiscount).toFixed(2)}</Text>
+                                styles.checkoutDetailText]}>₹ {details.total * (totalDiscount)}</Text>
                     </View>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
@@ -353,7 +454,7 @@ styles.heading]}>Invoice</Text>*/}
                             {(details.sub_total_with_discount).toFixed(2)}</Text>
                     </View>
                     {
-                        props.data[0].tax_details.map((item, index) => (
+                        calculatedPrice[0].tax_details.map((item, index) => (
                             <View key={index} style={styles.calculatepriceRow}>
                                 <Text style={[textTheme.bodyLarge,
                                     styles.checkoutDetailText]}>{item.name}</Text>
@@ -370,8 +471,7 @@ styles.heading]}>Invoice</Text>*/}
                             styles.checkoutDetailText]}>Total</Text>
                         <Text
                             style={[textTheme.titleMedium,
-                                styles.checkoutDetailText]}>₹ {(details.total + centralGST +
-                            stateGST).toFixed(2)}</Text>
+                                styles.checkoutDetailText]}>₹ {details.total}</Text>
                     </View>
                     <View style={styles.paymentModeContainer}>
                         <Text style={[textTheme.titleMedium]}>Payment
@@ -379,42 +479,43 @@ styles.heading]}>Invoice</Text>*/}
                         <Table style={styles.paymentModeTable}>
                             <Row style={styles.paymentModeTableHead}
                                  data={["Date & Time", "Mode", "Amount", "Status"]}
-                                 textStyle={{textAlign: "center"}}/>
+                                 textStyle={{textAlign: "center"}}
+                            />
                             {
-                                splitPayment.map((item, index) => (
-                                    <Row
+                                invoiceDetails.split_payment && invoiceDetails.split_payment.map((item, index) => {
+                                    return <Row
                                         key={index}
-                                        data={[dateFormatter(item.date, 'short') + " " + item.time,
+                                        data={[item.date + " " + item.time,
                                             item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
                                         style={styles.paymentModeTableRow}
-                                        textStyle={{textAlign: "center"}}
+                                        textStyle={{textAlign: 'center'}}
                                     />
-                                ))
+                                })
                             }
                         </Table>
                     </View>
                 </View>
                 <Divider color={Colors.highlight}/>
                 {
-                    checkNullUndefined(details.footer_message_1) &&
-                    details.footer_message_1.trim().length !== 0 ?
+                    checkNullUndefined(invoiceDetails.footer_message_1) &&
+                    invoiceDetails.footer_message_1.trim().length !== 0 ?
                         <View style={styles.termsAndConditions}>
                             <Text
                                 style={[textTheme.titleMedium]}>Terms & conditions: </Text>
                             <Text
-                                style={[textTheme.bodyMedium]}>{details.footer_message_1}</Text>
+                                style={[textTheme.bodyMedium]}>{invoiceDetails.footer_message_1}</Text>
 
                         </View> :
-                        null
+                        <></>
                 }
             </View>
             {
-                checkNullUndefined(details.footer_message_2) &&
-                details.footer_message_2.trim().length !== 0 ?
+                checkNullUndefined(invoiceDetails.footer_message_2) &&
+                invoiceDetails.footer_message_2.trim().length !== 0 ?
                     <Text
                         style={[textTheme.titleMedium,
-                            styles.thankYouText]}>{details.footer_message_2}</Text> :
-                    null
+                            styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
+                    <></>
             }
         </ScrollView>
     </Modal>
@@ -565,7 +666,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         top: '40%',      // Adjust the placement
         left: '0%',     // Adjust the placement
-        transform: [{ rotate: '-35deg' }],  // Rotate the stamp diagonally
+        transform: [{rotate: '-35deg'}],  // Rotate the stamp diagonally
         // opacity: 0.6,    // Slight transparency
         alignItems: 'center',
         paddingVertical: 8,
@@ -574,6 +675,11 @@ const styles = StyleSheet.create({
     cancelledText: {
         color: Colors.error,
         letterSpacing: 4
+    },
+    durationDetails: {
+        width: "100%",
+        backgroundColor: Colors.grey200,
+        padding: 12
     }
 });
 

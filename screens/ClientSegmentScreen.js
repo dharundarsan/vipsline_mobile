@@ -27,6 +27,7 @@ import {loadClientCountFromDb} from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
 import {clientFilterAPI} from "../util/apis/clientFilterAPI";
 import axios from "axios";
+import {checkNullUndefined} from "../util/Helpers";
 
 
 export default function ClientSegmentScreen() {
@@ -57,11 +58,19 @@ export default function ClientSegmentScreen() {
     const [clientId, setClientId] = useState("");
     const isSearchClientFetching = useSelector(state => state.clientFilter.isFetchingSearchClient);
 
-    const allClientCount = useSelector(state => state.client.clientCount)[0].all_clients_count;
-    const activeClientCount = useSelector(state => state.client.clientCount)[0].active_clients_count;
-    const inActiveClientCount = useSelector(state => state.client.clientCount)[0].inactive_clients_count;
-    const churnClientCount = useSelector(state => state.client.clientCount)[0].churn_clients_count;
-    const leadsClientCount = useSelector(state => state.client.clientCount)[0].leads_clients_count;
+    const allClientCountHelper = useSelector(state => state.client.clientCount)
+    const activeClientCountHelper = useSelector(state => state.client.clientCount)
+    const inActiveClientCountHelper = useSelector(state => state.client.clientCount)
+    const churnClientCountHelper = useSelector(state => state.client.clientCount)
+    const leadsClientCountHelper = useSelector(state => state.client.clientCount)
+
+
+
+    const allClientCount = checkNullUndefined(allClientCountHelper) ? allClientCountHelper[0].all_clients_count : 0;
+    const activeClientCount = checkNullUndefined(activeClientCountHelper) ? activeClientCountHelper[0].active_clients_count : 0;
+    const inActiveClientCount = checkNullUndefined(inActiveClientCountHelper) ? inActiveClientCountHelper[0].inactive_clients_count : 0;
+    const churnClientCount = checkNullUndefined(churnClientCountHelper) ? churnClientCountHelper[0].churn_clients_count : 0;
+    const leadsClientCount = checkNullUndefined(leadsClientCountHelper) ? leadsClientCountHelper[0].leads_clients_count : 0;
 
     const currentFilterClientCount = useSelector(state => state.clientFilter.totalClients);
 
@@ -158,8 +167,7 @@ export default function ClientSegmentScreen() {
         //     else{
         //         setToggle(true);
         //     }
-        //     console.log("rerender")
-        //     return ;
+        //             //     return ;
         // }
 
         return (
@@ -194,14 +202,8 @@ export default function ClientSegmentScreen() {
     }
 
     const changeSelectedFilter = (filter) => {
-        // console.log("change", filter);
         setFilterPressed(filter);
     }
-
-    // console.log(filterPressed);
-    // console.log(filterClientsList);
-    // console.log(currentFilterClientCount);
-    // console.log(clientCount);
 
 
 

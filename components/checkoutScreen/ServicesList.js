@@ -74,8 +74,7 @@ const ServicesList = React.memo((props) => {
                     <View style={styles.headingAndSearchContainer}>
                         <SearchBar filter={true}
                                    onPressFilter={() => {
-                                       console.log("Filter pressed");
-                                   }}
+                                                                          }}
                                    onChangeText={filterServicesData}
                                    placeholder={"Search by service name or prices"}/>
                     </View>

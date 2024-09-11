@@ -5,40 +5,79 @@ import Divider from "../ui/Divider";
 import BusinessCard from "../components/listOfBusinessesScreen/BusinessCard";
 import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus, updateBusinessId, updateBusinessName} from "../store/authSlice";
-import {loadBusinessesListFromDb, updateSelectedBusinessDetails} from "../store/listOfBusinessSlice";
-import getBusinessNotificationDetailsAPI from "../util/apis/getBusinessNotificationDetailsAPI";
-import {useEffect, useLayoutEffect} from "react";
+import {
+    loadBusinessesListFromDb,
+    updateIsBusinessSelected,
+    updateSelectedBusinessDetails
+} from "../store/listOfBusinessSlice";
+import {useCallback, useEffect, useLayoutEffect, useState} from "react";
+
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
     loadProductsDataFromDb,
     loadServicesDataFromDb
 } from "../store/catalogueSlice";
-import {loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
+import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
 import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useFocusEffect} from "@react-navigation/native";
 
 
-export default function ListOfBusinessesScreen(props) {
+export default function ListOfBusinessesScreen({navigation}) {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
 
+
     useLayoutEffect(() => {
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-        dispatch(loadClientsFromDb());
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
+        // dispatch(loadServicesDataFromDb("women"));
+        // dispatch(loadServicesDataFromDb("men"));
+        // dispatch(loadServicesDataFromDb("kids"));
+        // dispatch(loadServicesDataFromDb("general"));
+        // dispatch(loadProductsDataFromDb());
+        // dispatch(loadPackagesDataFromDb());
+        // dispatch(loadMembershipsDataFromDb());
+        // dispatch(loadClientsFromDb());
+        // dispatch(loadClientCountFromDb());
+        // dispatch(loadClientFiltersFromDb(10, "All"));
         dispatch(loadBusinessesListFromDb());
         dispatch(loadLoginUserDetailsFromDb());
     }, []);
 
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         // Function to execute whenever the drawer screen is opened
+    //         dispatch(clearClientsList());
+    //
+    //         // Optional cleanup function when screen is unfocused
+    //         return () => {
+    //             dispatch(loadClientsFromDb());
+    //         };
+    //     }, [])
+    // );
+
+    async function authToken() {
+
+        let businessId = ""
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                businessId = value;
+            }
+        } catch (e) {
+                    }
+
+    }
+
+    const storeData = async (value) => {
+        try {
+            await AsyncStorage.setItem('businessId', value);
+        } catch (e) {
+                    }
+    };
 
     function renderItem(itemData) {
         return (
@@ -48,10 +87,12 @@ export default function ListOfBusinessesScreen(props) {
                 address={itemData.item.address}
                 imageURL={itemData.item.photo}
                 status={itemData.item.verificationStatus}
-                onPress={() => {
+                onPress={async () => {
+                    await storeData(itemData.item.id);
                     dispatch(updateBusinessId(itemData.item.id));
+                    dispatch(updateIsBusinessSelected(true));
                     dispatch(updateSelectedBusinessDetails(itemData.item));
-                    dispatch(updateAuthStatus(true));
+                    navigation.navigate("Checkout");
                 }}
             />
         );
@@ -60,16 +101,12 @@ export default function ListOfBusinessesScreen(props) {
     const token = useSelector(state => state.authDetails.authToken);
     const id = useSelector(state => state.authDetails.businessId);
 
-    console.log("token: " + token);
-    console.log("business id: " + id);
 
 
 
     return (
         <ScrollView style={styles.listOfBusinesses} contentContainerStyle={{alignItems: "center"}}>
-            <View style={styles.header}>
-                <Text style={[textTheme.titleLarge]}>Locations</Text>
-            </View>
+
             <Divider />
             <View style={styles.body}>
                 <Text style={[textTheme.titleMedium]}>
@@ -100,6 +137,7 @@ const styles = StyleSheet.create({
     },
     header: {
         marginVertical: 16,
+
     },
     body: {
         width: "90%",

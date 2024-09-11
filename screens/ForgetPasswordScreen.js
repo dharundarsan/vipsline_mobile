@@ -24,7 +24,6 @@ export default function ForgetPasswordScreen() {
 
     const [mobileNumber, setMobileNumber] = useState("");
 
-    console.log("mobile number", mobileNumber);
 
     return(
         <>

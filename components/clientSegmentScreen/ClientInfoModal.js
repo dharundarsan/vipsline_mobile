@@ -114,8 +114,7 @@ export default function clientInfoModal(props) {
         setClientMoreDetails(id);
     }
     function seeMoreStatisticsHandler() {
-        // console.log("seeMoreStatisticsHandler");
-        setClientMoreDetails("seeMoreStats");
+                setClientMoreDetails("seeMoreStats");
     }
     let content;
 
@@ -151,8 +150,7 @@ export default function clientInfoModal(props) {
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     setModalVisibility(false);
-                    console.log("Fetched")
-                    dispatch(loadClientInfoFromDb(props.id))
+                                        dispatch(loadClientInfoFromDb(props.id))
 
                 }}
                 header={"Delete Client"}

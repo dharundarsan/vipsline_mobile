@@ -1,8 +1,10 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 import axios from "axios";
-import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
+import { updateClientsList, updateFetchingState } from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {formatDate} from "../util/Helpers";
 
 const initialCartState = {
     items: [],
@@ -18,61 +20,102 @@ const initialCartState = {
         index: 0,
     }],
     salesNotes: "",
+    totalChargeAmount: 0.0,
+    clientMembershipID: undefined,
+    packageCart: []
 };
 
+async function getBusinessId() {
+    let businessId = ""
+    try {
+        const value = await AsyncStorage.getItem('businessId');
+        if (value !== null) {
+            return value;
+        }
+    } catch (e) {
+    }
+}
+
+
 export const addItemToCart = (data) => async (dispatch, getState) => {
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error.(inside cartSlice addItemsToCart)" + e);
+    }
+
+
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/addItemsToCheckout`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
                 ...data
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
-        dispatch(loadCartFromDB());
+        dispatch(await loadCartFromDB())
     } catch (error) {
     }
 }
 
 export const checkStaffOnCartItems = () => (dispatch, getState) => {
-    const {cart} = getState();
+    const { cart } = getState();
     return cart.items.every(item => item.resource_id !== null);
 }
 
-export const loadCartFromDB = () => async (dispatch, getState) => {
-    const {cart} = getState();
+export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
+    const { clientInfo } = getState();
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
+    }
+
+    const { cart } = getState();
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
+                client_membership_id: cart.clientMembershipID
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
         dispatch(updateItem(response.data.data));
-        dispatch(updateEditedMembership({type:"map"}))
+        dispatch(updateEditedMembership({ type: "map" }))
         dispatch(updateEditedCart());
-        dispatch(updateCalculatedPrice());
+        // dispatch(updatePackageCart());
+        dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId ));
+        dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
     }
 }
 
-export const updateCalculatedPrice = () => async (dispatch, getState) => {
-    const {cart} = getState();
+export const updateCalculatedPrice = (clientId) => async (dispatch, getState) => {
+    const { cart } = getState();
+
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
         cart: cart.items.map(item => {
-            return {id: item.item_id}
+            return { id: item.item_id }
         }),
         coupon_code: "",
         edited_cart: [...cart.editedMembership.map(item => {
@@ -83,7 +126,7 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                 itemId: item.item_id,
                 membership_id: item.id,
                 membership_number: "",
-                res_cat_id: 282773,
+                res_cat_id: item.resource_category_id,
                 resource_id: item.resource_id,
                 type: "AMOUNT",
                 valid_from: item.valid_from,
@@ -91,53 +134,77 @@ export const updateCalculatedPrice = () => async (dispatch, getState) => {
                 wallet_amount: 0,
             }
         }),
-            // ...cart.editedCart
-            ...cart.editedCart.map(item => {
-                if (item.gender === "Products")
-                    return {
-                        amount: item.amount,
-                        bonus_value: 0,
-                        disc_value: item.disc_value,
-                        itemId: item.item_id,
-                        membership_id: 0,
-                        product_id:item.product_id,
-                        resource_id: item.resource_id,
-                        type: "AMOUNT",
-                        valid_from: "",
-                        valid_till: "",
-                        wallet_amount: 0,
-                    }
-                else
-                    return item
-            })
+        ...cart.editedCart.map(item => {
+            if (item.gender === "Products")
+                return {
+                    amount: item.amount,
+                    bonus_value: 0,
+                    disc_value: item.disc_value,
+                    itemId: item.item_id,
+                    membership_id: 0,
+                    product_id: item.product_id,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: "",
+                    valid_till: "",
+                    wallet_amount: 0,
+                }
+            else if (item.gender === "prepaid")
+                return {
+                    amount: 0,
+                    bonus_value: item.wallet_bonus,
+                    disc_value: 0,
+                    itemId: item.item_id,
+                    membership_id: 0,
+                    resource_id: item.resource_id,
+                    type: "AMOUNT",
+                    valid_from: "",
+                    valid_till: "",
+                    wallet_amount: item.wallet_amount,
+                    wallet_description: item.wallet_description
+                }
+            else
+                return item
+        })
         ],
-        extra_charges: cart.chargesData,
+        extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
         isWalletSelected: false,
+        client_membership_id: cart.clientMembershipID === undefined || null ? null : cart.clientMembershipID,
+        // client_membership_id:clientMembershipID,
+        walkInUserId: clientId === "" ? undefined : clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
         wallet_amt: 0
     }).then(response => {
-        console.log("RESPONSE")
-        console.log(response)
         dispatch(setCalculatedPrice(response))
     })
 
 }
 
 export const removeItemFromCart = async (itemId) => async (dispatch, getState) => {
-    const {cart} = getState()
+    const { cart } = getState();
+
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
+    }
 
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/removeFromCart2`,
             {
-                business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
+                business_id: `${await getBusinessId()}`,
                 item_id: itemId
             },
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                    Authorization: `Bearer ${authToken}`
                 }
             }
         );
@@ -185,6 +252,17 @@ export const cartSlice = createSlice({
             else
                 state.editedCart = [...state.editedCart, action.payload];
         },
+        updateStaffInEditedCart(state, action) {
+            state.editedCart = state.editedCart.map(item => {
+                if (action.payload.itemId === item.item_id) {
+                    return {
+                        ...item,
+                        resource_id: action.payload.resource_id
+                    }
+                }
+                return item;
+            })
+        },
         removeItemFromEditedCart(state, action) {
             state.editedCart = state.editedCart.filter(item => item.itemId !== action.payload);
         },
@@ -195,40 +273,29 @@ export const cartSlice = createSlice({
             state.items = state.items.filter(item =>
                 !state.editedCart.some(edited => edited.item_id === item.item_id)
             )
-
-            // state.editedCart = state.editedCart.map(edited => {
-            //     return state.items.filter(item => {
-            //         return item.item_id === edited.itemId;
-            //     }).map(item => {
-            //         console.log("ITEM NAME")
-            //         console.log(item)
-            //         console.log("EDITED NAME")
-            //         console.log(edited)
-            //         return {
-            //             ...item,
-            //             ...edited,
-            //             price: edited.amount,
-            //             amount: edited.amount,
-            //             name: item.resource_category_name,
-            //             resource_category_name: item.resource_category_name
-            //         }
-            //     })
-            // }).flat();
-
+        },
+        clearLocalCart(state, action) {
+            state.items = [];
+            state.editedCart = [];
+            state.editedMembership = [];
+            state.customItems = [];
+            state.packageCart = [];
+            state.additionalDiscounts = [];
+            state.chargesData = initialCartState.chargesData;
         },
         updateCustomItem(state, action) {
-            state.customItems = state.customItems.map(edited => {
-                if (edited.item_id === action.payload.item_id) {
+            state.customItems = state.customItems.map(item => {
+                if (item.item_id === action.payload.item_id) {
                     return {
-                        ...edited,
+                        ...item,
                         ...action.payload
                     }
                 }
-                return edited;
+                return item;
             })
         },
         updateEditedMembership(state, action) {
-            if(action.payload.type === "map") {
+            if (action.payload.type === "map") {
                 state.editedMembership = state.editedMembership.map(edited => {
                     return state.items.filter(item => {
                         return item.membership_id === edited.id
@@ -247,43 +314,43 @@ export const cartSlice = createSlice({
                 }).flat()
 
                 state.items = state.items.filter(item =>
-                    !state.editedMembership.some(edited => edited.id === item.membership_id)
+                    !state.editedMembership.some(edited => edited.item_id === item.item_id)
                 );
-            } else if(action.payload.type === "edit"){
-                state.editedMembership = state.editedMembership.map(edited => {
-                    if(edited.item_id === action.payload.id){
+            } else if (action.payload.type === "edit") {
+                state.editedMembership = state.editedMembership.map(item => {
+                    if (item.item_id === action.payload.id) {
                         return {
-                            ...edited,
-                            itemId:edited.item_id,
-                            item_Id:edited.item_id,
-                            membership_id: edited.membership_id,
+                            ...item,
+                            itemId: item.item_id,
+                            item_Id: item.item_id,
+                            membership_id: item.membership_id,
                             membership_number: "",
                             res_cat_id: action.payload.data.res_cat_id,
-                            resource_id:edited.resource_id,
+                            resource_id: item.resource_id,
                             disc_value: action.payload.data.disc_value,
-                            amount:action.payload.data.amount,
+                            amount: action.payload.data.amount,
                             price: action.payload.data.amount,
                             total_price: action.payload.data.amount,
                             type: action.payload.data.type,
-                            valid_from: edited.valid_from,
-                            valid_till: edited.valid_until,
+                            valid_from: item.valid_from,
+                            valid_until: item.valid_until,
                             wallet_amount: 0,
                         }
                     }
-                    return edited;
+                    return item;
                 })
             }
-            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.membership_id !== edited.id)).flat();
-
-            // console.log(state.editedMembership)
+            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.item_id !== edited.item_id)).flat();
         },
         setCalculatedPrice(state, action) {
             state.calculatedPrice = action.payload;
         },
         addCustomItems(state, action) {
+            const id = Math.floor(Math.random() * 90000) + 10000;
             const data = {
                 ...action.payload,
-                id: Math.floor(Math.random() * 90000) + 10000
+                id: id,
+                item_id: id
             }
             state.customItems = [...state.customItems, data];
         },
@@ -291,15 +358,69 @@ export const cartSlice = createSlice({
             state.customItems = state.customItems.filter(oldItem => oldItem.id !== action.payload);
         },
         //Bhaski reducers
-        updateDiscount(state,action){
+        updateDiscount(state, action) {
             state.additionalDiscounts.pop();
             state.additionalDiscounts = [action.payload];
         },
-        updateChargeData(state,action){
+        updateChargeData(state, action) {
             state.chargesData = action.payload;
         },
-        updateSalesNotes(state,action){
+        updateSalesNotes(state, action) {
             state.salesNotes = action.payload;
+        },
+        clearSalesNotes(state, action) {
+            state.salesNotes = "";
+        },
+        updateTotalChargeAmount(state, action) {
+            state.totalChargeAmount = action.payload;
+        },
+        addItemsToPackageCart(state, action) {
+            state.packageCart = [...state.packageCart, action.payload];
+        },
+        updatePackageCart(state, action) {
+            state.items.forEach(item => {
+                if (item.gender === "packages" && item.package_name === "" && item.price !== 0) {
+                    const existingPackage = state.packageCart.find(p => p.packageDetails.package_id === item.package_id);
+                    if (!existingPackage) {
+                        state.packageCart.push({
+                            packageDetails: { ...item, type: "Package" },
+                            packageItems: []
+                        });
+                    }
+                }
+            });
+            state.items.forEach(item => {
+                if (item.gender === "packages" && item.package_name !== "" && item.price === 0) {
+                    state.packageCart = state.packageCart.map(wholePackage => {
+                        if (wholePackage.packageDetails.package_id === item.package_id) {
+                            // Ensure item is not duplicated
+                            if (!wholePackage.packageItems.find(i => i.item_id === item.item_id)) {
+                                return {
+                                    packageDetails: wholePackage.packageDetails,
+                                    packageItems: [...wholePackage.packageItems, item]
+                                };
+                            }
+                        }
+                        return wholePackage;
+                    });
+                }
+            });
+
+            state.items = state.items.filter(item => item.gender !== "packages");
+        },
+        clearCalculatedPrice(state, action) {
+            state.calculatedPrice = [];
+        },
+        modifyClientMembershipId(state, action) {
+            const { type, payload } = action.payload;
+            switch (type) {
+                case "clear":
+                    state.clientMembershipID = undefined;
+                    break;
+                case "add":
+                    state.clientMembershipID = payload;
+                    break;
+            }
         }
     }
 });
@@ -319,7 +440,15 @@ export const {
     updateCustomItem,
     updateDiscount,
     updateChargeData,
-    updateSalesNotes
+    updateSalesNotes,
+    addItemsToPackageCart,
+    updatePackageCart,
+    clearCalculatedPrice,
+    updateStaffInEditedCart,
+    clearLocalCart,
+    clearSalesNotes,
+    updateTotalChargeAmount,
+    modifyClientMembershipId,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

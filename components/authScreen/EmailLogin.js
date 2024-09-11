@@ -9,6 +9,7 @@ import findUser from "../../util/apis/findUserApi";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch} from "react-redux";
 import {updateAuthStatus, updateAuthToken} from "../../store/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function EmailLogin() {
     const navigation = useNavigation();
@@ -45,6 +46,14 @@ export default function EmailLogin() {
         navigation.navigate('ForgetPasswordScreen');
     }
 
+    const storeData = async (value) => {
+        try {
+            await AsyncStorage.setItem('my-key', value);
+        } catch (e) {
+            // saving error
+        }
+    };
+
     /** Authentication Logic
      *
      * @returns {Promise<string>}
@@ -63,32 +72,29 @@ export default function EmailLogin() {
                     password: password
                 });
                 dispatch(updateAuthToken(response.data.other_message));
-            }
-            catch (error) {
-                console.log("could not authenticate with email: " + error);
+                try {
+                    await AsyncStorage.setItem('authKey', response.data.other_message);
+                } catch (e) {
+                }
+            } catch (error) {
                 setIsLoading(false);
                 setIsPasswordValid(false);
             }
             isAuthenticationSuccessful = response.data.message === undefined ?
-                                            "" :
-                                            response.data.message === "User authenticated";
+                "" :
+                response.data.message === "User authenticated";
         }
 
 
         if (isAuthenticationSuccessful) {
             setIsPasswordValid(true);
-            navigation.navigate(
-                "ListOfBusinessesScreen",
-            );
-            console.log("Signed In Successfully!!!");
-        }
-        else {
+            dispatch(updateAuthStatus(true));
+        } else {
             setIsPasswordValid(false);
             dispatch(updateAuthStatus(false));
         }
         setIsLoading(false);
 
-        // console.log(email + " " + password + " " + isPasswordFocussed + " " + isPasswordValid);
 
     }
 
@@ -118,7 +124,7 @@ export default function EmailLogin() {
             borderColor:
                 isPasswordFocussed ?
                     isPasswordValid ?
-                        Colors.highlight:
+                        Colors.highlight :
                         Colors.error :
                     !isPasswordValid ?
                         Colors.error :
@@ -140,9 +146,7 @@ export default function EmailLogin() {
             height: 45,
             marginTop: 16
         },
-        activityIndicator: {
-
-        },
+        activityIndicator: {},
         showPasswordText: {
             marginLeft: 6
         }
@@ -154,8 +158,9 @@ export default function EmailLogin() {
 
     return (
         <View style={styles.emailContainer}>
-                <Text style={[textTheme.titleSmall, styles.inputLabel]}>Email Address</Text>
-                <TextInput
+            <Text style={[textTheme.titleSmall, styles.inputLabel]}>Email Address</Text>
+            <TextInput
+                autoCapitalize={"none"}
                 placeholder="Enter email Address"
                 style={[textTheme.titleSmall, styles.emailInput]}
                 onChangeText={setEmail}
@@ -165,15 +170,15 @@ export default function EmailLogin() {
                     setIsPasswordFocussed(false);
                 }}
 
-                />
+            />
             {
                 !isUserFound ?
                     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect email</Text> :
                     <Text></Text>
 
             }
-                <Text style={[textTheme.titleSmall, styles.inputLabel]}>Password</Text>
-                <TextInput
+            <Text style={[textTheme.titleSmall, styles.inputLabel]}>Password</Text>
+            <TextInput
                 placeholder="Enter password"
                 value={password}
                 style={[textTheme.titleSmall, styles.passwordInput]}
@@ -183,43 +188,51 @@ export default function EmailLogin() {
                     setIsPasswordFocussed(true)
                     setIsEmailFocussed(false);
                 }}
-                />
+            />
             {
                 !isPasswordValid ?
                     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect password</Text> :
                     <Text></Text>
             }
-            <View style={{marginTop: 6, width: '100%',flexDirection:'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            <View style={{
+                marginTop: 6,
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                <CheckBox
-                    onClick={() => {
-                        setIsChecked(!isChecked);
-                    }}
-                    isChecked={isChecked}
-                    checkBoxColor={Colors.highlight}
-                    uncheckedCheckBoxColor={Colors.grey400}
+                    <CheckBox
+                        onClick={() => {
+                            setIsChecked(!isChecked);
+                        }}
+                        isChecked={isChecked}
+                        checkBoxColor={Colors.highlight}
+                        uncheckedCheckBoxColor={Colors.grey400}
 
 
-                />
+                    />
                     <Text style={[textTheme.titleSmall, styles.showPasswordText]}>Show Password</Text>
                 </View>
                 <Pressable
                     onPress={forgetPasswordOnPressHandler}
                 >
-                    <Text style={[textTheme.titleSmall, {color: Colors.highlight, fontWeight: "600"}]}>Forgot Password?</Text>
+                    <Text style={[textTheme.titleSmall, {color: Colors.highlight, fontWeight: "600"}]}>Forgot
+                        Password?</Text>
                 </Pressable>
             </View>
-                <PrimaryButton
-                    buttonStyle={styles.signInButton}
-                    onPress={isLoading ? null : signInHandler}
-                >
-                    {
-                        !isLoading ?
-                            <Text style={[textTheme.titleSmall, {color: Colors.onHighlight, fontWeight: '600'}]}>Sign in</Text> :
-                            <ActivityIndicator color={Colors.onHighlight} style={styles.activityIndicator}/>
-                    }
+            <PrimaryButton
+                buttonStyle={styles.signInButton}
+                onPress={isLoading ? null : signInHandler}
+            >
+                {
+                    !isLoading ?
+                        <Text style={[textTheme.titleSmall, {color: Colors.onHighlight, fontWeight: '600'}]}>Sign
+                            in</Text> :
+                        <ActivityIndicator color={Colors.onHighlight} style={styles.activityIndicator}/>
+                }
 
-                </PrimaryButton>
+            </PrimaryButton>
         </View>
     );
 }

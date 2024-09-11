@@ -1,21 +1,23 @@
-import { FlatList, Modal, Platform, StyleSheet, Text, View } from "react-native";
+import {FlatList, Modal, Platform, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, {useCallback, useEffect, useState, useRef} from "react";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import SearchBar from "../../ui/SearchBar";
 import Feather from '@expo/vector-icons/Feather';
-import { useSelector, useDispatch } from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
-import { loadClientsFromDb } from "../../store/clientSlice";
+import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
+import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {shadowStyling} from "../../util/Helpers";
 
 const AddClientModal = (props) => {
-    const pageNo = useSelector(state => state.client.pageNo);
+    // const pageNo = useSelector(state => state.client.pageNo);
     const clientsList = useSelector(state => state.client.clients);
     const [isCreateClientModalVisible, setIsCreateClientModalVisible] = useState(false);
     const dispatch = useDispatch();
@@ -24,27 +26,52 @@ const AddClientModal = (props) => {
     const [searchClientPageNo, setSearchClientPageNo] = useState(0);
     const queryRef = useRef("");
     const [isLoading, setIsLoading] = useState(false);
+    // const businessId = useSelector(state => state.authDetails.businessId);
 
     const searchClientFromDB = useCallback(async (query, pageNo) => {
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
+
+
+        let authToken = ""
+        try {
+            const value = await AsyncStorage.getItem('authKey');
+            if (value !== null) {
+                authToken = value;
+            }
+        } catch (e) {
+            console.log("auth token fetching error. (inside calculateCartPriceAPI)" + e);
+        }
+
+        let businessId = ""
+        try {
+            const value = await AsyncStorage.getItem('businessId');
+            if (value !== null) {
+                businessId = value;
+            }
+        } catch (e) {
+            console.log("business token fetching error." + e);
+        }
+
 
         setIsLoading(true);
         try {
             const response = await axios.post(
                 `${process.env.EXPO_PUBLIC_API_URI}/business/searchCustomersOfBusiness?pageSize=50&pageNo=${pageNo}`,
                 {
-                    business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                    business_id: businessId,
                     query,
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                        Authorization: `Bearer ${authToken}`
                     }
                 }
             );
             setSearchedClients(prev => [...prev, ...response.data.data]);
+            setIsLoading(false);
         } catch (e) {
             console.error("Error fetching clients:", e);
+            setIsLoading(false);
         } finally {
             setIsLoading(false); // Ensure loading state is reset after completion or failure
         }
@@ -55,14 +82,14 @@ const AddClientModal = (props) => {
             queryRef.current = searchClientQuery;
             setSearchedClients([]);
             setSearchClientPageNo(0);
-            searchClientFromDB(searchClientQuery, 0);
+            searchClientFromDB(searchClientQuery, 0).then(r => null);
         }
     }, [searchClientQuery, searchClientFromDB]);
 
     const loadMoreClients = () => {
         const newPageNo = searchClientPageNo + 1;
         setSearchClientPageNo(newPageNo);
-        searchClientFromDB(searchClientQuery, newPageNo);
+        searchClientFromDB(searchClientQuery, newPageNo).then(r => null);
     };
 
     return (
@@ -70,17 +97,19 @@ const AddClientModal = (props) => {
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 setIsCreateClientModalVisible(false);
             }}/>
-            <View style={styles.closeAndHeadingContainer}>
+            <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     pressableStyle={styles.closeButtonPressable}
-                    onPress={props.closeModal}
+                    onPress={() => {
+                        setSearchClientQuery("");
+                        props.closeModal()
+                    }}
                 >
                     <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
-            <Divider/>
             <View style={styles.modalContent}>
                 <SearchBar placeholder={"Search by email or mobile"} onChangeText={(text) => {
                     setSearchClientQuery(text);
@@ -99,9 +128,8 @@ const AddClientModal = (props) => {
                     <FlatList
                         data={clientsList}
                         keyExtractor={(item) => item.id.toString()}
-                        onEndReachedThreshold={0.7}
-                        onEndReached={() => dispatch(loadClientsFromDb(pageNo))}
-                        renderItem={({ item }) => (
+                        // onEndReachedThreshold={0.7}
+                        renderItem={({item}) => (
                             <ClientCard
                                 clientId={item.id}
                                 name={item.name}
@@ -109,10 +137,9 @@ const AddClientModal = (props) => {
                                 email={item.username}
                                 divider={true}
                                 onPress={(clientId) => {
-                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
-                                    dispatch(updateClientId(item.id));
-                                    dispatch(loadClientInfoFromDb(item.id));
                                     props.closeModal();
+                                    dispatch(loadClientInfoFromDb(item.id));
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
                                 }}
                             />
                         )}
@@ -123,7 +150,7 @@ const AddClientModal = (props) => {
                         keyExtractor={(item) => item.id.toString()}
                         onEndReachedThreshold={0.7}
                         onEndReached={loadMoreClients}
-                        renderItem={({ item }) => (
+                        renderItem={({item}) => (
                             <ClientCard
                                 clientId={item.id}
                                 name={item.name}
@@ -131,9 +158,8 @@ const AddClientModal = (props) => {
                                 email={item.username}
                                 divider={true}
                                 onPress={(clientId) => {
-                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id))
-                                    dispatch(loadClientInfoFromDb(item.id));
                                     props.closeModal();
+                                    dispatch(loadClientInfoFromDb(item.id));
                                 }}
                             />
                         )}
