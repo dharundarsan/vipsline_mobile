@@ -64,8 +64,8 @@ const EditMembershipModal = (props) => {
                 resource_id:null,
                 item_id: checkNullUndefined(props.data.item_id) ? Math.floor(Math.random() * 90000) + 10000 : props.data.item_id,
                 "id": membershipId,
-                "valid_from": formatDate(validFromDate, "yyyy-d-m"),
-                "valid_until": formatDate(validUntilDate, "yyyy-d-m"),
+                "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
+                "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
             }));
         dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
         props.onCloseModal();

@@ -150,14 +150,7 @@ const AppNavigator = () => {
 
     useEffect(() => {
         checkAuthentication(); // Initial auth check
-
-        // console.log("useEffuect in app.js")
-        // console.log(reduxAuthStatus);
     }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
-
-    // console.log("status ---------------------------------" + isAuthenticated)
-
-
     return (
         <NavigationContainer>
             <SafeAreaProvider>

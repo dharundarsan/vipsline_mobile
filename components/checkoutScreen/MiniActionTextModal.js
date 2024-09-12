@@ -305,12 +305,11 @@ const MiniActionTextModal = React.memo((props) => {
                       props.addDiscount(selectedDiscountMode, "clear");
                     }
                     else if (props.clickedValue === "Add Sales Notes") {
-                      // props.updateSalesNotes();
+                      props.clearSalesNotes();
                     }
                     else if (props.clickedValue === "Add Charges") {
                       props.clearCharges()
-                      console.log(props.setChargesInputData);
-                      
+
                     }
                   }}
                   style={styles.closeAction}>
