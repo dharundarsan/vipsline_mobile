@@ -1,23 +1,24 @@
-import {View, StyleSheet, Text, TextInput, ScrollView} from "react-native";
-import {Ionicons} from "@expo/vector-icons";
-import React, {useState} from "react";
+import { View, StyleSheet, Text, TextInput, ScrollView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
-import {Feather} from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
-import {MaterialIcons} from '@expo/vector-icons';
-import {useDispatch, useSelector} from "react-redux";
+import { MaterialIcons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from "react-redux";
 import {
     deleteItemFromCart,
     removeCustomItems,
     removeItemFromCart,
     removeItemFromEditedCart, updateEditedCart,
-    updateLoadingState, updateStaffInEditedCart,updateStaffInCustomItemsCart
+    updateLoadingState, updateStaffInEditedCart, updateStaffInCustomItemsCart,
+    modifyPrepaidDetails
 } from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
-import {updateCartItemStaff} from "../../store/staffSlice";
+import { updateCartItemStaff } from "../../store/staffSlice";
 import EditCartModal from "./EditCartModal";
 import PrepaidModal from "./PrepaidModal";
 
@@ -43,28 +44,31 @@ const CartItem = (props) => {
         <View style={styles.cartItem}>
             {isEditPrepaidModalVisible &&
                 <PrepaidModal edited={true} data={props.data} isVisible={isEditPrepaidModalVisible}
-                              onCloseModal={() => setIsEditPrepaidModalVisible(false)}/>}
+                    onCloseModal={() => setIsEditPrepaidModalVisible(false)} />}
             {isEditCartModalVisible && <EditCartModal isVisible={isEditCartModalVisible}
-                                                      onCloseModal={() => setIsEditCartModalVisible(false)}
-                                                      data={props.data}/>}
+                onCloseModal={() => setIsEditCartModalVisible(false)}
+                data={props.data} />}
 
             <DropdownModal isVisible={isStaffDropdownModalVisible}
-                           onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
-                           object={true} objectName={"name"} selectedValue={selectedStaff}
-                           onChangeValue={(value) => {
-                               dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
-                               if(props.data.gender === "custom_item") {
-                                   dispatch(updateStaffInCustomItemsCart({itemId: props.data.item_id, resource_id: value.id}));
-                               } else {
-                                   dispatch(updateStaffInEditedCart({itemId: props.data.item_id, resource_id: value.id}));
-                               }
-                               setSelectedStaff(value)
-                           }}/>
+                onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
+                object={true} objectName={"name"} selectedValue={selectedStaff}
+                onChangeValue={(value) => {
+                    dispatch(updateCartItemStaff([{ item_id: props.data.item_id, resource_id: value.id }]));
+                    if (props.data.gender === "custom_item") {
+                        dispatch(updateStaffInCustomItemsCart({ itemId: props.data.item_id, resource_id: value.id }));
+                    } else if (props.data.gender === "prepaid") {
+                        dispatch(modifyPrepaidDetails({ type: "updateResourceId", payload: value.id }));
+                    }
+                    else {
+                        dispatch(updateStaffInEditedCart({ itemId: props.data.item_id, resource_id: value.id }));
+                    }
+                    setSelectedStaff(value)
+                }} />
             <View style={styles.itemNameAndDetailsContainer}>
                 {props.data.gender === "prepaid" ? <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>Prepaid value
                     ₹{parseFloat(props.data.wallet_amount) + parseFloat(props.data.wallet_bonus)}</Text> : <Text
-                    style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>}
+                        style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>}
 
                 <View style={styles.itemDetailsContainer}>
                     <Text style={[TextTheme.labelLarge, styles.itemQuantityText]}>1x</Text>
@@ -79,36 +83,36 @@ const CartItem = (props) => {
                                 setIsEditCartModalVisible(true)
                             }
                         }}
-                                                                                  buttonStyle={styles.editAmountButton}
-                                                                                  pressableStyle={styles.editAmountPressable}>
-                            <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
+                            buttonStyle={styles.editAmountButton}
+                            pressableStyle={styles.editAmountPressable}>
+                            <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black" />
                             {/*<Feather  name="edit" size={22} color="black"/>*/}
                         </PrimaryButton>}
                     </View>
                     <PrimaryButton buttonStyle={styles.closeIconButton} pressableStyle={styles.closeIconPressable}
-                                   onPress={
-                                       async () => {
-                                           if (props.data.gender === "prepaid" && props.data) {
-                                               dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
-                                                   dispatch(updateLoadingState(false));
-                                                   dispatch(removeItemFromEditedCart(props.data.item_id))
-                                               })
-                                           } else if (props.data.gender === "custom_item")
-                                               dispatch(removeCustomItems(props.data.id))
-                                           else
-                                               removeItemHandler()
-                                       }}>
-                        <Ionicons name="close" size={24} color="black"/>
+                        onPress={
+                            async () => {
+                                if (props.data.gender === "prepaid" && props.data) {
+                                    dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
+                                        dispatch(updateLoadingState(false));
+                                        dispatch(removeItemFromEditedCart(props.data.item_id))
+                                    })
+                                } else if (props.data.gender === "custom_item")
+                                    dispatch(removeCustomItems(props.data.id))
+                                else
+                                    removeItemHandler()
+                            }}>
+                        <Ionicons name="close" size={24} color="black" />
                     </PrimaryButton>
                 </View>
             </View>
             <View style={styles.staffAndDiscountContainer}>
                 <PrimaryButton buttonStyle={styles.staffButton} pressableStyle={styles.staffPressable}
-                               onPress={() => setIsStaffDropdownModalVisible(true)}>
+                    onPress={() => setIsStaffDropdownModalVisible(true)}>
                     <View style={styles.staffContainer}>
                         <Text
                             style={[textTheme.bodyMedium, styles.staffText]}>{selectedStaff !== null ? selectedStaff.name : "Select Staff"}</Text>
-                        <MaterialIcons name="keyboard-arrow-down" size={24} color="black"/>
+                        <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
                     </View>
                 </PrimaryButton>
 
@@ -118,7 +122,7 @@ const CartItem = (props) => {
                 }
             </View>
         </View>
-        <Divider/>
+        <Divider />
 
     </>
 }

@@ -1,31 +1,32 @@
-import {Modal, Platform, ScrollView, StyleSheet, Text, View} from "react-native";
+import { Modal, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import Colors from "../../constants/Colors";
 import Feather from '@expo/vector-icons/Feather';
-import {Row, Table} from "react-native-table-component";
+import { Row, Table } from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import {useDispatch, useSelector} from "react-redux";
-import {checkNullUndefined, dateFormatter, shadowStyling} from "../../util/Helpers";
-import {useEffect, useRef, useState} from "react";
-import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { checkNullUndefined, dateFormatter, shadowStyling } from "../../util/Helpers";
+import { useEffect, useRef, useState } from "react";
+import { loadWalletPriceFromDb } from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import clearCartAPI from "../../util/apis/clearCartAPI";
-import {clearClientInfo} from "../../store/clientInfoSlice";
+import { clearClientInfo } from "../../store/clientInfoSlice";
 import {
     clearCalculatedPrice,
     clearLocalCart,
     clearSalesNotes,
     loadCartFromDB,
-    modifyClientMembershipId
+    modifyClientMembershipId,
+    modifyPrepaidDetails
 } from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
@@ -85,8 +86,8 @@ const InvoiceModal = (props) => {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     // let selectedBusinessDetails = "";
     // getBusinessId().then(r => {
-             //     setBusinessId(r);
-        // });
+    //     setBusinessId(r);
+    // });
     const selectedBusinessDetails = listOfBusinesses.filter((item) => {
         return item.id === businessId
     })[0];
@@ -110,6 +111,17 @@ const InvoiceModal = (props) => {
     }, [selectedClientDetails]);
 
 
+    const calculateTotalDifference = (organizedList) => {
+        return organizedList.reduce((total, category) => {
+            const categoryTotal = category.list.reduce((subTotal, item) => {
+                return subTotal + (item.service_cost - item.price);
+            }, 0);
+            return total + categoryTotal;
+        }, 0);
+    };
+      
+      const totalDiscountPercent = calculateTotalDifference(details.organized_list);
+    
     return <Modal style={styles.invoiceModal} animationType={"slide"}
         visible={props.isVisible}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
@@ -218,8 +230,8 @@ const InvoiceModal = (props) => {
                         // props.onCloseModal();
                     }
                 }}
-                buttonOneStyle={{borderColor: Colors.error, borderWidth: 1.5}}
-                buttonOneTextStyle={{color: Colors.error}}
+                buttonOneStyle={{ borderColor: Colors.error, borderWidth: 1.5 }}
+                buttonOneTextStyle={{ color: Colors.error }}
 
             />
 
@@ -249,11 +261,13 @@ styles.heading]}>Invoice</Text>*/}
                 onPress={() => {
                     // setCancelInvoiceModalVisibility(true)
                     clearCartAPI();
-                    dispatch(modifyClientMembershipId({type: "clear"}))
+                    dispatch(clearSalesNotes());
+                    dispatch(modifyClientMembershipId({ type: "clear" }))
                     dispatch(clearSalesNotes());
                     dispatch(clearLocalCart());
                     dispatch(clearClientInfo());
                     dispatch(clearCalculatedPrice());
+                    dispatch(modifyPrepaidDetails({type:"clear"}))
                     props.onCloseModal();
                 }
                 }
@@ -288,6 +302,7 @@ styles.heading]}>Invoice</Text>*/}
                                 dispatch(clearLocalCart());
                                 dispatch(clearClientInfo());
                                 dispatch(clearCalculatedPrice());
+                                dispatch(modifyPrepaidDetails({type:"clear"}))
                                 props.onCloseModal();
                             }}
                         />
@@ -295,8 +310,8 @@ styles.heading]}>Invoice</Text>*/}
                             onPress={() => setOptionModalVisibility(true)}
                             buttonStyle={styles.backToCheckoutOptionsButton}>
                             <MaterialIcons name="keyboard-arrow-down"
-                                           size={24}
-                                           color={Colors.background}
+                                size={24}
+                                color={Colors.background}
                             />
                         </PrimaryButton>
                     </View>
@@ -373,133 +388,137 @@ styles.heading]}>Invoice</Text>*/}
                             : </Text>{selectedClientDetails.customer_gst}</Text>
                     </View>
                     {
-                        details.organized_list && details.organized_list.length > 0 &&
-                        <Table style={styles.cartItemTable}>
-                        <Row
-                            textStyle={{textAlign: "center", fontWeight: "bold"}}
-                            style={styles.cartItemTableHead}
-                            data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
-                        />
-
-
-                        {
-                            checkNullUndefined(details) ?
+                        checkNullUndefined(details) ?
                             checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
-                            details.organized_list.map((item) => (
-                                    checkNullUndefined(item.list) && checkNullUndefined(item.list.length) &&
-                                    item.list.map((innerItem, index) => {
-                                        // setTotalDiscount(prev => prev + innerItem.discount_percent);
-                                        return (<>
-                                            <Row
-                                                key={index}
-                                                data={
-                                                    [
-                                                        innerItem.resource_service,
-                                                        innerItem.resource_name,
-                                                        innerItem.count,
-                                                        (innerItem.service_cost).toFixed(2)
+                            <Table style={styles.cartItemTable}>
+                                <Row
+                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
+                                    style={styles.cartItemTableHead}
+                                    data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
+                                />
 
-                                                    ]
-                                                }
-                                                style={styles.cartItemTableRow}
-                                                textStyle={{textAlign: "center"}}
-                                            />
-                                            {
-                                                checkNullUndefined(item.gender === "Membership") &&  item.gender === "Membership"?
-                                                    <View style={styles.durationDetails}>
-                                                        <Text>
-                                                            Duration: {innerItem.duration} days
-                                                        </Text>
-                                                        <Text>
-                                                            Start date: {innerItem.valid_from} | Expiry
-                                                            date: {innerItem.valid_till}
-                                                        </Text>
-                                                    </View> :
-                                                    <></>
-                                            }
-                                            {
-                                                checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" ?
-                                                    <View style={styles.durationDetails}>
-                                                        <Text>
-                                                            Duration: {innerItem.duration} days
-                                                        </Text>
-                                                        <Text>
-                                                            Start date: {innerItem.valid_from} | Expiry
-                                                            date: {innerItem.valid_till}
-                                                        </Text>
-                                                    </View> :
-                                                    <></>
-                                            }
 
-                                        </>)
+                                {
+                                    checkNullUndefined(details) ?
+                                        checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
+                                        details.organized_list.map((item) => (
+                                            checkNullUndefined(item.list) && checkNullUndefined(item.list.length) &&
+                                            item.list.map((innerItem, index) => {
+                                                // setTotalDiscount(prev => prev + innerItem.discount_percent);
+                                                return (<>
+                                                    <Row
+                                                        key={index}
+                                                        data={
+                                                            [
+                                                                innerItem.resource_service,
+                                                                innerItem.resource_name,
+                                                                innerItem.count,
+                                                                (innerItem.service_cost).toFixed(2)
 
-                                    })
+                                                            ]
+                                                        }
+                                                        style={styles.cartItemTableRow}
+                                                        textStyle={{ textAlign: "center" }}
+                                                    />
+                                                    {
+                                                        checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" ?
+                                                            <View style={styles.durationDetails}>
+                                                                <Text>
+                                                                    Duration: {innerItem.duration} days
+                                                                </Text>
+                                                                <Text>
+                                                                    Start date: {innerItem.valid_from} | Expiry
+                                                                    date: {innerItem.valid_till}
+                                                                </Text>
+                                                            </View> :
+                                                            <></>
+                                                    }
+                                                    {
+                                                        checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" ?
+                                                            <View style={styles.durationDetails}>
+                                                                <Text>
+                                                                    Duration: {innerItem.duration} days
+                                                                </Text>
+                                                                <Text>
+                                                                    Start date: {innerItem.valid_from} | Expiry
+                                                                    date: {innerItem.valid_till}
+                                                                </Text>
+                                                            </View> :
+                                                            <></>
+                                                    }
 
-                                )
-                            ) : <></>
-                        }
-                    </Table>}
+                                                </>)
+
+                                            })
+
+                                        )
+                                        ) : <></>
+                                }
+                            </Table>
+                            : <></>
+                    }
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
                         styles.checkoutDetailText]}>Discount</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>₹ {details.total * (totalDiscount)}</Text>
+                            styles.checkoutDetailText]}>₹ {(totalDiscountPercent).toFixed(2)}</Text>
                     </View>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>Sub Total</Text>
+                        styles.checkoutDetailText]}>Sub Total</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>₹
+                            styles.checkoutDetailText]}>₹
                             {(details.sub_total_with_discount).toFixed(2)}</Text>
                     </View>
                     {
                         calculatedPrice[0].tax_details.map((item, index) => (
                             <View key={index} style={styles.calculatepriceRow}>
                                 <Text style={[textTheme.bodyLarge,
-                                    styles.checkoutDetailText]}>{item.name}</Text>
+                                styles.checkoutDetailText]}>{item.name}</Text>
                                 <Text style={[textTheme.bodyLarge,
-                                    styles.checkoutDetailText]}>₹ {(item.value)}</Text>
+                                styles.checkoutDetailText]}>₹ {(item.value)}</Text>
                             </View>
                         ))
 
                     }
 
-                    <Divider/>
+                    <Divider />
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.titleMedium,
-                            styles.checkoutDetailText]}>Total</Text>
+                        styles.checkoutDetailText]}>Total</Text>
                         <Text
                             style={[textTheme.titleMedium,
-                                styles.checkoutDetailText]}>₹ {details.total}</Text>
+                            styles.checkoutDetailText]}>₹ {details.total}</Text>
                     </View>
                     <View style={styles.paymentModeContainer}>
                         <Text style={[textTheme.titleMedium]}>Payment
                             Mode</Text>
                         <Table style={styles.paymentModeTable}>
                             <Row style={styles.paymentModeTableHead}
-                                 data={["Date & Time", "Mode", "Amount", "Status"]}
-                                 textStyle={{textAlign: "center"}}
+                                data={["Date & Time", "Mode", "Amount", "Status"]}
+                                textStyle={{ textAlign: "center" }}
                             />
                             {
-                                invoiceDetails.split_payment && invoiceDetails.split_payment.map((item, index) => {
+                                checkNullUndefined(invoiceDetails.split_payment) ? invoiceDetails.split_payment.map((item, index) => {
                                     return <Row
                                         key={index}
                                         data={[item.date + " " + item.time,
-                                            item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
+                                        item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
                                         style={styles.paymentModeTableRow}
-                                        textStyle={{textAlign: 'center'}}
+                                        textStyle={{ textAlign: 'center' }}
                                     />
                                 })
+                                : <></>
                             }
                         </Table>
                     </View>
                 </View>
-                <Divider color={Colors.highlight}/>
+                <Divider color={Colors.highlight} />
                 {
                     checkNullUndefined(invoiceDetails.footer_message_1) &&
-                    invoiceDetails.footer_message_1.trim().length !== 0 ?
+                        invoiceDetails.footer_message_1.trim().length !== 0 ?
                         <View style={styles.termsAndConditions}>
                             <Text
                                 style={[textTheme.titleMedium]}>Terms & conditions: </Text>
@@ -515,7 +534,7 @@ styles.heading]}>Invoice</Text>*/}
                     invoiceDetails.footer_message_2.trim().length !== 0 ?
                     <Text
                         style={[textTheme.titleMedium,
-                            styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
+                        styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
                     <></>
             }
         </ScrollView>
@@ -667,7 +686,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         top: '40%',      // Adjust the placement
         left: '0%',     // Adjust the placement
-        transform: [{rotate: '-35deg'}],  // Rotate the stamp diagonally
+        transform: [{ rotate: '-35deg' }],  // Rotate the stamp diagonally
         // opacity: 0.6,    // Slight transparency
         alignItems: 'center',
         paddingVertical: 8,

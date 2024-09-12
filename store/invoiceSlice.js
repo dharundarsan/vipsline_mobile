@@ -87,9 +87,6 @@ export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
                 }
             }
         );
-        console.log("response.data.data[0]");
-        console.log(response.data.data[0]);
-
         dispatch(updateWalletBalance(response.data.data[0]));
 
     } catch (e) {

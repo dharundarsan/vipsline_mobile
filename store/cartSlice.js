@@ -4,7 +4,7 @@ import axios from "axios";
 import { updateClientsList, updateFetchingState } from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {formatDate} from "../util/Helpers";
+import { formatDate } from "../util/Helpers";
 
 const initialCartState = {
     items: [],
@@ -22,7 +22,15 @@ const initialCartState = {
     salesNotes: "",
     totalChargeAmount: 0.0,
     clientMembershipID: undefined,
-    packageCart: []
+    packageCart: [],
+    prepaid_wallet: [{
+        bonus_value: "",
+        description: "",
+        mobile: "",
+        resource_id: "",
+        source: "",
+        wallet_amount: "",
+    }]
 };
 
 async function getBusinessId() {
@@ -102,7 +110,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
         dispatch(updateEditedMembership({ type: "map" }))
         dispatch(updateEditedCart());
         // dispatch(updatePackageCart());
-        dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId ));
+        dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId));
         dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
     }
@@ -432,7 +440,64 @@ export const cartSlice = createSlice({
                     state.clientMembershipID = payload;
                     break;
             }
-        }
+        },
+        modifyPrepaidDetails(state, action) {
+            const { type, payload } = action.payload;
+            switch (type) {
+                case "clear":
+                    state.prepaid_wallet = [{
+                        bonus_value: "",
+                        description: "",
+                        mobile: "",
+                        resource_id: "",
+                        source: "",
+                        wallet_amount: "",
+                    }];
+                    console.log("Prepaid wallet cleared:", state.prepaid_wallet);
+                    break;
+                case "add":
+                    console.log("Adding to prepaid_wallet:", payload);
+                    state.prepaid_wallet = payload;
+                    break;
+                case "updateMobile":
+                    console.log("Updating mobile with:", payload);
+                    if (state.prepaid_wallet.length > 0) {
+                        // state.prepaid_wallet[0].mobile = payload;
+                        state.prepaid_wallet = [{
+                            ...state.prepaid_wallet[0],
+                            mobile: payload
+                        }]
+                        console.log("Updated prepaid_wallet[0]:", state.prepaid_wallet[0]);
+                    } else {
+                        console.error("No prepaid_wallet entry to update mobile");
+                    }
+                    break;
+                case "updateResourceId":
+                    console.log("Updating resource_id with:", payload);
+                    if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
+                        console.log("Updating source from 'Add prepaid' to 'add_prepaid'");
+                        // state.prepaid_wallet[0].source = "add_prepaid";
+                        state.prepaid_wallet = [{
+                            ...state.prepaid_wallet[0],
+                            source: "add_prepaid"
+                        }]
+                    }
+                    if (state.prepaid_wallet.length > 0) {
+                        // state.prepaid_wallet[0].resource_id = payload;
+                        state.prepaid_wallet = [{
+                            ...state.prepaid_wallet[0],
+                            resource_id: payload
+                        }]
+                        console.log("Updated prepaid_wallet[0]:", state.prepaid_wallet[0]);
+                    } else {
+                        console.error("No prepaid_wallet entry to update resource_id");
+                    }
+                    break;
+                default:
+                    console.error("Unknown action type:", type);
+            }
+        },
+
     }
 });
 
@@ -461,6 +526,7 @@ export const {
     clearSalesNotes,
     updateTotalChargeAmount,
     modifyClientMembershipId,
+    modifyPrepaidDetails
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
