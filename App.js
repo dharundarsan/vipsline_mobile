@@ -1,11 +1,11 @@
-import {StatusBar} from 'expo-status-bar';
-import {Image, SafeAreaView, StyleSheet} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {AntDesign, FontAwesome5} from '@expo/vector-icons';
-import React, {useCallback, useState, useEffect} from 'react';
-import {Provider, useDispatch, useSelector} from 'react-redux';
+import { StatusBar } from 'expo-status-bar';
+import {Alert, BackHandler, Image, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {CommonActions, NavigationContainer, useNavigation} from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
+import React, { useCallback, useState ,useEffect } from 'react';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import CheckoutScreen from './screens/CheckoutScreen';
 import CustomDrawer from './components/common/CustomDrawer';
 import AuthScreen from './screens/AuthScreen';
@@ -46,6 +46,9 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import signOutScreen from "./screens/signOutScreen";
 import checkoutScreen from "./screens/CheckoutScreen";
 import {updateAuthStatus} from "./store/authSlice";
+import clearCartAPI from "./util/apis/clearCartAPI";
+import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "./store/cartSlice";
+import {clearClientInfo} from "./store/clientInfoSlice";
 
 enableScreens();
 
@@ -129,6 +132,45 @@ const AppNavigator = () => {
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated); // Redux state
     const businessChosen = useSelector(state => state.businesses.isBusinessSelected);
 
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert(
+                "Exit App",
+                "Are you sure you want to exit the app?",
+                [
+                    {
+                        text: "No",
+                        onPress: () => null, // Do nothing if user presses 'No'
+                        style: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        onPress: () => {
+
+                            clearCartAPI();
+                            dispatch(modifyClientMembershipId({type: "clear"}))
+                            dispatch(clearSalesNotes());
+                            dispatch(clearLocalCart());
+                            dispatch(clearClientInfo());
+                            dispatch(clearCalculatedPrice());
+                            BackHandler.exitApp();
+                        }, // Exit the app when 'Yes' is pressed
+                    }
+                ],
+                { cancelable: false }
+            );
+            return true; // Return true to prevent the default back button behavior
+        };
+
+        // Add event listener for hardware back press
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove(); // Cleanup the event listener on component unmount
+    }, []);
+
     const checkAuthentication = async () => {
         try {
             const authKey = await AsyncStorage.getItem('authKey');
@@ -136,6 +178,7 @@ const AppNavigator = () => {
                 setIsAuthenticated(true); // Update local state if the user is authenticated
                 // console.log("authkeyStatu" + authKey);
                 dispatch(updateAuthStatus(true));
+
             } else {
                 setIsAuthenticated(false);
                 dispatch(updateAuthStatus(false));
@@ -150,7 +193,9 @@ const AppNavigator = () => {
 
     useEffect(() => {
         checkAuthentication(); // Initial auth check
-    }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
+    }, [reduxAuthStatus]); // Dependency on Redux authentication status
+
+
     return (
         <NavigationContainer>
             <SafeAreaProvider>
@@ -179,8 +224,18 @@ const LandingScreen = () => (
     </LandingStack.Navigator>
 );
 
-const MainDrawerNavigator = () => (
-    <Drawer.Navigator
+const MainDrawerNavigator = () => {
+    const navigation = useNavigation();
+    useEffect(() => {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'List of Business' }],
+            })
+        );
+    }, []);
+
+    return <Drawer.Navigator
         initialRouteName="List of Business"
         drawerContent={(props) => <CustomDrawer {...props} />}
         screenOptions={{
@@ -296,7 +351,7 @@ const MainDrawerNavigator = () => (
                                      width={25} height={25} style={{resizeMode: "contain", tintColor: Colors.white}}/>
         }}/>
     </Drawer.Navigator>
-);
+};
 
 const styles = StyleSheet.create({
     safeAreaView: {
