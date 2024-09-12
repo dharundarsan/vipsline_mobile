@@ -160,8 +160,7 @@ const CheckoutSection = (props) => {
         }
 
         if (type === "clear") {
-            console.log("12321");
-            
+
             dispatch(updateDiscount([]));
             setSelectedDiscountMode("")
         } else {

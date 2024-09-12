@@ -82,13 +82,10 @@ const CheckoutScreen = () => {
             dispatch(loadStaffsFromDB());
             dispatch(loadCartFromDB());
             // dispatch(loadBookingDetailsFromDb());
-            console.log("checkout useefefect screen")
         }
-        console.log("checkout useefefect screen11111");
 
     }, [businessId]);
 
-    console.log("checkout screen");
 
 
     useFocusEffect(

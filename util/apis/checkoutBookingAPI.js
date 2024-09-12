@@ -134,7 +134,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
                 Authorization: `Bearer ${authToken}`
             }
         });
-        ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+        // ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
         return response.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);
