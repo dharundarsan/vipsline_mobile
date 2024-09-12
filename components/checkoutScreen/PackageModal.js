@@ -20,7 +20,7 @@ const PackageModal = (props) => {
 
     const addSittingItems = (item) => {
         setSelectedSittingItems(prev => [...prev, item]);
-            }
+    }
 
     const deleteSittingItems = (item) => {
         setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
@@ -94,7 +94,8 @@ const PackageModal = (props) => {
                         resource_id: null
                     }));
                 })
-                props.closeOverallModal()
+                if (!redeem) props.closeOverallModal();
+
                 props.onCloseModal();
             }} label={"Save"}/>
         </View>
