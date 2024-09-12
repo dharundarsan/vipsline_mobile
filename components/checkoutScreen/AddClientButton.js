@@ -44,10 +44,6 @@ const AddClientButton = (props) => {
         function singleMembershipApply() {
             
             if (clientInfo.membershipDetails.length === 1 && clientInfo.isClientSelected ) {
-                console.log("clientInfo.membershipDetails[0]");
-
-                console.log(clientInfo.membershipDetails[0]);
-
                 if (clientInfo.membershipDetails[0].id !== undefined || clientInfo.membershipDetails[0].client_id !== undefined) {
                     dispatch(modifyClientMembershipId({ type: "add", payload: clientInfo.membershipDetails[0].id }))
                     onApplyMembership(clientInfo.membershipDetails[0].id, clientInfo.membershipDetails[0].client_id)

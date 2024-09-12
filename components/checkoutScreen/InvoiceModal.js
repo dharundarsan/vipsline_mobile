@@ -23,8 +23,6 @@ import { clearClientInfo } from "../../store/clientInfoSlice";
 import { clearCalculatedPrice, clearLocalCart, clearSalesNotes, loadCartFromDB, modifyClientMembershipId } from "../../store/cartSlice";
 
 const InvoiceModal = (props) => {
-    console.log("props");
-    console.log(props);
 
     const details = useSelector(state => state.invoice.details);
     const bookingId = useSelector(state => state.invoice.booking_id1);
@@ -32,21 +30,6 @@ const InvoiceModal = (props) => {
     const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
-
-    console.log("details");
-    console.log(details);
-
-
-    console.log("bookingId");
-    console.log(bookingId);
-
-    console.log("invoiceDetails");
-    console.log(invoiceDetails);
-
-
-    console.log("selectedClientDetails");
-    console.log(selectedClientDetails);
-
 
     const dispatch = useDispatch();
 
@@ -76,15 +59,6 @@ const InvoiceModal = (props) => {
     const businessId = useSelector(state => state.authDetails.businessId);
 
     const walletBalance = useSelector(state => state.invoice.walletBalance);
-
-    console.log("calculatedPrice");
-    console.log(calculatedPrice);
-
-    console.log("businessId");
-    console.log(businessId);
-
-    console.log("walletBalance");
-    console.log(walletBalance);
 
     const actualData = details.organized_list;
 

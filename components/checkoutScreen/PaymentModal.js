@@ -489,27 +489,27 @@ const PaymentModal = (props) => {
                             console.log(-1);
                             dispatch(modifyPrepaidDetails({ type: "updateMobile", payload: details.mobile_1 }))
                             console.log(0);
-                            
                         }
                         else {
                             console.log("Its false");
                             console.log(findIsPrepaid());
                             dispatch(modifyPrepaidDetails({ type: "clear" }))
+                            console.log(cartSliceState.prepaid_wallet);
+                            
                         }
-                        console.log(1);
-                        await checkoutBookingAPI(details, cartSliceState).then(response => {
-                            console.log(2);
-
+                        await checkoutBookingAPI(details.id, cartSliceState).then(response => {
+                            console.log(1);
+                            
                             updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
-                            console.log(3);
+                            console.log(2);
                             updateLiveStatusAPI(response[0].booking_id);
-                            console.log(4);
+                            console.log(3);
                             dispatch(updateBookingId(response[0].booking_id));
-                            console.log(5);
+                            console.log(4);
                             dispatch(loadBookingDetailsFromDb(response[0].booking_id));
-                            console.log(6);
+                            console.log(5);
                             dispatch(loadWalletPriceFromDb(details.id))
-                            console.log(7);
+                            console.log(6);
                         })
                         console.clear();
                         // Assuming dispatch is an asynchronous action creator

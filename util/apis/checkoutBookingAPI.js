@@ -42,7 +42,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
 
-export default async function checkoutBookingAPI(clientInfo, cartSliceState) {
+export default async function checkoutBookingAPI(clientId, cartSliceState) {
     let authToken = "";
     let businessId = "";
     
@@ -116,13 +116,13 @@ export default async function checkoutBookingAPI(clientInfo, cartSliceState) {
             memberShipIdPurchased: [],
             mobile_1: "",
             notes: "",
-            prepaid_wallet: [],
+            prepaid_wallet: cartSliceState.prepaid_wallet,
             promo_code: "",
             sales_notes: cartSliceState.salesNotes,
             starttime: "17:35:00",
             user_coupon: "",
-            user_id: clientInfo.id,
-            walkInUserId: clientInfo.id,
+            user_id: clientId,
+            walkInUserId: clientId,
             walkin: "yes",
             wallet_amt: 0,
         }, {
