@@ -22,11 +22,10 @@ const PackageModal = (props) => {
         setSelectedSittingItems(prev => [...prev, item]);
             }
 
-    // const deleteSittingItems = (item) => {
-    //     setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
-    // }
-    useEffect(() => {
-            }, [selectedSittingItems]);
+    const deleteSittingItems = (item) => {
+        setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
+    }
+
 
     useEffect(() => {
         const getPackageDetailsFromDB = async () => {
@@ -76,7 +75,9 @@ const PackageModal = (props) => {
                 {packageDetails.length === 0 ? <ActivityIndicator/> :
                     <FlatList scrollEnabled={false} data={packageDetails[0].service_list}
                               renderItem={({item}) => <PackageSittingItem data={item}
-                                                                          addSittingItems={addSittingItems}/>
+                                                                          addSittingItems={addSittingItems}
+                                                                          deleteSittingItems={deleteSittingItems}
+                              />
                               }
                     />
                 }
