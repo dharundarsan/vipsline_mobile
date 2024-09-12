@@ -476,8 +476,9 @@ const PaymentModal = (props) => {
                                    setIsInvoiceModalVisible(true);
                                try {
                                    await checkoutBookingAPI(details.id, cartSliceState).then(response => {
-                                       console.log(response[0].booking_id);
-                                       const response1 = response[0];
+                                       if(response.data === null) {
+                                           return
+                                       }
                                     updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
                                     updateLiveStatusAPI(response[0].booking_id);
                                     dispatch(updateBookingId(response[0].booking_id));
