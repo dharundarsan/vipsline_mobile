@@ -79,7 +79,7 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
                     itemId: item.item_id,
                     membership_id: item.id,
                     membership_number: "",
-                    res_cat_id: 282773,
+                    res_cat_id: item.resource_category_id,
                     resource_id: item.resource_id,
                     type: "AMOUNT",
                     valid_from: item.valid_from,
