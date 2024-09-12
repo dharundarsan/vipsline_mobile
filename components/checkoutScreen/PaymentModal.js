@@ -635,7 +635,6 @@ const PaymentModal = (props) => {
                                     dispatch(loadWalletPriceFromDb(details.id))
                                     dispatch(loadInvoiceDetailsFromDb(response[0].booking_id));
                                    })
-                                   console.clear();
                                    // Assuming dispatch is an asynchronous action creator
                                } catch (error) {
                                    console.error("An error occurred:", error);

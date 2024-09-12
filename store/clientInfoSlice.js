@@ -148,7 +148,7 @@ export const clientInfoSlice = createSlice({
             state.packageDetails = action.payload.packageDetails;
         },
         clearClientInfo(state, action) {
-            state.details = initialClientInfoState.details;
+            state.details = {};
             state.isClientSelected = false;
         },
         updateAnalyticDetails(state, action) {
