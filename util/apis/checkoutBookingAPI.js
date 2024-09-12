@@ -41,6 +41,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
+import {ToastAndroid} from "react-native";
 
 export default async function checkoutBookingAPI(clientId, cartSliceState) {
     let authToken = "";
@@ -131,9 +132,8 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
                 Authorization: `Bearer ${authToken}`
             }
         });
-        console.log("hello")
-        console.log(response.data.other_message);
-        return response.data.data;
+        ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+        return response.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);
         throw error; // Ensure that the error is propagated

@@ -26,6 +26,9 @@ export const authSlice = createSlice({
         },
         updateBusinessName(state, action) {
             state.businessName = action.payload;
+        },
+        clearBusinessId(state, action) {
+            state.businessId = "";
         }
     }
 });
@@ -35,7 +38,8 @@ export const {
     updateFetchingState,
     updateAuthToken,
     updateBusinessId,
-    updateBusinessName
+    updateBusinessName,
+    clearBusinessId
 } = authSlice.actions;
 
 export default authSlice.reducer;
