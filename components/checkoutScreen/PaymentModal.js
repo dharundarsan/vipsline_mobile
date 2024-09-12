@@ -25,6 +25,7 @@ import {useSafeAreaInsets} from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
 import {shadowStyling} from "../../util/Helpers";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { modifyPrepaidDetails } from "../../store/cartSlice";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -73,6 +74,7 @@ const PaymentModal = (props) => {
     )
 
     const cartSliceState = useSelector((state) => state.cart);
+    const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
 
     useEffect(() => {
@@ -627,45 +629,26 @@ const PaymentModal = (props) => {
                 onPress={async () => {
                     setIsInvoiceModalVisible(true);
                     try {
-                        const prepaidItem = findIsPrepaid();
-                        if (!!prepaidItem) {
-                            console.log("Its true");
-                            console.log(prepaidItem);
-
-                            console.log(-2);
-                            dispatch(modifyPrepaidDetails({ type: "updateResourceId", payload: prepaidItem.resource_id }));
-                            console.log(-1);
-                            dispatch(modifyPrepaidDetails({ type: "updateMobile", payload: details.mobile_1 }))
-                            console.log(0);
-                        }
-                        else {
-                            console.log("Its false");
-                            console.log(findIsPrepaid());
-                            dispatch(modifyPrepaidDetails({ type: "clear" }))
-                            console.log(cartSliceState.prepaid_wallet);
-                            
-                        }
-                        await checkoutBookingAPI(details.id, cartSliceState).then(response => {
-                            console.log(1);
-                            
-                            updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
-                            console.log(2);
-                            updateLiveStatusAPI(response[0].booking_id);
-                            console.log(3);
-                            dispatch(updateBookingId(response[0].booking_id));
-                            console.log(4);
-                            dispatch(loadBookingDetailsFromDb(response[0].booking_id));
-                            console.log(5);
-                            dispatch(loadWalletPriceFromDb(details.id))
-                            console.log(6);
-                        })
+                        await checkoutBookingAPI(details, cartSliceState).then(response => {
+                            if(response.data[0] === null) {
+                                return
+                            }
+                            updateAPI(response.data[0], selectedPaymentOption, splitUpState);
+                            setTimeout(()=>{
+                                updateLiveStatusAPI(response.data[0].booking_id);
+                                dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                dispatch(updateBookingId(response.data[0].booking_id));
+                                dispatch(loadWalletPriceFromDb(details.id));
+                                dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                            },500);
+                        });
+                
                         console.clear();
-                        // Assuming dispatch is an asynchronous action creator
                     } catch (error) {
                         console.error("An error occurred:", error);
-                        // Handle the error appropriately here
                     }
-                }}>
+                }}
+                >
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
                     <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price}</Text>

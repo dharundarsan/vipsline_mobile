@@ -19,27 +19,6 @@ const PrepaidModal = (props) => {
     const dispatch = useDispatch();
     const prepaidAmountRef = useRef(null);
 
-    console.log("selectedDate ");
-    console.log(selectedDate.toString());
-
-    console.log("prepaidAmount " + prepaidAmount);
-    console.log("prepaidSource " + prepaidSource);
-    console.log("prepaidBonus " + prepaidBonus);
-    console.log("description " + description);
-
-    function formatDateToISO() {
-        const date = new Date(selectedDate);
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-        const milliseconds = String(date.getUTCMilliseconds()).padStart(3, '0');
-        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+0000`;
-
-        return formattedDate;
-    }
 
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
@@ -118,10 +97,10 @@ const PrepaidModal = (props) => {
                         type: "add", payload: [{
                             bonus_value: prepaidBonus.toString(),
                             description: description,
-                            mobile:"",
-                            resource_id:"",
                             source:prepaidSource,
                             wallet_amount: prepaidAmount.toString(),
+                            mobile: "",
+                            resource_id: "",
                         }]
                     }))
                     props.onCloseModal();
