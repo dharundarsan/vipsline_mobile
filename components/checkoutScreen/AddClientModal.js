@@ -26,7 +26,6 @@ const AddClientModal = (props) => {
     const [searchClientPageNo, setSearchClientPageNo] = useState(0);
     const queryRef = useRef("");
     const [isLoading, setIsLoading] = useState(false);
-    // const businessId = useSelector(state => state.authDetails.businessId);
 
     const searchClientFromDB = useCallback(async (query, pageNo) => {
         if (isLoading) return; // Prevent initiating another request if one is already ongoing
@@ -160,6 +159,8 @@ const AddClientModal = (props) => {
                                 onPress={(clientId) => {
                                     props.closeModal();
                                     dispatch(loadClientInfoFromDb(item.id));
+                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                    setSearchClientQuery("");
                                 }}
                             />
                         )}

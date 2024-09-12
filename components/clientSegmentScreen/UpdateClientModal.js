@@ -130,7 +130,7 @@ const UpdateClientModal = (props) => {
                 pinCode: "",
                 state: "Tamilnadu",
             });
-            dispatch(loadClientCountFromDb());
+            // dispatch(loadClientCountFromDb());
             dispatch(loadClientInfoFromDb(clientDetails.id));
             props.onCloseModal();
             ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);

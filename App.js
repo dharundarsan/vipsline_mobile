@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { Image, SafeAreaView, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import {Alert, BackHandler, Image, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {CommonActions, NavigationContainer, useNavigation} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
@@ -46,6 +46,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import signOutScreen from "./screens/signOutScreen";
 import checkoutScreen from "./screens/CheckoutScreen";
 import {updateAuthStatus} from "./store/authSlice";
+import clearCartAPI from "./util/apis/clearCartAPI";
+import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "./store/cartSlice";
+import {clearClientInfo} from "./store/clientInfoSlice";
 
 enableScreens();
 
@@ -129,13 +132,53 @@ const AppNavigator = () => {
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated); // Redux state
     const businessChosen = useSelector(state => state.businesses.isBusinessSelected);
 
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert(
+                "Exit App",
+                "Are you sure you want to exit the app?",
+                [
+                    {
+                        text: "No",
+                        onPress: () => null, // Do nothing if user presses 'No'
+                        style: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        onPress: () => {
+
+                            clearCartAPI();
+                            dispatch(modifyClientMembershipId({type: "clear"}))
+                            dispatch(clearSalesNotes());
+                            dispatch(clearLocalCart());
+                            dispatch(clearClientInfo());
+                            dispatch(clearCalculatedPrice());
+                            BackHandler.exitApp();
+                        }, // Exit the app when 'Yes' is pressed
+                    }
+                ],
+                { cancelable: false }
+            );
+            return true; // Return true to prevent the default back button behavior
+        };
+
+        // Add event listener for hardware back press
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove(); // Cleanup the event listener on component unmount
+    }, []);
+
     const checkAuthentication = async () => {
         try {
             const authKey = await AsyncStorage.getItem('authKey');
             if (authKey !== null) {
                 setIsAuthenticated(true); // Update local state if the user is authenticated
-                // console.log("authkeyStatu" + authKey);
+                console.log("authkeyStatu" + authKey);
                 dispatch(updateAuthStatus(true));
+
             } else {
                 setIsAuthenticated(false);
                 dispatch(updateAuthStatus(false));
@@ -150,12 +193,7 @@ const AppNavigator = () => {
 
     useEffect(() => {
         checkAuthentication(); // Initial auth check
-
-        // console.log("useEffuect in app.js")
-        // console.log(reduxAuthStatus);
-    }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
-
-    // console.log("status ---------------------------------" + isAuthenticated)
+    }, [reduxAuthStatus]); // Dependency on Redux authentication status
 
 
     return (
@@ -186,16 +224,26 @@ const LandingScreen = () => (
     </LandingStack.Navigator>
 );
 
-const MainDrawerNavigator = () => (
-    <Drawer.Navigator
+const MainDrawerNavigator = () => {
+    const navigation = useNavigation();
+    useEffect(() => {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'List of Business' }],
+            })
+        );
+    }, []);
+
+    return <Drawer.Navigator
         initialRouteName="List of Business"
         drawerContent={(props) => <CustomDrawer {...props} />}
         screenOptions={{
             drawerActiveTintColor: Colors.highlight,
             drawerInactiveTintColor: Colors.white,
-            drawerStyle: { backgroundColor: Colors.darkBlue },
+            drawerStyle: {backgroundColor: Colors.darkBlue},
             headerTitleStyle: [textTheme.titleLarge],
-            headerStyle:{
+            headerStyle: {
                 elevation: 4,             // Shadow strength
                 backgroundColor: '#fff',  // Background color
                 shadowColor: '#000',      // Shadow color
@@ -230,8 +278,8 @@ const MainDrawerNavigator = () => (
             component={CheckoutStack}
             options={{
                 drawerLabel: 'Checkout',
-                drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(checkout_icon).uri }}
-                    width={25} height={25} style={{ resizeMode: "contain" }} />,
+                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(checkout_icon).uri}}
+                                         width={25} height={25} style={{resizeMode: "contain"}}/>,
                 headerTitle: "Add to cart",
                 headerTitleAlign: "center",
             }}
@@ -242,10 +290,10 @@ const MainDrawerNavigator = () => (
             options={{
                 drawerIcon: () => (
                     <Image
-                        source={{ uri: Image.resolveAssetSource(clients_icon).uri }}
+                        source={{uri: Image.resolveAssetSource(clients_icon).uri}}
                         width={25}
                         height={25}
-                        style={{ resizeMode: 'contain' }}
+                        style={{resizeMode: 'contain'}}
                     />
                 ),
                 headerTitle: 'Client Segment',
@@ -302,7 +350,7 @@ const MainDrawerNavigator = () => (
                                      width={25} height={25} style={{resizeMode: "contain", tintColor: Colors.white}}/>
         }}/>
     </Drawer.Navigator>
-);
+};
 
 const styles = StyleSheet.create({
     safeAreaView: {

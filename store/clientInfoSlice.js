@@ -148,7 +148,7 @@ export const clientInfoSlice = createSlice({
             state.packageDetails = action.payload.packageDetails;
         },
         clearClientInfo(state, action) {
-            state.details = initialClientInfoState.details;
+            state.details = {};
             state.isClientSelected = false;
         },
         updateAnalyticDetails(state, action) {
@@ -158,8 +158,6 @@ export const clientInfoSlice = createSlice({
             state.analyticDetails["feedbacks"] = action.payload;
         },
         updateClientId(state, action) {
-            console.log("details");
-            console.log(state.details);
             state.clientId = action.payload;
         }
     }

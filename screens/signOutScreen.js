@@ -50,7 +50,7 @@ const SignOutPrompt = ({ navigation }) => {
             <Text style={styles.message}>Are you sure you want to sign out?</Text>
             <View style={styles.buttonContainer}>
                 <PrimaryButton label="Yes" onPress={ async () => await handleSignOut()} buttonStyle={{width: "40%"}}/>
-                <PrimaryButton label="No" onPress={() => null} buttonStyle={{width: "40%"}}/>
+                <PrimaryButton label="No" onPress={() => navigation.goBack()} buttonStyle={{width: "40%"}}/>
             </View>
         </View>
     );

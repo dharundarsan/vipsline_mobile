@@ -26,7 +26,7 @@ import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
 import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
-import {clearSalesNotes, loadCartFromDB} from "../store/cartSlice";
+import {clearSalesNotes, loadCartFromDB, modifyClientMembershipId} from "../store/cartSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
@@ -43,55 +43,60 @@ const CheckoutScreen = () => {
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
-    const checkAuthentication = async () => {
-        try {
-            const authKey = await AsyncStorage.getItem('authKey');
-            if (authKey !== null) {
-                setIsAuthenticated(true); // Update local state if the user is authenticated
-            } else {
-                setIsAuthenticated(false);
-            }
-        } catch (e) {
-                        setIsAuthenticated(false);
+    // const checkAuthentication = async () => {
+    //     try {
+    //         const authKey = await AsyncStorage.getItem('authKey');
+    //         if (authKey !== null) {
+    //             setIsAuthenticated(true); // Update local state if the user is authenticated
+    //         } else {
+    //             setIsAuthenticated(false);
+    //         }
+    //     } catch (e) {
+    //                     setIsAuthenticated(false);
+    //     }
+    // };
+    //
+    //
+    // useEffect(() => {
+    //     checkAuthentication(); // Initial auth check
+    // }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
+
+
+    useEffect(() => {
+        if(businessId !== "") {
+            clearCartAPI();
+            dispatch(clearSalesNotes());
+            dispatch(modifyClientMembershipId({type: "clear"}))
+            dispatch(loadServicesDataFromDb("women"));
+            dispatch(loadServicesDataFromDb("men"));
+            dispatch(loadServicesDataFromDb("kids"));
+            dispatch(loadServicesDataFromDb("general"));
+            dispatch(loadProductsDataFromDb());
+            dispatch(loadPackagesDataFromDb());
+            dispatch(loadMembershipsDataFromDb());
+            dispatch(loadClientsFromDb());
+            dispatch(loadClientCountFromDb());
+            dispatch(loadClientFiltersFromDb(10, "All"));
+            dispatch(loadBusinessesListFromDb());
+            dispatch(loadLoginUserDetailsFromDb());
+            dispatch(loadStaffsFromDB());
+            dispatch(loadCartFromDB());
+            // dispatch(loadBookingDetailsFromDb());
+            console.log("checkout useefefect screen")
         }
-    };
-
-
-    useEffect(() => {
-        checkAuthentication(); // Initial auth check
-    }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
-
-
-    useEffect(() => {
-        clearCartAPI();
-        dispatch(clearSalesNotes());
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-
-        dispatch(loadClientsFromDb());
-
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
-        dispatch(loadBusinessesListFromDb());
-        dispatch(loadLoginUserDetailsFromDb());
-        dispatch(loadStaffsFromDB());
-        dispatch(loadCartFromDB());
-        // dispatch(loadBookingDetailsFromDb());
+        console.log("checkout useefefect screen11111");
 
     }, [businessId]);
+
+    console.log("checkout screen");
 
 
     useFocusEffect(
         useCallback(() => {
             // Function to execute whenever the drawer screen is opened
-
-            dispatch(loadClientsFromDb());
-
+            if(businessId !== "") {
+                dispatch(loadClientsFromDb());
+            }
             // Optional cleanup function when screen is unfocused
             return () => {
                 dispatch(clearClientsList());
