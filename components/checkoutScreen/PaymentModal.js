@@ -14,17 +14,25 @@ import DropdownModal from "../../ui/DropdownModal";
 import checkoutBooking from "../../util/apis/checkoutBookingAPI";
 import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
 import {useDispatch, useSelector} from "react-redux";
-import {loadBookingDetailsFromDb, loadInvoiceDetailsFromDb, updateBookingId} from "../../store/invoiceSlice";
+import {
+    loadBookingDetailsFromDb,
+    loadInvoiceDetailsFromDb,
+    loadWalletPriceFromDb,
+    updateBookingId
+} from "../../store/invoiceSlice";
 import updateAPI from "../../util/apis/updateAPI";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
 import {shadowStyling} from "../../util/Helpers";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
 
 
-    const [selectedPaymentOption, setSelectedPaymentOption] = useState("cash");
+    const clientInfo = useSelector(state => state.clientInfo.details);
+    const isPrepaidAvailable = clientInfo.wallet_status && clientInfo.wallet_balance !== undefined && clientInfo.wallet_balance !== 0;
+    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? "prepaid" : "cash");
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
     const [splitResponse, setSplitResponse] = useState([]);
@@ -32,7 +40,7 @@ const PaymentModal = (props) => {
     const [stopAPI, setStopAPI] = useState(false);
     const [isSplitPaymentDropdownVisible, setIsSplitPaymentDropdownVisible] = useState(false)
     const [recentlyChanged, setRecentlyChanged] = useState([]);
-    const [paymentOrder, setPaymentOrder] = useState(["cash"])
+    const [paymentOrder, setPaymentOrder] = useState([isPrepaidAvailable ? "prepaid" : "cash"])
     const [isError, setIsError] = useState(false);
     const [bodyData, setBodyData] = useState([])
     const [shownCount, setShownCount] = useState(0)
@@ -55,7 +63,12 @@ const PaymentModal = (props) => {
                 shown: false,
                 amount: 0,
                 name: "Digital payment"
-            },
+            }, {
+                mode: "prepaid",
+                shown: false,
+                amount: 0,
+                name: "Prepaid"
+            }
         ]
     )
 
@@ -92,24 +105,76 @@ const PaymentModal = (props) => {
 
     useEffect(() => {
         setTotalPrice(props.price);
-        setSplitUpState([
-            {
-                mode: "cash",
-                shown: true,
-                amount: props.price,
-                name: "Cash"
-            }, {
-                mode: "card",
-                shown: true,
-                amount: 0,
-                name: "Credit / Debit card"
-            }, {
-                mode: "digital payments",
-                shown: false,
-                amount: 0,
-                name: "Digial payment"
-            },
-        ])
+        if (isPrepaidAvailable) {
+            if (clientInfo.wallet_balance < props.price) {
+                setSplitUpState([
+                    {
+                        mode: "prepaid",
+                        shown: true,
+                        amount: clientInfo.wallet_balance,
+                        name: "Prepaid"
+                    }, {
+                        mode: "cash",
+                        shown: true,
+                        amount: props.price - clientInfo.wallet_balance,
+                        name: "Cash"
+                    }, {
+                        mode: "card",
+                        shown: false,
+                        amount: 0,
+                        name: "Credit / Debit card"
+                    }, {
+                        mode: "digital payments",
+                        shown: false,
+                        amount: 0,
+                        name: "Digial payment"
+                    },
+                ])
+            } else {
+                setSplitUpState([
+                    {
+                        mode: "prepaid",
+                        shown: true,
+                        amount: 0,
+                        name: "Prepaid"
+                    }, {
+                        mode: "cash",
+                        shown: true,
+                        amount: 0,
+                        name: "Cash"
+                    }, {
+                        mode: "card",
+                        shown: false,
+                        amount: 0,
+                        name: "Credit / Debit card"
+                    }, {
+                        mode: "digital payments",
+                        shown: false,
+                        amount: 0,
+                        name: "Digial payment"
+                    },
+                ])
+            }
+        } else {
+            setSplitUpState([
+                {
+                    mode: "cash",
+                    shown: true,
+                    amount: props.price,
+                    name: "Cash"
+                }, {
+                    mode: "card",
+                    shown: true,
+                    amount: 0,
+                    name: "Credit / Debit card"
+                }, {
+                    mode: "digital payments",
+                    shown: false,
+                    amount: 0,
+                    name: "Digial payment"
+                },
+            ])
+        }
     }, [props.price, props.isVisible]);
 
     useEffect(() => {
@@ -126,13 +191,19 @@ const PaymentModal = (props) => {
                 // const shownCount = splitUpState.reduce((acc, item) => {
                 //     return item.shown ? acc + 1 : acc;
                 // }, 0);
-                                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
-                                                // return;
+                const aiyoda = recentlyChanged.slice(Math.abs(recentlyChanged.length - shownCount), recentlyChanged.length - 1);
+                // return;
                 data = {
                     booking_amount: props.price,
                     paid_amount: splitUpState.map(split => {
 
                         if (split.mode === "cash" && split.shown) {
+                            if (shownCount === 4 && paymentOrder.at(-1) === "cash") {
+                                return {
+                                    mode: "CASH",
+                                    amount: 0
+                                }
+                            }
                             if (shownCount === 3 && paymentOrder.at(-1) === "cash") {
                                 return {
                                     mode: "CASH",
@@ -150,6 +221,12 @@ const PaymentModal = (props) => {
                                 amount: split.amount
                             }
                         } else if (split.mode === "card" && split.shown) {
+                            if (shownCount === 4 && paymentOrder.at(-1) === "card") {
+                                return {
+                                    mode: "CARD",
+                                    amount: 0
+                                }
+                            }
                             if (shownCount === 3 && paymentOrder.at(-1) === "card") {
                                 return {
                                     mode: "CARD",
@@ -167,6 +244,12 @@ const PaymentModal = (props) => {
                                 amount: split.amount
                             }
                         } else if (split.mode === "digital payments" && split.shown) {
+                            if (shownCount === 4 && paymentOrder.at(-1) === "digital payments") {
+                                return {
+                                    mode: "DIGITAL PAYMENTS",
+                                    amount: 0
+                                }
+                            }
                             if (shownCount === 3 && paymentOrder.at(-1) === "digital payments") {
                                 return {
                                     mode: "DIGITAL PAYMENTS",
@@ -183,6 +266,29 @@ const PaymentModal = (props) => {
                                 mode: "DIGITAL PAYMENTS",
                                 amount: split.amount
                             }
+                        } else if (split.mode === "prepaid" && split.shown) {
+                            if (shownCount === 4 && paymentOrder.at(-1) === "prepaid") {
+                                return {
+                                    mode: "PREPAID",
+                                    amount: 0
+                                }
+                            }
+                            if (shownCount === 3 && paymentOrder.at(-1) === "prepaid") {
+                                return {
+                                    mode: "PREPAID",
+                                    amount: 0
+                                }
+                            }
+                            if (shownCount === 2 && aiyoda.includes(split.mode)) {
+                                return {
+                                    mode: "PREPAID",
+                                    amount: 0
+                                }
+                            }
+                            return {
+                                mode: "PREPAID",
+                                amount: split.amount
+                            }
                         }
                         return null;
                     }).filter(item => item !== null)
@@ -191,7 +297,7 @@ const PaymentModal = (props) => {
 
 
             const response = await splitPaymentAPI(data);
-                                    setSplitResponse(response[0]);
+            setSplitResponse(response[0]);
             setStopAPI(true);
         }
         splitApi();
@@ -230,7 +336,7 @@ const PaymentModal = (props) => {
     }, [splitResponse]);
 
     const callCashAPI = () => {
-        if (selectedPaymentOption === "card" || selectedPaymentOption === "digital payments") {
+        if (selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" || selectedPaymentOption === "prepaid") {
             if (parseFloat(totalPrice) > props.price) {
                 setTotalPrice(props.price);
             }
@@ -250,14 +356,16 @@ const PaymentModal = (props) => {
                 });
                 setSplitResponse(response);
             }
-                    }
+        }
         splitApi();
     }
     const insets = useSafeAreaInsets();
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
-        }} dropdownItems={["Cash", "Credit / Debit card", "Digial payment"]} onChangeValue={setAddedSplitPayment}/>
+        }}
+                       dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
+                       onChangeValue={setAddedSplitPayment}/>
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 ?
                 <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
@@ -267,7 +375,8 @@ const PaymentModal = (props) => {
                 null
         }
 
-        <View style={[styles.headingAndCloseContainer,{marginTop:insets.top}, shadowStyling]}>
+        <View
+            style={[styles.headingAndCloseContainer, {marginTop: Platform.OS === "ios" ? insets.top : 0}, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -328,11 +437,34 @@ const PaymentModal = (props) => {
                         </PrimaryButton>
                     </View>
                 </View>
-                {selectedPaymentOption === "cash" || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" ? <>
+                {(isPrepaidAvailable) &&
+                    <PrimaryButton
+                        buttonStyle={[styles.paymentOptionButton, {marginBottom: 20}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
+                        onPress={() => {
+                            if (clientInfo.wallet_balance < props.price) {
+                                setSelectedPaymentOption("split_payment")
+                            } else {
+                                setSelectedPaymentOption("prepaid")
+                            }
+                        }}
+                        pressableStyle={styles.paymentOptionButtonPressable}>
+                        {selectedPaymentOption === "prepaid" ? <View style={styles.tickContainer}>
+                            <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
+                                                    color={Colors.highlight}/>
+                        </View> : null}
+                        <FontAwesome6 name="indian-rupee-sign" size={24} color={Colors.green}/>
+                        <Text>Prepaid <Text
+                            style={{
+                                color: Colors.highlight,
+                                fontWeight: "bold"
+                            }}>₹ {clientInfo.wallet_balance}</Text>
+                        </Text>
+                    </PrimaryButton>}
+                {selectedPaymentOption === "cash" || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" || selectedPaymentOption === "prepaid" ? <>
                     <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
                                      placeholder={"Price"}
                                      onChangeText={(price) => {
-                                                                                                                           if (price.trim().length === 0) {
+                                         if (price.trim().length === 0) {
                                              setTotalPrice(0)
                                              return
                                          }
@@ -389,8 +521,14 @@ const PaymentModal = (props) => {
                                                 else return [...prev, item.mode]
                                             }
                                         );
-                                                                                                                                                                                                    }}
+                                    }}
                                     onEndEditing={(text) => {
+                                        if (item.mode === "prepaid") {
+                                            if (parseFloat(text) > clientInfo.wallet_balance) {
+                                                ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
+                                                return;
+                                            }
+                                        }
                                         const totalValue = splitUpState.reduce((acc, ele) => {
                                             if (ele.shown) {
                                                 if (ele.mode === item.mode) return acc + parseFloat(text)
@@ -455,25 +593,36 @@ const PaymentModal = (props) => {
                             </View>
                         }
                     }}/>
-                    {shownCount !== 3 ? <View style={styles.addPaymentButtonContainer}>
-                        <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
-                                       buttonStyle={styles.addPaymentButton}
-                                       pressableStyle={styles.addPaymentButtonPressable}>
-                            <Entypo name="plus" size={15} color="black"/>
-                            <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
-                        </PrimaryButton>
-                    </View> : null}
+                    {isPrepaidAvailable ? shownCount !== 4 ?
+                            <View style={styles.addPaymentButtonContainer}>
+                                <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
+                                               buttonStyle={styles.addPaymentButton}
+                                               pressableStyle={styles.addPaymentButtonPressable}>
+                                    <Entypo name="plus" size={15} color="black"/>
+                                    <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
+                                </PrimaryButton>
+                            </View> :
+                            null :
+                        shownCount !== 3 ?
+                            <View style={styles.addPaymentButtonContainer}>
+                                <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
+                                               buttonStyle={styles.addPaymentButton}
+                                               pressableStyle={styles.addPaymentButtonPressable}>
+                                    <Entypo name="plus" size={15} color="black"/>
+                                    <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
+                                </PrimaryButton>
+                            </View> : null}
                 </View> : null}
             </View>
         </ScrollView>
         <Divider/>
-        <View style={[styles.buttonContainer,{paddingBottom:insets.bottom}]}>
+        <View style={[styles.buttonContainer, {paddingBottom: insets.bottom}]}>
             <PrimaryButton buttonStyle={styles.optionButton}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
-                           onPress={ async() => {
-                                   setIsInvoiceModalVisible(true);
+                           onPress={async () => {
+                               setIsInvoiceModalVisible(true);
                                try {
                                    await checkoutBookingAPI(details.id, cartSliceState).then(response => {
                                        if(response.data === null) {
@@ -483,6 +632,7 @@ const PaymentModal = (props) => {
                                     updateLiveStatusAPI(response[0].booking_id);
                                     dispatch(updateBookingId(response[0].booking_id));
                                     dispatch(loadBookingDetailsFromDb(response[0].booking_id));
+                                    dispatch(loadWalletPriceFromDb(details.id))
                                     dispatch(loadInvoiceDetailsFromDb(response[0].booking_id));
                                    })
                                    console.clear();

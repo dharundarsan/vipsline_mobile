@@ -5,9 +5,6 @@ import { ToastAndroid } from "react-native";
 export default async function updateAPI(bookingId, mode_of_payment, splitUpState) {
     let authToken = "";
     let businessId = "";
-    console.log("Booking Id "+bookingId);
-    console.log("Mode Of Payement"+mode_of_payment);
-    console.log("splitUpState "+splitUpState);
     
     try {
         authToken = await AsyncStorage.getItem('authKey') || "";
@@ -36,13 +33,13 @@ export default async function updateAPI(bookingId, mode_of_payment, splitUpState
             };
             break;
         case "card":
-            data = { status: "paid_at_venue", booking_id: bookingId, mode_of_payment: "CARD", transactionId: "" };
+            data = { status: "paid_at_venue", bookingId: bookingId, mode_of_payment: "CARD", transactionId: "" };
             break;
         case "digital payments":
-            data = { status: "paid_at_venue", booking_id: bookingId, mode_of_payment: "DIGITAL PAYMENTS", transactionId: "" };
+            data = { status: "paid_at_venue", bookingId: bookingId, mode_of_payment: "DIGITAL PAYMENTS", transactionId: "" };
             break;
         case "prepaid":
-            // Handle prepaid payment logic if necessary
+            data = { status: "paid_at_venue", bookingId: bookingId, mode_of_payment: "PREPAID", transactionId: "" };
             break;
         default:
             throw new Error("Unknown payment mode");

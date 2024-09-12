@@ -26,7 +26,7 @@ import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
 import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
-import {clearSalesNotes, loadCartFromDB} from "../store/cartSlice";
+import {clearSalesNotes, loadCartFromDB, modifyClientMembershipId} from "../store/cartSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
@@ -65,6 +65,7 @@ const CheckoutScreen = () => {
     useEffect(() => {
         clearCartAPI();
         dispatch(clearSalesNotes());
+        dispatch(modifyClientMembershipId({ type: "clear" }))
         dispatch(loadServicesDataFromDb("women"));
         dispatch(loadServicesDataFromDb("men"));
         dispatch(loadServicesDataFromDb("kids"));

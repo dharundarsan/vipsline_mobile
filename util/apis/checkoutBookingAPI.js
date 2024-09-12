@@ -73,7 +73,6 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
             device: "BUSINESS_WEB",
             editedPurchasedMemberShipId: [],
             edited_cart: [...cartSliceState.editedMembership.map(item => {
-                console.log(item)
                 return {
                     amount: item.price,
                     bonus_value: 0,
