@@ -25,6 +25,8 @@ import {useSafeAreaInsets} from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
 import {shadowStyling} from "../../util/Helpers";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import {modifyPrepaidDetails, updateCalculatedPrice} from "../../store/cartSlice";
+import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -45,6 +47,7 @@ const PaymentModal = (props) => {
     const [bodyData, setBodyData] = useState([])
     const [shownCount, setShownCount] = useState(0)
     const invoiceDetails = useSelector(state => state.invoice.details);
+    const moreInvoiceDetails = useSelector(state => state.invoice.invoiceDetails);
 
 
     const [splitUpState, setSplitUpState] = useState([
@@ -73,6 +76,7 @@ const PaymentModal = (props) => {
     )
 
     const cartSliceState = useSelector((state) => state.cart);
+    const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
 
     useEffect(() => {
@@ -360,6 +364,9 @@ const PaymentModal = (props) => {
         splitApi();
     }
     const insets = useSafeAreaInsets();
+    const findIsPrepaid = () => {
+        return cartSliceState.items.find(item => item.gender === "prepaid");
+    }
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
@@ -367,7 +374,7 @@ const PaymentModal = (props) => {
                        dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
                        onChangeValue={setAddedSplitPayment}/>
         {
-            isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 ?
+            isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
                 <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
                     setIsInvoiceModalVisible(false);
                     props.onCloseModal();
@@ -622,25 +629,93 @@ const PaymentModal = (props) => {
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
                            onPress={async () => {
-                               setIsInvoiceModalVisible(true);
-                               try {
-                                   await checkoutBookingAPI(details.id, cartSliceState).then(response => {
-                                       if(response.data === null) {
-                                           return
+                               if (selectedPaymentOption === "prepaid" || (selectedPaymentOption === "split_payment" && splitUpState.some(item => (item.mode === "prepaid" && item.shown)))) {
+                                   if (selectedPaymentOption === "prepaid") {
+                                       dispatch(updateCalculatedPrice(details.id, true, props.price));
+                                       try {
+                                           await checkoutBookingAPI(details, cartSliceState, true, props.price).then(response => {
+                                               if (response.data === null || response.message === "Something went wrong") {
+
+                                                   return;
+                                               } else {
+                                                   setIsInvoiceModalVisible(true);
+                                               }
+
+                                               updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+                                               setTimeout(() => {
+                                                   updateLiveStatusAPI(response.data[0].booking_id);
+                                                   dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                                   dispatch(updateBookingId(response.data[0].booking_id));
+                                                   dispatch(loadWalletPriceFromDb(details.id));
+                                                   dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                               }, 500);
+                                           });
+
+
+                                           console.clear();
+                                       } catch (error) {
+                                           console.error("An error occurred:", error);
                                        }
-                                    updateAPI(response[0].booking_id, selectedPaymentOption, splitUpState);
-                                    updateLiveStatusAPI(response[0].booking_id);
-                                    dispatch(updateBookingId(response[0].booking_id));
-                                    dispatch(loadBookingDetailsFromDb(response[0].booking_id));
-                                    dispatch(loadWalletPriceFromDb(details.id))
-                                    dispatch(loadInvoiceDetailsFromDb(response[0].booking_id));
-                                   })
-                                   // Assuming dispatch is an asynchronous action creator
+                                   } else if (selectedPaymentOption === "split_payment") {
+                                       dispatch(updateCalculatedPrice(details.id, true, splitUpState.filter(item => {
+                                               if (item.mode === "prepaid") return true;
+                                           })[0].amount
+                                       ));
+                                       try {
+                                           await checkoutBookingAPI(details, cartSliceState, true, splitUpState.filter(item => {
+                                               if (item.mode === "prepaid") return true;
+                                           })[0].amount).then(response => {
+                                               if (response.data === null || response.message === "Something went wrong") {
+
+                                                   return;
+                                               } else {
+                                                   setIsInvoiceModalVisible(true);
+                                               }
+
+                                               updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+                                               setTimeout(() => {
+                                                   updateLiveStatusAPI(response.data[0].booking_id);
+                                                   dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                                   dispatch(updateBookingId(response.data[0].booking_id));
+                                                   dispatch(loadWalletPriceFromDb(details.id));
+                                                   dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                               }, 500);
+                                           });
+
+
+                                           console.clear();
+                                       } catch (error) {
+                                           console.error("An error occurred:", error);
+                                       }
+                                   }
+
+                               }
+                               try {
+                                   await checkoutBookingAPI(details, cartSliceState).then(response => {
+                                       if (response.data === null || response.message === "Something went wrong") {
+
+                                           return;
+                                       } else {
+                                           setIsInvoiceModalVisible(true);
+                                       }
+
+                                       updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+                                       setTimeout(() => {
+                                           updateLiveStatusAPI(response.data[0].booking_id);
+                                           dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                           dispatch(updateBookingId(response.data[0].booking_id));
+                                           dispatch(loadWalletPriceFromDb(details.id));
+                                           dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                       }, 500);
+                                   });
+
+
+                                   console.clear();
                                } catch (error) {
                                    console.error("An error occurred:", error);
-                                   // Handle the error appropriately here
                                }
-                           }}>
+                           }}
+            >
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
                     <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price}</Text>

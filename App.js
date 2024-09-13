@@ -13,7 +13,7 @@ import VerificationCodeScreen from './screens/VerificationCodeScreen';
 import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
 import store from './store/store';
 import Colors from './constants/Colors';
-import { enableScreens } from "react-native-screens";
+import {enableScreens} from "react-native-screens";
 import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 // import ClientSegmentScreen from "./screens/ClientSegmentScreen";
 //Font And SplashScreen Imports
@@ -40,9 +40,9 @@ import staffs_icon from "./assets/icons/drawerIcons/staffs.png";
 import settings_icon from "./assets/icons/drawerIcons/settings.png";
 import reports_icon from "./assets/icons/drawerIcons/reports.png";
 import ClientSegmentScreen from "./screens/ClientSegmentScreen";
-import { useFonts } from "expo-font";
+import {useFonts} from "expo-font";
 import textTheme from "./constants/TextTheme";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import signOutScreen from "./screens/signOutScreen";
 import checkoutScreen from "./screens/CheckoutScreen";
 import {updateAuthStatus} from "./store/authSlice";
@@ -79,19 +79,19 @@ export default function App() {
 
         <Provider store={store}>
             {/*<SafeAreaView style={styles.safeAreaView}>*/}
-                <StatusBar style="dark"/>
-                <AppNavigator/>
+            <StatusBar style="dark"/>
+            <AppNavigator/>
             {/*</SafeAreaView>*/}
         </Provider>
     );
 }
 
 const CheckoutStack = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen
             name="CheckoutScreen"
             component={CheckoutScreen}
-            options={({ navigation }) => ({
+            options={({navigation}) => ({
                 headerLeft: () => (
                     <AntDesign
                         name="menu-fold"
@@ -176,7 +176,7 @@ const AppNavigator = () => {
             const authKey = await AsyncStorage.getItem('authKey');
             if (authKey !== null) {
                 setIsAuthenticated(true); // Update local state if the user is authenticated
-                console.log("authkeyStatu" + authKey);
+                // console.log("authkeyStatu" + authKey);
                 dispatch(updateAuthStatus(true));
 
             } else {
@@ -200,8 +200,8 @@ const AppNavigator = () => {
         <NavigationContainer>
             <SafeAreaProvider>
                 {isAuthenticated ?
-                    <MainDrawerNavigator />
-                    : <AuthNavigator />}
+                    <MainDrawerNavigator/>
+                    : <AuthNavigator/>}
             </SafeAreaProvider>
         </NavigationContainer>
     );
@@ -334,6 +334,7 @@ const MainDrawerNavigator = () => {
         {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
         {/*}}/>*/}
         <Drawer.Screen name="List of Business" component={ListOfBusinessesScreen} options={{
+            headerLeft: () => null,
             drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(list_of_businesses_icon).uri}}
                                      width={25} height={25} style={{resizeMode: "contain"}}/>
         }}/>

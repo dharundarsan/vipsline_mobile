@@ -87,10 +87,12 @@ export const loadWalletPriceFromDb = (clientId) => async (dispatch) => {
                 }
             }
         );
-        console.log("response.data.data[0]");
-        console.log(response.data.data[0]);
-
-        dispatch(updateWalletBalance(response.data.data[0]));
+        if(response.data.message === "Something went wrong") {
+            dispatch(updateWalletBalance({wallet_balance: 0}));
+        }
+        else {
+            dispatch(updateWalletBalance(response.data.data[0]));
+        }
 
     } catch (e) {
         // console.error(e + " wallet error");

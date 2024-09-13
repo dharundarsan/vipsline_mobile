@@ -43,7 +43,7 @@ import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
 import {ToastAndroid} from "react-native";
 
-export default async function checkoutBookingAPI(clientId, cartSliceState) {
+export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {
     let authToken = "";
     let businessId = "";
 
@@ -88,50 +88,55 @@ export default async function checkoutBookingAPI(clientId, cartSliceState) {
                     wallet_amount: 0,
                 }
             }),
-                ...cartSliceState.editedCart.map(item => {
-                    if (item.gender === "Products")
-                        return {
-                            amount: item.amount,
-                            bonus_value: 0,
-                            disc_value: item.disc_value,
-                            itemId: item.item_id,
-                            membership_id: 0,
-                            product_id: item.product_id,
-                            resource_id: item.resource_id,
-                            type: "AMOUNT",
-                            valid_from: "",
-                            valid_till: "",
-                            wallet_amount: 0,
-                        }
-                    else
-                        return item
-                })
+            ...cartSliceState.editedCart.map(item => {
+                if (item.gender === "Products")
+                    return {
+                        amount: item.amount,
+                        bonus_value: 0,
+                        disc_value: item.disc_value,
+                        itemId: item.item_id,
+                        membership_id: 0,
+                        product_id: item.product_id,
+                        resource_id: item.resource_id,
+                        type: "AMOUNT",
+                        valid_from: "",
+                        valid_till: "",
+                        wallet_amount: 0,
+                    }
+                else
+                    return item
+            })
             ],
             endtime: "18:17:00",
-            extra_charges: cartSliceState.chargesData,
+            extra_charges: cartSliceState.chargesData[0].amount === 0 ? [] : cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
-            isWalletSelected: false,
+            isWalletSelected: prepaidStatus === undefined ? false : prepaidStatus,
             is_direct_checkout: true,
             is_walkin_appt: false,
             memberShipIdPurchased: [],
             mobile_1: "",
             notes: "",
-            prepaid_wallet: [],
+            prepaid_wallet: cartSliceState.prepaid_wallet[0].wallet_amount !== "" ? [{
+                ...cartSliceState.prepaid_wallet[0],
+                mobile: clientDetails.mobile_1,
+            }] : [],
             promo_code: "",
             sales_notes: cartSliceState.salesNotes,
             starttime: "17:35:00",
             user_coupon: "",
-            user_id: clientId,
-            walkInUserId: clientId,
+            user_id: clientDetails.id,
+            walkInUserId: clientDetails.id,
             walkin: "yes",
-            wallet_amt: 0,
+            wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
         }, {
             headers: {
                 Authorization: `Bearer ${authToken}`
             }
         });
-        ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+        if(response.data.other_message) {
+            ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+        }
         return response.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);
