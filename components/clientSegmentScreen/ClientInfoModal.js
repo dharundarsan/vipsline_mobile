@@ -1,23 +1,23 @@
-import {Modal, Text, View, StyleSheet, ScrollView, Platform} from "react-native";
+import { Modal, Text, View, StyleSheet, ScrollView, Platform, Linking } from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Divider from "../../ui/Divider";
 import ClientStatistics from "./ClientStatistics";
 import ClientDetails from "./ClientDetails";
 import MoreOptionDropDownModal from "./MoreOptionDropDownModal";
 import UpdateClientModal from "./UpdateClientModal";
 import DeleteClient from "./DeleteClientModal";
-import {useDispatch, useSelector} from "react-redux";
-import {dateFormatter} from "../../util/Helpers";
-import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
-import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { checkNullUndefined, dateFormatter } from "../../util/Helpers";
+import { loadClientInfoFromDb } from "../../store/clientInfoSlice";
+import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
 
 /**
  * ClientInfoModal Component
@@ -40,16 +40,17 @@ import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../stor
 
 
 const getCategoryTitle =
-    {"clientDetails": "Client details",
-        "billActivity": "Bill activity",
-        "appointments": "Appointments",
-        "memberships": "Memberships",
-        "packageSales": "Package sales",
-        "prepaidSales": "Prepaid sales",
-        "review": "Review",
-        "giftVoucher": "Gift Voucher",
-        "seeMoreStats": "Statistics"
-    }
+{
+    "clientDetails": "Client details",
+    "billActivity": "Bill activity",
+    "appointments": "Appointments",
+    "memberships": "Memberships",
+    "packageSales": "Package sales",
+    "prepaidSales": "Prepaid sales",
+    "review": "Review",
+    "giftVoucher": "Gift Voucher",
+    "seeMoreStats": "Statistics"
+}
 
 
 export default function clientInfoModal(props) {
@@ -58,7 +59,8 @@ export default function clientInfoModal(props) {
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
     const details = useSelector(state => state.clientInfo.details);
-
+    console.log(details);
+    
 
     const [totalSales, setTotalSales] = useState("");
     const [lastVisit, setLastVisit] = useState("");
@@ -75,9 +77,9 @@ export default function clientInfoModal(props) {
         setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
         setLastVisit(
             analyticDetails.history_appointmentList !== undefined ?
-            analyticDetails.history_appointmentList.length !== 0 ?
-                dateFormatter(analyticDetails.history_appointmentList[0].appointment_date, 'short') :
-                "" : "");
+                analyticDetails.history_appointmentList.length !== 0 ?
+                    dateFormatter(analyticDetails.history_appointmentList[0].appointment_date, 'short') :
+                    "" : "");
         setCompletedAppointment(analyticDetails.completed_appointments === undefined ? "" : analyticDetails.completed_appointments);
         setCancelledAppointment(analyticDetails.cancelled_appointments === undefined ? "" : analyticDetails.cancelled_appointments);
         setFeedbackCount(analyticDetails.feedbacks);
@@ -98,11 +100,11 @@ export default function clientInfoModal(props) {
     const [deleteClientModalVisibility, setDeleteClientModalVisibility] = useState(false);
 
     useEffect(() => {
-        if(selectedOption === "editClient") {
+        if (selectedOption === "editClient") {
             setEditClientModalVisibility(true);
             setSelectedOption("");
         }
-        else if(selectedOption === "deleteClient") {
+        else if (selectedOption === "deleteClient") {
             setDeleteClientModalVisibility(true);
             setSelectedOption("");
             setModalVisibility(false);
@@ -114,11 +116,11 @@ export default function clientInfoModal(props) {
         setClientMoreDetails(id);
     }
     function seeMoreStatisticsHandler() {
-                setClientMoreDetails("seeMoreStats");
+        setClientMoreDetails("seeMoreStats");
     }
     let content;
 
-    if(clientMoreDetails === null) {
+    if (clientMoreDetails === null) {
         content = <ScrollView>
             <MoreOptionDropDownModal
                 isVisible={modalVisibility}
@@ -150,7 +152,7 @@ export default function clientInfoModal(props) {
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     setModalVisibility(false);
-                                        dispatch(loadClientInfoFromDb(props.id))
+                    dispatch(loadClientInfoFromDb(props.id))
 
                 }}
                 header={"Delete Client"}
@@ -176,19 +178,26 @@ export default function clientInfoModal(props) {
                         onPress={() => {
                             setModalVisibility(true);
                         }}
-                        pressableStyle={[styles.pressable, {paddingHorizontal: 12}]}
+                        pressableStyle={[styles.pressable, { paddingHorizontal: 12 }]}
                     >
                         <SimpleLineIcons name="options" size={24} color="black" />
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.callButton} pressableStyle={[styles.pressable, styles.pressableStyle]}>
-                        <View style={{flexDirection: "row"}}>
+                    <PrimaryButton buttonStyle={styles.callButton}
+                        onPress={() => {
+                            if(checkNullUndefined(details.mobile_1)){
+                                Linking.openURL(`tel:${details.mobile_1}`)
+                            }
+                        }
+                        }
+                        pressableStyle={[styles.pressable, styles.pressableStyle]}>
+                        <View style={{ flexDirection: "row" }}>
                             <Feather name="phone" size={18} color="black" />
-                            <Text style={[textTheme.bodyMedium, {marginLeft: 8}]}>Call</Text>
+                            <Text style={[textTheme.bodyMedium, { marginLeft: 8 }]}>Call</Text>
                         </View>
 
                     </PrimaryButton>
                     <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={[styles.pressable, styles.pressableStyle]}>
-                        <Text style={[textTheme.bodyMedium, {color: Colors.white}]}>
+                        <Text style={[textTheme.bodyMedium, { color: Colors.white }]}>
                             Book now
                         </Text>
                     </PrimaryButton>
@@ -210,7 +219,7 @@ export default function clientInfoModal(props) {
         </ScrollView>
 
     }
-    else if(clientMoreDetails === "seeMoreStats") {
+    else if (clientMoreDetails === "seeMoreStats") {
         content =
             <ClientStatistics
                 title={getCategoryTitle[clientMoreDetails]}
@@ -223,7 +232,7 @@ export default function clientInfoModal(props) {
                 totalVisits={totalVisits}
             />
     }
-    else if(clientMoreDetails === "clientDetails") {
+    else if (clientMoreDetails === "clientDetails") {
         content =
             <ClientDetails
                 title={getCategoryTitle[clientMoreDetails]}
@@ -243,7 +252,7 @@ export default function clientInfoModal(props) {
                                 setClientMoreDetails(null);
                             }}
                         >
-                            <AntDesign name="arrowleft" size={24} color="black"/>
+                            <AntDesign name="arrowleft" size={24} color="black" />
                         </PrimaryButton>
                 }
 
@@ -255,17 +264,17 @@ export default function clientInfoModal(props) {
                         setClientMoreDetails(null);
                     }}
                 >
-                    <Ionicons name="close" size={25} color="black"/>
+                    <Ionicons name="close" size={25} color="black" />
                 </PrimaryButton>
                 {
                     clientMoreDetails === null ?
                         null :
-                    <ClientCard
-                        name={props.name}
-                        card={styles.clientProfileCard}
-                        cardInnerContainer={styles.cardInnerContainer}
-                        rippleColor={Colors.white}
-                    />
+                        <ClientCard
+                            name={props.name}
+                            card={styles.clientProfileCard}
+                            cardInnerContainer={styles.cardInnerContainer}
+                            rippleColor={Colors.white}
+                        />
                 }
 
             </View>
@@ -273,7 +282,7 @@ export default function clientInfoModal(props) {
                 clientMoreDetails === null ?
                     null :
                     <>
-                    <Divider />
+                        <Divider />
                     </>
             }
             {content}

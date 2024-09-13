@@ -196,8 +196,9 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     parentCategoryAndGenderContainer: {
-        marginHorizontal: 40,
+        marginHorizontal: 20,
         marginVertical: 20,
+        width:'65%',
         flexDirection: "row",
         // justifyContent:"center",
         alignItems: "center",
