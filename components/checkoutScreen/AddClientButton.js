@@ -20,6 +20,7 @@ import {loadCartFromDB, modifyClientMembershipId, updateCalculatedPrice} from ".
 
 import {loadClientFiltersFromDb} from "../../store/clientFilterSlice";
 import PackageModal from "./PackageModal";
+import AvailablePackagesModal from "./AvailablePackagesModal";
 
 
 const AddClientButton = (props) => {
@@ -30,7 +31,7 @@ const AddClientButton = (props) => {
     // const [storeMembershipId, setStoreMembershipId] = useState(useSelector(state => state.cart.clientMembershipID));
     const dispatch = useDispatch();
     const storeMembershipId = useSelector(state => state.cart.clientMembershipID);
-    const [isRedeemPackageModalVisible, setIsRedeemPackageModalVisible] = useState(false);
+    const [isAvailablePackagesModalVisible, setIsAvailablePackageModalVisible] = useState(false);
 
     async function onApplyMembership(clientMembershipId, clientId) {
         // setStoreMembershipId(clientMembershipId)
@@ -65,7 +66,7 @@ const AddClientButton = (props) => {
     }, [clientInfo.isClientSelected])
 
     const openRedeemPackageModalHandler = () => {
-        setIsRedeemPackageModalVisible(true);
+        setIsAvailablePackageModalVisible(true);
     }
 
     return (
@@ -89,11 +90,9 @@ const AddClientButton = (props) => {
                                 id={clientInfo.details?.id}
                             />
                         )}
-                        {isRedeemPackageModalVisible &&
-                            <PackageModal redeem={true}
-                                          isVisible={isRedeemPackageModalVisible}
-                                          onCloseModal={() => setIsRedeemPackageModalVisible(false)}
-                            />
+                        {isAvailablePackagesModalVisible &&
+                            <AvailablePackagesModal isVisible={isAvailablePackagesModalVisible}
+                                                    onCloseModal={() => setIsAvailablePackageModalVisible(false)}/>
                         }
                         <View style={styles.clientCardContainer}>
                             <ClientCard
