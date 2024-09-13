@@ -24,6 +24,7 @@ const PackageSittingItem = (props) => {
         }
     }, [sittingCount]);
 
+
     return <View style={styles.editPackageItem}>
         <Text style={[textTheme.titleMedium]}>{props.data.name}</Text>
         <View style={styles.editPackageItemInnerRow}>
@@ -34,35 +35,40 @@ const PackageSittingItem = (props) => {
                     Sessions {props.data.available_quantity}</Text>
             </View>
             <View style={styles.quantityToggleContainer}>
-                <PrimaryButton rippleColor={isMinReached ? Colors.transparent : `rgba(0, 0, 0, 0.1)`}
-                               onPress={
-                                   isMinReached ? () => {
-                                       } :
-                                       () => {
-                                           props.deleteSittingItems(props.data);
-                                           setSittingCount(prev => prev - 1)
-                                       }} buttonStyle={[styles.toggleButton, {
-                    borderBottomRightRadius: 0,
-                    borderTopRightRadius: 0
-                }]}
-                               pressableStyle={styles.togglePressable}>
-                    <Entypo name="minus" size={18} color={isMinReached ? Colors.grey500 : Colors.black}/>
-                </PrimaryButton>
-                <Text>{sittingCount}</Text>
-                <PrimaryButton rippleColor={isMaxReached ? Colors.transparent : `rgba(0, 0, 0, 0.1)`}
-                               onPress={
-                                   isMaxReached ? () => {
-                                       } :
-                                       () => {
-                                           props.addSittingItems(props.data);
-                                           setSittingCount(prev => prev + 1)
-                                       }} buttonStyle={[styles.toggleButton, {
-                    borderBottomLeftRadius: 0,
-                    borderTopLeftRadius: 0
-                }]}
-                               pressableStyle={styles.togglePressable}>
-                    <Entypo name="plus" size={18} color={isMaxReached ? Colors.grey500 : Colors.black}/>
-                </PrimaryButton>
+                {props.data.available_quantity === 0 ?
+                    <Text style={textTheme.titleSmall}>Redeemed</Text> :
+                    <>
+                        <PrimaryButton rippleColor={isMinReached ? Colors.transparent : `rgba(0, 0, 0, 0.1)`}
+                                       onPress={
+                                           isMinReached ? () => {
+                                               } :
+                                               () => {
+                                                   props.deleteSittingItems(props.data);
+                                                   setSittingCount(prev => prev - 1)
+                                               }} buttonStyle={[styles.toggleButton, {
+                            borderBottomRightRadius: 0,
+                            borderTopRightRadius: 0
+                        }]}
+                                       pressableStyle={styles.togglePressable}>
+                            <Entypo name="minus" size={18} color={isMinReached ? Colors.grey500 : Colors.black}/>
+                        </PrimaryButton>
+                        <Text>{sittingCount}</Text>
+                        <PrimaryButton rippleColor={isMaxReached ? Colors.transparent : `rgba(0, 0, 0, 0.1)`}
+                                       onPress={
+                                           isMaxReached ? () => {
+                                               } :
+                                               () => {
+                                                   props.addSittingItems(props.data);
+                                                   setSittingCount(prev => prev + 1)
+                                               }} buttonStyle={[styles.toggleButton, {
+                            borderBottomLeftRadius: 0,
+                            borderTopLeftRadius: 0
+                        }]}
+                                       pressableStyle={styles.togglePressable}>
+                            <Entypo name="plus" size={18} color={isMaxReached ? Colors.grey500 : Colors.black}/>
+                        </PrimaryButton>
+                    </>}
+
             </View>
         </View>
     </View>

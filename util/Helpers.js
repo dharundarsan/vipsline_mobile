@@ -68,6 +68,11 @@ export const shadowStyling = StyleSheet.create({
     borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
 })
 
-
+export const formatDateWithAddedMonths = (monthsToAdd) => {
+    let currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() + parseInt(monthsToAdd));
+    const formattedDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(currentDate);
+    return formattedDate;
+}
 
 
