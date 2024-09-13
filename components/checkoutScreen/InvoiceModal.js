@@ -41,6 +41,7 @@ const InvoiceModal = (props) => {
     const dispatch = useDispatch();
 
 
+
     const navigation = useNavigation();
 
     const [actionModalVisibility, setActionModalVisibility] = useState(false);
@@ -376,16 +377,27 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Contact
                             : </Text>{selectedClientDetails.mobile_1}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Email
-                            : </Text>{selectedClientDetails.username}</Text>
-                        <Text style={textTheme.bodyLarge}>
-                            <Text
-                                style={textTheme.titleMedium}>Prepaid :
-                            </Text> {walletBalance.wallet_balance}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN
-                            : </Text>{selectedClientDetails.customer_gst}</Text>
+                        {
+                            selectedClientDetails.username === "" ?
+                                <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Email
+                                : </Text>{selectedClientDetails.username}</Text> :
+                                <></>
+                        }
+                        {
+                            walletBalance.wallet_balance > 0 ?
+                                <Text style={textTheme.bodyLarge}>
+                                <Text style={textTheme.titleMedium}>Prepaid :
+                                </Text> {walletBalance.wallet_balance}</Text> :
+                                <></>
+                        }
+                        {
+                            selectedClientDetails.customer_gst !== null  && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                                <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>GSTIN
+                                : </Text>{selectedClientDetails.customer_gst}</Text> :
+                                <></>
+                        }
                     </View>
                     {
                         checkNullUndefined(details) ?
@@ -462,7 +474,7 @@ styles.heading]}>Invoice</Text>*/}
                         styles.checkoutDetailText]}>Discount</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>₹ {(totalDiscountPercent).toFixed(2)}</Text>
+                            styles.checkoutDetailText]}>₹ {invoiceDetails.total_discount_in_price.toFixed(2)}</Text>
                     </View>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
@@ -490,7 +502,7 @@ styles.heading]}>Invoice</Text>*/}
                         styles.checkoutDetailText]}>Total</Text>
                         <Text
                             style={[textTheme.titleMedium,
-                            styles.checkoutDetailText]}>₹ {details.total}</Text>
+                            styles.checkoutDetailText]}>₹ {details.total.toFixed(2)}</Text>
                     </View>
                     <View style={styles.paymentModeContainer}>
                         <Text style={[textTheme.titleMedium]}>Payment

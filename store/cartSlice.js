@@ -116,7 +116,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
     }
 }
 
-export const updateCalculatedPrice = (clientId) => async (dispatch, getState) => {
+export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async (dispatch, getState) => {
     const { cart } = getState();
 
     calculateCartPriceAPI({
@@ -176,14 +176,14 @@ export const updateCalculatedPrice = (clientId) => async (dispatch, getState) =>
         })
         ],
         extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
-        isWalletSelected: false,
+        isWalletSelected: prepaid === undefined ? false : prepaid,
+        wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
         client_membership_id: cart.clientMembershipID === undefined || null ? null : cart.clientMembershipID,
         // client_membership_id:clientMembershipID,
         walkInUserId: clientId === "" ? undefined : clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
-        wallet_amt: 0
     }).then(response => {
         dispatch(setCalculatedPrice(response))
     })

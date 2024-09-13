@@ -23,6 +23,8 @@ import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useFocusEffect} from "@react-navigation/native";
+import {clearClientInfo} from "../store/clientInfoSlice";
+import clearCartAPI from "../util/apis/clearCartAPI";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -93,6 +95,8 @@ export default function ListOfBusinessesScreen({navigation}) {
                     dispatch(updateBusinessId(itemData.item.id));
                     dispatch(updateIsBusinessSelected(true));
                     dispatch(updateSelectedBusinessDetails(itemData.item));
+                    dispatch(clearClientInfo());
+                    await clearCartAPI();
                     navigation.navigate("Checkout");
                 }}
             />

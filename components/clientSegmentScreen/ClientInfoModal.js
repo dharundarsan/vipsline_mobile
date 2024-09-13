@@ -169,6 +169,9 @@ export default function clientInfoModal(props) {
                     card={styles.clientDetailsContainer}
                     nameText={[textTheme.titleSmall, styles.name]}
                     phoneText={[textTheme.titleSmall, styles.phone]}
+                    onPress={() => null}
+                    rippleColor={Colors.transparent}
+
                 />
                 <View style={styles.optionsContainer}>
                     <PrimaryButton
