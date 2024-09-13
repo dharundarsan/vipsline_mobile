@@ -5,6 +5,8 @@ node_modules/
 package-lock.json
 android
 .idea
+ProgramData/
+%ProgramData%/
 
 # Expo
 .expo/

@@ -146,10 +146,11 @@ const CheckoutSection = (props) => {
     const [data, setData] = useState([{}])
 
     useEffect(()=>{
-        if(cartItems.length === 1){
+        // console.log(JSON.stringify(cartItems,null,3));
+        // if(cartItems.length === 0){
             dispatch(updateDiscount([]));
-        }
-    },[cartItems])
+        // }
+    },[])
 
     function openModal(title, value) {
         setTitle(title);
