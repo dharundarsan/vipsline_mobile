@@ -151,7 +151,7 @@ const AddClientButton = (props) => {
 
                                 <Ionicons name="close" size={24} color="black" onPress={() => {
                                     onApplyMembership(null, undefined)
-                                    // setStoreMembershipId(null);
+                                    setIsClientInfo(false)
                                     dispatch(modifyClientMembershipId({type: "clear"}));
                                     dispatch(clearClientInfo())
                                 }}/>
