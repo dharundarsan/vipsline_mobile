@@ -253,7 +253,13 @@ const InvoiceModal = (props) => {
                 imageWidth={24}
                 primaryViewChildrenStyle={styles.dropdownInnerContainer}
 
-
+                onChangeValue={(value) => {
+                    if (value === "Go to Appointment") {
+                    }
+                    else if(value === "Booking history"){
+                    }
+                }}
+                
             />
             {/*<Text style={[textTheme.titleLarge,
 styles.heading]}>Invoice</Text>*/}

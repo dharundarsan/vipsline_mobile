@@ -379,7 +379,7 @@ export const cartSlice = createSlice({
         //Bhaski reducers
         updateDiscount(state, action) {
             state.additionalDiscounts.pop();
-            state.additionalDiscounts = [action.payload];
+            state.additionalDiscounts = action.payload.length === 0 ? [] : [action.payload];
         },
         updateChargeData(state, action) {
             state.chargesData = action.payload;
