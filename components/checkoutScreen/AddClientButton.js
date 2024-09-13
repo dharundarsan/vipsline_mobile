@@ -1,6 +1,6 @@
 import PrimaryButton from "../../ui/PrimaryButton";
 import {FontAwesome6, Ionicons} from "@expo/vector-icons";
-import {Modal, Pressable, StyleSheet, Text, View} from "react-native";
+import {Pressable, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";

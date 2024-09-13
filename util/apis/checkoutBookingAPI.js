@@ -43,7 +43,7 @@ import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
 import {ToastAndroid} from "react-native";
 
-export default async function checkoutBookingAPI(clientDetails, cartSliceState) {
+export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {
     let authToken = "";
     let businessId = "";
 
@@ -111,7 +111,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
             extra_charges: cartSliceState.chargesData[0].amount === 0 ? [] : cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
-            isWalletSelected: false,
+            isWalletSelected: prepaidStatus === undefined ? false : prepaidStatus,
             is_direct_checkout: true,
             is_walkin_appt: false,
             memberShipIdPurchased: [],
@@ -128,13 +128,15 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
             user_id: clientDetails.id,
             walkInUserId: clientDetails.id,
             walkin: "yes",
-            wallet_amt: 0,
+            wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
         }, {
             headers: {
                 Authorization: `Bearer ${authToken}`
             }
         });
-        // ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+        if(response.data.other_message) {
+            ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+        }
         return response.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);
