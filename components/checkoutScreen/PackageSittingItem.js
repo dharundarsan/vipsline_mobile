@@ -39,6 +39,7 @@ const PackageSittingItem = (props) => {
                                    isMinReached ? () => {
                                        } :
                                        () => {
+                                           props.deleteSittingItems(props.data);
                                            setSittingCount(prev => prev - 1)
                                        }} buttonStyle={[styles.toggleButton, {
                     borderBottomRightRadius: 0,

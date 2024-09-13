@@ -18,8 +18,7 @@ const MemberShipDetailModal = React.memo((props) => {
 
     useEffect(() => {
         if (isModalVisible && props.membershipDetails.length === 1) {
-            console.log("length: 1");
-            
+
             props.onApplyMembership( props.membershipDetails[0].id,props.membershipDetails[0].client_id);
         }
     }, [props.membershipDetails, isModalVisible]);

@@ -137,7 +137,7 @@ const CheckoutSection = (props) => {
     const [title, setTitle] = useState("")
     const [isDelete, setIsDelete] = useState(false);
     const [discountValue, setDiscountValue] = useState("");
-    const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage")
+    const [selectedDiscountMode, setSelectedDiscountMode] = useState("PERCENTAGE")
     const [clickedValue, setClickedValue] = useState("")
     const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
@@ -145,14 +145,17 @@ const CheckoutSection = (props) => {
     const [chargesInputData, setChargesInputData] = useState([{ index: 0 }]);
     const [data, setData] = useState([{}])
 
+    useEffect(()=>{
+        // console.log(JSON.stringify(cartItems,null,3));
+        // if(cartItems.length === 0){
+            dispatch(updateDiscount([]));
+        // }
+    },[])
+
     function openModal(title, value) {
         setTitle(title);
         setClickedValue(value);
     }
-
-
-    const checkoutDiscount = useSelector(state => state.checkoutAction.additionalDiscounts)
-    const checkoutCharges = useSelector(state => state.checkoutAction.chargesData);
 
     async function addDiscount(discountMode, type) {
         const addDiscount = {
@@ -160,15 +163,15 @@ const CheckoutSection = (props) => {
         }
 
         if (type === "clear") {
-            console.log("12321");
-            
-            dispatch(updateDiscount([]));
-            setSelectedDiscountMode("")
-        } else {
-            dispatch(updateDiscount(addDiscount));
-            dispatch(updateCalculatedPrice());
-        }
 
+            dispatch(updateDiscount([]));
+            setSelectedDiscountMode("PERCENTAGE")
+        } else {
+            setSelectedDiscountMode(discountMode)
+            dispatch(updateDiscount(addDiscount));
+        }
+        dispatch(updateCalculatedPrice());
+        
         setActionModal(false);
     }
 
@@ -216,7 +219,7 @@ const CheckoutSection = (props) => {
 
         setActionModal(false);
     }
-    function clearSalesNotes(){
+    function clearSaleNotes(){
         setSalesnote("");
         dispatch(clearSalesNotes());
         setActionModal(false);
@@ -228,7 +231,9 @@ const CheckoutSection = (props) => {
             onCloseModal={() => {
                 setActionModal(false)
             }}
-            clearSalesNotes={clearSalesNotes}
+            selectedDiscountMode={selectedDiscountMode}
+            setSelectedDiscountMode={setSelectedDiscountMode}
+            clearSalesNotes={clearSaleNotes}
             chargesInputData={chargesInputData}
             setChargesInputData={setChargesInputData}
             title={title}
@@ -257,9 +262,9 @@ const CheckoutSection = (props) => {
                 // props.setVisible(false);
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
-                clearCartAPI();
+                await clearCartAPI();
                 dispatch(modifyClientMembershipId({ type: "clear" }))
-                dispatch(clearSalesNotes());
+                clearSaleNotes();
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
                 dispatch(clearCalculatedPrice())

@@ -39,9 +39,9 @@
 
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSelector } from "react-redux";
-import { formatDate } from "../Helpers";
-import { ToastAndroid } from "react-native";
+import {useSelector} from "react-redux";
+import {formatDate} from "../Helpers";
+import {ToastAndroid} from "react-native";
 
 export default async function checkoutBookingAPI(clientDetails, cartSliceState) {
     let authToken = "";
@@ -80,7 +80,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
                     itemId: item.item_id,
                     membership_id: item.id,
                     membership_number: "",
-                    res_cat_id: 282773,
+                    res_cat_id: item.resource_category_id,
                     resource_id: item.resource_id,
                     type: "AMOUNT",
                     valid_from: item.valid_from,
@@ -134,6 +134,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
                 Authorization: `Bearer ${authToken}`
             }
         });
+        // ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
         return response.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);

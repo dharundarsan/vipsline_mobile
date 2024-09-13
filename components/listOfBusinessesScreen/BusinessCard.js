@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Image, Pressable} from 'react-native';
+import {View, Text, StyleSheet, Image, Pressable, ToastAndroid} from 'react-native';
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
@@ -9,13 +9,11 @@ export default function BusinessCard(props) {
 
     useEffect(() => {
         let status = props.status;
-        if(status === "test") {
+        if (status === "test") {
             setStatus("TEST BUSINESS")
-        }
-        else if(status === "unverified") {
+        } else if (status === "unverified") {
             setStatus("UNVERIFIED")
-        }
-        else if(status === "verified") {
+        } else if (status === "verified") {
             setStatus("VERIFIED");
         }
     }, []);
@@ -41,27 +39,23 @@ export default function BusinessCard(props) {
             gap: 1,
         },
         profileImageContainer: {
-            justifyContent:"center",
+            justifyContent: "center",
             overflow: 'hidden',
             borderRadius: 8,
             // borderWidth: 1,
         },
         buttonStyle: {
-            alignSelf: "flex-start",
             marginVertical: 12,
-            backgroundColor: props.status !== "verified" ? Colors.white : Colors.green,
+            backgroundColor: props.status !== "verified" ? Colors.transparent : Colors.green,
             borderWidth: 1,
             borderColor: props.status === "verified" ? Colors.white : props.status === "unverified" ? Colors.error : Colors.highlight,
-
-
-        },
-        pressableStyle: {
-            paddingVertical: 6,
-
-        },
-        buttonText: {
+            borderRadius: 8,
+            paddingVertical: 8,
+            paddingHorizontal: 10,
             color: props.status === "verified" ? Colors.white : props.status === "unverified" ? Colors.error : Colors.highlight,
-        }
+            textAlign: "center",
+            fontWeight: "bold"
+        },
     })
 
 
@@ -69,7 +63,13 @@ export default function BusinessCard(props) {
         <Pressable
             style={styles.businessCard}
             android_ripple={{color: Colors.grey250}}
-            onPress={props.onPress}
+            onPress={() => {
+                if (props.status === "unverified") {
+                    ToastAndroid.show("Business yet to be verified", ToastAndroid.SHORT);
+                    return
+                }
+                props.onPress();
+            }}
         >
             <View style={styles.profileImageContainer}>
                 <Image
@@ -77,7 +77,7 @@ export default function BusinessCard(props) {
                         uri: props.imageURL === null ?
                             "https://5.imimg.com/data5/SELLER/Default/2023/4/301028890/FI/HM/UA/5050159/saloon-interior-design-500x500.jpg" :
                             props.imageURL
-                }}
+                    }}
                     height={80}
                     width={130}
                     style={styles.profileImage}
@@ -94,14 +94,10 @@ export default function BusinessCard(props) {
                 </Text>
                 <Text style={[textTheme.bodyMedium]}>
                     {props.address}
-                </Text >
-
-                <PrimaryButton
-                    label={status}
-                    buttonStyle={styles.buttonStyle}
-                    pressableStyle={styles.pressableStyle}
-                    textStyle={styles.buttonText}
-                />
+                </Text>
+                <Text style={styles.buttonStyle}>
+                    {status}
+                </Text>
             </View>
         </Pressable>
     );

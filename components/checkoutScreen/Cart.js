@@ -13,8 +13,9 @@ import Colors from "../../constants/Colors";
 import AddItemModal from "./AddItemModal";
 import CartItem from "./CartItem";
 import CheckoutSection from "./CheckoutSection";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import { updateDiscount } from '../../store/cartSlice';
 
 const Cart = () => {
 
@@ -26,8 +27,8 @@ const Cart = () => {
     const staffs = useSelector((state) => state.staff.staffs);
     // const [customItems, setCustomItems] = useState([]);
     // const [calculatedPrice, setCalculatedPrice] = useState([]);
+    const dispatch = useDispatch()
     const customItems = useSelector(state => state.cart.customItems)
-
     // useEffect(() => {
     //     if (cartItems.length === 0 && editedMembership.length === 0 && customItems.length === 0 && editedCart.length === 0) {
     //         setCalculatedPrice([]);
@@ -150,9 +151,10 @@ const Cart = () => {
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}}
                                   data={[...cartItems, ...editedCart, ...customItems, ...editedMembership]}
-                                  keyExtractor={(item, index) => {
-                                      return item;
-                                  }}
+                                  // keyExtractor={(item, index) => {
+                                  //     console.log(item.item_id);
+                                  //     return item.item_id
+                                  // }}
                                   renderItem={({item}) => <CartItem staffs={staffs} data={item}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>

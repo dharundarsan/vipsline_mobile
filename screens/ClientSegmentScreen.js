@@ -23,11 +23,12 @@ import {
 } from "../store/clientInfoSlice";
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
-import {loadClientCountFromDb} from "../store/clientSlice";
+import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
 import {clientFilterAPI} from "../util/apis/clientFilterAPI";
 import axios from "axios";
 import {checkNullUndefined} from "../util/Helpers";
+import {useFocusEffect} from "@react-navigation/native";
 
 
 export default function ClientSegmentScreen() {
@@ -63,7 +64,6 @@ export default function ClientSegmentScreen() {
     const inActiveClientCountHelper = useSelector(state => state.client.clientCount)
     const churnClientCountHelper = useSelector(state => state.client.clientCount)
     const leadsClientCountHelper = useSelector(state => state.client.clientCount)
-
 
 
     const allClientCount = checkNullUndefined(allClientCountHelper) ? allClientCountHelper[0].all_clients_count : 0;
@@ -119,15 +119,20 @@ export default function ClientSegmentScreen() {
     // };
 
 
-
-
     const [searchClientTotalCount, setSearchClientTotalCount] = useState(0);
 
+    const businessId = useSelector(state => state.authDetails.businessId);
+
+    useEffect(() => {
+        setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
+    }, [allClientCountHelper]);
 
 
-    useLayoutEffect(() => {
-        dispatch(loadClientCountFromDb());
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            dispatch(loadClientCountFromDb())
+        }, [businessId])
+    );
 
 
     useEffect(() => {
@@ -206,171 +211,170 @@ export default function ClientSegmentScreen() {
     }
 
 
-
     return (
-            <ScrollView style={styles.scrollView}>
-                <View style={styles.clientSegment}>
-                    <EntryModel
-                        isModalVisible={isModalVisible}
-                        setIsModalVisible={setIsModalVisible}
+        <ScrollView style={styles.scrollView}>
+            <View style={styles.clientSegment}>
+                <EntryModel
+                    isModalVisible={isModalVisible}
+                    setIsModalVisible={setIsModalVisible}
+                    filterPressed={filterPressed}
+                    query={searchQuery}
+                />
+
+                <ClientInfoModal
+                    visible={isClientInfoModalVisible}
+                    setVisible={setIsClientInfoModalVisible}
+                    closeModal={() => {
+                        setIsClientInfoModalVisible(false);
+                        dispatch(clearClientInfo());
+                        dispatch(loadClientFiltersFromDb(10, "All"));
+                    }}
+                    name={clientName}
+                    phone={clientPhone}
+                    id={clientId}
+                    setSearchQuery={setSearchQuery}
+                    setFilterPressed={setFilterPressed}
+                    onClose={() => setIsClientInfoModalVisible(false)}
+                />
+
+                <AddClient/>
+
+                <Divider color={Colors.grey250}/>
+
+                <View style={styles.clientFilterContainer}>
+                    <ClientFiltersCategories
+                        changeSelectedFilter={changeSelectedFilter}
                         filterPressed={filterPressed}
-                        query={searchQuery}
+                        isLoading={isFetching}
+                        searchLoading={isSearchClientFetching}
                     />
+                </View>
 
-            <ClientInfoModal
-                visible={isClientInfoModalVisible}
-                setVisible={setIsClientInfoModalVisible}
-                closeModal={() => {
-                    setIsClientInfoModalVisible(false);
-                    dispatch(clearClientInfo());
-                    dispatch(loadClientFiltersFromDb(10, "All"));
-                }}
-                name={clientName}
-                phone={clientPhone}
-                id={clientId}
-                setSearchQuery={setSearchQuery}
-                setFilterPressed={setFilterPressed}
-                onClose={() => setIsClientInfoModalVisible(false)}
-            />
+                <View style={styles.currentFilter}>
+                    <View style={styles.descBullet}/>
+                    <Text
+                        style={[textTheme.titleSmall, styles.descText]}
+                    >
+                        {appliedFilter(filterPressed) + (filterPressed === "churn_clients_count" ? " (likely to be Inactive)" : "")}
+                    </Text>
+                </View>
+                <Text style={[textTheme.bodyMedium, styles.filterDescText]}>
+                    {clientFilterDescriptionData[appliedFilter(filterPressed)]}
+                </Text>
 
-                    <AddClient />
 
-                    <Divider color={Colors.grey250}/>
-
-                    <View style={styles.clientFilterContainer}>
-                        <ClientFiltersCategories
-                            changeSelectedFilter={changeSelectedFilter}
-                            filterPressed={filterPressed}
-                            isLoading={isFetching}
-                            searchLoading={isSearchClientFetching}
+                <View style={styles.searchClientContainer}>
+                    <View style={styles.textInputContainer}>
+                        <SearchBar
+                            placeholder={"search by mobile number name"}
+                            searchContainerStyle={[textTheme.bodyMedium, styles.searchBarContainer]}
+                            onChangeText={(text) => {
+                                setSearchQuery(text);
+                            }}
+                            value={searchQuery}
                         />
                     </View>
 
-                    <View style={styles.currentFilter}>
-                        <View style={styles.descBullet}/>
-                        <Text
-                            style={[textTheme.titleSmall, styles.descText]}
-                        >
-                            {appliedFilter(filterPressed) + (filterPressed === "churn_clients_count" ? " (likely to be Inactive)" : "")}
-                        </Text>
-                    </View>
-                    <Text style={[textTheme.bodyMedium, styles.filterDescText]}>
-                        {clientFilterDescriptionData[appliedFilter(filterPressed)]}
-                    </Text>
+                    <PrimaryButton
+                        buttonStyle={styles.filterButton}
+                    >
+                        <SimpleLineIcons
+                            name="equalizer"
+                            size={24}
+                            color={Colors.darkBlue}
+                            style={styles.filterIcon}
+                        />
+                    </PrimaryButton>
 
+                </View>
 
-                    <View style={styles.searchClientContainer}>
-                        <View style={styles.textInputContainer}>
-                            <SearchBar
-                                placeholder={"search by mobile number name"}
-                                searchContainerStyle={[textTheme.bodyMedium, styles.searchBarContainer]}
-                                onChangeText={(text) => {
-                                    setSearchQuery(text);
-                                }}
-                                value={searchQuery}
-                            />
-                        </View>
-
-                        <PrimaryButton
-                            buttonStyle={styles.filterButton}
-                        >
-                            <SimpleLineIcons
-                                name="equalizer"
-                                size={24}
-                                color={Colors.darkBlue}
-                                style={styles.filterIcon}
-                            />
-                        </PrimaryButton>
-
-                    </View>
-
-                    <View style={styles.clientCount}>
-                        <Image source={require("../assets/icons/menu.png")} style={styles.menuImage}/>
-                        <Text style={[textTheme.bodyMedium, styles.clientCountText]}>
-                            Client count : {
-                            searchQuery === "" ?
-                                clientCount :
-                                searchClientTotalCount
-                        }
-                        </Text>
-                    </View>
-
-
-                    {
+                <View style={styles.clientCount}>
+                    <Image source={require("../assets/icons/menu.png")} style={styles.menuImage}/>
+                    <Text style={[textTheme.bodyMedium, styles.clientCountText]}>
+                        Client count : {
                         searchQuery === "" ?
-                            <>
-                                {
-                                    !isFetching ?
-                                        <FlatList
-                                            data={filterClientsList}
-                                            renderItem={renderItem}
-                                            scrollEnabled={false}
+                            clientCount :
+                            searchClientTotalCount
+                    }
+                    </Text>
+                </View>
 
-                                        /> :
-                                        <Bullets
-                                            tHeight={35}
-                                            tWidth={"75%"}
-                                            listSize={maxEntry}
-                                            aSize={35}
-                                            animationDuration={500}
-                                            containerStyles={{
-                                                paddingVertical: 16,
-                                                borderBottomWidth: 1,
-                                                borderBottomColor: Colors.grey250
-                                            }}
-                                            avatarStyles={{marginLeft: 16}}
-                                        />
-                                }
 
-                                {
-                                    clientCount >= 10 ?
+                {
+                    searchQuery === "" ?
+                        <>
+                            {
+                                !isFetching ?
+                                    <FlatList
+                                        data={filterClientsList}
+                                        renderItem={renderItem}
+                                        scrollEnabled={false}
+
+                                    /> :
+                                    <Bullets
+                                        tHeight={35}
+                                        tWidth={"75%"}
+                                        listSize={maxEntry}
+                                        aSize={35}
+                                        animationDuration={500}
+                                        containerStyles={{
+                                            paddingVertical: 16,
+                                            borderBottomWidth: 1,
+                                            borderBottomColor: Colors.grey250
+                                        }}
+                                        avatarStyles={{marginLeft: 16}}
+                                    />
+                            }
+
+                            {
+                                clientCount >= 10 ?
                                     <Pagination
                                         filterPressed={filterPressed}
                                         setIsModalVisible={setIsModalVisible}
                                     /> : null
-                                }
-                                </> :
+                            }
+                        </> :
 
-                            <>
-                                {
-                                    !isSearchClientFetching ?
+                        <>
+                            {
+                                !isSearchClientFetching ?
                                     <FlatList
                                         data={searchClientList}
                                         scrollEnabled={false}
                                         renderItem={renderItem}
                                     /> :
-                                        <Bullets
-                                            tHeight={35}
-                                            tWidth={"75%"}
-                                            listSize={maxEntry}
-                                            aSize={35}
-                                            animationDuration={500}
-                                            containerStyles={{
-                                                paddingVertical: 16,
-                                                borderBottomWidth: 1,
-                                                borderBottomColor: Colors.grey250
-                                            }}
-                                            avatarStyles={{marginLeft: 16}}
-                                        />
+                                    <Bullets
+                                        tHeight={35}
+                                        tWidth={"75%"}
+                                        listSize={maxEntry}
+                                        aSize={35}
+                                        animationDuration={500}
+                                        containerStyles={{
+                                            paddingVertical: 16,
+                                            borderBottomWidth: 1,
+                                            borderBottomColor: Colors.grey250
+                                        }}
+                                        avatarStyles={{marginLeft: 16}}
+                                    />
 
-                                }
+                            }
 
-                                {
-                                    <SearchClientPagination
-                                        filterPressed={filterPressed}
-                                        setIsModalVisible={setIsModalVisible}
-                                        query={searchQuery}
-                                        setSearchClientTotalCount={setSearchClientTotalCount}
-                                        />
+                            {
+                                <SearchClientPagination
+                                    filterPressed={filterPressed}
+                                    setIsModalVisible={setIsModalVisible}
+                                    query={searchQuery}
+                                    setSearchClientTotalCount={setSearchClientTotalCount}
+                                />
 
-                                }
+                            }
 
-                                </>
-                    }
+                        </>
+                }
 
 
-                </View>
-            </ScrollView>
+            </View>
+        </ScrollView>
     );
 }
 

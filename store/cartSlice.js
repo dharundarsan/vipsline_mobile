@@ -379,7 +379,7 @@ export const cartSlice = createSlice({
         //Bhaski reducers
         updateDiscount(state, action) {
             state.additionalDiscounts.pop();
-            state.additionalDiscounts = [action.payload];
+            state.additionalDiscounts = action.payload.length === 0 ? [] : [action.payload];
         },
         updateChargeData(state, action) {
             state.chargesData = action.payload;
@@ -453,29 +453,23 @@ export const cartSlice = createSlice({
                         source: "",
                         wallet_amount: "",
                     }];
-                    console.log("Prepaid wallet cleared:", state.prepaid_wallet);
                     break;
                 case "add":
-                    console.log("Adding to prepaid_wallet:", payload);
                     state.prepaid_wallet = payload;
                     break;
                 case "updateMobile":
-                    console.log("Updating mobile with:", payload);
                     if (state.prepaid_wallet.length > 0) {
                         // state.prepaid_wallet[0].mobile = payload;
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
                             mobile: payload
                         }]
-                        console.log("Updated prepaid_wallet[0]:", state.prepaid_wallet[0]);
                     } else {
                         console.error("No prepaid_wallet entry to update mobile");
                     }
                     break;
                 case "updateResourceId":
-                    console.log("Updating resource_id with:", payload);
                     if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
-                        console.log("Updating source from 'Add prepaid' to 'add_prepaid'");
                         // state.prepaid_wallet[0].source = "add_prepaid";
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
@@ -488,7 +482,6 @@ export const cartSlice = createSlice({
                             ...state.prepaid_wallet[0],
                             resource_id: payload
                         }]
-                        console.log("Updated prepaid_wallet[0]:", state.prepaid_wallet[0]);
                     } else {
                         console.error("No prepaid_wallet entry to update resource_id");
                     }

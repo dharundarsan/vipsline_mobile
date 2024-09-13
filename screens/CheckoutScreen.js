@@ -43,56 +43,57 @@ const CheckoutScreen = () => {
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
-    const checkAuthentication = async () => {
-        try {
-            const authKey = await AsyncStorage.getItem('authKey');
-            if (authKey !== null) {
-                setIsAuthenticated(true); // Update local state if the user is authenticated
-            } else {
-                setIsAuthenticated(false);
-            }
-        } catch (e) {
-                        setIsAuthenticated(false);
+    // const checkAuthentication = async () => {
+    //     try {
+    //         const authKey = await AsyncStorage.getItem('authKey');
+    //         if (authKey !== null) {
+    //             setIsAuthenticated(true); // Update local state if the user is authenticated
+    //         } else {
+    //             setIsAuthenticated(false);
+    //         }
+    //     } catch (e) {
+    //                     setIsAuthenticated(false);
+    //     }
+    // };
+    //
+    //
+    // useEffect(() => {
+    //     checkAuthentication(); // Initial auth check
+    // }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
+
+
+    useEffect(() => {
+        if(businessId !== "") {
+            clearCartAPI();
+            dispatch(clearSalesNotes());
+            dispatch(modifyClientMembershipId({type: "clear"}))
+            dispatch(loadServicesDataFromDb("women"));
+            dispatch(loadServicesDataFromDb("men"));
+            dispatch(loadServicesDataFromDb("kids"));
+            dispatch(loadServicesDataFromDb("general"));
+            dispatch(loadProductsDataFromDb());
+            dispatch(loadPackagesDataFromDb());
+            dispatch(loadMembershipsDataFromDb());
+            dispatch(loadClientsFromDb());
+            dispatch(loadClientCountFromDb());
+            dispatch(loadClientFiltersFromDb(10, "All"));
+            dispatch(loadBusinessesListFromDb());
+            dispatch(loadLoginUserDetailsFromDb());
+            dispatch(loadStaffsFromDB());
+            dispatch(loadCartFromDB());
+            // dispatch(loadBookingDetailsFromDb());
         }
-    };
-
-
-    useEffect(() => {
-        checkAuthentication(); // Initial auth check
-    }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
-
-
-    useEffect(() => {
-        clearCartAPI();
-        dispatch(clearSalesNotes());
-        dispatch(modifyClientMembershipId({ type: "clear" }))
-        dispatch(loadServicesDataFromDb("women"));
-        dispatch(loadServicesDataFromDb("men"));
-        dispatch(loadServicesDataFromDb("kids"));
-        dispatch(loadServicesDataFromDb("general"));
-        dispatch(loadProductsDataFromDb());
-        dispatch(loadPackagesDataFromDb());
-        dispatch(loadMembershipsDataFromDb());
-
-        dispatch(loadClientsFromDb());
-
-        dispatch(loadClientCountFromDb());
-        dispatch(loadClientFiltersFromDb(10, "All"));
-        dispatch(loadBusinessesListFromDb());
-        dispatch(loadLoginUserDetailsFromDb());
-        dispatch(loadStaffsFromDB());
-        dispatch(loadCartFromDB());
-        // dispatch(loadBookingDetailsFromDb());
 
     }, [businessId]);
+
 
 
     useFocusEffect(
         useCallback(() => {
             // Function to execute whenever the drawer screen is opened
-
-            dispatch(loadClientsFromDb());
-
+            if(businessId !== "") {
+                dispatch(loadClientsFromDb());
+            }
             // Optional cleanup function when screen is unfocused
             return () => {
                 dispatch(clearClientsList());

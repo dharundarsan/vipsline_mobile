@@ -3,7 +3,7 @@ import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 import PrimaryButton from "../ui/PrimaryButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useDispatch} from "react-redux";
-import {updateAuthStatus} from "../store/authSlice";
+import {clearBusinessId, updateAuthStatus} from "../store/authSlice";
 
 const SignOutPrompt = ({ navigation }) => {
 
@@ -20,8 +20,9 @@ const SignOutPrompt = ({ navigation }) => {
         try {
             await AsyncStorage.removeItem('businessId');
             dispatch(updateAuthStatus(false));
-        } catch (e) {
-                    }
+        } catch (e) {}
+        dispatch(clearBusinessId());
+
         Alert.alert("Signed out", "You have been signed out successfully.");
         navigation.navigate("Checkout");
 
@@ -49,7 +50,7 @@ const SignOutPrompt = ({ navigation }) => {
             <Text style={styles.message}>Are you sure you want to sign out?</Text>
             <View style={styles.buttonContainer}>
                 <PrimaryButton label="Yes" onPress={ async () => await handleSignOut()} buttonStyle={{width: "40%"}}/>
-                <PrimaryButton label="No" onPress={() => null} buttonStyle={{width: "40%"}}/>
+                <PrimaryButton label="No" onPress={() => navigation.goBack()} buttonStyle={{width: "40%"}}/>
             </View>
         </View>
     );
