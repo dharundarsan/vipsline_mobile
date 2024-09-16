@@ -199,6 +199,8 @@ const CustomTextInput = (props) => {
             <>
                 {(isDateTimePickerVisible) && (
                     <RNDateTimePicker
+                    maximumDate={props.maximumDate}
+                    minimumDate={props.minimumDate}
                         value={props.value === undefined || props.value === null ? new Date(Date.now()) : new Date(props.value)}
                         mode="date"
                         display="default"

@@ -9,17 +9,17 @@ import {
     ToastAndroid,
     View
 } from "react-native";
-import {AntDesign, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import PrimaryButton from "../../ui/PrimaryButton";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import Divider from "../../ui/Divider";
-import {checkNullUndefined, formatDate} from "../../util/Helpers";
-import RNDateTimePicker, {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
+import { checkNullUndefined, formatDate } from "../../util/Helpers";
+import RNDateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {addItemToCart, addItemToEditedMembership} from "../../store/cartSlice";
-import {useDispatch, useSelector} from "react-redux";
+import { addItemToCart, addItemToEditedMembership } from "../../store/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
 
 const EditMembershipModal = (props) => {
@@ -32,7 +32,7 @@ const EditMembershipModal = (props) => {
     const [membershipId, setMembershipId] = useState(props.data.id);
 
     const handleSave = () => {
-        if(editedMembership.some(ele => ele.id === props.data.id)){
+        if (editedMembership.some(ele => ele.id === props.data.id)) {
             ToastAndroid.show("Item already in the cart", ToastAndroid.LONG);
             return;
         }
@@ -56,22 +56,21 @@ const EditMembershipModal = (props) => {
         //     props.closeOverallModal()
         //     return;
         // }
-            dispatch(addItemToEditedMembership({
-                ...props.data,
-                price: membershipPrice,
-                total_price: membershipPrice,
-                amount: membershipPrice,
-                resource_id:null,
-                item_id: checkNullUndefined(props.data.item_id) ? Math.floor(Math.random() * 90000) + 10000 : props.data.item_id,
-                "id": membershipId,
-                "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
-                "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
-            }));
-        dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+        dispatch(addItemToEditedMembership({
+            ...props.data,
+            price: membershipPrice,
+            total_price: membershipPrice,
+            amount: membershipPrice,
+            resource_id: null,
+            item_id: checkNullUndefined(props.data.item_id) ? Math.floor(Math.random() * 90000) + 10000 : props.data.item_id,
+            "id": membershipId,
+            "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
+            "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
+        }));
+        dispatch(addItemToCart({ membership_id: props.data.id, membership_number: "" }));
         props.onCloseModal();
         props.closeOverallModal()
     }
-
     return <>
         <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}>
             <View style={styles.headingAndCloseContainer}>
@@ -80,27 +79,29 @@ const EditMembershipModal = (props) => {
                     buttonStyle={styles.closeButton}
                     onPress={props.onCloseModal}
                 >
-                    <Ionicons name="close" size={25} color="black"/>
+                    <Ionicons name="close" size={25} color="black" />
                 </PrimaryButton>
             </View>
-            <Divider/>
-            <ScrollView style={{flex: 1,}}>
+            <Divider />
+            <ScrollView style={{ flex: 1, }}>
                 <View style={styles.modalContent}>
                     <CustomTextInput label={"Valid from"} type={"date"} value={new Date(validFromDate)}
-                                     onChangeValue={setValidFromDate}/>
+                        minimumDate={new Date()}
+                        onChangeValue={setValidFromDate} />
                     <CustomTextInput label={"Valid until"} type={"date"} value={new Date(validUntilDate)}
-                                     onChangeValue={setValidUntilDate}/>
+                        minimumDate={new Date()}
+                        onChangeValue={setValidUntilDate} />
                     <CustomTextInput label={"Membership Price"} type={"price"} value={membershipPrice.toString()}
-                                     onChangeText={(price) => {
-                                         if (price === "") setMembershipPrice(0)
-                                         else setMembershipPrice(parseFloat(price))
-                                     }}/>
+                        onChangeText={(price) => {
+                            if (price === "") setMembershipPrice(0)
+                            else setMembershipPrice(parseFloat(price))
+                        }} />
                     <CustomTextInput type={"number"} readOnly={true} label={"Membership ID"} value={membershipId.toString()}
-                                     onChangeText={(_id) => setMembershipId(_id)}/>
+                        onChangeText={(_id) => setMembershipId(_id)} />
                 </View>
             </ScrollView>
             <View style={styles.addToCartButtonContainer}>
-                <PrimaryButton onPress={handleSave} label={"Add to cart"}/>
+                <PrimaryButton onPress={handleSave} label={"Add to cart"} />
             </View>
         </Modal>
     </>
