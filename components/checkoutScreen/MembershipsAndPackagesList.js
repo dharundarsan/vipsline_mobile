@@ -49,11 +49,9 @@ const MembershipsAndPackagesList = (props) => {
                         return (props.category === "memberships" ?
                             <MembershipItem data={item}
                                             closeOverallModal={props.closeOverallModal}
-
                             /> :
                             <PackageItem data={item}
                                          closeOverallModal={props.closeOverallModal}
-
                             />)
                     }}
                     keyExtractor={(item) => item.id.toString()}
