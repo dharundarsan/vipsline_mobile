@@ -1,10 +1,10 @@
-{
+ {
   "expo": {
     "name": "vipsline_mobile",
     "slug": "vipsline_mobile",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/512x512.jpg",
     "userInterfaceStyle": "light",
     "plugins": [
       [

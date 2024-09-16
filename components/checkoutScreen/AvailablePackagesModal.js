@@ -31,7 +31,7 @@ const AvailablePackagesModal = (props) => {
         fetchPackages();
     }, [clientId, businessId]);
 
-    return <Modal style={styles.availablePackagesModal}>
+    return <Modal style={styles.availablePackagesModal} animationType={"slide"}>
         {isPackageModalVisible && <PackageModal redeem={true}
                                                 data={packageModalData}
                                                 isVisible={isPackageModalVisible}
