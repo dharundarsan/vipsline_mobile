@@ -6,18 +6,18 @@ import React, {useEffect, useState} from "react";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import axios from "axios";
-import {formatDate} from "../../util/Helpers";
+import {formatDate, formatDateWithAddedMonths} from "../../util/Helpers";
 import Entypo from '@expo/vector-icons/Entypo';
 import {addItemsToPackageCart, addItemToCart, loadCartFromDB} from "../../store/cartSlice";
 import packageSittingItem from "./PackageSittingItem";
 import PackageSittingItem from "./PackageSittingItem";
 import {useDispatch} from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PackageModal = (props) => {
     const [packageDetails, setPackageDetails] = useState([]);
     const [selectedSittingItems, setSelectedSittingItems] = useState([]);
     const dispatch = useDispatch();
-
     const addSittingItems = (item) => {
         setSelectedSittingItems(prev => [...prev, item]);
     }
@@ -26,34 +26,59 @@ const PackageModal = (props) => {
         setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
     }
 
-
     useEffect(() => {
         const getPackageDetailsFromDB = async () => {
+            let businessId = ""
+            try {
+                const value = await AsyncStorage.getItem('businessId');
+                if (value !== null) {
+                    businessId = value;
+                }
+            } catch (e) {
+                console.log("auth token fetching error. (inside catalogueSlice loadServiceDataFromDb)" + e);
+            }
+
+            let authToken = ""
+            try {
+                const value = await AsyncStorage.getItem('authKey');
+                if (value !== null) {
+                    authToken = value;
+                }
+            } catch (e) {
+                console.log("auth token fetching error. (inside catalogueSlice loadServiceDataFromDb)" + e);
+            }
+
+
             try {
                 const response = await axios.post(
-                    `${process.env.EXPO_PUBLIC_API_URI}/package/detail`,
-                    {
+                    props.redeem ? `${process.env.EXPO_PUBLIC_API_URI}/package/getClientPackageDetailById` : `${process.env.EXPO_PUBLIC_API_URI}/package/detail`,
+                    props.redeem ? {
+                        client_package_id: props.data.client_package_id,
+                        business_id: businessId
+                    } : {
                         package_id: props.data.id,
                         date: formatDate(Date.now(), "yyyy-mm-dd"),
-                        business_id: process.env.EXPO_PUBLIC_BUSINESS_ID,
+                        business_id: businessId,
                     },
                     {
                         headers: {
-                            Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
+                            Authorization: `Bearer ${authToken}`
                         }
                     }
                 );
                 setPackageDetails(response.data.data);
             } catch (e) {
-
+                console.log(e)
             }
         }
         getPackageDetailsFromDB();
     }, []);
 
+
     return <Modal visible={props.isVisible} style={styles.packageModal} animationType={"slide"}>
         <View style={styles.headingAndCloseContainer}>
-            <Text style={[textTheme.titleLarge, styles.heading]}>{props.data.name}</Text>
+            <Text
+                style={[textTheme.titleLarge, styles.heading]}>{props.data.name === undefined ? props.data.package_name : props.data.name}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}
@@ -65,16 +90,22 @@ const PackageModal = (props) => {
         <View style={styles.modalContent}>
             <ScrollView>
                 <View style={styles.details}>
-                    <Text style={[textTheme.titleSmall, styles.packageName]}>Transformation Package</Text>
-                    <Text style={[textTheme.bodySmall, styles.serviceCount]}>10 Services</Text>
-                    <Text style={[textTheme.bodySmall, styles.expireText]}>This package will expire on <Text
-                        style={styles.expireDate}>30 November
-                        2023</Text></Text>
-                    <Text style={[textTheme.bodyMedium, styles.price]}>₹ 2500</Text>
+                    <Text
+                        style={[textTheme.titleSmall, styles.packageName]}>{props.data.name === undefined ? props.data.package_name : props.data.name}</Text>
+                    <Text style={[textTheme.bodySmall, styles.serviceCount]}>{props.data.total_sittings} Services</Text>
+                    <Text style={[textTheme.bodySmall, styles.expireText]}>This package will expire on
+                        <Text
+                            style={styles.expireDate}> {props.redeem ? props.data.valid_till : formatDateWithAddedMonths(props.data.duration_months[0])}
+                        </Text>
+                    </Text>
+                    <Text
+                        style={[textTheme.bodyMedium, styles.price]}>₹ {props.redeem ? props.data.price : props.data.package_cost}</Text>
                 </View>
                 {packageDetails.length === 0 ? <ActivityIndicator/> :
-                    <FlatList scrollEnabled={false} data={packageDetails[0].service_list}
+                    <FlatList scrollEnabled={false}
+                              data={props.redeem ? packageDetails[0].Services_List : packageDetails[0].service_list}
                               renderItem={({item}) => <PackageSittingItem data={item}
+                                                                          redeem={props.redeem}
                                                                           addSittingItems={addSittingItems}
                                                                           deleteSittingItems={deleteSittingItems}
                               />
@@ -86,16 +117,24 @@ const PackageModal = (props) => {
         <Divider/>
         <View style={styles.saveButtonContainer}>
             <PrimaryButton onPress={async () => {
-                dispatch(addItemToCart({package_id: props.data.id}));
+                if (!props.redeem)
+                    dispatch(addItemToCart({package_id: props.data.id}));
                 selectedSittingItems.forEach((item) => {
-                    dispatch(addItemToCart({
-                        package_id: props.data.id,
-                        resource_category: item.res_cat_id,
-                        resource_id: null
-                    }));
+                    if (props.redeem) {
+                        dispatch(addItemToCart({
+                            client_package_id: props.data.client_package_id,
+                            resource_category: item.res_cat_id,
+                            resource_id: null
+                        }))
+                    } else {
+                        dispatch(addItemToCart({
+                            package_id: props.data.id,
+                            resource_category: item.res_cat_id,
+                            resource_id: null
+                        }));
+                    }
                 })
-                if (!redeem) props.closeOverallModal();
-
+                props.closeOverallModal();
                 props.onCloseModal();
             }} label={"Save"}/>
         </View>

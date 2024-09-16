@@ -2,7 +2,7 @@ import axios from "axios";
 import { ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default async function sendEmailAPI(email) {
+export default async function sendEmailAPI(email, bookingId) {
 
     let authToken = ""
     try {
@@ -30,8 +30,8 @@ export default async function sendEmailAPI(email) {
             `${process.env.EXPO_PUBLIC_API_URI}/appointment/sendInvoice`,
             {
                 business_id: businessId,
-                booking_id: "2e54d6dd-3fd4-4962-b481-b801c8e0c53c",
-                user_mail: email,
+                booking_id: bookingId,
+                user_mail: email.trim(),
             },
             {
                 headers: {
