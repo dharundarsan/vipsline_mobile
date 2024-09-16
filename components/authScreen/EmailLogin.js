@@ -34,6 +34,8 @@ export default function EmailLogin() {
 
     const [isPasswordValid, setIsPasswordValid] = useState(true);
 
+    const [prompt, setPrompt] = useState(0);
+
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
 
     const dispatch = useDispatch();
@@ -172,10 +174,11 @@ export default function EmailLogin() {
 
             />
             {
-                !isUserFound ?
-                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect email</Text> :
-                    <Text></Text>
-
+                prompt === 1 ?
+                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Enter Email</Text> :
+                    !isUserFound ?
+                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect email</Text> :
+                        <Text></Text>
             }
             <Text style={[textTheme.titleSmall, styles.inputLabel]}>Password</Text>
             <TextInput
@@ -190,9 +193,11 @@ export default function EmailLogin() {
                 }}
             />
             {
-                !isPasswordValid ?
-                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect password</Text> :
-                    <Text></Text>
+                prompt === 2 ?
+                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Enter Password</Text> :
+                    !isPasswordValid ?
+                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect password</Text> :
+                        <Text></Text>
             }
             <View style={{
                 marginTop: 6,
@@ -223,7 +228,29 @@ export default function EmailLogin() {
             </View>
             <PrimaryButton
                 buttonStyle={styles.signInButton}
-                onPress={isLoading ? null : signInHandler}
+                onPress={() => {
+                    if(isLoading) {
+                        return null;
+                    }
+                    if(email.trim().length === 0 && password.trim().length > 0) {
+                        setPrompt(1);
+                    }
+                    else if(email.trim().length > 0 && password.trim().length === 0){
+                        setPrompt(2)
+                    }
+                    else {
+                        setPrompt(0)
+                    }
+
+                    if(email.trim().length === 0 && password.trim().length === 0) {
+                        setPrompt(1)
+                    }
+                    else {
+                        signInHandler().then(r => null);
+                    }
+
+
+                }}
             >
                 {
                     !isLoading ?

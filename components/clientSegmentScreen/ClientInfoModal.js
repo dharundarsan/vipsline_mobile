@@ -268,6 +268,7 @@ export default function clientInfoModal(props) {
                         card={styles.clientProfileCard}
                         cardInnerContainer={styles.cardInnerContainer}
                         rippleColor={Colors.white}
+                        onPress={() => null}
                     />
                 }
 

@@ -172,10 +172,10 @@ const InvoiceModal = (props) => {
                 onCloseModal={() => setSMSModalVisibility(false)}
                 onChangeText={(text) => setPhone(text)}
                 value={phone[1]}
-                buttonTwoOnPress={() => {
+                buttonTwoOnPress={async () => {
                     const phoneNoValid = phoneNoRef.current();
                     if (phoneNoValid) {
-                        sendSMSAPI(selectedClientDetails.name, phone[1]);
+                        await sendSMSAPI(selectedClientDetails.name, phone[1]);
                         setSMSModalVisibility(false)
                     }
                 }}
@@ -195,10 +195,10 @@ const InvoiceModal = (props) => {
                 onCloseModal={() => setEmailModalVisibility(false)}
                 onChangeText={(text) => setEmail(text)}
                 value={email}
-                buttonTwoOnPress={() => {
+                buttonTwoOnPress={async () => {
                     const emailValid = emailRef.current();
                     if (emailValid) {
-                        sendEmailAPI(email);
+                        await sendEmailAPI(email, bookingId);
                         setEmailModalVisibility(false);
                     }
                 }}
@@ -433,7 +433,7 @@ styles.heading]}>Invoice</Text>*/}
                                                         textStyle={{ textAlign: "center" }}
                                                     />
                                                     {
-                                                        checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" ?
+                                                        checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" && innerItem.parent_category_name === "membership"?
                                                             <View style={styles.durationDetails}>
                                                                 <Text>
                                                                     Duration: {innerItem.duration} days
@@ -446,7 +446,7 @@ styles.heading]}>Invoice</Text>*/}
                                                             <></>
                                                     }
                                                     {
-                                                        checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" ?
+                                                        checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" && innerItem.parent_category_name === "packages" ?
                                                             <View style={styles.durationDetails}>
                                                                 <Text>
                                                                     Duration: {innerItem.duration} days
@@ -455,8 +455,9 @@ styles.heading]}>Invoice</Text>*/}
                                                                     Start date: {innerItem.valid_from} | Expiry
                                                                     date: {innerItem.valid_till}
                                                                 </Text>
-                                                            </View> :
-                                                            <></>
+
+                                                            </View> : <></>
+
                                                     }
 
                                                 </>)

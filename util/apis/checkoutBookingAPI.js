@@ -60,6 +60,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             COD: 1,
             additional_discounts: cartSliceState.additionalDiscounts,
             additional_services: cartSliceState.customItems,
+            client_membership_id: cartSliceState.client_membership_id,
             appointment_date: formatDate(Date.now(), "yyyy-mm-dd"),
             business_id: businessId,
             cart: cartSliceState.items.map(item => {
@@ -107,7 +108,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                     return item
             })
             ],
-            endtime: "18:17:00",
+            endtime: "22:17:00",
             extra_charges: cartSliceState.chargesData[0].amount === 0 ? [] : cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
@@ -129,6 +130,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             walkInUserId: clientDetails.id,
             walkin: "yes",
             wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
+
         }, {
             headers: {
                 Authorization: `Bearer ${authToken}`
