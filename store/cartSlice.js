@@ -321,6 +321,7 @@ export const cartSlice = createSlice({
                     })
                 }).flat()
 
+
                 state.items = state.items.filter(item =>
                     !state.editedMembership.some(edited => edited.item_id === item.item_id)
                 );

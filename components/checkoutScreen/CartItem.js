@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text, TextInput, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
@@ -39,9 +39,13 @@ const CartItem = (props) => {
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
 
+    // useEffect(() => {
+    //     setSelectedStaff(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
+    // }, [props.data]);
+
 
     return <>
-        <View style={styles.cartItem}>
+        <View style={styles.cartItem} >
             {isEditPrepaidModalVisible &&
                 <PrepaidModal edited={true} data={props.data} isVisible={isEditPrepaidModalVisible}
                     onCloseModal={() => setIsEditPrepaidModalVisible(false)} />}
@@ -78,9 +82,9 @@ const CartItem = (props) => {
                         <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.price}</Text>
                         {props.data.gender === "packages" ? null : <PrimaryButton onPress={() => {
                             if (props.data.gender === "prepaid") {
-                                setIsEditPrepaidModalVisible(true)
+                                setIsEditPrepaidModalVisible(prev => !prev)
                             } else {
-                                setIsEditCartModalVisible(true)
+                                setIsEditCartModalVisible(prev => !prev)
                             }
                         }}
                             buttonStyle={styles.editAmountButton}

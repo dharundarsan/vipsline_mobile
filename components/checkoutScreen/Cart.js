@@ -151,10 +151,10 @@ const Cart = () => {
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}}
                                   data={[...cartItems, ...editedCart, ...customItems, ...editedMembership]}
-                                  // keyExtractor={(item, index) => {
-                                  //     console.log(item.item_id);
-                                  //     return item.item_id
-                                  // }}
+                                  keyExtractor={(item, index) => {
+                                      console.log(item.item_id);
+                                      return item.item_id
+                                  }}
                                   renderItem={({item}) => <CartItem staffs={staffs} data={item}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>

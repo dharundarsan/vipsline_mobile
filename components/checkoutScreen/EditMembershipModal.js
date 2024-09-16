@@ -56,13 +56,18 @@ const EditMembershipModal = (props) => {
         //     props.closeOverallModal()
         //     return;
         // }
+        const temp = Math.floor(Math.random() * 90000) + 10000;
+        console.log("temp")
+        console.log(props.data.item_id)
+        console.log(checkNullUndefined(props.data.item_id))
+        console.log(temp)
             dispatch(addItemToEditedMembership({
                 ...props.data,
                 price: membershipPrice,
                 total_price: membershipPrice,
                 amount: membershipPrice,
                 resource_id:null,
-                item_id: checkNullUndefined(props.data.item_id) ? Math.floor(Math.random() * 90000) + 10000 : props.data.item_id,
+                item_id: checkNullUndefined(props.data.item_id) ? props.data.item_id : temp,
                 "id": membershipId,
                 "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
                 "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
