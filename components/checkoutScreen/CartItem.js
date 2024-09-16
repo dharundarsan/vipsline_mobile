@@ -116,9 +116,9 @@ const CartItem = (props) => {
                     </View>
                 </PrimaryButton>
 
-                {props.data.price - props.data.discounted_price === props.data.price ? null :
+                {props.data.gender === "custom_item" || props.data.price - props.data.discounted_price === props.data.price || props.data.gender === "prepaid" ? null :
                     <Text
-                        style={[textTheme.labelLarge, styles.discountText]}>{`Discount ₹${props.data.price - props.data.discounted_price}`}</Text>
+                        style={[textTheme.labelLarge, styles.discountText]}>{`Discount ₹${(props.data.price - props.data.discounted_price).toFixed(2)}`}</Text>
                 }
             </View>
         </View>
