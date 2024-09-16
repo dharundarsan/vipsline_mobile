@@ -4,9 +4,10 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Colors from "../../constants/Colors";
 import React, {useState} from "react";
 import CreateClientModal from "../checkoutScreen/CreateClientModal";
-import {loadClientsFromDb} from "../../store/clientSlice";
+import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import {useDispatch} from "react-redux";
 import textTheme from "../../constants/TextTheme";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 
 /**
  * AddClient Component
@@ -35,7 +36,9 @@ export default function AddClient() {
                 isVisible={isModalVisible}
                 onCloseModal={() => {
                     setIsModalVisible(false);
-                    // dispatch(loadClientsFromDb());
+                    dispatch(loadClientCountFromDb());
+                    dispatch(loadClientFiltersFromDb(10, "All"));
+                    dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
                 }}
 
             />

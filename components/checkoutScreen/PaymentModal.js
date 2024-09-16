@@ -698,14 +698,25 @@ const PaymentModal = (props) => {
                                        } else {
                                            setIsInvoiceModalVisible(true);
                                        }
+                                       console.log(12);
 
                                        updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
                                        setTimeout(() => {
                                            updateLiveStatusAPI(response.data[0].booking_id);
+
+
                                            dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+
+
                                            dispatch(updateBookingId(response.data[0].booking_id));
+
+
                                            dispatch(loadWalletPriceFromDb(details.id));
+
+
                                            dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+
+
                                        }, 500);
                                    });
 
