@@ -18,13 +18,12 @@ import Divider from "../../ui/Divider";
 import {checkNullUndefined, formatDate} from "../../util/Helpers";
 import RNDateTimePicker, {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {addItemToCart, addItemToEditedMembership} from "../../store/cartSlice";
+import {addItemToCart, addItemToEditedCart} from "../../store/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
 
 const EditMembershipModal = (props) => {
     const dispatch = useDispatch();
-    const editedMembership = useSelector(state => state.cart.editedMembership);
     const [date, setDate] = useState(new Date(Date.now()).setHours(0, 0, 0, 0));
     const [validFromDate, setValidFromDate] = useState(date);
     const [validUntilDate, setValidUntilDate] = useState(date + (props.data.duration * 24 * 60 * 60 * 1000));
@@ -32,47 +31,39 @@ const EditMembershipModal = (props) => {
     const [membershipId, setMembershipId] = useState(props.data.id);
 
     const handleSave = () => {
-        if(editedMembership.some(ele => ele.id === props.data.id)){
-            ToastAndroid.show("Item already in the cart", ToastAndroid.LONG);
-            return;
-        }
 
-        // if (new Date(validFromDate).getTime() !== new Date(date).getTime() ||
-        //     new Date(validUntilDate).getTime() !== new Date(date + (props.data.duration * 24 * 60 * 60 * 1000)).getTime() ||
-        //     membershipPrice !== props.data.price ||
-        //     membershipId !== props.data.id) {
-        //             //     dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
-        //     dispatch(addItemToEditedMembership({
-        //         ...props.data,
-        //         price: membershipPrice,
-        //         total_price: membershipPrice,
-        //         amount: membershipPrice,
-        //         resource_id:null,
-        //         "id": membershipId,
-        //         "valid_from": formatDate(validFromDate, "yyyy-d-m"),
-        //         "valid_until": formatDate(validUntilDate, "yyyy-d-m"),
-        //     }));
-        //     props.onCloseModal();
-        //     props.closeOverallModal()
-        //     return;
-        // }
-        const temp = Math.floor(Math.random() * 90000) + 10000;
-        console.log("temp")
-        console.log(props.data.item_id)
-        console.log(checkNullUndefined(props.data.item_id))
-        console.log(temp)
-            dispatch(addItemToEditedMembership({
+        if (new Date(validFromDate).getTime() !== new Date(date).getTime() ||
+            new Date(validUntilDate).getTime() !== new Date(date + (props.data.duration * 24 * 60 * 60 * 1000)).getTime() ||
+            membershipPrice !== props.data.price ||
+            membershipId !== props.data.id) {
+            dispatch(addItemToEditedCart({
                 ...props.data,
                 price: membershipPrice,
                 total_price: membershipPrice,
                 amount: membershipPrice,
                 resource_id:null,
-                item_id: checkNullUndefined(props.data.item_id) ? props.data.item_id : temp,
                 "id": membershipId,
-                "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
-                "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
+                "valid_from": formatDate(validFromDate, "yyyy-d-m"),
+                "valid_until": formatDate(validUntilDate, "yyyy-d-m"),
             }));
-        dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+            dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+            props.onCloseModal();
+            props.closeOverallModal()
+            return;
+        }
+        const temp = Math.floor(Math.random() * 90000) + 10000;
+        // dispatch(addItemToEditedMembership({
+        //     ...props.data,
+        //     price: membershipPrice,
+        //     total_price: membershipPrice,
+        //     amount: membershipPrice,
+        //     resource_id:null,
+        //     item_id: checkNullUndefined(props.data.item_id) ? props.data.item_id : temp,
+        //     "id": membershipId,
+        //     "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
+        //     "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
+        // }));
+        // dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
         props.onCloseModal();
         props.closeOverallModal()
     }

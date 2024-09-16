@@ -72,7 +72,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             covid_declaration: "true",
             device: "BUSINESS_WEB",
             editedPurchasedMemberShipId: [],
-            edited_cart: [...cartSliceState.editedMembership.map(item => {
+            edited_cart: [...cartSliceState.editedCart.map(item => {
                 return {
                     amount: item.price,
                     bonus_value: 0,
@@ -88,24 +88,24 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                     wallet_amount: 0,
                 }
             }),
-            ...cartSliceState.editedCart.map(item => {
-                if (item.gender === "Products")
-                    return {
-                        amount: item.amount,
-                        bonus_value: 0,
-                        disc_value: item.disc_value,
-                        itemId: item.item_id,
-                        membership_id: 0,
-                        product_id: item.product_id,
-                        resource_id: item.resource_id,
-                        type: "AMOUNT",
-                        valid_from: "",
-                        valid_till: "",
-                        wallet_amount: 0,
-                    }
-                else
-                    return item
-            })
+                ...cartSliceState.editedCart.map(item => {
+                    if (item.gender === "Products")
+                        return {
+                            amount: item.amount,
+                            bonus_value: 0,
+                            disc_value: item.disc_value,
+                            itemId: item.item_id,
+                            membership_id: 0,
+                            product_id: item.product_id,
+                            resource_id: item.resource_id,
+                            type: "AMOUNT",
+                            valid_from: "",
+                            valid_till: "",
+                            wallet_amount: 0,
+                        }
+                    else
+                        return item
+                })
             ],
             endtime: "18:17:00",
             extra_charges: cartSliceState.chargesData[0].amount === 0 ? [] : cartSliceState.chargesData,
@@ -134,7 +134,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                 Authorization: `Bearer ${authToken}`
             }
         });
-        if(response.data.other_message) {
+        if (response.data.other_message) {
             ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
         }
         return response.data;

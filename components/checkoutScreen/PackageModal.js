@@ -8,7 +8,7 @@ import Divider from "../../ui/Divider";
 import axios from "axios";
 import {formatDate, formatDateWithAddedMonths} from "../../util/Helpers";
 import Entypo from '@expo/vector-icons/Entypo';
-import {addItemsToPackageCart, addItemToCart, loadCartFromDB} from "../../store/cartSlice";
+import {addItemToCart, loadCartFromDB} from "../../store/cartSlice";
 import packageSittingItem from "./PackageSittingItem";
 import PackageSittingItem from "./PackageSittingItem";
 import {useDispatch} from "react-redux";

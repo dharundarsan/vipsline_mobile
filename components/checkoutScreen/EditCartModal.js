@@ -16,7 +16,6 @@ import {
     loadCartFromDB,
     updateCalculatedPrice,
     updateCustomItem,
-    updateEditedCart, updateEditedMembership
 } from "../../store/cartSlice";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 
@@ -27,7 +26,6 @@ const EditCartModal = (props) => {
             const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
             const cartItems = useSelector((state) => state.cart.items);
-    const editedMembership = useSelector((state) => state.cart.editedMembership);
     const editedCart = useSelector((state) => state.cart.editedCart);
 
     useEffect(() => {
@@ -148,7 +146,6 @@ const EditCartModal = (props) => {
                             wallet_amount: props.data.wallet_amount,
                             edited: true
                         }))
-                        dispatch(updateEditedCart());
                     } else if (props.data.gender === "Products") {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
@@ -169,7 +166,6 @@ const EditCartModal = (props) => {
                             wallet_amount: props.data.wallet_amount,
                             edited: true
                         }))
-                        dispatch(updateEditedCart());
                     } else if (props.data.gender === "custom_item") {
                         dispatch(updateCustomItem({
                             amount: price,
@@ -178,15 +174,15 @@ const EditCartModal = (props) => {
                             item_id: props.data.item_id,
                         }))
                     } else if (props.data.gender === "membership") {
-                        await dispatch(updateEditedMembership({
-                            type: "edit", id: props.data.item_id, data: {
-                                amount: price,
-                                bonus_value: 0,
-                                disc_value: discountAmount,
-                                type: "AMOUNT",
-                                res_cat_id: props.data.resource_category_id
-                            }
-                        }))
+                        // await dispatch(updateEditedMembership({
+                        //     type: "edit", id: props.data.item_id, data: {
+                        //         amount: price,
+                        //         bonus_value: 0,
+                        //         disc_value: discountAmount,
+                        //         type: "AMOUNT",
+                        //         res_cat_id: props.data.resource_category_id
+                        //     }
+                        // }))
                         await dispatch(loadCartFromDB());
                     }
                     dispatch(updateCalculatedPrice());

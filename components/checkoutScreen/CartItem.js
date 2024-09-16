@@ -27,6 +27,16 @@ const CartItem = (props) => {
     const isLoading = useSelector(state => state.cart.isLoading);
     const [isEditCartModalVisible, setIsEditCartModalVisible] = useState(false);
     const [isEditPrepaidModalVisible, setIsEditPrepaidModalVisible] = useState(false);
+    const editedCart = useSelector(state => state.cart.editedCart);
+    let editedData;
+    console.log(props.data);
+    if(props.data.gender === "membership"){
+        editedData = editedCart.filter(item => item.id === props.data.membership_id)[0];
+    } else {
+        editedData = editedCart.filter(item => item.id === props.data.item_id)[0];
+    }
+    // const edited = editedData.some(item => props.data.item_id === item.item_id);
+
     const removeItemHandler = async () => {
         if (isLoading) return;
         dispatch(updateLoadingState(true));
@@ -39,6 +49,7 @@ const CartItem = (props) => {
     const [isStaffDropdownModalVisible, setIsStaffDropdownModalVisible] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
 
+    console.log(editedData)
     // useEffect(() => {
     //     setSelectedStaff(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
     // }, [props.data]);
@@ -79,7 +90,7 @@ const CartItem = (props) => {
                     <View style={styles.amountContainer}>
                         <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
-                        <Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.price}</Text>
+                        <Text style={[TextTheme.bodyLarge, styles.amountText]}>{ editedData ? editedData.price : props.data.price}</Text>
                         {props.data.gender === "packages" ? null : <PrimaryButton onPress={() => {
                             if (props.data.gender === "prepaid") {
                                 setIsEditPrepaidModalVisible(prev => !prev)

@@ -12,7 +12,7 @@ import { shadowStyling } from "../../util/Helpers";
 
 const PrepaidModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
-    const [prepaidSource, setPrepaidSource] = useState();
+    const [prepaidSource, setPrepaidSource] = useState("Add prepaid");
     const [prepaidAmount, setPrepaidAmount] = useState(props.edited ? props.data.wallet_amount : 0)
     const [prepaidBonus, setPrepaidBonus] = useState(props.edited ? props.data.wallet_bonus : 0)
     const [description, setDescription] = useState(props.edited ? props.data.wallet_bonus : "")

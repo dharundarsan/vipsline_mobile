@@ -1,15 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 import axios from "axios";
-import { updateClientsList, updateFetchingState } from "./clientFilterSlice";
+import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { formatDate } from "../util/Helpers";
+import {formatDate} from "../util/Helpers";
 
 const initialCartState = {
     items: [],
     isLoading: false,
-    editedMembership: [],
     editedCart: [],
     calculatedPrice: [],
     customItems: [],
@@ -22,7 +21,6 @@ const initialCartState = {
     salesNotes: "",
     totalChargeAmount: 0.0,
     clientMembershipID: undefined,
-    packageCart: [],
     prepaid_wallet: [{
         bonus_value: "",
         description: "",
@@ -76,12 +74,12 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
 }
 
 export const checkStaffOnCartItems = () => (dispatch, getState) => {
-    const { cart } = getState();
+    const {cart} = getState();
     return cart.items.every(item => item.resource_id !== null);
 }
 
 export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
-    const { clientInfo } = getState();
+    const {clientInfo} = getState();
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
@@ -92,7 +90,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
         console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
     }
 
-    const { cart } = getState();
+    const {cart} = getState();
     try {
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
@@ -107,9 +105,6 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
             }
         );
         dispatch(updateItem(response.data.data));
-        dispatch(updateEditedMembership({ type: "map" }))
-        dispatch(updateEditedCart());
-        // dispatch(updatePackageCart());
         dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId));
         dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
@@ -117,63 +112,91 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
 }
 
 export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async (dispatch, getState) => {
-    const { cart } = getState();
+    const {cart} = getState();
 
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems,
-        cart: cart.items.map(item => {
-            return { id: item.item_id }
-        }),
+        cart: cart.items
+            .filter(item => {
+                    if (item.gender === "membership") {
+                        const editedMemberships = cart.editedCart.filter(item => item.gender === "membership");
+                        return editedMemberships.some(editedShips => item.membership_id === editedShips.id);
+                    } else {
+                        return !cart.editedCart.some(edited =>
+                            item.item_id === edited.item_id
+                        )
+                    }
+                }
+            )
+            .map(item => {
+                return {id: item.item_id};
+            }),
         coupon_code: "",
-        edited_cart: [...cart.editedMembership.map(item => {
-            return {
-                amount: item.price,
-                bonus_value: 0,
-                disc_value: 0,
-                itemId: item.item_id,
-                membership_id: item.id,
-                membership_number: "",
-                res_cat_id: item.resource_category_id,
-                resource_id: item.resource_id,
-                type: "AMOUNT",
-                valid_from: item.valid_from,
-                valid_till: item.valid_until,
-                wallet_amount: 0,
-            }
-        }),
-        ...cart.editedCart.map(item => {
-            if (item.gender === "Products")
-                return {
-                    amount: item.amount,
-                    bonus_value: 0,
-                    disc_value: item.disc_value,
-                    itemId: item.item_id,
-                    membership_id: 0,
-                    product_id: item.product_id,
-                    resource_id: item.resource_id,
-                    type: "AMOUNT",
-                    valid_from: "",
-                    valid_till: "",
-                    wallet_amount: 0,
-                }
-            else if (item.gender === "prepaid")
-                return {
-                    amount: 0,
-                    bonus_value: item.wallet_bonus,
-                    disc_value: 0,
-                    itemId: item.item_id,
-                    membership_id: 0,
-                    resource_id: item.resource_id,
-                    type: "AMOUNT",
-                    valid_from: "",
-                    valid_till: "",
-                    wallet_amount: item.wallet_amount,
-                    wallet_description: item.wallet_description
-                }
-            else
-                return item
-        })
+        edited_cart: [
+            //     ...cart.editedMembership.map(item => {
+            //     return {
+            //         amount: item.price,
+            //         bonus_value: 0,
+            //         disc_value: 0,
+            //         itemId: item.item_id,
+            //         membership_id: item.id,
+            //         membership_number: "",
+            //         res_cat_id: item.resource_category_id,
+            //         resource_id: item.resource_id,
+            //         type: "AMOUNT",
+            //         valid_from: item.valid_from,
+            //         valid_till: item.valid_until,
+            //         wallet_amount: 0,
+            //     }
+            // }),
+            ...cart.editedCart.map(item => {
+                if (item.gender === "membership")
+                    return {
+                        amount: item.price,
+                        bonus_value: 0,
+                        disc_value: 0,
+                        itemId: item.item_id,
+                        membership_id: item.id,
+                        membership_number: "",
+                        res_cat_id: item.resource_category_id,
+                        resource_id: item.resource_id,
+                        type: "AMOUNT",
+                        valid_from: item.valid_from,
+                        valid_till: item.valid_until,
+                        wallet_amount: 0,
+                    }
+                else if (item.gender === "Products")
+                    return {
+                        amount: item.amount,
+                        bonus_value: 0,
+                        disc_value: item.disc_value,
+                        itemId: item.item_id,
+                        membership_id: 0,
+                        product_id: item.product_id,
+                        resource_id: item.resource_id,
+                        type: "AMOUNT",
+                        valid_from: "",
+                        valid_till: "",
+                        wallet_amount: 0,
+                    }
+                else if (item.gender === "prepaid")
+                    return {
+                        amount: 0,
+                        bonus_value: item.wallet_bonus,
+                        disc_value: 0,
+                        itemId: item.item_id,
+                        membership_id: 0,
+                        resource_id: item.resource_id,
+                        type: "AMOUNT",
+                        valid_from: "",
+                        valid_till: "",
+                        wallet_amount: item.wallet_amount,
+                        wallet_description: item.wallet_description
+                    }
+                else
+                    return item
+            })
         ],
         extra_charges: cart.chargesData[0].amount === 0 ? [] : cart.chargesData,
         isWalletSelected: prepaid === undefined ? false : prepaid,
@@ -191,7 +214,7 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
 }
 
 export const removeItemFromCart = async (itemId) => async (dispatch, getState) => {
-    const { cart } = getState();
+    const {cart} = getState();
 
     let authToken = ""
     try {
@@ -215,10 +238,7 @@ export const removeItemFromCart = async (itemId) => async (dispatch, getState) =
                     Authorization: `Bearer ${authToken}`
                 }
             }
-        );
-        if (cart.editedMembership.some(ele => ele.itemId === itemId)) {
-            dispatch(removeItemFromEditedMembership(itemId));
-        }
+        )
         if (cart.editedCart.some(ele => ele.itemId === itemId)) {
             dispatch(removeItemFromEditedCart(itemId));
         }
@@ -242,9 +262,6 @@ export const cartSlice = createSlice({
         },
         updateLoadingState(state, action) {
             state.isLoading = action.payload;
-        },
-        addItemToEditedMembership(state, action) {
-            state.editedMembership = [...state.editedMembership, action.payload];
         },
         addItemToEditedCart(state, action) {
             if (state.editedCart.some(item => item.item_id === action.payload.item_id))
@@ -274,20 +291,10 @@ export const cartSlice = createSlice({
         removeItemFromEditedCart(state, action) {
             state.editedCart = state.editedCart.filter(item => item.itemId !== action.payload);
         },
-        removeItemFromEditedMembership(state, action) {
-            state.editedMembership = state.editedMembership.filter(item => item.itemId !== action.payload);
-        },
-        updateEditedCart(state, action) {
-            state.items = state.items.filter(item =>
-                !state.editedCart.some(edited => edited.item_id === item.item_id)
-            )
-        },
         clearLocalCart(state, action) {
             state.items = [];
             state.editedCart = [];
-            state.editedMembership = [];
             state.customItems = [];
-            state.packageCart = [];
             state.additionalDiscounts = [];
             state.chargesData = initialCartState.chargesData;
         },
@@ -301,55 +308,6 @@ export const cartSlice = createSlice({
                 }
                 return item;
             })
-        },
-        updateEditedMembership(state, action) {
-            if (action.payload.type === "map") {
-                state.editedMembership = state.editedMembership.map(edited => {
-                    return state.items.filter(item => {
-                        return item.membership_id === edited.id
-
-                    }).map(item => {
-                        return {
-                            ...item,
-                            price: edited.price,
-                            id: edited.id,
-                            valid_from: edited.valid_from,
-                            valid_until: edited.valid_until,
-                            edited: true
-                        }
-
-                    })
-                }).flat()
-
-
-                state.items = state.items.filter(item =>
-                    !state.editedMembership.some(edited => edited.item_id === item.item_id)
-                );
-            } else if (action.payload.type === "edit") {
-                state.editedMembership = state.editedMembership.map(item => {
-                    if (item.item_id === action.payload.id) {
-                        return {
-                            ...item,
-                            itemId: item.item_id,
-                            item_Id: item.item_id,
-                            membership_id: item.membership_id,
-                            membership_number: "",
-                            res_cat_id: action.payload.data.res_cat_id,
-                            resource_id: item.resource_id,
-                            disc_value: action.payload.data.disc_value,
-                            amount: action.payload.data.amount,
-                            price: action.payload.data.amount,
-                            total_price: action.payload.data.amount,
-                            type: action.payload.data.type,
-                            valid_from: item.valid_from,
-                            valid_until: item.valid_until,
-                            wallet_amount: 0,
-                        }
-                    }
-                    return item;
-                })
-            }
-            // state.items = state.editedMembership.map(edited => state.items.filter(item => item.item_id !== edited.item_id)).flat();
         },
         setCalculatedPrice(state, action) {
             state.calculatedPrice = action.payload;
@@ -394,45 +352,11 @@ export const cartSlice = createSlice({
         updateTotalChargeAmount(state, action) {
             state.totalChargeAmount = action.payload;
         },
-        addItemsToPackageCart(state, action) {
-            state.packageCart = [...state.packageCart, action.payload];
-        },
-        updatePackageCart(state, action) {
-            state.items.forEach(item => {
-                if (item.gender === "packages" && item.package_name === "" && item.price !== 0) {
-                    const existingPackage = state.packageCart.find(p => p.packageDetails.package_id === item.package_id);
-                    if (!existingPackage) {
-                        state.packageCart.push({
-                            packageDetails: { ...item, type: "Package" },
-                            packageItems: []
-                        });
-                    }
-                }
-            });
-            state.items.forEach(item => {
-                if (item.gender === "packages" && item.package_name !== "" && item.price === 0) {
-                    state.packageCart = state.packageCart.map(wholePackage => {
-                        if (wholePackage.packageDetails.package_id === item.package_id) {
-                            // Ensure item is not duplicated
-                            if (!wholePackage.packageItems.find(i => i.item_id === item.item_id)) {
-                                return {
-                                    packageDetails: wholePackage.packageDetails,
-                                    packageItems: [...wholePackage.packageItems, item]
-                                };
-                            }
-                        }
-                        return wholePackage;
-                    });
-                }
-            });
-
-            state.items = state.items.filter(item => item.gender !== "packages");
-        },
         clearCalculatedPrice(state, action) {
             state.calculatedPrice = [];
         },
         modifyClientMembershipId(state, action) {
-            const { type, payload } = action.payload;
+            const {type, payload} = action.payload;
             switch (type) {
                 case "clear":
                     state.clientMembershipID = undefined;
@@ -443,7 +367,7 @@ export const cartSlice = createSlice({
             }
         },
         modifyPrepaidDetails(state, action) {
-            const { type, payload } = action.payload;
+            const {type, payload} = action.payload;
             switch (type) {
                 case "clear":
                     state.prepaid_wallet = [{
@@ -470,7 +394,8 @@ export const cartSlice = createSlice({
                     }
                     break;
                 case "updateResourceId":
-                    if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
+                    // if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
+                    if (state.prepaid_wallet.length > 0) {
                         // state.prepaid_wallet[0].source = "add_prepaid";
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
@@ -498,12 +423,8 @@ export const cartSlice = createSlice({
 export const {
     updateItem,
     updateLoadingState,
-    addItemToEditedMembership,
-    updateEditedMembership,
-    removeItemFromEditedMembership,
     addItemToEditedCart,
     removeItemFromEditedCart,
-    updateEditedCart,
     setCalculatedPrice,
     addCustomItems,
     removeCustomItems,
@@ -511,8 +432,6 @@ export const {
     updateDiscount,
     updateChargeData,
     updateSalesNotes,
-    addItemsToPackageCart,
-    updatePackageCart,
     clearCalculatedPrice,
     updateStaffInEditedCart,
     updateStaffInCustomItemsCart,
