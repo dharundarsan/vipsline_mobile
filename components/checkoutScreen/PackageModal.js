@@ -11,24 +11,26 @@ import Entypo from '@expo/vector-icons/Entypo';
 import {addItemToCart, loadCartFromDB} from "../../store/cartSlice";
 import packageSittingItem from "./PackageSittingItem";
 import PackageSittingItem from "./PackageSittingItem";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PackageModal = (props) => {
     const [packageDetails, setPackageDetails] = useState([
         {
             "expiry_date": "",
-            "package_name":"",
-            "service_list":[{}],
-            "package_price":0,
-            "total_sessions":0,
+            "package_name": "",
+            "service_list": [{}],
+            "package_price": 0,
+            "total_sessions": 0,
         }
     ]);
+    const [editedPackageDetails, setEditedPackageDetails] = useState([]);
     const [selectedSittingItems, setSelectedSittingItems] = useState([]);
     const dispatch = useDispatch();
     const addSittingItems = (item) => {
         setSelectedSittingItems(prev => [...prev, item]);
     }
+    const cartItems = useSelector(state => state.cart.items);
 
     const deleteSittingItems = (item) => {
         setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
@@ -64,7 +66,7 @@ const PackageModal = (props) => {
                         client_package_id: props.data.client_package_id,
                         business_id: businessId
                     } : {
-                        package_id: props.data.id,
+                        package_id: props.edited ? props.data.package_id : props.data.id,
                         date: formatDate(Date.now(), "yyyy-mm-dd"),
                         business_id: businessId,
                     },
@@ -75,18 +77,50 @@ const PackageModal = (props) => {
                     }
                 );
                 setPackageDetails(response.data.data);
-                // console.log(JSON.stringify(response.data.data,null,3));
-                
+                // const packageSittingItemsInCart = [];
+                let packageSittingItemsInCart = cartItems.filter(item => item.gender === "packages" && item.package_name !== "");
+
+                console.log(response.data.data[0].service_list.map(item => {
+                    let counter = 0;
+                    let index;
+
+                    // Use a loop to find and remove all matching items
+                    while ((index = packageSittingItemsInCart.findIndex(ele =>
+                        ele.resource_category_name === item.name &&
+                        ele.resource_category_id === item.res_cat_id &&
+                        ele.parent_resource_category_id === item.par_res_cat_id
+                    )) !== -1) {
+                        packageSittingItemsInCart.splice(index, 1);  // Remove the element at found index
+                        counter++;  // Increment counter since one element was removed
+                    }
+
+                    // const original = packageDetails[0].service_list.filter(ele => ele.resource_category_name === item.resource_category_name &&
+                    //     ele.resource_category_id === item.resource_category_id &&
+                    //     ele.parent_resource_category_id === item.parent_resource_category_id)[0]
+
+                    return {
+                        name: item.name,
+                        resource_category_id: item.res_cat_id,
+                        parent_resource_category_id: item.par_res_cat_id,
+                        counter: counter,
+                        // available_quantity: original.available_quantity,
+                        // total_quantity: original.total_quantity
+                    };
+                }));
+
+
             } catch (e) {
                 console.log(e)
             }
         }
         getPackageDetailsFromDB();
     }, []);
+
+
     return <Modal visible={props.isVisible} style={styles.packageModal} animationType={"slide"}>
         <View style={styles.headingAndCloseContainer}>
             <Text
-                style={[textTheme.titleLarge, styles.heading]}>{props.data.name === undefined ? props.data.package_name : props.data.name}</Text>
+                style={[textTheme.titleLarge, styles.heading]}>{props.edited ? props.data.resource_category_name : props.data.name === undefined ? props.data.package_name : props.data.name}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}
@@ -99,10 +133,11 @@ const PackageModal = (props) => {
             <ScrollView>
                 <View style={styles.details}>
                     <Text
-                        style={[textTheme.titleSmall, styles.packageName]}>{props.data.name === undefined ? props.data.package_name : props.data.name}</Text>
-                    <Text style={[textTheme.bodySmall, styles.serviceCount]}>{packageDetails.service_list === undefined ? packageDetails[0].service_list.length : packageDetails.service_list.length} Services</Text>
+                        style={[textTheme.titleSmall, styles.packageName]}>{props.edited ? props.data.resource_category_name : props.data.name === undefined ? props.data.package_name : props.data.name}</Text>
+                    <Text
+                        style={[textTheme.bodySmall, styles.serviceCount]}>{packageDetails.service_list === undefined ? packageDetails[0].service_list.length : packageDetails.service_list.length} Services</Text>
                     <Text style={[textTheme.bodySmall, styles.expireText]}>This package will expire on
-                        <Text 
+                        <Text
                             // style={styles.expireDate}> {props.redeem ? props.data.valid_till : formatDateWithAddedMonths(props.data.duration_months[0])}
                             style={styles.expireDate}> {props.redeem ? props.data.valid_till : packageDetails[0].expiry_date}
                         </Text>
@@ -112,14 +147,14 @@ const PackageModal = (props) => {
                 </View>
                 {packageDetails[0].expiry_date === "" ? <ActivityIndicator/> :
                     <FlatList scrollEnabled={false}
-                        data={props.redeem ? packageDetails[0].Services_List : packageDetails[0].service_list}
-                        renderItem={({item}) => 
-                        <PackageSittingItem data={item}
-                            redeem={props.redeem}
-                            addSittingItems={addSittingItems}
-                            deleteSittingItems={deleteSittingItems}
-                        />
-                        }
+                              data={props.redeem ? packageDetails[0].Services_List : packageDetails[0].service_list}
+                              renderItem={({item}) =>
+                                  <PackageSittingItem data={item}
+                                                      redeem={props.redeem}
+                                                      addSittingItems={addSittingItems}
+                                                      deleteSittingItems={deleteSittingItems}
+                                  />
+                              }
                     />
                 }
             </ScrollView>
