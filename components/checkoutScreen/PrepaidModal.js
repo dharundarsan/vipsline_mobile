@@ -39,19 +39,21 @@ const PrepaidModal = (props) => {
                 <CustomTextInput label={"Prepaid amount"} type={"price"} placeholder={"0.00"}
                     value={prepaidAmount.toString()}
                     validator={(text) => {
-                        if (parseFloat(text) === 0) return "Price is required";
+                        if (parseFloat(text) === 0 || text === "") return "Price is required";
                         else return true;
                     }}
                     onSave={(callback) => {
                         prepaidAmountRef.current = callback;
                     }}
-                    onChangeText={(price) => {
-                        if (price === "") setPrepaidAmount(0)
-                        else setPrepaidAmount(parseFloat(price))
-                    }} />
+                    onEndEditing={(price) => {
+                        if (price === "") return 0
+                        setPrepaidAmount(parseFloat(price))
+                    }}
+                    onChangeText={setPrepaidAmount} />
                 <CustomTextInput label={"Prepaid Bonus"} type={"price"} placeholder={"0.00"}
                     value={prepaidBonus.toString()}
-                    onChangeText={(price) => {
+                    onChangeText={setPrepaidBonus}
+                    onEndEditing={(price) => {
                         if (price === "") setPrepaidBonus(0)
                         else setPrepaidBonus(parseFloat(price))
                     }} />

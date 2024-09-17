@@ -157,6 +157,13 @@ const CheckoutSection = (props) => {
         setClickedValue(value);
     }
 
+
+    const checkoutDiscount = useSelector(state => state.checkoutAction.additionalDiscounts)
+    const checkoutCharges = useSelector(state => state.checkoutAction.chargesData);
+
+    const customDiscount = useSelector(state => state.cart.additionalDiscounts);
+
+
     async function addDiscount(discountMode, type) {
         const addDiscount = {
             name: "Custom Discount", type: discountMode, amount: discountValue
@@ -338,7 +345,9 @@ const CheckoutSection = (props) => {
                         <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
                     {discountCategory.package !== "0" ?
                         <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
-                    {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" ?
+                    {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount)?
+                        <Text>Custom Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text>: null}
+                    {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" && customDiscount !== undefined && customDiscount.length === 0 ?
                         <Text>No discounts applied</Text> : null}
                 </Popover>
             </View>
@@ -375,7 +384,9 @@ const CheckoutSection = (props) => {
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].gst_charges}</Text>
         </View>
-        <View style={styles.checkoutDetailRow}>
+        {
+            totalChargeAmount !== 0 ?
+            <View style={styles.checkoutDetailRow}>
             <View>
                 {
                     chargesAmount[0].amount === 0 ?
@@ -413,8 +424,10 @@ const CheckoutSection = (props) => {
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>*/}
             {/*    ₹ {checkNullUndefined(chargesAmount[0].amount) ? chargesAmount[0].amount : null}*/}
             {/*</Text>*/}
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {totalChargeAmount}</Text>
-        </View>
+                <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {totalChargeAmount}</Text>
+            </View> :
+                <></>
+        }
         <View style={styles.buttonContainer}>
             <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>

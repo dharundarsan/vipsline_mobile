@@ -57,7 +57,7 @@ const ServiceItem = (props) => {
     >
         <View style={styles.leftBar}></View>
         <View style={styles.nameAndPriceContainer}>
-            <Text style={textTheme.bodyMedium}>{props.data.name}</Text>
+            <Text style={[textTheme.bodyMedium,{maxWidth:"80%"}]}>{props.data.name}</Text>
 
             <View style={styles.priceContainer}>
                 {

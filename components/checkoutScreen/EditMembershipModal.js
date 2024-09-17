@@ -43,8 +43,8 @@ const EditMembershipModal = (props) => {
                 amount: membershipPrice,
                 resource_id:null,
                 "id": membershipId,
-                "valid_from": formatDate(validFromDate, "yyyy-d-m"),
-                "valid_until": formatDate(validUntilDate, "yyyy-d-m"),
+                "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
+                "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
             }));
             dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
             props.onCloseModal();
@@ -83,9 +83,11 @@ const EditMembershipModal = (props) => {
             <ScrollView style={{flex: 1,}}>
                 <View style={styles.modalContent}>
                     <CustomTextInput label={"Valid from"} type={"date"} value={new Date(validFromDate)}
-                                     onChangeValue={setValidFromDate}/>
+                        minimumDate={new Date()}
+                        onChangeValue={setValidFromDate} />
                     <CustomTextInput label={"Valid until"} type={"date"} value={new Date(validUntilDate)}
-                                     onChangeValue={setValidUntilDate}/>
+                        minimumDate={new Date()}
+                        onChangeValue={setValidUntilDate} />
                     <CustomTextInput label={"Membership Price"} type={"price"} value={membershipPrice.toString()}
                                      onChangeText={(price) => {
                                          if (price === "") setMembershipPrice(0)

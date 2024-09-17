@@ -59,8 +59,7 @@ export default function clientInfoModal(props) {
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
     const details = useSelector(state => state.clientInfo.details);
-    console.log(details);
-    
+
 
     const [totalSales, setTotalSales] = useState("");
     const [lastVisit, setLastVisit] = useState("");
@@ -272,12 +271,13 @@ export default function clientInfoModal(props) {
                 {
                     clientMoreDetails === null ?
                         null :
-                        <ClientCard
-                            name={props.name}
-                            card={styles.clientProfileCard}
-                            cardInnerContainer={styles.cardInnerContainer}
-                            rippleColor={Colors.white}
-                        />
+                    <ClientCard
+                        name={props.name}
+                        card={styles.clientProfileCard}
+                        cardInnerContainer={styles.cardInnerContainer}
+                        rippleColor={Colors.white}
+                        onPress={() => null}
+                    />
                 }
 
             </View>
