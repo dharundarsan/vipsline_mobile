@@ -12,7 +12,7 @@ import getDiscountAPI from "../../util/apis/getDiscountAPI";
 import Divider from "../../ui/Divider";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    addItemToEditedCart,
+    addItemToEditedCart, editMembership,
     loadCartFromDB,
     updateCalculatedPrice,
     updateCustomItem,
@@ -23,9 +23,9 @@ const EditCartModal = (props) => {
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage");
     const [discountValue, setDiscountValue] = useState(0);
     const [discountAmount, setDiscountAmount] = useState(0);
-            const [price, setPrice] = useState(props.data.price);
+    const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
-            const cartItems = useSelector((state) => state.cart.items);
+    const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
 
     useEffect(() => {
@@ -41,7 +41,7 @@ const EditCartModal = (props) => {
         setDiscountAmount(0);
     }, [selectedDiscountMode]);
 
-    return <Modal visible={props.isVisible} style={styles.editCartModal}>
+    return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Edit {props.data.resource_category_name}</Text>
             <PrimaryButton
@@ -127,7 +127,7 @@ const EditCartModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={async () => {
                 if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
-                    if (props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" ) {
+                    if (props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General") {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
                             amount: price,
@@ -166,24 +166,20 @@ const EditCartModal = (props) => {
                             wallet_amount: props.data.wallet_amount,
                             edited: true
                         }))
-                    } else if (props.data.gender === "custom_item") {
-                        dispatch(updateCustomItem({
-                            amount: price,
-                            price: price,
-                            total_price: price,
-                            item_id: props.data.item_id,
-                        }))
                     } else if (props.data.gender === "membership") {
-                        // await dispatch(updateEditedMembership({
-                        //     type: "edit", id: props.data.item_id, data: {
-                        //         amount: price,
-                        //         bonus_value: 0,
-                        //         disc_value: discountAmount,
-                        //         type: "AMOUNT",
-                        //         res_cat_id: props.data.resource_category_id
-                        //     }
-                        // }))
-                        await dispatch(loadCartFromDB());
+                        await dispatch(editMembership({
+                            id: props.data.id === undefined ? props.data.membership_id : props.data.id, data: {
+                                amount: price,
+                                price: price,
+                                total_price: price,
+                                bonus_value: 0,
+                                disc_value: discountAmount,
+                                type: "AMOUNT",
+                                id: props.data.membership_id,
+                                res_cat_id: props.data.resource_category_id
+                            }
+                        }))
+                        // await dispatch(loadCartFromDB());
                     }
                     dispatch(updateCalculatedPrice());
                     props.onCloseModal()

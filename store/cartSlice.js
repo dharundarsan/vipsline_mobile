@@ -5,6 +5,7 @@ import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {formatDate} from "../util/Helpers";
+import {useState} from "react";
 
 const initialCartState = {
     items: [],
@@ -120,8 +121,10 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
         cart: cart.items
             .filter(item => {
                     if (item.gender === "membership") {
-                        const editedMemberships = cart.editedCart.filter(item => item.gender === "membership");
-                        return editedMemberships.some(editedShips => item.membership_id === editedShips.id);
+                        if (cart.editedCart.length === 0) return true;
+                        else {
+                            return !cart.editedCart.some(editedShips => item.membership_id === editedShips.id)
+                        }
                     } else {
                         return !cart.editedCart.some(edited =>
                             item.item_id === edited.item_id
@@ -151,22 +154,23 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
             //     }
             // }),
             ...cart.editedCart.map(item => {
-                if (item.gender === "membership")
+                if (item.gender === "membership") {
+                    const originalData = cart.items.filter(ele => ele.membership_id === item.id)[0];
                     return {
                         amount: item.price,
                         bonus_value: 0,
                         disc_value: 0,
-                        itemId: item.item_id,
+                        itemId: originalData.item_id,
                         membership_id: item.id,
                         membership_number: "",
-                        res_cat_id: item.resource_category_id,
+                        res_cat_id: originalData.resource_category_id,
                         resource_id: item.resource_id,
                         type: "AMOUNT",
                         valid_from: item.valid_from,
                         valid_till: item.valid_until,
                         wallet_amount: 0,
                     }
-                else if (item.gender === "Products")
+                } else if (item.gender === "Products")
                     return {
                         amount: item.amount,
                         bonus_value: 0,
@@ -290,6 +294,29 @@ export const cartSlice = createSlice({
         },
         removeItemFromEditedCart(state, action) {
             state.editedCart = state.editedCart.filter(item => item.itemId !== action.payload);
+        },
+        removeMembershipFromEditedCart(state, action) {
+            state.editedCart = state.editedCart.filter(item => item.id !== action.payload);
+        },
+        editMembership(state, action) {
+            if (state.editedCart.some(edited => edited.membership_id === action.payload.id)) {
+                state.editedCart = state.editedCart.map(edited => {
+                    if (edited.membership_id === action.payload.id) {
+                        return {...edited, ...action.payload.data}
+                    }
+                    return edited;
+                })
+            } else {
+                const originalData = state.items.filter(item => item.membership_id === action.payload.id)[0];
+                const validFrom = new Date(Date.now()).setHours(0, 0, 0, 0)
+                const validUntil = validFrom + (originalData.duration * 24 * 60 * 60 * 1000)
+                console.log({...originalData, ...action.payload.data})
+                state.editedCart = [...state.editedCart, {
+                    ...originalData, ...action.payload.data,
+                    valid_from: formatDate(validFrom, "yyyy-mm-dd"),
+                    valid_until: formatDate(validUntil, "yyyy-mm-dd"),
+                }];
+            }
         },
         clearLocalCart(state, action) {
             state.items = [];
@@ -435,6 +462,8 @@ export const {
     clearCalculatedPrice,
     updateStaffInEditedCart,
     updateStaffInCustomItemsCart,
+    removeMembershipFromEditedCart,
+    editMembership,
     clearLocalCart,
     clearSalesNotes,
     updateTotalChargeAmount,

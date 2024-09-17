@@ -38,13 +38,15 @@ const EditMembershipModal = (props) => {
             membershipId !== props.data.id) {
             dispatch(addItemToEditedCart({
                 ...props.data,
+                gender:"membership",
                 price: membershipPrice,
                 total_price: membershipPrice,
                 amount: membershipPrice,
                 resource_id:null,
                 "id": membershipId,
-                "valid_from": formatDate(validFromDate, "yyyy-d-m"),
-                "valid_until": formatDate(validUntilDate, "yyyy-d-m"),
+                "membership_id": membershipId,
+                "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
+                "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
             }));
             dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
             props.onCloseModal();
@@ -63,7 +65,7 @@ const EditMembershipModal = (props) => {
         //     "valid_from": formatDate(validFromDate, "yyyy-mm-dd"),
         //     "valid_until": formatDate(validUntilDate, "yyyy-mm-dd"),
         // }));
-        // dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
+        dispatch(addItemToCart({membership_id: props.data.id, membership_number: ""}));
         props.onCloseModal();
         props.closeOverallModal()
     }
