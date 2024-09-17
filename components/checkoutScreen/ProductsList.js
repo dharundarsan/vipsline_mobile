@@ -1,15 +1,15 @@
-import {ActivityIndicator, FlatList, ScrollView, ScrollViewBase, StyleSheet, Text, TextInput, View} from "react-native";
+import { ActivityIndicator, FlatList, ScrollView, ScrollViewBase, StyleSheet, Text, TextInput, View } from "react-native";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
-import {Ionicons} from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import PrimaryButton from "../../ui/PrimaryButton";
 import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
-import React, {useEffect, useState, useLayoutEffect} from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import ServiceItem from "./ServiceItem";
 import ProductItem from "./ProductItem";
 import axios from "axios";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import SearchBar from "../../ui/SearchBar";
 
 const ProductsList = (props) => {
@@ -18,6 +18,7 @@ const ProductsList = (props) => {
 
     const filterProductsData = (filterValue) => {
         const lowerCaseFilterValue = filterValue.toLowerCase();
+        if (productsData[0] === null) return [];
         const newFilteredData = productsData.map((categoryObj) => {
             const filteredCategories = {};
 
@@ -39,48 +40,61 @@ const ProductsList = (props) => {
         setFilteredProductsData(newFilteredData);
     };
 
-    const transformedData = filteredProductsData.map(categoryObj =>
+    const transformedData = productsData[0] !== null ? filteredProductsData.map(categoryObj =>
         Object.keys(categoryObj).map(key => ({
             parent_category: key,
             products: categoryObj[key]
         }))
-    ).flat();
+    ).flat() : [];
     return (
         <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>
-                <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
-                <SearchBar filter={true}
-                           onPressFilter={() => {
-                                                          }}
-                           onChangeText={filterProductsData}
-                           placeholder={"Search by product name or prices"}/>
+                {
+                    productsData[0] !== null ?
+                        <>
+                            <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
+                            <SearchBar filter={true}
+                                onPressFilter={() => {
+                                }}
+                                onChangeText={filterProductsData}
+                                placeholder={"Search by product name or prices"} />
+                        </>
+                        : null
+                }
             </View>
-            <ScrollView style={styles.flatListContainer} fadingEdgeLength={75}>
-                {transformedData.map((item, index) => (
-                    <View key={index}>
-                        <View style={styles.parentCategoryAndProductsLengthContainer}>
-                            <Text style={[textTheme.titleMedium, styles.parentCategoryText]}>
-                                {item.parent_category}
-                            </Text>
-                            <View style={styles.productsLengthContainer}>
-                                <Text
-                                    style={[textTheme.titleMedium, styles.productsLengthText]}>{item.products.length}</Text>
+            {
+                productsData[0] === null ? <View style={styles.noDataMessage}>
+                    <Text style={TextTheme.titleMedium}>No Products Available</Text>
+                </View>
+                    :
+                    <ScrollView style={styles.flatListContainer} fadingEdgeLength={75}>
+                        {transformedData.map((item, index) => (
+                            <View key={index}>
+                                <View style={styles.parentCategoryAndProductsLengthContainer}>
+                                    <Text style={[textTheme.titleMedium, styles.parentCategoryText]}>
+                                        {item.parent_category}
+                                    </Text>
+                                    <View style={styles.productsLengthContainer}>
+                                        <Text
+                                            style={[textTheme.titleMedium, styles.productsLengthText]}>{item.products.length}</Text>
+                                    </View>
+                                </View>
+                                <FlatList
+                                    data={item.products}
+                                    renderItem={({ item }) => <ProductItem data={item}
+                                        closeOverallModal={props.closeOverallModal}
+                                    />}
+                                    // renderItem={({item}) => <ProductItem data={item}
+                                    //                                      addToTempSelectedItems={addToTempSelectedItems}
+                                    //                                      selected={tempSelectedItems.includes(item)}/>}
+                                    keyExtractor={(item) => item.id.toString()}
+                                    scrollEnabled={false}
+                                />
                             </View>
-                        </View>
-                        <FlatList
-                            data={item.products}
-                            renderItem={({item}) => <ProductItem data={item}
-                                                                 closeOverallModal={props.closeOverallModal}
-                            />}
-                            // renderItem={({item}) => <ProductItem data={item}
-                            //                                      addToTempSelectedItems={addToTempSelectedItems}
-                            //                                      selected={tempSelectedItems.includes(item)}/>}
-                            keyExtractor={(item) => item.id.toString()}
-                            scrollEnabled={false}
-                        />
-                    </View>
-                ))}
-            </ScrollView>
+                        ))}
+                    </ScrollView>
+
+            }
         </View>
 
     );
@@ -114,7 +128,13 @@ const styles = StyleSheet.create({
         paddingVertical: 0,
         paddingHorizontal: 6,
     },
-    productsLengthText: {}
+    productsLengthText: {},
+    noDataMessage: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: "-50%"
+    }
 });
 
 export default ProductsList;

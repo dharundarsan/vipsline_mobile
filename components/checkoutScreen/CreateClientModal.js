@@ -142,10 +142,10 @@ const CreateClientModal = (props) => {
                         placeholder="Enter client's last name"
                         value={lastName}
                         onChangeText={setLastName}
-                        validator={(text) => {
-                            if (text.length === 0) return "Last name is required";
-                            else return true;
-                        }}
+                        // validator={(text) => {
+                        //     if (text.length === 0) return "Last name is required";
+                        //     else return true;
+                        // }}
                         onSave={(callback) => {
                             lastNameRef.current = callback;
                         }}
@@ -171,7 +171,7 @@ const CreateClientModal = (props) => {
                         value={email}
                         onChangeText={setEmail}
                         validator={(text) => {
-                            if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) return "Email is invalid";
+                            if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "") return "Email is invalid";
                             else return true;
                         }}
                     />

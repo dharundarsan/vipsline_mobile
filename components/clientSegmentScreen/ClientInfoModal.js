@@ -335,6 +335,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     phone: {
+        width:"150%"
     },
     optionsContainer: {
         flexDirection: "row",

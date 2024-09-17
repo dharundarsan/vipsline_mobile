@@ -179,7 +179,7 @@ const UpdateClientModal = (props) => {
                         placeholder="Enter client's last name"
                         value={clientData.lastName}
                         onChangeText={(value) => handleChange("lastName", value)}
-                        validator={(text) => text.length === 0 ? "Last name is required" : true}
+                        // validator={(text) => text.length === 0 ? "Last name is required" : true}
                         onSave={(callback) => { lastNameRef.current = callback; }}
                     />
                     <CustomTextInput
@@ -197,7 +197,7 @@ const UpdateClientModal = (props) => {
                         placeholder="Enter email address"
                         value={clientData.email}
                         onChangeText={(value) => handleChange("email", value)}
-                        validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
+                        validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
                         onSave={(callback) => { emailRef.current = callback; }}
                     />
                     <CustomTextInput

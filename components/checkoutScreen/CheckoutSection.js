@@ -170,7 +170,7 @@ const CheckoutSection = (props) => {
         }
 
         if (type === "clear") {
-
+            setDiscountValue("")
             dispatch(updateDiscount([]));
             setSelectedDiscountMode("PERCENTAGE")
         } else {
