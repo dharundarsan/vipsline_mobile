@@ -21,6 +21,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { addItemToCart, addItemToEditedMembership } from "../../store/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
+import Toast from "react-native-root-toast";
 
 const EditMembershipModal = (props) => {
     const dispatch = useDispatch();
@@ -33,7 +34,14 @@ const EditMembershipModal = (props) => {
 
     const handleSave = () => {
         if (editedMembership.some(ele => ele.id === props.data.id)) {
-            ToastAndroid.show("Item already in the cart", ToastAndroid.LONG);
+            // ToastAndroid.show("Item already in the cart", ToastAndroid.LONG);
+            Toast.show("Item already in the cart",{
+                duration:Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow:false,
+                backgroundColor:"black",
+                opacity:1
+            })
             return;
         }
 

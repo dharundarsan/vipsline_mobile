@@ -55,22 +55,22 @@ const ProductItem = (props) => {
     });
 
     return <PrimaryButton buttonStyle={styles.selectProductItemButton}
-                          pressableStyle={styles.selectProductItemPressable}
-                          onPress={() => {
-                              props.closeOverallModal()
-                              dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
-                          }}
+            pressableStyle={styles.selectProductItemPressable}
+            onPress={() => {
+                props.closeOverallModal()
+                dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
+            }}
     >
         <View style={styles.nameAndPriceContainer}>
             <Text style={[textTheme.bodyMedium, styles.nameText]}>{props.data.name}</Text>
             <View style={styles.priceContainer}>
                 {
                     props.data.price === props.data.discounted_price ? <>
-                        <Text style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + props.data.price}</Text>
+                        <Text style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + (props.data.price).toFixed(2)}</Text>
                     </> : <>
-                        <Text style={[textTheme.titleSmall, styles.lineThroughPrice]}>{"₹ " + props.data.price}</Text>
+                        <Text style={[textTheme.titleSmall, styles.lineThroughPrice]}>{"₹ " + (props.data.price).toFixed(2)}</Text>
                         <Text
-                            style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + props.data.discounted_price}</Text>
+                            style={[textTheme.titleSmall, styles.priceText]}>{"₹ " + (props.data.discounted_price).toFixed(2)}</Text>
                     </>
                 }
             </View>

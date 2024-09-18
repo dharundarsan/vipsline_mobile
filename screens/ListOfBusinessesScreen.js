@@ -23,6 +23,8 @@ import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useFocusEffect} from "@react-navigation/native";
+import {clearClientInfo} from "../store/clientInfoSlice";
+import clearCartAPI from "../util/apis/clearCartAPI";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -30,7 +32,12 @@ export default function ListOfBusinessesScreen({navigation}) {
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
 
-
+    useFocusEffect(
+        useCallback(() => {
+            dispatch(clearClientInfo());
+            clearCartAPI();
+        }, [])
+    );
 
     useLayoutEffect(() => {
         // dispatch(loadServicesDataFromDb("women"));
@@ -69,7 +76,7 @@ export default function ListOfBusinessesScreen({navigation}) {
                 businessId = value;
             }
         } catch (e) {
-                    }
+        }
 
     }
 
@@ -77,7 +84,7 @@ export default function ListOfBusinessesScreen({navigation}) {
         try {
             await AsyncStorage.setItem('businessId', value);
         } catch (e) {
-                    }
+        }
     };
 
     function renderItem(itemData) {
@@ -103,12 +110,10 @@ export default function ListOfBusinessesScreen({navigation}) {
     const id = useSelector(state => state.authDetails.businessId);
 
 
-
-
     return (
         <ScrollView style={styles.listOfBusinesses} contentContainerStyle={{alignItems: "center"}}>
 
-            <Divider />
+            <Divider/>
             <View style={styles.body}>
                 <Text style={[textTheme.titleMedium]}>
                     Hi, {name}!
@@ -132,7 +137,7 @@ export default function ListOfBusinessesScreen({navigation}) {
 
 
 const styles = StyleSheet.create({
-    listOfBusinesses :{
+    listOfBusinesses: {
         flex: 1,
         backgroundColor: Colors.white,
     },

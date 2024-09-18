@@ -4,9 +4,10 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Colors from "../../constants/Colors";
 import React, {useState} from "react";
 import CreateClientModal from "../checkoutScreen/CreateClientModal";
-import {loadClientsFromDb} from "../../store/clientSlice";
+import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import {useDispatch} from "react-redux";
 import textTheme from "../../constants/TextTheme";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 
 /**
  * AddClient Component
@@ -35,7 +36,9 @@ export default function AddClient() {
                 isVisible={isModalVisible}
                 onCloseModal={() => {
                     setIsModalVisible(false);
-                    // dispatch(loadClientsFromDb());
+                    dispatch(loadClientCountFromDb());
+                    dispatch(loadClientFiltersFromDb(10, "All"));
+                    dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
                 }}
 
             />
@@ -48,7 +51,7 @@ export default function AddClient() {
             >
                 <View style={{flexDirection: 'row'}}>
                     <View style={styles.addTextContainer}>
-                        <Text style={[textTheme.titleSmall, styles.addText, {paddingTop: Platform.OS === 'ios' ? 2 : 0}]}>Add</Text>
+                        <Text style={[textTheme.titleSmall, styles.addText, {paddingTop: Platform.OS === 'ios' ? 0 : 0}]}>Add</Text>
                     </View>
                     <View style={styles.addSymbolContainer}>
                         <FontAwesome6 name="add" size={14} color={Colors.darkBlue}/>

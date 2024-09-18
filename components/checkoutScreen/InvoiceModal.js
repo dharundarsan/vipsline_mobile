@@ -28,6 +28,7 @@ import {
     modifyClientMembershipId,
     modifyPrepaidDetails
 } from "../../store/cartSlice";
+import Toast from "react-native-root-toast";
 
 const InvoiceModal = (props) => {
 
@@ -39,6 +40,7 @@ const InvoiceModal = (props) => {
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
     const dispatch = useDispatch();
+
 
 
     const navigation = useNavigation();
@@ -171,10 +173,10 @@ const InvoiceModal = (props) => {
                 onCloseModal={() => setSMSModalVisibility(false)}
                 onChangeText={(text) => setPhone(text)}
                 value={phone[1]}
-                buttonTwoOnPress={() => {
+                buttonTwoOnPress={async () => {
                     const phoneNoValid = phoneNoRef.current();
                     if (phoneNoValid) {
-                        sendSMSAPI(selectedClientDetails.name, phone[1]);
+                        await sendSMSAPI(selectedClientDetails.name, phone[1]);
                         setSMSModalVisibility(false)
                     }
                 }}
@@ -194,10 +196,10 @@ const InvoiceModal = (props) => {
                 onCloseModal={() => setEmailModalVisibility(false)}
                 onChangeText={(text) => setEmail(text)}
                 value={email}
-                buttonTwoOnPress={() => {
+                buttonTwoOnPress={async () => {
                     const emailValid = emailRef.current();
                     if (emailValid) {
-                        sendEmailAPI(email);
+                        await sendEmailAPI(email, bookingId);
                         setEmailModalVisibility(false);
                     }
                 }}
@@ -382,16 +384,27 @@ styles.heading]}>Invoice</Text>*/}
                         <Text style={textTheme.bodyLarge}><Text
                             style={textTheme.titleMedium}>Contact
                             : </Text>{selectedClientDetails.mobile_1}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Email
-                            : </Text>{selectedClientDetails.username}</Text>
-                        <Text style={textTheme.bodyLarge}>
-                            <Text
-                                style={textTheme.titleMedium}>Prepaid :
-                            </Text> {walletBalance.wallet_balance}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN
-                            : </Text>{selectedClientDetails.customer_gst}</Text>
+                        {
+                            selectedClientDetails.username === "" ?
+                                <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Email
+                                : </Text>{selectedClientDetails.username}</Text> :
+                                <></>
+                        }
+                        {
+                            walletBalance.wallet_balance > 0 ?
+                                <Text style={textTheme.bodyLarge}>
+                                <Text style={textTheme.titleMedium}>Prepaid :
+                                </Text> {walletBalance.wallet_balance}</Text> :
+                                <></>
+                        }
+                        {
+                            selectedClientDetails.customer_gst !== null  && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                                <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>GSTIN
+                                : </Text>{selectedClientDetails.customer_gst}</Text> :
+                                <></>
+                        }
                     </View>
                     {
                         checkNullUndefined(details) ?
@@ -427,7 +440,7 @@ styles.heading]}>Invoice</Text>*/}
                                                         textStyle={{ textAlign: "center" }}
                                                     />
                                                     {
-                                                        checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" ?
+                                                        checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" && innerItem.parent_category_name === "membership"?
                                                             <View style={styles.durationDetails}>
                                                                 <Text>
                                                                     Duration: {innerItem.duration} days
@@ -440,7 +453,7 @@ styles.heading]}>Invoice</Text>*/}
                                                             <></>
                                                     }
                                                     {
-                                                        checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" ?
+                                                        checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" && innerItem.parent_category_name === "packages" ?
                                                             <View style={styles.durationDetails}>
                                                                 <Text>
                                                                     Duration: {innerItem.duration} days
@@ -449,8 +462,9 @@ styles.heading]}>Invoice</Text>*/}
                                                                     Start date: {innerItem.valid_from} | Expiry
                                                                     date: {innerItem.valid_till}
                                                                 </Text>
-                                                            </View> :
-                                                            <></>
+
+                                                            </View> : <></>
+
                                                     }
 
                                                 </>)
@@ -468,7 +482,7 @@ styles.heading]}>Invoice</Text>*/}
                         styles.checkoutDetailText]}>Discount</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>₹ {(totalDiscountPercent).toFixed(2)}</Text>
+                            styles.checkoutDetailText]}>₹ {invoiceDetails.total_discount_in_price.toFixed(2)}</Text>
                     </View>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
@@ -496,7 +510,7 @@ styles.heading]}>Invoice</Text>*/}
                         styles.checkoutDetailText]}>Total</Text>
                         <Text
                             style={[textTheme.titleMedium,
-                            styles.checkoutDetailText]}>₹ {details.total}</Text>
+                            styles.checkoutDetailText]}>₹ {details.total.toFixed(2)}</Text>
                     </View>
                     <View style={styles.paymentModeContainer}>
                         <Text style={[textTheme.titleMedium]}>Payment

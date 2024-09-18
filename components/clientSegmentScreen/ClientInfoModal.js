@@ -59,8 +59,7 @@ export default function clientInfoModal(props) {
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
     const details = useSelector(state => state.clientInfo.details);
-    console.log(details);
-    
+
 
     const [totalSales, setTotalSales] = useState("");
     const [lastVisit, setLastVisit] = useState("");
@@ -171,6 +170,9 @@ export default function clientInfoModal(props) {
                     card={styles.clientDetailsContainer}
                     nameText={[textTheme.titleSmall, styles.name]}
                     phoneText={[textTheme.titleSmall, styles.phone]}
+                    onPress={() => null}
+                    rippleColor={Colors.transparent}
+
                 />
                 <View style={styles.optionsContainer}>
                     <PrimaryButton
@@ -269,12 +271,13 @@ export default function clientInfoModal(props) {
                 {
                     clientMoreDetails === null ?
                         null :
-                        <ClientCard
-                            name={props.name}
-                            card={styles.clientProfileCard}
-                            cardInnerContainer={styles.cardInnerContainer}
-                            rippleColor={Colors.white}
-                        />
+                    <ClientCard
+                        name={props.name}
+                        card={styles.clientProfileCard}
+                        cardInnerContainer={styles.cardInnerContainer}
+                        rippleColor={Colors.white}
+                        onPress={() => null}
+                    />
                 }
 
             </View>
@@ -332,6 +335,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     phone: {
+        width:"150%"
     },
     optionsContainer: {
         flexDirection: "row",

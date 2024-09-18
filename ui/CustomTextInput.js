@@ -62,7 +62,7 @@ const CustomTextInput = (props) => {
     }, [props.onSave]);
 
     let content;
-    if (props.type === "text" || props.type === "email" || props.type === "multiLine" || props.type === "number") {
+    if (props.type === "text" || props.type === "multiLine" || props.type === "number") {
         content = (
             <TextInput
                 onEndEditing={props.onEndEditing !== undefined ? (event) => props.onEndEditing(event.nativeEvent.text) : () => {
@@ -90,7 +90,38 @@ const CustomTextInput = (props) => {
                 }}
             />
         );
-    } else if (props.type === "price") {
+    }else if(props.type === "email"){
+        content = (
+            <TextInput
+                onEndEditing={props.onEndEditing !== undefined ? (event) => props.onEndEditing(event.nativeEvent.text) : () => {
+                }}
+                readOnly={props.readOnly}
+                style={[
+                    textTheme.bodyLarge,
+                    styles.textInput,
+                    {borderColor: error ? Colors.error : Colors.grey400},
+                    props.type === "multiLine" ? {height: 100, textAlignVertical: "top", paddingVertical: 10} : {},
+                    props.textInputStyle
+                ]}
+                autoCapitalize={false}
+                keyboardType={props.type}
+                multiline={props.type === "multiLine"}
+                value={props.value}
+                defaultValue={props.defaultValue}
+                placeholder={props.placeholder}
+                onBlur={() => handleSave()}
+                onChangeText={(text) => {
+                    props.onChangeText(text);
+                    if (error && props.validator && props.validator(text) === true) {
+                        setError(false);
+                        setErrorMessage("");
+                    }
+                }}
+            />
+        );
+        
+    } 
+    else if (props.type === "price") {
         content = (
             <View style={[styles.priceInputContainer,
                 {borderColor: error ? Colors.error : Colors.grey400},

@@ -7,7 +7,8 @@ android
 .idea
 ProgramData/
 %ProgramData%/
-
+.dockerignore
+Dockerfile
 # Expo
 .expo/
 dist/

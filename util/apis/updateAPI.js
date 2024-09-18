@@ -1,8 +1,9 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ToastAndroid } from "react-native";
+import Toast from "react-native-root-toast";
 
-export default async function updateAPI(response, mode_of_payment, splitUpState) {
+export default async function updateAPI(response, mode_of_payment, splitUpState, clientInfo) {
     let authToken = "";
     let businessId = "";
     try {
@@ -23,14 +24,14 @@ export default async function updateAPI(response, mode_of_payment, splitUpState)
             data = {
                 bookingId: response.booking_id,
                 mode_of_payment: "SPLIT",
-                prepaid_wallet_details: null,
+                // prepaid_wallet_details: null,
                 split_payments: splitUpState.filter(state => state.shown).map(state => ({
                     mode_of_payment: state.mode.toUpperCase(),
                     amount: state.amount
                 })),
                 status: "paid_at_venue",
                 transactionId: "",
-                prepaid_wallet_details : prepaid_wallet_details
+                prepaid_wallet_details : null
             };
             break;
         case "card":
@@ -45,13 +46,13 @@ export default async function updateAPI(response, mode_of_payment, splitUpState)
             break;
         case "prepaid":
             data = { status: "paid_at_venue", bookingId: response.booking_id, mode_of_payment: "PREPAID", transactionId: "",
-                prepaid_wallet_details : Object.keys(response.prepaid_wallet_details).length !== 0 ? response.prepaid_wallet_details : undefined
+                prepaid_wallet_details : Object.keys(response.prepaid_wallet_details).length !== 0 ? response.prepaid_wallet_details : undefined,
+                wallet_id: clientInfo.wallet_id
              };
             break;
         default:
             throw new Error("Unknown payment mode");
     }
-
     try {
         await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/appointment/bookingPayment/update`,
@@ -62,10 +63,24 @@ export default async function updateAPI(response, mode_of_payment, splitUpState)
                 }
             }
         );
-        ToastAndroid.show("updated successfully!", ToastAndroid.LONG);
+        // ToastAndroid.show("updated successfully!", ToastAndroid.LONG);
+        Toast.show("Updated Successfully",{
+            duration:Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow:false,
+            backgroundColor:"black",
+            opacity:1
+        })
     } catch (error) {
         console.error("Error during updateAPI call:", error);
-        ToastAndroid.show("not updated successfully!", ToastAndroid.LONG);
+        // ToastAndroid.show("not updated successfully!", ToastAndroid.LONG);
+        Toast.show("Not Updated Successfully",{
+            duration:Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow:false,
+            backgroundColor:"black",
+            opacity:1
+        })
         throw error; // Ensure that the error is propagated
     }
 }

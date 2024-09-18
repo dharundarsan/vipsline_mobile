@@ -20,6 +20,7 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Font from 'expo-font';
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -49,6 +50,7 @@ import {updateAuthStatus} from "./store/authSlice";
 import clearCartAPI from "./util/apis/clearCartAPI";
 import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "./store/cartSlice";
 import {clearClientInfo} from "./store/clientInfoSlice";
+import Toast from 'react-native-toast-message';
 
 enableScreens();
 
@@ -200,7 +202,10 @@ const AppNavigator = () => {
         <NavigationContainer>
             <SafeAreaProvider>
                 {isAuthenticated ?
-                    <MainDrawerNavigator/>
+                <>
+                    <MainDrawerNavigator/>    
+                    <Toast />
+                </>
                     : <AuthNavigator/>}
             </SafeAreaProvider>
         </NavigationContainer>

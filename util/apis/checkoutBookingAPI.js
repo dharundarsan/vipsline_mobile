@@ -42,8 +42,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
 import {ToastAndroid} from "react-native";
+import Toast from "react-native-root-toast";
 
-export default async function checkoutBookingAPI(clientDetails, cartSliceState) {
+export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {
     let authToken = "";
     let businessId = "";
 
@@ -60,6 +61,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
             COD: 1,
             additional_discounts: cartSliceState.additionalDiscounts,
             additional_services: cartSliceState.customItems,
+            client_membership_id: cartSliceState.client_membership_id,
             appointment_date: formatDate(Date.now(), "yyyy-mm-dd"),
             business_id: businessId,
             cart: cartSliceState.items.map(item => {
@@ -107,11 +109,11 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
                     return item
             })
             ],
-            endtime: "18:17:00",
+            endtime: "22:17:00",
             extra_charges: cartSliceState.chargesData[0].amount === 0 ? [] : cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
-            isWalletSelected: false,
+            isWalletSelected: prepaidStatus === undefined ? false : prepaidStatus,
             is_direct_checkout: true,
             is_walkin_appt: false,
             memberShipIdPurchased: [],
@@ -128,13 +130,23 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState) 
             user_id: clientDetails.id,
             walkInUserId: clientDetails.id,
             walkin: "yes",
-            wallet_amt: 0,
+            wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
+
         }, {
             headers: {
                 Authorization: `Bearer ${authToken}`
             }
         });
-        // ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+        if(response.data.other_message) {
+            // ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+            Toast.show(response.data.other_message,{
+                duration:Toast.durations.SHORT,
+                position: Toast.positions.BOTTOM,
+                shadow:false,
+                backgroundColor:"black",
+                opacity:1
+            })
+        }
         return response.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);

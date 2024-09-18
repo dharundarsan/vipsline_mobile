@@ -9,6 +9,7 @@ import CustomTextInput from "../../ui/CustomTextInput";
 import { addItemToCart, addItemToEditedCart, modifyPrepaidDetails, updateCalculatedPrice, updateEditedCart } from "../../store/cartSlice";
 import { useDispatch } from "react-redux";
 import { shadowStyling } from "../../util/Helpers";
+import Toast from "react-native-root-toast";
 
 const PrepaidModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
@@ -73,7 +74,14 @@ const PrepaidModal = (props) => {
             <PrimaryButton onPress={() => {
                 if (!prepaidAmountRef.current()) return;
                 if (prepaidBonus > prepaidAmount) {
-                    ToastAndroid.show("Prepaid bonus should be lesser or equal to actual amount", ToastAndroid.LONG)
+                    // ToastAndroid.show("Prepaid bonus should be lesser or equal to actual amount", ToastAndroid.LONG)
+                    Toast.show("Prepaid bonus should be lesser or equal to actual amount",{
+                        duration:Toast.durations.LONG,
+                        position: Toast.positions.BOTTOM,
+                        shadow:false,
+                        backgroundColor:"black",
+                        opacity:1
+                    })
                     return;
                 }
                 if (props.edited) {

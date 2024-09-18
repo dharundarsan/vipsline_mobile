@@ -24,11 +24,11 @@ export default function clientSalesInfo(props) {
             <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <View style={styles.innerContainer}>
                     <Text style={[textTheme.bodyMedium, {color: Colors.grey650}]}>Total sales</Text>
-                    <Text style={textTheme.labelLarge}>{"₹" + props.totalSales}</Text>
+                    <Text style={textTheme.labelLarge}>{props.totalSales.trim() === "" ?"₹ " + 0 :"₹ " + props.totalSales}</Text>
                 </View>
                 <View style={styles.innerContainer}>
                     <Text style={[textTheme.bodyMedium, {color: Colors.grey650}]}>Last visit</Text>
-                    <Text style={textTheme.labelLarge}>{props.lastVisit}</Text>
+                    <Text style={textTheme.labelLarge}>{props.lastVisit.trim() === "" ? 0 : props.lastVisit}</Text>
                 </View>
             </View>
             <PrimaryButton
