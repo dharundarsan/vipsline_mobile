@@ -100,9 +100,9 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
 
     try {
         const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getAnalyticsForBusinessByCustomer?pageSize=${pageSize}&pageNo=${pageNo}`,
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getAnalyticsForBusinessByCustomer?pageSize=10&pageNo=0`,
             {
-                business_id: `${await getBusinessId()}`,
+                business_id: await getBusinessId(),
                 user_id: user_id,
             },
             {
@@ -112,9 +112,11 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
             }
         );
 
+
         dispatch(updateAnalyticDetails(response.data.data[0]));
     }
     catch (e) {
+        console.log("error" + e)
             }
 
     try {

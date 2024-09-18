@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import {Alert, BackHandler, Image, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {Alert, BackHandler, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {CommonActions, NavigationContainer, useNavigation} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -79,7 +79,7 @@ export default function App() {
 
         <Provider store={store}>
             {/*<SafeAreaView style={styles.safeAreaView}>*/}
-            <StatusBar style="dark"/>
+
             <AppNavigator/>
             {/*</SafeAreaView>*/}
         </Provider>
@@ -121,6 +121,17 @@ async function isAuthenticatedFunc() {
         return false;
     }
 
+}
+
+function CustomDrawerIcon({ navigation }) {
+    return (
+        <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+            <Image
+                source={require('./assets/icons/drawerIcons/drawer.png')}
+                style={{ width: 24, height: 24, marginLeft: 16}}
+            />
+        </TouchableOpacity>
+    );
 }
 
 
@@ -238,7 +249,7 @@ const MainDrawerNavigator = () => {
     return <Drawer.Navigator
         initialRouteName="List of Business"
         drawerContent={(props) => <CustomDrawer {...props} />}
-        screenOptions={{
+        screenOptions={({navigation}) => ({
             drawerActiveTintColor: Colors.highlight,
             drawerInactiveTintColor: Colors.white,
             drawerStyle: {backgroundColor: Colors.darkBlue},
@@ -252,8 +263,15 @@ const MainDrawerNavigator = () => {
                 shadowRadius: 3.84,       // Blur radius (optional for cross-platform)
                 borderBottomWidth: 0.5,     // Helps define a stronger bottom line
                 borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
-            }
-        }}
+            },
+            // headerLeft: () => <CustomDrawerIcon navigation={navigation} />,
+            drawerIcon: ({ focused }) => (
+                <Image
+                    source={require('./assets/icons/drawerIcons/drawer.png')}
+                    style={{ width: 24, height: 24}}
+                />
+            )
+        })}
     >
         {/*<Drawer.Screen*/}
         {/*    name="Dashboard"*/}

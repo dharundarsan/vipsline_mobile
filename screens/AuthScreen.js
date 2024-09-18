@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Pressable, KeyboardAvoidingView, StatusBar, ScrollView} from "react-native";
+import {View, Text, StyleSheet, Pressable, KeyboardAvoidingView, ScrollView} from "react-native";
 import Colors from "../constants/Colors";
 import SignInHeader from "../components/authScreen/SignInHeader";
 import {SafeAreaView} from "react-native-safe-area-context";
@@ -11,6 +11,7 @@ import {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
 import textTheme from "../constants/TextTheme";
+import { StatusBar } from 'expo-status-bar';
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -122,12 +123,16 @@ function AuthScreen() {
 
     return (
         <>
-            <StatusBar
-                backgroundColor={Colors.darkBlue} // Change background color
-                barStyle="light-content" // Set the content (icons/text) to light
-            />
+
 
         <SafeAreaView style={styles.signIn}>
+            <StatusBar
+                backgroundColor={Colors.darkBlue}
+                style="light"
+                barStyle={"dark-content"}
+
+
+            />
             <ScrollView style={{flex: 1, backgroundColor: Colors.white}}>
             <SignInHeader/>
             <View style={styles.body}>

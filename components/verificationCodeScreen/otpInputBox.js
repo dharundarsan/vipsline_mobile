@@ -269,6 +269,7 @@ export default function OtpInputBox(props) {
                     value={value}
                     selection={{ start: value.length, end: value.length }}
                     cursorColor={Colors.transparent}
+                    caretHidden={true}
                 />
             ))}
         </View>

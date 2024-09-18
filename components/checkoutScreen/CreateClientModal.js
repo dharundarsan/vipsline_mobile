@@ -192,6 +192,7 @@ const CreateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Date of birth"
+                        maximumDate={new Date()}
                         value={ dateOfBirth === null || dateOfBirth === undefined ? null : new Date(dateOfBirth)}
                         onChangeValue={(value) => {
                             setIsDobSelected(true);
@@ -201,6 +202,7 @@ const CreateClientModal = (props) => {
                     <CustomTextInput
                         type="date"
                         label="Anniversary"
+                        maximumDate={new Date()}
                         value={ anniversaryDate === null || anniversaryDate === undefined ? null : new Date(anniversaryDate)}
                         onChangeValue={(value) => {
                             setIsAnniversarySelected(true);

@@ -33,10 +33,11 @@ export default function BusinessCard(props) {
             alignItems: "center",
         },
         innerContainer: {
-            paddingLeft: 8,
+            padding: 8,
             flexShrink: 1,
             marginLeft: 8,
             gap: 1,
+            width: '100%'
         },
         profileImageContainer: {
             justifyContent: "center",
@@ -54,7 +55,8 @@ export default function BusinessCard(props) {
             paddingHorizontal: 10,
             color: props.status === "verified" ? Colors.white : props.status === "unverified" ? Colors.error : Colors.highlight,
             textAlign: "center",
-            fontWeight: "bold"
+            fontWeight: "bold",
+            maxWidth: 200
         },
     })
 

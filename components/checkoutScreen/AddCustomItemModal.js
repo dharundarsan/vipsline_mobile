@@ -1,4 +1,4 @@
-import {Modal, Platform, StyleSheet, Text, TextInput, View} from "react-native";
+import {Modal, Platform, StyleSheet, Text, TextInput, ToastAndroid, View} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
@@ -40,16 +40,22 @@ const AddCustomItemModal = (props) => {
         </View>
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={() => {
+                if(itemPrice === 0 || !parseInt(itemPrice) ){
+                    ToastAndroid.show("Invalid Amount", ToastAndroid.SHORT);
+                    return;
+                }
+                let converted = parseInt(itemPrice, 10);
+                let convertedString = converted.toString();
                 props.onCloseModal();
                 props.closeOverallModal()
                 dispatch(addCustomItems({
                     name: itemName,
-                    price: itemPrice,
+                    price: convertedString,
                     resource_category_name: null,
-                    total_price: itemPrice,
+                    total_price: convertedString,
                     category: "custom_item",
                     gender: "custom_item",
-                    amount: itemPrice,
+                    amount: convertedString,
                     resource_id: null,
                 }))
                 dispatch(updateCalculatedPrice());

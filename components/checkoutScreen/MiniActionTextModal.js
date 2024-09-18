@@ -148,13 +148,13 @@ const MiniActionTextModal = React.memo((props) => {
                           <View style={styles.toggleBox}>
                             <PrimaryButton
                               onPress={() => {
-                                // props.setSelectedDiscountMode("PERCENTAGE");
+                                props.setSelectedDiscountMode("PERCENTAGE");
                                 setSelectedDiscountMode("PERCENTAGE");
                               }}
                               buttonStyle={[
                                 styles.percentAndAmountButton,
                                 // props.selectedDiscountMode === "PERCENTAGE"
-                                selectedDiscountMode === "PERCENTAGE"
+                                props.selectedDiscountMode === "PERCENTAGE"
                                   ? { backgroundColor: Colors.highlight }
                                   : {},
                                 {
@@ -170,7 +170,7 @@ const MiniActionTextModal = React.memo((props) => {
                                 size={20}
                                 color={
                                   // props.selectedDiscountMode === "PERCENTAGE"
-                                  selectedDiscountMode === "PERCENTAGE"
+                                  props.selectedDiscountMode === "PERCENTAGE"
                                     ? Colors.white
                                     : Colors.black
                                 }
@@ -178,13 +178,13 @@ const MiniActionTextModal = React.memo((props) => {
                             </PrimaryButton>
                             <PrimaryButton
                               onPress={() => {
-                                // props.setSelectedDiscountMode("AMOUNT");
+                                props.setSelectedDiscountMode("AMOUNT");
                                 setSelectedDiscountMode("AMOUNT");
                               }}
                               buttonStyle={[
                                 styles.percentAndAmountButton,
                                 // props.selectedDiscountMode === "AMOUNT"
-                                selectedDiscountMode === "AMOUNT"
+                                props.selectedDiscountMode === "AMOUNT"
                                   ? { backgroundColor: Colors.highlight }
                                   : {},
                                 {
@@ -199,7 +199,7 @@ const MiniActionTextModal = React.memo((props) => {
                                 size={20}
                                 color={
                                   // props.selectedDiscountMode === "AMOUNT"
-                                  selectedDiscountMode === "AMOUNT"
+                                  props.selectedDiscountMode === "AMOUNT"
                                     ? Colors.white
                                     : Colors.black
                                 }

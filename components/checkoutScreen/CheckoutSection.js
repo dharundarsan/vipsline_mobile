@@ -137,13 +137,20 @@ const CheckoutSection = (props) => {
     const [title, setTitle] = useState("")
     const [isDelete, setIsDelete] = useState(false);
     const [discountValue, setDiscountValue] = useState("");
-    const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage")
+    const [selectedDiscountMode, setSelectedDiscountMode] = useState("PERCENTAGE")
     const [clickedValue, setClickedValue] = useState("")
     const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
     const [salesnote, setSalesnote] = useState("");
     const [chargesInputData, setChargesInputData] = useState([{ index: 0 }]);
     const [data, setData] = useState([{}])
+
+    useEffect(()=>{
+        // console.log(JSON.stringify(cartItems,null,3));
+        // if(cartItems.length === 0){
+            dispatch(updateDiscount([]));
+        // }
+    },[])
 
     function openModal(title, value) {
         setTitle(title);
@@ -165,11 +172,12 @@ const CheckoutSection = (props) => {
         if (type === "clear") {
 
             dispatch(updateDiscount([]));
-            setSelectedDiscountMode("")
+            setSelectedDiscountMode("PERCENTAGE")
         } else {
+            setSelectedDiscountMode(discountMode)
             dispatch(updateDiscount(addDiscount));
-            dispatch(updateCalculatedPrice());
         }
+        dispatch(updateCalculatedPrice());
 
         setActionModal(false);
     }
@@ -218,7 +226,7 @@ const CheckoutSection = (props) => {
 
         setActionModal(false);
     }
-    function clearSalesNotes(){
+    function clearSaleNotes(){
         setSalesnote("");
         dispatch(clearSalesNotes());
         setActionModal(false);
@@ -230,7 +238,9 @@ const CheckoutSection = (props) => {
             onCloseModal={() => {
                 setActionModal(false)
             }}
-            clearSalesNotes={clearSalesNotes}
+            selectedDiscountMode={selectedDiscountMode}
+            setSelectedDiscountMode={setSelectedDiscountMode}
+            clearSalesNotes={clearSaleNotes}
             chargesInputData={chargesInputData}
             setChargesInputData={setChargesInputData}
             title={title}
@@ -259,9 +269,9 @@ const CheckoutSection = (props) => {
                 // props.setVisible(false);
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
-                clearCartAPI();
+                await clearCartAPI();
                 dispatch(modifyClientMembershipId({ type: "clear" }))
-                dispatch(clearSalesNotes());
+                clearSaleNotes();
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
                 dispatch(clearCalculatedPrice())
@@ -318,30 +328,40 @@ const CheckoutSection = (props) => {
             {/*<Text*/}
             {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { calculatedPrice.length !== 0 ? calculatedPrice[0].total_discount_in_price : 0}</Text>*/}
             <View>
-                <Popover popoverStyle={styles.popoverStyle}
-                    from={<Pressable style={styles.checkoutDetailInnerContainer}>
-                        <Text
-                            style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-                        <MaterialCommunityIcons name="information-outline" size={24}
-                            color="black" />
-                    </Pressable>}
-                    offset={Platform.OS === "ios" ? 0 : 32}
-                >
-                    {discountCategory.service !== "0" ?
-                        <Text>Service Discount: ₹{discountCategory.service}</Text> : null}
-                    {discountCategory.product !== "0" ?
-                        <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
-                    {discountCategory.package !== "0" ?
-                        <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
-                    {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount)?
-                        <Text>Custom Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text>: null}
-                    {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" && customDiscount !== undefined && customDiscount.length === 0 ?
-                        <Text>No discounts applied</Text> : null}
-                </Popover>
+                {
+                    checkNullUndefined(calculatedPrice[0]) ? calculatedPrice[0].total_discount_in_price === 0 ?
+                        <Pressable style={styles.checkoutDetailInnerContainer}>
+                            <Text
+                                style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                            <MaterialCommunityIcons name="information-outline" size={24}
+                                                    color="black" />
+                        </Pressable> :
+
+                    <Popover popoverStyle={styles.popoverStyle}
+                        from={<Pressable style={styles.checkoutDetailInnerContainer}>
+                            <Text
+                                style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                            <MaterialCommunityIcons name="information-outline" size={24}
+                                color="black" />
+                        </Pressable>}
+                        offset={Platform.OS === "ios" ? 0 : 32}
+                    >
+                        {discountCategory.service !== "0" ?
+                            <Text>Service Discount: ₹{discountCategory.service}</Text> : null}
+                        {discountCategory.product !== "0" ?
+                            <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
+                        {discountCategory.package !== "0" ?
+                            <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
+                        {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount)?
+                            <Text>Custom Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text>: null}
+                        {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" && customDiscount !== undefined && customDiscount.length === 0 ?
+                            <Text>No discounts applied</Text> : null}
+                    </Popover> :
+                        <></>
+                }
             </View>
 
-            <Text
-                style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
+            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
         </View>
 
         <View style={styles.checkoutDetailRow}>
@@ -351,23 +371,31 @@ const CheckoutSection = (props) => {
         </View>
         <View style={styles.checkoutDetailRow}>
             <View>
-                <Popover popoverStyle={styles.popoverStyle}
-                    from={<Pressable style={styles.checkoutDetailInnerContainer}>
-                        <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
-                            (18%)</Text>
-                        <MaterialCommunityIcons name="information-outline" size={24} color="black" />
-                    </Pressable>}
-                    offset={Platform.OS === "ios" ? 0 : 32}
-                >
-                    {calculatedPrice.length === 0 ? null : calculatedPrice[0].tax_details.map((item, index) => (
-                        <View key={index} style={styles.calculatepriceRow}>
-                            <Text style={[textTheme.bodyMedium, styles.checkoutDetailText]}>
-                                {item.name + ": "} ₹ {item.value}
-                            </Text>
-                        </View>))
+                {
+                    checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
+                        <Pressable style={styles.checkoutDetailInnerContainer}>
+                            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
+                                (18%)</Text>
+                            <MaterialCommunityIcons name="information-outline" size={24} color="black" />
+                        </Pressable> :
+                    <Popover popoverStyle={styles.popoverStyle}
+                        from={<Pressable style={styles.checkoutDetailInnerContainer}>
+                            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
+                                (18%)</Text>
+                            <MaterialCommunityIcons name="information-outline" size={24} color="black" />
+                        </Pressable>}
+                        offset={Platform.OS === "ios" ? 0 : 32}
+                    >
+                        {calculatedPrice.length === 0 ? null : calculatedPrice[0].tax_details.map((item, index) => (
+                            <View key={index} style={styles.calculatepriceRow}>
+                                <Text style={[textTheme.bodyMedium, styles.checkoutDetailText]}>
+                                    {item.name + ": "} ₹ {item.value}
+                                </Text>
+                            </View>))
 
-                    }
-                </Popover>
+                        }
+                    </Popover>
+                }
             </View>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].gst_charges}</Text>

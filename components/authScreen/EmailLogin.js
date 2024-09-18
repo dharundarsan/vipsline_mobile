@@ -34,7 +34,11 @@ export default function EmailLogin() {
 
     const [isPasswordValid, setIsPasswordValid] = useState(true);
 
-    const [prompt, setPrompt] = useState(0);
+    const [isEmailTyping, setIsEmailTyping] = useState(false);
+    const [isPasswordTyping, setIsPasswordTyping] = useState(false);
+
+    const [emailPrompt, setEmailPrompt] = useState("");
+    const [passwordPrompt, setPasswordPrompt] = useState("");
 
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
 
@@ -66,7 +70,7 @@ export default function EmailLogin() {
         setIsIsUserFound(await findUser(email, platform));
         let response = '';
         let isAuthenticationSuccessful = false;
-        if (isUserFound) {
+        if (await findUser(email, platform)) {
             try {
                 response = await axios.post(BaseURL + '/authenticateWithPassword', {
                     platform: platform,
@@ -110,6 +114,10 @@ export default function EmailLogin() {
             paddingVertical: 8,
             borderRadius: 8,
             borderColor:
+            isEmailTyping ?
+                Colors.highlight :
+                passwordPrompt.trim().length > 0 ?
+                    Colors.error :
                 isEmailFocussed ?
                     isUserFound ?
                         Colors.highlight :
@@ -124,7 +132,11 @@ export default function EmailLogin() {
             paddingVertical: 8,
             borderRadius: 8,
             borderColor:
-                isPasswordFocussed ?
+            isPasswordTyping ?
+                Colors.highlight :
+                passwordPrompt.trim().length > 0 ?
+                    Colors.error :
+            isPasswordFocussed ?
                     isPasswordValid ?
                         Colors.highlight :
                         Colors.error :
@@ -165,7 +177,10 @@ export default function EmailLogin() {
                 autoCapitalize={"none"}
                 placeholder="Enter email Address"
                 style={[textTheme.titleSmall, styles.emailInput]}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                    setEmail(text);
+                    setIsEmailTyping(true);
+                }}
                 value={email}
                 onFocus={() => {
                     setIsEmailFocussed(true)
@@ -174,8 +189,10 @@ export default function EmailLogin() {
 
             />
             {
-                prompt === 1 ?
-                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Enter Email</Text> :
+                isEmailTyping ?
+                    <Text></Text> :
+                emailPrompt.trim().length > 0 ?
+                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>{emailPrompt}</Text> :
                     !isUserFound ?
                         <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect email</Text> :
                         <Text></Text>
@@ -185,7 +202,10 @@ export default function EmailLogin() {
                 placeholder="Enter password"
                 value={password}
                 style={[textTheme.titleSmall, styles.passwordInput]}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                    setPassword(text)
+                    setIsPasswordTyping(true)
+                }}
                 secureTextEntry={!isChecked}
                 onFocus={() => {
                     setIsPasswordFocussed(true)
@@ -193,8 +213,10 @@ export default function EmailLogin() {
                 }}
             />
             {
-                prompt === 2 ?
-                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Enter Password</Text> :
+                isPasswordTyping ?
+                    <Text></Text> :
+                passwordPrompt.trim().length > 0 ?
+                    <Text style={[textTheme.titleSmall, {color: Colors.error}]}>{passwordPrompt}</Text> :
                     !isPasswordValid ?
                         <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect password</Text> :
                         <Text></Text>
@@ -233,20 +255,29 @@ export default function EmailLogin() {
                         return null;
                     }
                     if(email.trim().length === 0 && password.trim().length > 0) {
-                        setPrompt(1);
+                        setEmailPrompt("Email is required");
+                        setPasswordPrompt("");
+                        return
                     }
                     else if(email.trim().length > 0 && password.trim().length === 0){
-                        setPrompt(2)
+                        setPasswordPrompt("Password is required")
+                        setEmailPrompt("");
+                        return
                     }
                     else {
-                        setPrompt(0)
-                    }
+                        setEmailPrompt("")
+                        setPasswordPrompt("")
 
+                    }
                     if(email.trim().length === 0 && password.trim().length === 0) {
-                        setPrompt(1)
+                        setEmailPrompt("Email is required")
+                        setPasswordPrompt("Password is required")
+
                     }
                     else {
                         signInHandler().then(r => null);
+                        setIsEmailTyping(false);
+                        setIsPasswordTyping(false)
                     }
 
 
