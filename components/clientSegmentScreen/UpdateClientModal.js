@@ -11,6 +11,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
 import updateClientAPI from "../../util/apis/updateClientAPI";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import Toast from "react-native-root-toast";
 
 /**
  * UpdateClientModal Component
@@ -133,10 +134,24 @@ const UpdateClientModal = (props) => {
             // dispatch(loadClientCountFromDb());
             dispatch(loadClientInfoFromDb(clientDetails.id));
             props.onCloseModal();
-            ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
+            // ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
+            Toast.show("User updated successfully",{
+                duration:Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow:false,
+                backgroundColor:"black",
+                opacity:1
+            })
             // props.onUpdate();
         } catch (e) {
-                        ToastAndroid.show(e + "error", ToastAndroid.LONG);
+                        // ToastAndroid.show(e + "error", ToastAndroid.LONG);
+                        Toast.show(e+" error",{
+                            duration:Toast.durations.LONG,
+                            position: Toast.positions.BOTTOM,
+                            shadow:false,
+                            backgroundColor:"black",
+                            opacity:1
+                        })
         }
     };
 

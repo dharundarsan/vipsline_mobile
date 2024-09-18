@@ -33,6 +33,7 @@ import { checkNullUndefined } from "../../util/Helpers";
 import { loadBusinessesListFromDb } from "../../store/listOfBusinessSlice";
 import { updateTotalClientCount } from "../../store/clientFilterSlice";
 import { clearClientInfo } from "../../store/clientInfoSlice";
+import Toast from "react-native-root-toast";
 
 
 const CheckoutSection = (props) => {
@@ -434,11 +435,25 @@ const CheckoutSection = (props) => {
                 pressableStyle={styles.checkoutButtonPressable}
                 onPress={() => {
                     if (!clientInfo.isClientSelected) {
-                        ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                        // ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                        Toast.show("Please select client",{
+                            duration:Toast.durations.LONG,
+                            position: Toast.positions.BOTTOM,
+                            shadow:false,
+                            backgroundColor:"black",
+                            opacity:1
+                        })
                         return;
                     }
                     if (!dispatch(checkStaffOnCartItems())) {
-                        ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                        // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                        Toast.show("Please select staff",{
+                            duration:Toast.durations.LONG,
+                            position: Toast.positions.BOTTOM,
+                            shadow:false,
+                            backgroundColor:"black",
+                            opacity:1
+                        })
                         return;
                     }
                     setIsPaymentModalVisible(true)

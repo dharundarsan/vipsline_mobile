@@ -42,6 +42,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
 import {ToastAndroid} from "react-native";
+import Toast from "react-native-root-toast";
 
 export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {
     let authToken = "";
@@ -137,7 +138,14 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             }
         });
         if(response.data.other_message) {
-            ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+            // ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
+            Toast.show(response.data.other_message,{
+                duration:Toast.durations.SHORT,
+                position: Toast.positions.BOTTOM,
+                shadow:false,
+                backgroundColor:"black",
+                opacity:1
+            })
         }
         return response.data;
     } catch (error) {

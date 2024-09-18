@@ -27,6 +27,7 @@ import {shadowStyling} from "../../util/Helpers";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import {modifyPrepaidDetails, updateCalculatedPrice} from "../../store/cartSlice";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import Toast from "react-native-root-toast";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -532,7 +533,14 @@ const PaymentModal = (props) => {
                                     onEndEditing={(text) => {
                                         if (item.mode === "prepaid") {
                                             if (parseFloat(text) > clientInfo.wallet_balance) {
-                                                ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
+                                                // ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
+                                                Toast.show("Prepaid split amount is greater than the prepaid balance",{
+                                                    duration:Toast.durations.LONG,
+                                                    position: Toast.positions.BOTTOM,
+                                                    shadow:false,
+                                                    backgroundColor:"black",
+                                                    opacity:1
+                                                })
                                                 return;
                                             }
                                         }
@@ -546,7 +554,14 @@ const PaymentModal = (props) => {
 
                                         if (totalValue > props.price) {
                                             setIsError(true);
-                                            ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
+                                            // ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
+                                            Toast.show("Split Payments are not summing upto transaction total. Please check.",{
+                                                duration:Toast.durations.SHORT,
+                                                position: Toast.positions.BOTTOM,
+                                                shadow:false,
+                                                backgroundColor:"black",
+                                                opacity:1
+                                            })
                                             return;
                                         } else if (totalValue > props.price) {
                                             setIsError(false);

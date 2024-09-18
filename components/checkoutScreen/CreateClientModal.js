@@ -13,6 +13,7 @@ import {useDispatch} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {shadowStyling} from "../../util/Helpers";
+import Toast from "react-native-root-toast";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -97,12 +98,26 @@ const CreateClientModal = (props) => {
                 pinCode: "",
                 state: "Tamilnadu",
             });
-            ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
+            // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
+            Toast.show("User added Successfully",{
+                duration:Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow:false,
+                backgroundColor:"black",
+                opacity:1
+            })
             clearForm();
             dispatch(loadClientCountFromDb());
             props.onCloseModal();
         } catch (e) {
-            ToastAndroid.show(e, ToastAndroid.LONG)
+            // ToastAndroid.show(e, ToastAndroid.LONG),
+            Toast.show(e,{
+                duration:Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow:false,
+                backgroundColor:"black",
+                opacity:1
+            })
         }
 
     };

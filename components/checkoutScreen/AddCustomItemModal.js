@@ -9,6 +9,7 @@ import {formatDate, shadowStyling} from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {addCustomItems, addItemToCart, updateCalculatedPrice} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import Toast from "react-native-root-toast";
 
 const AddCustomItemModal = (props) => {
     const [itemName, setItemName] = useState("");
@@ -41,7 +42,14 @@ const AddCustomItemModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={() => {
                 if(itemPrice === 0 || !parseInt(itemPrice) ){
-                    ToastAndroid.show("Invalid Amount", ToastAndroid.SHORT);
+                    // ToastAndroid.show("Invalid Amount", ToastAndroid.SHORT);
+                    Toast.show("Invalid Amount",{
+                        duration:Toast.durations.SHORT,
+                        position: Toast.positions.BOTTOM,
+                        shadow:false,
+                        backgroundColor:"black",
+                        opacity:1
+                    })
                     return;
                 }
                 let converted = parseInt(itemPrice, 10);
