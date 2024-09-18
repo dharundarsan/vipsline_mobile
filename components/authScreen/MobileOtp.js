@@ -18,6 +18,8 @@ export default function MobileOtp() {
     const [isUserTyping, setIsUserTyping] = useState(false);
     const [isUserFound, setIsUserFound] = useState(true);
 
+    const [isSendOtpPressed, setIsSendOtpPressed] = useState(false);
+
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
     const platform = "BUSINESS";
 
@@ -80,7 +82,16 @@ export default function MobileOtp() {
             width: '100%',
             borderWidth: 2,
             paddingVertical: 8,
-            borderColor: isFocussed ? isUserFound ? Colors.highlight : Colors.error : !isUserFound ? Colors.error : Colors.grey400,
+            borderColor:
+            isUserTyping ?
+                Colors.highlight :
+                isFocussed ?
+                    isUserFound ?
+                        Colors.highlight :
+                        Colors.error :
+                    !isUserFound ?
+                        Colors.error :
+                        Colors.grey400,
             borderRadius: 6,
             paddingHorizontal: 12,
         },
@@ -115,17 +126,26 @@ export default function MobileOtp() {
                     onChangeText={(text) => {
                         setMobileNumber(text);
                         setIsUserTyping(true);
+                        setIsSendOtpPressed(false)
                     }}
                     maxLength={10}
                 />
                 {
+                    isUserTyping ?
+                        <Text></Text> :
+                        isSendOtpPressed ?
+                            <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number is required</Text> :
                     !isUserFound ?
                         <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number</Text> :
                         <Text> </Text>
                 }
                 <PrimaryButton
                     buttonStyle={styles.sendOtpButton}
-                    onPress={sendOtp}
+                    onPress={async () => {
+                        await sendOtp();
+                        setIsUserTyping(false);
+                        setIsSendOtpPressed(true)
+                    }}
                 >
                     {
                         !isLoading ?

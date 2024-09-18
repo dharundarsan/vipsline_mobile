@@ -1,25 +1,25 @@
-import { Modal, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import {Modal, Platform, ScrollView, StyleSheet, Text, View} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import Colors from "../../constants/Colors";
 import Feather from '@expo/vector-icons/Feather';
-import { Row, Table } from "react-native-table-component";
+import {Row, Table} from "react-native-table-component";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useDispatch, useSelector } from "react-redux";
-import { checkNullUndefined, dateFormatter, shadowStyling } from "../../util/Helpers";
-import { useEffect, useRef, useState } from "react";
-import { loadWalletPriceFromDb } from "../../store/invoiceSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {checkNullUndefined, dateFormatter, shadowStyling} from "../../util/Helpers";
+import {useEffect, useRef, useState} from "react";
+import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
-import { useNavigation } from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import clearCartAPI from "../../util/apis/clearCartAPI";
-import { clearClientInfo } from "../../store/clientInfoSlice";
+import {clearClientInfo} from "../../store/clientInfoSlice";
 import {
     clearCalculatedPrice,
     clearLocalCart,
@@ -40,7 +40,6 @@ const InvoiceModal = (props) => {
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
     const dispatch = useDispatch();
-
 
 
     const navigation = useNavigation();
@@ -121,11 +120,20 @@ const InvoiceModal = (props) => {
             return total + categoryTotal;
         }, 0);
     };
-      
-      const totalDiscountPercent = calculateTotalDifference(details.organized_list);
-    
+
+    const totalDiscountPercent = calculateTotalDifference(details.organized_list);
+
+    const textStyle1 = {
+        textAlign: "center",
+        fontWeight: "bold"
+    };
+
+    const textStyle2 = {
+        textAlign: "center"
+    }
+
     return <Modal style={styles.invoiceModal} animationType={"slide"}
-        visible={props.isVisible}>
+                  visible={props.isVisible}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
             <DropdownModal
@@ -232,8 +240,8 @@ const InvoiceModal = (props) => {
                         // props.onCloseModal();
                     }
                 }}
-                buttonOneStyle={{ borderColor: Colors.error, borderWidth: 1.5 }}
-                buttonOneTextStyle={{ color: Colors.error }}
+                buttonOneStyle={{borderColor: Colors.error, borderWidth: 1.5}}
+                buttonOneTextStyle={{color: Colors.error}}
 
             />
 
@@ -256,11 +264,10 @@ const InvoiceModal = (props) => {
 
                 onChangeValue={(value) => {
                     if (value === "Go to Appointment") {
-                    }
-                    else if(value === "Booking history"){
+                    } else if (value === "Booking history") {
                     }
                 }}
-                
+
             />
             {/*<Text style={[textTheme.titleLarge,
 styles.heading]}>Invoice</Text>*/}
@@ -270,17 +277,17 @@ styles.heading]}>Invoice</Text>*/}
                     // setCancelInvoiceModalVisibility(true)
                     clearCartAPI();
                     dispatch(clearSalesNotes());
-                    dispatch(modifyClientMembershipId({ type: "clear" }))
+                    dispatch(modifyClientMembershipId({type: "clear"}))
                     dispatch(clearSalesNotes());
                     dispatch(clearLocalCart());
                     dispatch(clearClientInfo());
                     dispatch(clearCalculatedPrice());
-                    dispatch(modifyPrepaidDetails({type:"clear"}))
+                    dispatch(modifyPrepaidDetails({type: "clear"}))
                     props.onCloseModal();
                 }
                 }
             >
-                <Ionicons name="close" size={25} color="black" />
+                <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
         <ScrollView>
@@ -296,7 +303,7 @@ styles.heading]}>Invoice</Text>*/}
                 }
                 <View style={styles.logoAndButtonContainer}>
                     <Feather name="check-circle" size={50}
-                        color={Colors.highlight} />
+                             color={Colors.highlight}/>
                     <Text style={[textTheme.titleMedium]}>Checkout
                         Complete!</Text>
                     <View style={styles.backAndDropdownButtonContainer}>
@@ -305,12 +312,12 @@ styles.heading]}>Invoice</Text>*/}
                             label={"Back to checkout"}
                             onPress={() => {
                                 clearCartAPI();
-                                dispatch(modifyClientMembershipId({ type: "clear" }))
+                                dispatch(modifyClientMembershipId({type: "clear"}))
                                 dispatch(clearSalesNotes());
                                 dispatch(clearLocalCart());
                                 dispatch(clearClientInfo());
                                 dispatch(clearCalculatedPrice());
-                                dispatch(modifyPrepaidDetails({type:"clear"}))
+                                dispatch(modifyPrepaidDetails({type: "clear"}))
                                 props.onCloseModal();
                             }}
                         />
@@ -318,8 +325,8 @@ styles.heading]}>Invoice</Text>*/}
                             onPress={() => setOptionModalVisibility(true)}
                             buttonStyle={styles.backToCheckoutOptionsButton}>
                             <MaterialIcons name="keyboard-arrow-down"
-                                size={24}
-                                color={Colors.background}
+                                           size={24}
+                                           color={Colors.background}
                             />
                         </PrimaryButton>
                     </View>
@@ -338,14 +345,14 @@ styles.heading]}>Invoice</Text>*/}
 
 
                 </View>
-                <Divider />
+                <Divider/>
                 <View style={styles.invoiceHeadingContainer}>
                     <View style={styles.invoiceHeading}>
                         <Text style={[textTheme.titleMedium,
-                        styles.invoiceHeadingText]}>Invoice</Text>
+                            styles.invoiceHeadingText]}>Invoice</Text>
                     </View>
                 </View>
-                <Divider thickness={0.5} color={Colors.highlight} />
+                <Divider thickness={0.5} color={Colors.highlight}/>
                 <View style={styles.invoice}>
                     <View style={{
                         paddingVertical: 10,
@@ -387,22 +394,22 @@ styles.heading]}>Invoice</Text>*/}
                         {
                             selectedClientDetails.username === "" ?
                                 <Text style={textTheme.bodyLarge}><Text
-                                style={textTheme.titleMedium}>Email
-                                : </Text>{selectedClientDetails.username}</Text> :
+                                    style={textTheme.titleMedium}>Email
+                                    : </Text>{selectedClientDetails.username}</Text> :
                                 <></>
                         }
                         {
                             walletBalance.wallet_balance > 0 ?
                                 <Text style={textTheme.bodyLarge}>
-                                <Text style={textTheme.titleMedium}>Prepaid :
-                                </Text> {walletBalance.wallet_balance}</Text> :
+                                    <Text style={textTheme.titleMedium}>Prepaid :
+                                    </Text> {walletBalance.wallet_balance}</Text> :
                                 <></>
                         }
                         {
-                            selectedClientDetails.customer_gst !== null  && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                            selectedClientDetails.customer_gst !== null && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
                                 <Text style={textTheme.bodyLarge}><Text
-                                style={textTheme.titleMedium}>GSTIN
-                                : </Text>{selectedClientDetails.customer_gst}</Text> :
+                                    style={textTheme.titleMedium}>GSTIN
+                                    : </Text>{selectedClientDetails.customer_gst}</Text> :
                                 <></>
                         }
                     </View>
@@ -411,7 +418,7 @@ styles.heading]}>Invoice</Text>*/}
                             checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
                             <Table style={styles.cartItemTable}>
                                 <Row
-                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
+                                    textStyle={textStyle1}
                                     style={styles.cartItemTableHead}
                                     data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
                                 />
@@ -421,57 +428,57 @@ styles.heading]}>Invoice</Text>*/}
                                     checkNullUndefined(details) ?
                                         checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
                                         details.organized_list.map((item) => (
-                                            checkNullUndefined(item.list) && checkNullUndefined(item.list.length) &&
-                                            item.list.map((innerItem, index) => {
-                                                // setTotalDiscount(prev => prev + innerItem.discount_percent);
-                                                return (<>
-                                                    <Row
-                                                        key={index}
-                                                        data={
-                                                            [
-                                                                innerItem.resource_service,
-                                                                innerItem.resource_name,
-                                                                innerItem.count,
-                                                                (innerItem.service_cost).toFixed(2)
+                                                checkNullUndefined(item.list) && checkNullUndefined(item.list.length) &&
+                                                item.list.map((innerItem, index) => {
+                                                    // setTotalDiscount(prev => prev + innerItem.discount_percent);
+                                                    return (<>
+                                                        <Row
+                                                            key={index}
+                                                            data={
+                                                                [
+                                                                    innerItem.resource_service,
+                                                                    innerItem.resource_name,
+                                                                    innerItem.count,
+                                                                    (innerItem.service_cost).toFixed(2)
 
-                                                            ]
+                                                                ]
+                                                            }
+                                                            style={styles.cartItemTableRow}
+                                                            textStyle={textStyle2}
+                                                        />
+                                                        {
+                                                            checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" && innerItem.parent_category_name === "membership" ?
+                                                                <View style={styles.durationDetails}>
+                                                                    <Text>
+                                                                        Duration: {innerItem.duration} days
+                                                                    </Text>
+                                                                    <Text>
+                                                                        Start date: {innerItem.valid_from} | Expiry
+                                                                        date: {innerItem.valid_till}
+                                                                    </Text>
+                                                                </View> :
+                                                                <></>
                                                         }
-                                                        style={styles.cartItemTableRow}
-                                                        textStyle={{ textAlign: "center" }}
-                                                    />
-                                                    {
-                                                        checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" && innerItem.parent_category_name === "membership"?
-                                                            <View style={styles.durationDetails}>
-                                                                <Text>
-                                                                    Duration: {innerItem.duration} days
-                                                                </Text>
-                                                                <Text>
-                                                                    Start date: {innerItem.valid_from} | Expiry
-                                                                    date: {innerItem.valid_till}
-                                                                </Text>
-                                                            </View> :
-                                                            <></>
-                                                    }
-                                                    {
-                                                        checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" && innerItem.parent_category_name === "packages" ?
-                                                            <View style={styles.durationDetails}>
-                                                                <Text>
-                                                                    Duration: {innerItem.duration} days
-                                                                </Text>
-                                                                <Text>
-                                                                    Start date: {innerItem.valid_from} | Expiry
-                                                                    date: {innerItem.valid_till}
-                                                                </Text>
+                                                        {
+                                                            checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" && innerItem.parent_category_name === "packages" ?
+                                                                <View style={styles.durationDetails}>
+                                                                    <Text>
+                                                                        Duration: {innerItem.duration} days
+                                                                    </Text>
+                                                                    <Text>
+                                                                        Start date: {innerItem.valid_from} | Expiry
+                                                                        date: {innerItem.valid_till}
+                                                                    </Text>
 
-                                                            </View> : <></>
+                                                                </View> : <></>
 
-                                                    }
+                                                        }
 
-                                                </>)
+                                                    </>)
 
-                                            })
+                                                })
 
-                                        )
+                                            )
                                         ) : <></>
                                 }
                             </Table>
@@ -479,66 +486,66 @@ styles.heading]}>Invoice</Text>*/}
                     }
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
-                        styles.checkoutDetailText]}>Discount</Text>
+                            styles.checkoutDetailText]}>Discount</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>₹ {invoiceDetails.total_discount_in_price.toFixed(2)}</Text>
+                                styles.checkoutDetailText]}>₹ {invoiceDetails.total_discount_in_price.toFixed(2)}</Text>
                     </View>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.bodyLarge,
-                        styles.checkoutDetailText]}>Sub Total</Text>
+                            styles.checkoutDetailText]}>Sub Total</Text>
                         <Text
                             style={[textTheme.bodyLarge,
-                            styles.checkoutDetailText]}>₹
+                                styles.checkoutDetailText]}>₹
                             {(details.sub_total_with_discount).toFixed(2)}</Text>
                     </View>
                     {
                         calculatedPrice[0].tax_details.map((item, index) => (
                             <View key={index} style={styles.calculatepriceRow}>
                                 <Text style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>{item.name}</Text>
+                                    styles.checkoutDetailText]}>{item.name}</Text>
                                 <Text style={[textTheme.bodyLarge,
-                                styles.checkoutDetailText]}>₹ {(item.value)}</Text>
+                                    styles.checkoutDetailText]}>₹ {(item.value)}</Text>
                             </View>
                         ))
 
                     }
 
-                    <Divider />
+                    <Divider/>
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.titleMedium,
-                        styles.checkoutDetailText]}>Total</Text>
+                            styles.checkoutDetailText]}>Total</Text>
                         <Text
                             style={[textTheme.titleMedium,
-                            styles.checkoutDetailText]}>₹ {details.total.toFixed(2)}</Text>
+                                styles.checkoutDetailText]}>₹ {details.total.toFixed(2)}</Text>
                     </View>
                     <View style={styles.paymentModeContainer}>
                         <Text style={[textTheme.titleMedium]}>Payment
                             Mode</Text>
                         <Table style={styles.paymentModeTable}>
                             <Row style={styles.paymentModeTableHead}
-                                data={["Date & Time", "Mode", "Amount", "Status"]}
-                                textStyle={{ textAlign: "center" }}
+                                 data={["Date & Time", "Mode", "Amount", "Status"]}
+                                 textStyle={textStyle2}
                             />
                             {
                                 checkNullUndefined(invoiceDetails.split_payment) ? invoiceDetails.split_payment.map((item, index) => {
-                                    return <Row
-                                        key={index}
-                                        data={[item.date + " " + item.time,
-                                        item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
-                                        style={styles.paymentModeTableRow}
-                                        textStyle={{ textAlign: 'center' }}
-                                    />
-                                })
-                                : <></>
+                                        return <Row
+                                            key={index}
+                                            data={[item.date + " " + item.time,
+                                                item.mode_of_payment, (item.amount).toFixed(2), "Paid"]}
+                                            style={styles.paymentModeTableRow}
+                                            textStyle={textStyle2}
+                                        />
+                                    })
+                                    : <></>
                             }
                         </Table>
                     </View>
                 </View>
-                <Divider color={Colors.highlight} />
+                <Divider color={Colors.highlight}/>
                 {
                     checkNullUndefined(invoiceDetails.footer_message_1) &&
-                        invoiceDetails.footer_message_1.trim().length !== 0 ?
+                    invoiceDetails.footer_message_1.trim().length !== 0 ?
                         <View style={styles.termsAndConditions}>
                             <Text
                                 style={[textTheme.titleMedium]}>Terms & conditions: </Text>
@@ -551,10 +558,10 @@ styles.heading]}>Invoice</Text>*/}
             </View>
             {
                 checkNullUndefined(invoiceDetails.footer_message_2) &&
-                    invoiceDetails.footer_message_2.trim().length !== 0 ?
+                invoiceDetails.footer_message_2.trim().length !== 0 ?
                     <Text
                         style={[textTheme.titleMedium,
-                        styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
+                            styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
                     <></>
             }
         </ScrollView>
@@ -706,7 +713,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         top: '40%',      // Adjust the placement
         left: '0%',     // Adjust the placement
-        transform: [{ rotate: '-35deg' }],  // Rotate the stamp diagonally
+        transform: [{rotate: '-35deg'}],  // Rotate the stamp diagonally
         // opacity: 0.6,    // Slight transparency
         alignItems: 'center',
         paddingVertical: 8,
