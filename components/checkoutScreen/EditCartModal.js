@@ -20,9 +20,9 @@ import {
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 
 const EditCartModal = (props) => {
-    const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage");
-    const [discountValue, setDiscountValue] = useState(0);
-    const [discountAmount, setDiscountAmount] = useState(0);
+    const [selectedDiscountMode, setSelectedDiscountMode] = useState("cash");
+    const [discountValue, setDiscountValue] = useState(props.data.price - props.data.discounted_price);
+    const [discountAmount, setDiscountAmount] = useState(props.data.price - props.data.discounted_price);
     const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
@@ -31,8 +31,8 @@ const EditCartModal = (props) => {
     useEffect(() => {
         // setPrice(props.data.total_price === undefined ? props.data.price : props.data.total_price)
         setPrice(props.data.price)
-        setDiscountValue(0)
-        setDiscountAmount(0)
+        setDiscountValue(props.data.price - props.data.discounted_price)
+        setDiscountAmount(props.data.price - props.data.discounted_price)
     }, [props]);
 
 
@@ -150,7 +150,7 @@ const EditCartModal = (props) => {
                             membership_id: props.data.membership_id,
                             res_cat_id: props.data.resource_category_id,
                             resource_id: props.data.resource_id,
-                            type: "AMOUNT",
+                            type: selectedDiscountMode === "cash" ? "AMOUNT" : "PERCENT",
                             valid_from: "",
                             valid_till: "",
                             wallet_amount: props.data.wallet_amount,
@@ -167,7 +167,7 @@ const EditCartModal = (props) => {
                             membership_id: 0,
                             product_id: props.data.product_id,
                             resource_id: props.data.resource_id,
-                            type: "AMOUNT",
+                            type: selectedDiscountMode === "cash" ? "AMOUNT" : "PERCENT",
                             total_price: price,
                             price: price,
                             res_cat_id: props.data.resource_category_id,
