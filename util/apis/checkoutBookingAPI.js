@@ -64,52 +64,83 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             client_membership_id: cartSliceState.client_membership_id,
             appointment_date: formatDate(Date.now(), "yyyy-mm-dd"),
             business_id: businessId,
-            cart: cartSliceState.items.map(item => {
-                return {
-                    id: item.item_id,
-                    resource_id: item.resource_id,
+            cart: cartSliceState.items
+            .filter(item => {
+                    if (item.gender === "membership") {
+                        if (cartSliceState.editedCart.length === 0) return true;
+                        else {
+                            return !cartSliceState.editedCart.some(editedShips => item.membership_id === editedShips.id)
+                        }
+                    } else {
+                        return !cartSliceState.editedCart.some(edited =>
+                            item.item_id === edited.item_id
+                        )
+                    }
                 }
+            )
+            .map(item => {
+                return {id: item.item_id, resource_id: item.resource_id};
             }),
             coupon_code: "",
             covid_declaration: "true",
-            device: "BUSINESS_WEB",
+            device: "BUSINESS_MOBILE",
             editedPurchasedMemberShipId: [],
-            edited_cart: [...cartSliceState.editedMembership.map(item => {
-                return {
-                    amount: item.price,
-                    bonus_value: 0,
-                    disc_value: 0,
-                    itemId: item.item_id,
-                    membership_id: item.id,
-                    membership_number: "",
-                    res_cat_id: item.resource_category_id,
-                    resource_id: item.resource_id,
-                    type: "AMOUNT",
-                    valid_from: item.valid_from,
-                    valid_till: item.valid_until,
-                    wallet_amount: 0,
-                }
-            }),
-            ...cartSliceState.editedCart.map(item => {
-                if (item.gender === "Products")
-                    return {
-                        amount: item.amount,
-                        bonus_value: 0,
-                        disc_value: item.disc_value,
-                        itemId: item.item_id,
-                        membership_id: 0,
-                        product_id: item.product_id,
-                        resource_id: item.resource_id,
-                        type: "AMOUNT",
-                        valid_from: "",
-                        valid_till: "",
-                        wallet_amount: 0,
-                    }
-                else
-                    return item
-            })
+            edited_cart: [
+                ...cartSliceState.editedCart.map(item => {
+                    if (item.gender === "membership") {
+                        const originalData = cartSliceState.items.filter(ele => ele.membership_id === item.id)[0];
+                        return {
+                            amount: item.price,
+                            bonus_value: 0,
+                            disc_value: 0,
+                            itemId: originalData.item_id,
+                            membership_id: item.id,
+                            membership_number: "",
+                            res_cat_id: originalData.resource_category_id,
+                            resource_id: item.resource_id,
+                            type: "AMOUNT",
+                            valid_from: item.valid_from,
+                            valid_till: item.valid_until,
+                            wallet_amount: 0,
+                        }
+                    } else if (item.gender === "Products")
+                        return {
+                            amount: item.amount,
+                            bonus_value: 0,
+                            disc_value: item.disc_value,
+                            itemId: item.item_id,
+                            membership_id: 0,
+                            product_id: item.product_id,
+                            resource_id: item.resource_id,
+                            type: "AMOUNT",
+                            valid_from: "",
+                            valid_till: "",
+                            wallet_amount: 0,
+                        }
+                    else if (item.gender === "prepaid")
+                        return {
+                            amount: 0,
+                            bonus_value: item.wallet_bonus,
+                            disc_value: 0,
+                            itemId: item.item_id,
+                            membership_id: 0,
+                            resource_id: item.resource_id,
+                            type: "AMOUNT",
+                            valid_from: "",
+                            valid_till: "",
+                            wallet_amount: item.wallet_amount,
+                            wallet_description: item.wallet_description
+                        }
+                    else
+                        return item
+                })
             ],
-            endtime: "22:17:00",
+            endtime: new Date().toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }),
             extra_charges: cartSliceState.chargesData[0].amount === 0 ? [] : cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
@@ -125,7 +156,12 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             }] : [],
             promo_code: "",
             sales_notes: cartSliceState.salesNotes,
-            starttime: "17:35:00",
+            starttime: new Date().toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }),
             user_coupon: "",
             user_id: clientDetails.id,
             walkInUserId: clientDetails.id,
@@ -137,15 +173,8 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                 Authorization: `Bearer ${authToken}`
             }
         });
-        if(response.data.other_message) {
-            // ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
-            Toast.show(response.data.other_message,{
-                duration:Toast.durations.SHORT,
-                position: Toast.positions.BOTTOM,
-                shadow:false,
-                backgroundColor:"black",
-                opacity:1
-            })
+        if (response.data.other_message) {
+            ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
         }
         return response.data;
     } catch (error) {

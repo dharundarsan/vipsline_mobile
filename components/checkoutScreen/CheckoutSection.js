@@ -77,7 +77,7 @@ const CheckoutSection = (props) => {
     const cartDetails = useSelector(state => state.cart.items);
 
     useEffect(() => {
-        const updatedCategory = { service: 0, product: 0, package: 0 };
+        const updatedCategory = {service: 0, product: 0, package: 0};
 
         cartDetails.forEach(item => {
             if (["Women", "Men", "General"].includes(item.gender)) {
@@ -144,15 +144,15 @@ const CheckoutSection = (props) => {
     const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
     const [salesnote, setSalesnote] = useState("");
-    const [chargesInputData, setChargesInputData] = useState([{ index: 0 }]);
+    const [chargesInputData, setChargesInputData] = useState([{index: 0}]);
     const [data, setData] = useState([{}])
 
-    useEffect(()=>{
+    useEffect(() => {
         // console.log(JSON.stringify(cartItems,null,3));
         // if(cartItems.length === 0){
-            dispatch(updateDiscount([]));
+        dispatch(updateDiscount([]));
         // }
-    },[])
+    }, [])
 
     function openModal(title, value) {
         setTitle(title);
@@ -220,13 +220,14 @@ const CheckoutSection = (props) => {
 
     function clearCharges() {
 
-        setChargesInputData([{ index: 0 }])
-        dispatch(updateChargeData([{ index: 0, name: "", amount: 0, }]));
+        setChargesInputData([{index: 0}])
+        dispatch(updateChargeData([{index: 0, name: "", amount: 0,}]));
         dispatch(updateCalculatedPrice());
 
         setActionModal(false);
     }
-    function clearSaleNotes(){
+
+    function clearSaleNotes() {
         setSalesnote("");
         dispatch(clearSalesNotes());
         setActionModal(false);
@@ -236,26 +237,26 @@ const CheckoutSection = (props) => {
 
 
         {ActionModal && <MiniActionTextModal isVisible={ActionModal}
-            onCloseModal={() => {
-                setActionModal(false)
-            }}
-            selectedDiscountMode={selectedDiscountMode}
-            setSelectedDiscountMode={setSelectedDiscountMode}
-            clearSalesNotes={clearSaleNotes}
-            chargesInputData={chargesInputData}
-            setChargesInputData={setChargesInputData}
-            title={title}
-            clickedValue={clickedValue}
-            data={data}
-            setDiscountValue={setDiscountValue}
-            discountValue={discountValue}
-            onChangeValue={setSalesnote}
-            salesNote={salesnote}
-            addDiscount={addDiscount}
-            addCharges={addCharges}
-            updateCharges={updateCharges}
-            UpdateSalesNotes={UpdateSalesNotes}
-            clearCharges={clearCharges}
+                                             onCloseModal={() => {
+                                                 setActionModal(false)
+                                             }}
+                                             selectedDiscountMode={selectedDiscountMode}
+                                             setSelectedDiscountMode={setSelectedDiscountMode}
+                                             clearSalesNotes={clearSaleNotes}
+                                             chargesInputData={chargesInputData}
+                                             setChargesInputData={setChargesInputData}
+                                             title={title}
+                                             clickedValue={clickedValue}
+                                             data={data}
+                                             setDiscountValue={setDiscountValue}
+                                             discountValue={discountValue}
+                                             onChangeValue={setSalesnote}
+                                             salesNote={salesnote}
+                                             addDiscount={addDiscount}
+                                             addCharges={addCharges}
+                                             updateCharges={updateCharges}
+                                             UpdateSalesNotes={UpdateSalesNotes}
+                                             clearCharges={clearCharges}
         />}
         {isDelete && <DeleteClient
             isVisible={isDelete}
@@ -271,7 +272,7 @@ const CheckoutSection = (props) => {
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
                 await clearCartAPI();
-                dispatch(modifyClientMembershipId({ type: "clear" }))
+                dispatch(modifyClientMembershipId({type: "clear"}))
                 clearSaleNotes();
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
@@ -456,7 +457,7 @@ const CheckoutSection = (props) => {
         }
         <View style={styles.buttonContainer}>
             <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
-                <Entypo name="dots-three-horizontal" size={24} color="black" />
+                <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton}
                 pressableStyle={styles.checkoutButtonPressable}
@@ -489,7 +490,7 @@ const CheckoutSection = (props) => {
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
                     <Text
                         style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}</Text>
-                    <Feather name="arrow-right-circle" size={24} color={Colors.white} />
+                    <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                 </View>
             </PrimaryButton>
         </View>

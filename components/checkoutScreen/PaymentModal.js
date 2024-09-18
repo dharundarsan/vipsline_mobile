@@ -37,7 +37,7 @@ const PaymentModal = (props) => {
 
     const clientInfo = useSelector(state => state.clientInfo.details);
     const isPrepaidAvailable = clientInfo.wallet_status && clientInfo.wallet_balance !== undefined && clientInfo.wallet_balance !== 0;
-    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? "prepaid" : "cash");
+    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : "cash");
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
     const [splitResponse, setSplitResponse] = useState([]);
