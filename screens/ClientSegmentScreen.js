@@ -147,6 +147,13 @@ export default function ClientSegmentScreen() {
         }
     }, [searchQuery]);
 
+
+    useFocusEffect(
+        useCallback( ()=> {
+            return () => setFilterPressed("all_clients_count");
+        }, [])
+    )
+
     // useEffect(() => {
     //     if (clientCount !== currentFilterClientCount) {
     //         dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
@@ -327,7 +334,7 @@ export default function ClientSegmentScreen() {
                             }
 
                             {
-                                clientCount >= 10 ?
+                                clientCount > 10 ?
                                     <Pagination
                                         filterPressed={filterPressed}
                                         setIsModalVisible={setIsModalVisible}

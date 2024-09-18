@@ -27,6 +27,8 @@ import {shadowStyling} from "../../util/Helpers";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import {modifyPrepaidDetails, updateCalculatedPrice} from "../../store/cartSlice";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import Loader from 'react-native-three-dots-loader'
+import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -48,6 +50,7 @@ const PaymentModal = (props) => {
     const [shownCount, setShownCount] = useState(0)
     const invoiceDetails = useSelector(state => state.invoice.details);
     const moreInvoiceDetails = useSelector(state => state.invoice.invoiceDetails);
+    const [isLoading, setIsLoading] = useState(false);
 
 
     const [splitUpState, setSplitUpState] = useState([
@@ -627,8 +630,9 @@ const PaymentModal = (props) => {
             <PrimaryButton buttonStyle={styles.optionButton}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
-            <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={styles.checkoutButtonPressable}
+            <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={[styles.checkoutButtonPressable, isLoading ? {justifyContent: "center", paddingVertical: 0, paddingHorizontal: 0} : null]}
                            onPress={async () => {
+                               setIsLoading(true);
                                if (selectedPaymentOption === "prepaid" || (selectedPaymentOption === "split_payment" && splitUpState.some(item => (item.mode === "prepaid" && item.shown)))) {
                                    if (selectedPaymentOption === "prepaid") {
                                        dispatch(updateCalculatedPrice(details.id, true, props.price));
@@ -698,7 +702,6 @@ const PaymentModal = (props) => {
                                        } else {
                                            setIsInvoiceModalVisible(true);
                                        }
-                                       console.log(12);
 
                                        updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
                                        setTimeout(() => {
@@ -725,13 +728,27 @@ const PaymentModal = (props) => {
                                } catch (error) {
                                    console.error("An error occurred:", error);
                                }
+                               setIsLoading(false);
                            }}
             >
-                <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
-                <View style={styles.checkoutButtonAmountAndArrowContainer}>
-                    <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price}</Text>
-                    <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
-                </View>
+                {
+                    isLoading ?
+                        <View style={{ flex: 1}}>
+                            <ThreeDotActionIndicator />
+                        </View>
+                         :
+                        <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
+                }
+                {
+                    !isLoading ?
+                        <View style={styles.checkoutButtonAmountAndArrowContainer}>
+                            <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price}</Text>
+                            <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
+                        </View> :
+                        <></>
+                }
+
+
             </PrimaryButton>
         </View>
     </Modal>
