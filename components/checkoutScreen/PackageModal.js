@@ -8,7 +8,7 @@ import Divider from "../../ui/Divider";
 import axios from "axios";
 import {formatDate, formatDateWithAddedMonths} from "../../util/Helpers";
 import Entypo from '@expo/vector-icons/Entypo';
-import {addItemToCart, loadCartFromDB} from "../../store/cartSlice";
+import {addItemToCart, loadCartFromDB, removeItemFromCart} from "../../store/cartSlice";
 import packageSittingItem from "./PackageSittingItem";
 import PackageSittingItem from "./PackageSittingItem";
 import {useDispatch, useSelector} from "react-redux";
@@ -25,6 +25,7 @@ const PackageModal = (props) => {
         }
     ]);
     const [editedPackageDetails, setEditedPackageDetails] = useState([]);
+    const [modifiedEditedPackageDetails, setModifiedEditedPackageDetails] = useState([]);
     const [selectedSittingItems, setSelectedSittingItems] = useState([]);
     const dispatch = useDispatch();
     const addSittingItems = (item) => {
@@ -35,6 +36,17 @@ const PackageModal = (props) => {
     const deleteSittingItems = (item) => {
         setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
     }
+
+    const editSittingCountInEditedPackageDetails = (data) => {
+        setModifiedEditedPackageDetails(prev => prev.map(item => {
+                if (item.name === data.name && item.parent_resource_category_id === data.parent_resource_category_id && item.resource_category_id === data.resource_category_id) {
+                    return data;
+                }
+                return item;
+            }
+        ))
+    }
+
 
     useEffect(() => {
         const getPackageDetailsFromDB = async () => {
@@ -77,12 +89,16 @@ const PackageModal = (props) => {
                     }
                 );
                 setPackageDetails(response.data.data);
-                // const packageSittingItemsInCart = [];
                 let packageSittingItemsInCart = cartItems.filter(item => item.gender === "packages" && item.package_name !== "");
 
-                console.log(response.data.data[0].service_list.map(item => {
-                    let counter = 0;
+                let counter = 0;
+
+                const data = response.data.data[0].service_list.map(item => {
+                    counter = 0
                     let index;
+                    // const item_id = packageSittingItemsInCart.filter(ele => ele.resource_category_name === item.name &&
+                    //     ele.resource_category_id === item.res_cat_id &&
+                    //     ele.parent_resource_category_id === item.par_res_cat_id)[0].item_id;
 
                     // Use a loop to find and remove all matching items
                     while ((index = packageSittingItemsInCart.findIndex(ele =>
@@ -94,23 +110,19 @@ const PackageModal = (props) => {
                         counter++;  // Increment counter since one element was removed
                     }
 
-                    // const original = packageDetails[0].service_list.filter(ele => ele.resource_category_name === item.resource_category_name &&
-                    //     ele.resource_category_id === item.resource_category_id &&
-                    //     ele.parent_resource_category_id === item.parent_resource_category_id)[0]
-
                     return {
                         name: item.name,
                         resource_category_id: item.res_cat_id,
                         parent_resource_category_id: item.par_res_cat_id,
+                        // item_id: item.item_id,
                         counter: counter,
-                        // available_quantity: original.available_quantity,
-                        // total_quantity: original.total_quantity
                     };
-                }));
+                });
+                setEditedPackageDetails(data);
 
-
+                setModifiedEditedPackageDetails(data);
             } catch (e) {
-                console.log(e)
+                console.error(e)
             }
         }
         getPackageDetailsFromDB();
@@ -153,6 +165,9 @@ const PackageModal = (props) => {
                                                       redeem={props.redeem}
                                                       addSittingItems={addSittingItems}
                                                       deleteSittingItems={deleteSittingItems}
+                                                      edited={props.edited}
+                                                      editedData={editedPackageDetails}
+                                                      editSittingCountInEditedPackageDetails={editSittingCountInEditedPackageDetails}
                                   />
                               }
                     />
@@ -161,7 +176,38 @@ const PackageModal = (props) => {
         </View>
         <Divider/>
         <View style={styles.saveButtonContainer}>
-            <PrimaryButton onPress={async () => {
+            <PrimaryButton onPress={props.edited ? () => {
+                // console.log(editedPackageDetails.every(edited => {
+                //     const data = modifiedEditedPackageDetails.filter(modified => edited.name === modified.name && edited.parent_resource_category_id === modified.parent_resource_category_id && edited.resource_category_id === modified.resource_category_id)
+                //     return data[0].counter === edited.counter;
+                // }))
+                editedPackageDetails.forEach(async edited => {
+                    const data = modifiedEditedPackageDetails.filter(modified => edited.name === modified.name && edited.parent_resource_category_id === modified.parent_resource_category_id && edited.resource_category_id === modified.resource_category_id)
+                    if (data[0].counter === edited.counter) {
+
+                    } else if (data[0].counter > edited.counter) {
+                        const iter = data[0].counter - edited.counter;
+                        for (let i = 0; i < iter; i++) {
+                            // packageDetails.filter(det => );
+                            await dispatch(addItemToCart({
+                                package_id: props.data.package_id,
+                                resource_category: edited.resource_category_id,
+                                resource_id: null
+                            }))
+                        }
+                    } else if (data[0].counter < edited.counter) {
+                        const iter = edited.counter - data[0].counter;
+                        let tempCartItems = cartItems;
+                        for (let i = 0; i < iter; i++) {
+                            const item_id = tempCartItems.filter(item => item.parent_resource_category_id === edited.parent_resource_category_id && item.resource_category_name === edited.name && edited.resource_category_id === item.resource_category_id)[0].item_id;
+                            tempCartItems = tempCartItems.filter(item => item.item_id !== item_id);
+                            await dispatch(removeItemFromCart(item_id));
+                        }
+                    }
+                })
+
+                props.onCloseModal();
+            } : async () => {
                 if (!props.redeem)
                     dispatch(addItemToCart({package_id: props.data.id}));
                 selectedSittingItems.forEach((item) => {

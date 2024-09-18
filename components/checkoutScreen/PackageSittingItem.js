@@ -4,11 +4,33 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import Entypo from "@expo/vector-icons/Entypo";
 import React, {useEffect, useState} from "react";
 import Colors from "../../constants/Colors";
+import {useDispatch} from "react-redux";
+import {addItemToCart, removeItemFromCart} from "../../store/cartSlice";
 
 const PackageSittingItem = (props) => {
+    const [filteredEditedData, setFilteredEditedData] = useState([])
     const [sittingCount, setSittingCount] = useState(0);
+    // const [sittingCount, setSittingCount] = useState( 0);
     const [isMaxReached, setIsMaxReached] = useState(false);
     const [isMinReached, setIsMinReached] = useState(true);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (props.edited) {
+            const filteredData = props.editedData.filter(item =>
+                item.name === props.data.name &&
+                item.parent_resource_category_id === props.data.par_res_cat_id &&
+                item.resource_category_id === props.data.res_cat_id
+            );
+            setFilteredEditedData(filteredData);
+
+            if (filteredData.length > 0) {
+                setSittingCount(filteredData[0].counter);
+                setIsMaxReached(filteredData[0].counter === props.data.available_quantity);
+                setIsMinReached(filteredData[0].counter === 0);
+            }
+        }
+    }, [props.editedData, props.data]);
 
     useEffect(() => {
         if (sittingCount === 0) {
@@ -42,10 +64,16 @@ const PackageSittingItem = (props) => {
                                        onPress={
                                            isMinReached ? () => {
                                                } :
-                                               () => {
-                                                   props.deleteSittingItems(props.data);
-                                                   setSittingCount(prev => prev - 1)
-                                               }} buttonStyle={[styles.toggleButton, {
+                                               props.edited ? async () => {
+                                                       props.editSittingCountInEditedPackageDetails({...filteredEditedData[0], counter: sittingCount - 1})
+                                                       setSittingCount(prev => prev - 1)
+                                                   }
+                                                   :
+                                                   () => {
+                                                       props.deleteSittingItems(props.data);
+                                                       setSittingCount(prev => prev - 1)
+                                                   }
+                                       } buttonStyle={[styles.toggleButton, {
                             borderBottomRightRadius: 0,
                             borderTopRightRadius: 0
                         }]}
@@ -57,10 +85,14 @@ const PackageSittingItem = (props) => {
                                        onPress={
                                            isMaxReached ? () => {
                                                } :
-                                               () => {
-                                                   props.addSittingItems(props.data);
-                                                   setSittingCount(prev => prev + 1)
-                                               }} buttonStyle={[styles.toggleButton, {
+                                               props.edited ? () => {
+                                                       props.editSittingCountInEditedPackageDetails({...filteredEditedData[0], counter: sittingCount + 1})
+                                                       setSittingCount(prev => prev + 1)
+                                                   } :
+                                                   () => {
+                                                       props.addSittingItems(props.data);
+                                                       setSittingCount(prev => prev + 1)
+                                                   }} buttonStyle={[styles.toggleButton, {
                             borderBottomLeftRadius: 0,
                             borderTopLeftRadius: 0
                         }]}

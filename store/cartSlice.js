@@ -137,22 +137,6 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
             }),
         coupon_code: "",
         edited_cart: [
-            //     ...cart.editedMembership.map(item => {
-            //     return {
-            //         amount: item.price,
-            //         bonus_value: 0,
-            //         disc_value: 0,
-            //         itemId: item.item_id,
-            //         membership_id: item.id,
-            //         membership_number: "",
-            //         res_cat_id: item.resource_category_id,
-            //         resource_id: item.resource_id,
-            //         type: "AMOUNT",
-            //         valid_from: item.valid_from,
-            //         valid_till: item.valid_until,
-            //         wallet_amount: 0,
-            //     }
-            // }),
             ...cart.editedCart.map(item => {
                 if (item.gender === "membership") {
                     const originalData = cart.items.filter(ele => ele.membership_id === item.id)[0];
@@ -217,7 +201,8 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
 
 }
 
-export const removeItemFromCart = async (itemId) => async (dispatch, getState) => {
+export const removeItemFromCart = (itemId) => async (dispatch, getState) => {
+    console.log(itemId)
     const {cart} = getState();
 
     let authToken = ""
@@ -248,6 +233,7 @@ export const removeItemFromCart = async (itemId) => async (dispatch, getState) =
         }
         dispatch(await loadCartFromDB());
     } catch (error) {
+        console.error(e.response.data)
     }
 }
 

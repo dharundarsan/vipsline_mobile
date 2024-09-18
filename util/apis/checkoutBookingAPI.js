@@ -63,34 +63,46 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             client_membership_id: cartSliceState.client_membership_id,
             appointment_date: formatDate(Date.now(), "yyyy-mm-dd"),
             business_id: businessId,
-            cart: cartSliceState.items.map(item => {
-                return {
-                    id: item.item_id,
-                    resource_id: item.resource_id,
+            cart: cartSliceState.items
+            .filter(item => {
+                    if (item.gender === "membership") {
+                        if (cartSliceState.editedCart.length === 0) return true;
+                        else {
+                            return !cartSliceState.editedCart.some(editedShips => item.membership_id === editedShips.id)
+                        }
+                    } else {
+                        return !cartSliceState.editedCart.some(edited =>
+                            item.item_id === edited.item_id
+                        )
+                    }
                 }
+            )
+            .map(item => {
+                return {id: item.item_id};
             }),
             coupon_code: "",
             covid_declaration: "true",
             device: "BUSINESS_WEB",
             editedPurchasedMemberShipId: [],
-            edited_cart: [...cartSliceState.editedCart.map(item => {
-                return {
-                    amount: item.price,
-                    bonus_value: 0,
-                    disc_value: 0,
-                    itemId: item.item_id,
-                    membership_id: item.id,
-                    membership_number: "",
-                    res_cat_id: item.resource_category_id,
-                    resource_id: item.resource_id,
-                    type: "AMOUNT",
-                    valid_from: item.valid_from,
-                    valid_till: item.valid_until,
-                    wallet_amount: 0,
-                }
-            }),
+            edited_cart: [
                 ...cartSliceState.editedCart.map(item => {
-                    if (item.gender === "Products")
+                    if (item.gender === "membership") {
+                        const originalData = cartSliceState.items.filter(ele => ele.membership_id === item.id)[0];
+                        return {
+                            amount: item.price,
+                            bonus_value: 0,
+                            disc_value: 0,
+                            itemId: originalData.item_id,
+                            membership_id: item.id,
+                            membership_number: "",
+                            res_cat_id: originalData.resource_category_id,
+                            resource_id: item.resource_id,
+                            type: "AMOUNT",
+                            valid_from: item.valid_from,
+                            valid_till: item.valid_until,
+                            wallet_amount: 0,
+                        }
+                    } else if (item.gender === "Products")
                         return {
                             amount: item.amount,
                             bonus_value: 0,
@@ -103,6 +115,20 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                             valid_from: "",
                             valid_till: "",
                             wallet_amount: 0,
+                        }
+                    else if (item.gender === "prepaid")
+                        return {
+                            amount: 0,
+                            bonus_value: item.wallet_bonus,
+                            disc_value: 0,
+                            itemId: item.item_id,
+                            membership_id: 0,
+                            resource_id: item.resource_id,
+                            type: "AMOUNT",
+                            valid_from: "",
+                            valid_till: "",
+                            wallet_amount: item.wallet_amount,
+                            wallet_description: item.wallet_description
                         }
                     else
                         return item

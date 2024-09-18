@@ -110,7 +110,7 @@ const CartItem = (props) => {
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
                         <Text
                             style={[TextTheme.bodyLarge, styles.amountText]}>{editedData ? editedData.price : props.data.price}</Text>
-                        {props.data.gender === "packages" && props.data.package_name !== "" ? null :
+                        {(props.data.gender === "packages" && props.data.package_name !== "") || true ? null :
                             <PrimaryButton onPress={() => {
                                 if (props.data.gender === "prepaid") {
                                     setIsEditPrepaidModalVisible(true)
