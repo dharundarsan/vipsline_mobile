@@ -15,7 +15,7 @@ import {
     removeItemFromCart,
     removeItemFromEditedCart, updateEditedCart,
     updateLoadingState, updateStaffInEditedCart, updateStaffInCustomItemsCart,
-    modifyPrepaidDetails, removeMembershipFromEditedCart
+    modifyPrepaidDetails, removeMembershipFromEditedCart, updateCalculatedPrice
 } from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import {updateCartItemStaff} from "../../store/staffSlice";
@@ -23,6 +23,7 @@ import EditCartModal from "./EditCartModal";
 import PrepaidModal from "./PrepaidModal";
 import AddCustomItemModal from "./AddCustomItemModal";
 import PackageModal from "./PackageModal";
+import {clientSlice} from "../../store/clientSlice";
 
 const CartItem = (props) => {
     const dispatch = useDispatch();
@@ -110,13 +111,13 @@ const CartItem = (props) => {
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
                         <Text
                             style={[TextTheme.bodyLarge, styles.amountText]}>{editedData ? editedData.price : props.data.price}</Text>
-                        {(props.data.gender === "packages" && props.data.package_name !== "") || true ? null :
+                        {(props.data.gender === "packages" && props.data.package_name !== "") ? null :
                             <PrimaryButton onPress={() => {
                                 if (props.data.gender === "prepaid") {
                                     setIsEditPrepaidModalVisible(true)
                                 } else if (props.data.gender === "custom_item") {
                                     setIsEditCustomItemModalVisible(true);
-                                } else if(props.data.gender === "packages"){
+                                } else if (props.data.gender === "packages") {
                                     setIsEditPackageModalVisible(true);
                                 } else {
                                     setIsEditCartModalVisible(true)
@@ -136,9 +137,10 @@ const CartItem = (props) => {
                                                    dispatch(updateLoadingState(false));
                                                    dispatch(removeItemFromEditedCart(props.data.item_id))
                                                })
-                                           } else if (props.data.gender === "custom_item")
+                                           } else if (props.data.gender === "custom_item") {
                                                dispatch(removeCustomItems(props.data.id))
-                                           else if (props.data.gender === "membership") {
+                                               dispatch(updateCalculatedPrice());
+                                           } else if (props.data.gender === "membership") {
                                                removeItemHandler()
                                                dispatch(removeMembershipFromEditedCart(props.data.membership_id))
                                            } else

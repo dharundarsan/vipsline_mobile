@@ -76,7 +76,7 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
 
 export const checkStaffOnCartItems = () => (dispatch, getState) => {
     const {cart} = getState();
-    return cart.items.every(item => item.resource_id !== null);
+    return cart.items.every(item => item.resource_id !== null) && cart.customItems.every(item => item.resource_id !== null);
 }
 
 export const loadCartFromDB = (clientId) => async (dispatch, getState) => {

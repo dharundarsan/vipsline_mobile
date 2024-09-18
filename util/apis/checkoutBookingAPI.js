@@ -78,11 +78,11 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                 }
             )
             .map(item => {
-                return {id: item.item_id};
+                return {id: item.item_id, resource_id: item.resource_id};
             }),
             coupon_code: "",
             covid_declaration: "true",
-            device: "BUSINESS_WEB",
+            device: "BUSINESS_MOBILE",
             editedPurchasedMemberShipId: [],
             edited_cart: [
                 ...cartSliceState.editedCart.map(item => {
@@ -134,7 +134,12 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                         return item
                 })
             ],
-            endtime: "22:17:00",
+            endtime: new Date().toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }),
             extra_charges: cartSliceState.chargesData[0].amount === 0 ? [] : cartSliceState.chargesData,
             hasGST: false,
             home_service: false,
@@ -150,7 +155,12 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             }] : [],
             promo_code: "",
             sales_notes: cartSliceState.salesNotes,
-            starttime: "17:35:00",
+            starttime: new Date().toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }),
             user_coupon: "",
             user_id: clientDetails.id,
             walkInUserId: clientDetails.id,

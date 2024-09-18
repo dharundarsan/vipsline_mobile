@@ -28,31 +28,44 @@ const AddCustomItemModal = (props) => {
         </View>
         <View style={styles.modalContent}>
             <CustomTextInput label={"Custom Item Name"} type={"text"} onChangeText={setItemName} value={itemName}/>
-            <CustomTextInput label={"Price"} type={"price"} placeholder={"0.00"} value={itemPrice.toString()}
-                             onChangeText={setItemPrice} onEndEditing={price => {
-                if (price === "") setItemPrice(0)
-                else setItemPrice(parseFloat(price))
-            }}/>
+            <CustomTextInput label={"Price"}
+                             type={"price"}
+                             placeholder={"0.00"}
+                             value={itemPrice.toString()}
+                             onChangeText={setItemPrice}
+                             onEndEditing={price => {
+                                 if (price === "") setItemPrice(0)
+                                 else setItemPrice(parseFloat(price))
+                             }}/>
         </View>
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={() => {
+                if (itemName.trim() === "") {
+                    ToastAndroid.show("Please enter item name", ToastAndroid.SHORT)
+                    return;
+                }
+                let price;
+
+                if (itemName === "") price = 0
+                else price = parseFloat(itemPrice)
+
                 if (props.edited) {
                     dispatch(updateCustomItem({
-                        amount: itemPrice,
-                        price: itemPrice,
-                        total_price: itemPrice,
+                        amount: price,
+                        price: price,
+                        total_price: price,
                         item_id: props.data.item_id,
                     }))
                     props.onCloseModal();
                 } else {
                     dispatch(addCustomItems({
                         name: itemName,
-                        price: itemPrice.toString(),
+                        price: price.toString(),
                         resource_category_name: null,
-                        total_price: itemPrice.toString(),
+                        total_price: price.toString(),
                         category: "custom_item",
                         gender: "custom_item",
-                        amount: itemPrice.toString(),
+                        amount: price.toString(),
                         resource_id: null,
                     }))
                     props.onCloseModal();

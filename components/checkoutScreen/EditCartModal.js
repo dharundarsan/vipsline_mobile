@@ -37,8 +37,18 @@ const EditCartModal = (props) => {
 
 
     useEffect(() => {
-        setDiscountValue(0);
-        setDiscountAmount(0);
+        const api = async () => {
+            if (selectedDiscountMode === "percentage") {
+                setDiscountAmount(await getDiscountAPI({
+                    price: price,
+                    disc_percent: discountValue
+                }))
+            } else {
+                setDiscountAmount(parseFloat(discountValue));
+            }
+        }
+
+        api();
     }, [selectedDiscountMode]);
 
     return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}>
