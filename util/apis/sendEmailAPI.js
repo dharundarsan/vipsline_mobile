@@ -1,7 +1,8 @@
 import axios from "axios";
 import { ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-root-toast";
+import Toast from "react-native-toast-message";
+// import Toast from "react-native-root-toast";
 
 export default async function sendEmailAPI(email, bookingId) {
 
@@ -42,13 +43,20 @@ export default async function sendEmailAPI(email, bookingId) {
         );
 
         // ToastAndroid.show("Email sent successfully!", ToastAndroid.LONG);
-        Toast.show("Email Sent Successfully",{
-            duration:Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow:false,
-            backgroundColor:"black",
-            opacity:1
-        })
+        console.log(1);
+        
+        // Toast.show("Email Sent Successfully",{
+        //     duration:Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow:false,
+        //     backgroundColor:"black",
+        //     opacity:1
+        // })
+        Toast.show({
+            type: 'success',
+            text1: 'Hello',
+            text2: 'This is some something 👋'
+          });
     } catch (error) {
         // ToastAndroid.show("Failed to send email.", ToastAndroid.LONG);
         Toast.show("Failed To Send Email",{

@@ -34,6 +34,7 @@ import { loadBusinessesListFromDb } from "../../store/listOfBusinessSlice";
 import { updateTotalClientCount } from "../../store/clientFilterSlice";
 import { clearClientInfo } from "../../store/clientInfoSlice";
 import Toast from "react-native-root-toast";
+import InvoiceModal from "./InvoiceModal";
 
 
 const CheckoutSection = (props) => {
@@ -158,10 +159,8 @@ const CheckoutSection = (props) => {
         setClickedValue(value);
     }
 
-
-    const checkoutDiscount = useSelector(state => state.checkoutAction.additionalDiscounts)
-    const checkoutCharges = useSelector(state => state.checkoutAction.chargesData);
-
+    const invoiceDetails = useSelector(state => state.invoice.details);
+    const moreInvoiceDetails = useSelector(state => state.invoice.invoiceDetails);
     const customDiscount = useSelector(state => state.cart.additionalDiscounts);
 
 
@@ -232,6 +231,7 @@ const CheckoutSection = (props) => {
         dispatch(clearSalesNotes());
         setActionModal(false);
     }
+    const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     return <View style={styles.checkoutSection}>
 
 
@@ -322,7 +322,16 @@ const CheckoutSection = (props) => {
                 onCloseModal={() => {
                     setIsPaymentModalVisible(false)
                 }}
+                setIsInvoiceModalVisible={setIsInvoiceModalVisible}
                 price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} />
+        }
+        {
+            isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
+                <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
+                    setIsInvoiceModalVisible(false);
+                    // props.onCloseModal();
+                }}/> :
+                null
         }
         <View style={styles.checkoutDetailRow}>
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-root-toast";
 
@@ -41,7 +40,7 @@ export default async function cancelInvoiceAPI(status, bookingId) {
         })
     } catch (error) {
                 // ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
-        Toast.show("Falide To Cancel Invoice",{
+        Toast.show("Falied To Cancel Invoice",{
             duration:Toast.durations.LONG,
             position: Toast.positions.BOTTOM,
             shadow:false,

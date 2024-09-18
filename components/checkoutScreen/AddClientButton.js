@@ -16,7 +16,7 @@ import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MemberShipDetailModal from "./MemberShipDetailModal";
 
-import {loadCartFromDB, modifyClientMembershipId, updateCalculatedPrice} from "../../store/cartSlice";
+import {loadCartFromDB, modifyClientId, modifyClientMembershipId, updateCalculatedPrice} from "../../store/cartSlice";
 
 import {loadClientFiltersFromDb} from "../../store/clientFilterSlice";
 import PackageModal from "./PackageModal";
@@ -39,6 +39,14 @@ const AddClientButton = (props) => {
         dispatch(updateClientId(clientId))
         dispatch(modifyClientMembershipId({type: "add", payload: clientMembershipId}))
         dispatch(loadCartFromDB(clientInfo.client_id))
+        // console.log(JSON.stringify(clientInfo.membershipDetails[0].client_id,null,3));
+        
+        if(clientInfo.membershipDetails[0].client_id !== undefined){
+            dispatch(modifyClientId({type:"update",payload:clientInfo.membershipDetails[0].client_id}))
+        }
+        else {
+            dispatch(modifyClientId({type:"clear"}))
+        }
         // dispatch(updateCalculatedPrice())
     }
 
@@ -80,6 +88,7 @@ const AddClientButton = (props) => {
                                 setVisible={setIsVisibleModal}
                                 closeModal={() => {
                                     setIsVisibleModal(false);
+                                    dispatch(modifyClientId({type:"clear"}))
                                     dispatch(clearClientInfo());
                                 }}
                                 onClose={() => {

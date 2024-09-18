@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { formatDate } from "../util/Helpers";
 
 const initialCartState = {
+    prepaidClientId: "",
     items: [],
     isLoading: false,
     editedMembership: [],
@@ -30,7 +31,7 @@ const initialCartState = {
         resource_id: "",
         source: "",
         wallet_amount: "",
-    }]
+    }],
 };
 
 async function getBusinessId() {
@@ -110,7 +111,11 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
         dispatch(updateEditedMembership({ type: "map" }))
         dispatch(updateEditedCart());
         // dispatch(updatePackageCart());
-        dispatch(updateCalculatedPrice(clientId !== undefined || null ? clientId : clientInfo.clientId !== undefined || null ? clientInfo.clientId : clientId));
+        
+        if (clientId !== undefined) {
+            dispatch(modifyClientId({ type: "update", payload: clientId }));
+        }
+        dispatch(updateCalculatedPrice(clientId !== undefined || null || "" ? clientId : clientInfo.clientId !== undefined || null || "" ? clientInfo.clientId : clientId));
         dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
     } catch (error) {
     }
@@ -180,7 +185,7 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
         wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
         client_membership_id: cart.clientMembershipID === undefined || null ? null : cart.clientMembershipID,
         // client_membership_id:clientMembershipID,
-        walkInUserId: clientId === "" ? undefined : clientId,
+        walkInUserId: cart.prepaidClientId !== "" ? cart.prepaidClientId : clientId === "" ? undefined : clientId,
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
@@ -441,6 +446,25 @@ export const cartSlice = createSlice({
                     break;
             }
         },
+        modifyClientId(state, action) {
+            const { type, payload } = action.payload;
+            console.log("payload ");
+            console.log(payload);
+            console.log("type");
+            console.log(type);
+            switch (type) {
+                case "clear":
+                    state.prepaidClientId = undefined;
+                    console.log("Done 0");
+                    break;
+                case "update":
+                    console.log("Done 1");
+                    
+                    state.prepaidClientId = payload;
+                    console.log("Done 2");
+                    break;
+            }
+        },
         modifyPrepaidDetails(state, action) {
             const { type, payload } = action.payload;
             switch (type) {
@@ -519,7 +543,8 @@ export const {
     clearSalesNotes,
     updateTotalChargeAmount,
     modifyClientMembershipId,
-    modifyPrepaidDetails
+    modifyPrepaidDetails,
+    modifyClientId,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
