@@ -26,7 +26,13 @@ import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
 import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
-import {clearCustomItems, clearSalesNotes, loadCartFromDB, modifyClientMembershipId} from "../store/cartSlice";
+import {
+    clearCustomItems,
+    clearLocalCart,
+    clearSalesNotes,
+    loadCartFromDB,
+    modifyClientMembershipId
+} from "../store/cartSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
@@ -66,6 +72,7 @@ const CheckoutScreen = () => {
         if(businessId !== "") {
             clearCartAPI();
             dispatch(clearCustomItems());
+            dispatch(clearLocalCart());
             dispatch(clearSalesNotes());
             dispatch(modifyClientMembershipId({type: "clear"}))
             dispatch(loadServicesDataFromDb("women"));

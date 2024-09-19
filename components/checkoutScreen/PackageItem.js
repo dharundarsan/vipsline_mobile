@@ -57,7 +57,7 @@ const PackageItem = (props) => {
                           pressableStyle={styles.packageItemPressable}
                           onPress={() => {
                               setIsPackageModalVisible(true);
-                              dispatch(addItemToCart(props.data));
+                              // dispatch(addItemToCart(props.data));
                           }}>
         {isPackageModalVisible && <PackageModal redeem={false} isVisible={isPackageModalVisible} data={props.data}
                                                 closeOverallModal={props.closeOverallModal}

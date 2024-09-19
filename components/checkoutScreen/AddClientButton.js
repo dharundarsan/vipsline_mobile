@@ -118,8 +118,10 @@ const AddClientButton = (props) => {
                             />
                             <View style={styles.actionMenu}>
                                 {
-                                    clientInfo.details && clientInfo.membershipDetails.length !== 0 && clientInfo.packageDetails.length !== 0 && 
-                                    clientInfo.details.wallet_balance !== undefined ? (
+                                    clientInfo.details
+                                    // && clientInfo.membershipDetails.length !== 0 && clientInfo.packageDetails.length !== 0
+                                    // && clientInfo.details.wallet_balance !== undefined
+                                        ? (
                                             isClientInfo ? (
                                                 <Pressable style={[styles.activePlan, {
                                                     flexDirection: 'row', alignItems: "center",

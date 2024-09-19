@@ -85,10 +85,10 @@ const PrepaidModal = (props) => {
                 if (props.edited) {
                     dispatch(modifyPrepaidDetails({
                         type: "add", payload: [{
-                            bonus_value: prepaidBonus.toString(),
+                            bonus_value: parseFloat(prepaidBonus).toString(),
                             description: description,
                             source: "add_prepaid",
-                            wallet_amount: prepaidAmount.toString(),
+                            wallet_amount: parseFloat(prepaidAmount).toString(),
                             mobile: "",
                             resource_id: "",
                         }]
@@ -96,10 +96,10 @@ const PrepaidModal = (props) => {
                     dispatch(addItemToEditedCart({
                         ...props.data,
                         itemId: props.data.item_id,
-                        total_price: prepaidAmount,
-                        price: prepaidAmount,
+                        total_price: parseFloat(prepaidAmount),
+                        price: parseFloat(prepaidAmount),
                         description: description,
-                        wallet_amount: prepaidAmount,
+                        wallet_amount: parseFloat(prepaidAmount),
                         wallet_bonus: prepaidBonus
                     }));
                     dispatch(updateCalculatedPrice());
@@ -107,7 +107,7 @@ const PrepaidModal = (props) => {
                 } else {
                     dispatch(addItemToCart({
                         description: description,
-                        wallet_amount: prepaidAmount,
+                        wallet_amount: parseFloat(prepaidAmount),
                         wallet_bonus: prepaidBonus
                     }));
                     dispatch(modifyPrepaidDetails({
@@ -115,7 +115,7 @@ const PrepaidModal = (props) => {
                             bonus_value: prepaidBonus.toString(),
                             description: description,
                             source: "add_prepaid",
-                            wallet_amount: prepaidAmount.toString(),
+                            wallet_amount: parseFloat(prepaidAmount).toString(),
                             mobile: "",
                             resource_id: "",
                         }]

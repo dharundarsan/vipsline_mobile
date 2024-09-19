@@ -732,6 +732,7 @@ const PaymentModal = (props) => {
                                            }, 100)
                                        }
                                        updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+
                                        setTimeout(() => {
                                            updateLiveStatusAPI(response.data[0].booking_id);
 
