@@ -326,6 +326,9 @@ export const cartSlice = createSlice({
                 return item;
             })
         },
+        clearCustomItems(state, action) {
+            state.customItems = [];
+        },
         setCalculatedPrice(state, action) {
             state.calculatedPrice = action.payload;
         },
@@ -360,6 +363,7 @@ export const cartSlice = createSlice({
         updateChargeData(state, action) {
             state.chargesData = action.payload;
         },
+
         updateSalesNotes(state, action) {
             state.salesNotes = action.payload;
         },
@@ -471,6 +475,7 @@ export const {
     modifyClientMembershipId,
     modifyPrepaidDetails,
     modifyClientId,
+    clearCustomItems
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

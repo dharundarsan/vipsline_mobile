@@ -25,6 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useFocusEffect} from "@react-navigation/native";
 import {clearClientInfo} from "../store/clientInfoSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
+import {clearCustomItems} from "../store/cartSlice";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -35,6 +36,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     useFocusEffect(
         useCallback(() => {
             dispatch(clearClientInfo());
+            dispatch(clearCustomItems());
             clearCartAPI();
         }, [])
     );
