@@ -384,7 +384,7 @@ const PaymentModal = (props) => {
                     props.onCloseModal();
                 }}/> :
                 null
-        } */}
+        } 
 
         <View
             style={[styles.headingAndCloseContainer, {marginTop: Platform.OS === "ios" ? insets.top : 0}, shadowStyling]}>
