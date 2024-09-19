@@ -29,6 +29,7 @@ const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
     const [isClientInfo, setIsClientInfo] = useState(false)
     const [isVisibileModal, setIsVisibleModal] = useState(false)
+    const [filterPressed, setFilterPressed] = useState("")
     const [isMembershipModalVisible, setIsMembershipModalVisible] = useState(false)
     // const [storeMembershipId, setStoreMembershipId] = useState(useSelector(state => state.cart.clientMembershipID));
     const dispatch = useDispatch();
@@ -84,15 +85,7 @@ const AddClientButton = (props) => {
     }
     function editClientOption(option) {
         if (option === "edit") {
-            setIsVisibleModal(false);
-            {
-                Platform.OS === "ios" ?
-                    setTimeout(() => {
-                        setEditClientModalVisibility(true);
-                    }, 1000) :
-                    setEditClientModalVisibility(true);
-            }
-
+            setEditClientModalVisibility(true);
         }
     }
     
@@ -103,6 +96,9 @@ const AddClientButton = (props) => {
                     <View style={{ borderBottomWidth: 1, borderColor: Colors.highlight }}>
                         {isVisibileModal && (
                             <ClientInfoModal
+                                setFilterPressed={setFilterPressed}
+                                searchClientQuery={props.searchClientQuery}
+                                setSearchQuery={props.setSearchClientQuery}
                                 modalVisibility={modalVisibility}
                                 setModalVisibility={setModalVisibility}
                                 setEditClientModalVisibility={setEditClientModalVisibility}
@@ -122,7 +118,7 @@ const AddClientButton = (props) => {
                                 id={clientInfo.details?.id}
                             />
                         )}
-                        <UpdateClientModal
+                        {/* <UpdateClientModal
                             isVisible={editClientModalVisibility}
                             onCloseModal={() => {
                                 dispatch(loadClientInfoFromDb(clientInfo.details.id))
@@ -133,7 +129,7 @@ const AddClientButton = (props) => {
                             }}
                             details={details}
 
-                        />
+                        /> */}
                         {isAvailablePackagesModalVisible &&
                             <AvailablePackagesModal isVisible={isAvailablePackagesModalVisible}
                                 onCloseModal={() => setIsAvailablePackageModalVisible(false)} />

@@ -30,6 +30,7 @@ import axios from "axios";
 import { checkNullUndefined } from "../util/Helpers";
 import { useFocusEffect } from "@react-navigation/native";
 import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientModal";
+import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
 
 
 export default function ClientSegmentScreen() {
@@ -128,6 +129,7 @@ export default function ClientSegmentScreen() {
     const [searchClientTotalCount, setSearchClientTotalCount] = useState(0);
 
     const businessId = useSelector(state => state.authDetails.businessId);
+    const [selectedOption, setSelectedOption] = useState("");
 
     useEffect(() => {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
@@ -223,44 +225,56 @@ export default function ClientSegmentScreen() {
         setFilterPressed(filter);
     }
 
-    function editClientOption(option){
-        if(option === "edit"){
-            setIsClientInfoModalVisible(false);
+    function editClientOption(option) {
+        if (option === "edit") {
+            // setIsClientInfoModalVisible(false);
             {
-                Platform.OS === "ios" ?
-                    setTimeout(()=>{
-                        setEditClientModalVisibility(true);
-                    },1000) :
-                    setEditClientModalVisibility(true);
+                // Platform.OS === "ios" ?
+                //     setTimeout(()=>{
+                //         setEditClientModalVisibility(true);
+                //     },1000) :
+                setEditClientModalVisibility(true);
             }
-            
+
         }
     }
+    
     return (
         <ScrollView style={styles.scrollView}>
-            <UpdateClientModal
-                    isVisible={editClientModalVisibility}
-                    onCloseModal={() => {
-                        dispatch(loadClientInfoFromDb(clientId))
-                        dispatch(loadClientFiltersFromDb(10, "All"));
-                        dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
-                        setEditClientModalVisibility(false);
-                        setModalVisibility(false);
-                    }}
-                    details={details}
 
-                />
+            
             <View style={styles.clientSegment}>
-                <EntryModel
+                {
+                    isModalVisible &&
+                    <EntryModel
                     isModalVisible={isModalVisible}
                     setIsModalVisible={setIsModalVisible}
                     filterPressed={filterPressed}
                     query={searchQuery}
-                />
+                    />
+                }
 
-                
+                {/* {
+                    editClientModalVisibility &&
+                    <UpdateClientModal
+                        isVisible={editClientModalVisibility}
+                        onCloseModal={() => {
+                            dispatch(loadClientInfoFromDb(clientId))
+                            dispatch(loadClientFiltersFromDb(10, "All"));
+                            dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
+                            setEditClientModalVisibility(false);
+                            setModalVisibility(false);
+                        }}
+                        details={details}
 
-                <ClientInfoModal
+                    />
+                } */}
+
+
+
+                {
+                    isClientInfoModalVisible &&
+                    <ClientInfoModal
                     modalVisibility={modalVisibility}
                     setModalVisibility={setModalVisibility}
                     setEditClientModalVisibility={setEditClientModalVisibility}
@@ -278,7 +292,24 @@ export default function ClientSegmentScreen() {
                     setSearchQuery={setSearchQuery}
                     setFilterPressed={setFilterPressed}
                     onClose={() => setIsClientInfoModalVisible(false)}
-                />
+                    />
+                }
+
+                {
+                    modalVisibility && 
+                    <MoreOptionDropDownModal
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+                    isVisible={modalVisibility}
+                    onCloseModal={() => setModalVisibility(false)}
+                    dropdownItems={[
+                        "Edit client",
+                        "Delete client",
+                    ]}
+                    setOption={setSelectedOption}
+                    setModalVisibility={setModalVisibility}
+                    />
+                }
 
                 <AddClient />
 

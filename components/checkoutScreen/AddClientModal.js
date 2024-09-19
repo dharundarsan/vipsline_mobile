@@ -11,7 +11,7 @@ import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {shadowStyling} from "../../util/Helpers";
@@ -21,7 +21,7 @@ const AddClientModal = (props) => {
     const clientsList = useSelector(state => state.client.clients);
     const [isCreateClientModalVisible, setIsCreateClientModalVisible] = useState(false);
     const dispatch = useDispatch();
-    const [searchClientQuery, setSearchClientQuery] = useState("");
+    // const [searchClientQuery, setSearchClientQuery] = useState("");
     const [searchedClients, setSearchedClients] = useState([]);
     const [searchClientPageNo, setSearchClientPageNo] = useState(0);
     const queryRef = useRef("");
@@ -77,18 +77,18 @@ const AddClientModal = (props) => {
     }, [isLoading]);
 
     useEffect(() => {
-        if (searchClientQuery !== queryRef.current) {
-            queryRef.current = searchClientQuery;
+        if (props.searchClientQuery !== queryRef.current) {
+            queryRef.current = props.searchClientQuery;
             setSearchedClients([]);
             setSearchClientPageNo(0);
-            searchClientFromDB(searchClientQuery, 0).then(r => null);
+            searchClientFromDB(props.searchClientQuery, 0).then(r => null);
         }
-    }, [searchClientQuery, searchClientFromDB]);
+    }, [props.searchClientQuery, searchClientFromDB]);
 
     const loadMoreClients = () => {
         const newPageNo = searchClientPageNo + 1;
         setSearchClientPageNo(newPageNo);
-        searchClientFromDB(searchClientQuery, newPageNo).then(r => null);
+        searchClientFromDB(props.searchClientQuery, newPageNo).then(r => null);
     };
 
     return (
@@ -103,7 +103,7 @@ const AddClientModal = (props) => {
                     buttonStyle={styles.closeButton}
                     pressableStyle={styles.closeButtonPressable}
                     onPress={() => {
-                        setSearchClientQuery("");
+                        props.setSearchClientQuery("");
                         props.closeModal()
                     }}
                 >
@@ -112,7 +112,7 @@ const AddClientModal = (props) => {
             </View>
             <View style={styles.modalContent}>
                 <SearchBar placeholder={"Search by email or mobile"} onChangeText={(text) => {
-                    setSearchClientQuery(text);
+                    props.setSearchClientQuery(text);
                 }}
                            searchContainerStyle={styles.searchContainerStyle}/>
                 <Divider/>
@@ -124,7 +124,7 @@ const AddClientModal = (props) => {
                     <Text style={[textTheme.titleMedium, styles.createClientText]}>Create new client</Text>
                 </PrimaryButton>
                 <Divider/>
-                {searchClientQuery === "" ? (
+                {props.searchClientQuery === "" ? (
                     <FlatList
                         data={clientsList}
                         keyExtractor={(item) => item.id.toString()}
@@ -140,6 +140,7 @@ const AddClientModal = (props) => {
                                     props.closeModal();
                                     dispatch(loadClientInfoFromDb(item.id));
                                     dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                    dispatch(updateClientId(item.id))
                                 }}
                             />
                         )}
@@ -161,7 +162,8 @@ const AddClientModal = (props) => {
                                     props.closeModal();
                                     dispatch(loadClientInfoFromDb(item.id));
                                     dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
-                                    setSearchClientQuery("");
+                                    props.setSearchClientQuery("");
+                                    dispatch(updateClientId(item.id))
                                 }}
                             />
                         )}

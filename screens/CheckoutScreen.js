@@ -40,6 +40,7 @@ const CheckoutScreen = () => {
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [searchClientQuery, setSearchClientQuery] = useState("");
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
@@ -126,10 +127,14 @@ const CheckoutScreen = () => {
         <View style={[styles.checkoutScreen, {
             paddingBottom: insets.bottom
         }]}>
-            <AddClientModal closeModal={() => {
+            <AddClientModal setSearchClientQuery={setSearchClientQuery}
+            searchClientQuery={searchClientQuery}
+            closeModal={() => {
                 setIsAddClientModalVisible(false)
             }} isVisible={isAddClientModalVisible} />
-            <AddClientButton onPress={() => {
+            <AddClientButton setSearchClientQuery={setSearchClientQuery}
+            searchClientQuery={searchClientQuery}
+            onPress={() => {
                 setIsAddClientModalVisible(true)
             }} />
             <Cart />

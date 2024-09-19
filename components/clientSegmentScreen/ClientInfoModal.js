@@ -16,7 +16,7 @@ import UpdateClientModal from "./UpdateClientModal";
 import DeleteClient from "./DeleteClientModal";
 import { useDispatch, useSelector } from "react-redux";
 import { checkNullUndefined, dateFormatter } from "../../util/Helpers";
-import { loadClientInfoFromDb } from "../../store/clientInfoSlice";
+import { clearClientInfo, loadClientInfoFromDb } from "../../store/clientInfoSlice";
 import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
 
 /**
@@ -95,7 +95,7 @@ export default function clientInfoModal(props) {
 
     // const [modalVisibility, setModalVisibility] = useState(false)
 
-    // const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
+    const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
     const [deleteClientModalVisibility, setDeleteClientModalVisibility] = useState(false);
     
     useEffect(() => {
@@ -109,7 +109,7 @@ export default function clientInfoModal(props) {
             props.setModalVisibility(false);
             // props.setVisible(false);
             props.editClientOption("edit");
-            // props.setEditClientModalVisibility(true);
+            setEditClientModalVisibility(true);
         }
         else if (selectedOption === "deleteClient") {
             setDeleteClientModalVisibility(true);
@@ -141,7 +141,7 @@ export default function clientInfoModal(props) {
 
             />
 
-            {/* <UpdateClientModal
+            <UpdateClientModal
                 isVisible={editClientModalVisibility}
                 onCloseModal={() => {
                     dispatch(loadClientInfoFromDb(props.id))
@@ -153,14 +153,15 @@ export default function clientInfoModal(props) {
                 }}
                 details={details}
 
-            /> */}
+            />
 
             <DeleteClient
                 isVisible={deleteClientModalVisibility}
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     props.setModalVisibility(false);
-                    dispatch(loadClientInfoFromDb(props.id))
+                    // dispatch(loadClientInfoFromDb(props.id))
+                    dispatch(clearClientInfo());
 
                 }}
                 header={"Delete Client"}
