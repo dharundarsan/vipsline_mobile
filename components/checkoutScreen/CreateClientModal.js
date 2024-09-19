@@ -123,7 +123,8 @@ const CreateClientModal = (props) => {
     };
 
     return (
-        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} >
+        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} 
+        presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Add a new client</Text>
                 <PrimaryButton
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     closeAndHeadingContainer: {
-        marginTop: Platform.OS === "ios" ? 40 : 0,
+        // marginTop: Platform.OS === "ios" ? 40 : 0,
         justifyContent: "center",
         alignItems: "center",
         height: 60,

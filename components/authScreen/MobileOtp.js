@@ -63,11 +63,13 @@ export default function MobileOtp() {
                         mobileNumber: mobileNumber
                     });
                 setIsUserFound(true);
+                setIsUserTyping(true);
             } catch (error) {
             }
 
         } else {
             setIsUserFound(false);
+            setIsUserTyping(false);
         }
 
         setIsLoading(false);
@@ -143,7 +145,6 @@ export default function MobileOtp() {
                     buttonStyle={styles.sendOtpButton}
                     onPress={async () => {
                         await sendOtp();
-                        setIsUserTyping(false);
                         setIsSendOtpPressed(true)
                     }}
                 >

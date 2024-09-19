@@ -26,7 +26,8 @@ const PrepaidModal = (props) => {
     const prepaidAmountRef = useRef(null);
 
 
-    return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}>
+    return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}
+    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Prepaid</Text>
             <PrimaryButton
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
         alignItems: "center",

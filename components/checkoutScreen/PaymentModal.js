@@ -371,7 +371,9 @@ const PaymentModal = (props) => {
     const findIsPrepaid = () => {
         return cartSliceState.items.find(item => item.gender === "prepaid");
     }
-    return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
+    return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
+    // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
+    >
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
         }}
@@ -387,7 +389,7 @@ const PaymentModal = (props) => {
         }
 
         <View
-            style={[styles.headingAndCloseContainer, {marginTop: Platform.OS === "ios" ? insets.top : 0}, shadowStyling]}>
+            style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -782,7 +784,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        // marginTop: Platform.OS === "ios" ? 50 : 0,
+        marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingVertical: 15,
         alignItems: "center",
     },

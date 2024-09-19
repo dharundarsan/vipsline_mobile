@@ -71,7 +71,8 @@ const EditMembershipModal = (props) => {
     }
 
     return <>
-        <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}>
+        <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}
+        presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={styles.headingAndCloseContainer}>
                 <Text style={[textTheme.titleLarge, styles.heading]}>{props.data.name}</Text>
                 <PrimaryButton
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
     },

@@ -92,7 +92,8 @@ const AddClientModal = (props) => {
     };
 
     return (
-        <Modal visible={props.isVisible} animationType={"slide"}>
+        <Modal visible={props.isVisible} animationType={"slide"}
+        presentationStyle="pageSheet" onRequestClose={props.closeModal}>
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 setIsCreateClientModalVisible(false);
             }}/>
@@ -173,7 +174,7 @@ const AddClientModal = (props) => {
 
 const styles = StyleSheet.create({
     closeAndHeadingContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         justifyContent: "center",
         alignItems: "center",
         height: 60,

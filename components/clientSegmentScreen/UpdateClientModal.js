@@ -42,7 +42,7 @@ import Toast from "react-native-root-toast";
  */
 
 
-const UpdateClientModal = (props) => {
+const UpdateClientModal = React.memo((props) => {
     // const details = useSelector(state => state.clientInfo.details);
     const details = props.details;
 
@@ -99,9 +99,8 @@ const UpdateClientModal = (props) => {
 
 
 
-    useEffect(() => {
-        existingValues();
-    }, [props.isVisible, details]);
+
+    
 
     const handleUpdate = async () => {
         const firstNameValid = firstNameRef.current();
@@ -162,9 +161,13 @@ const UpdateClientModal = (props) => {
         }));
     };
 
+    useEffect(() => {
+        existingValues();
+    }, [props.isVisible, details]);
 
     return (
-        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}>
+        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} 
+        presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={styles.closeAndHeadingContainer}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Edit client</Text>
                 <PrimaryButton
@@ -283,14 +286,14 @@ const UpdateClientModal = (props) => {
             </View>
         </Modal>
     );
-};
+});
 
 const styles = StyleSheet.create({
     createClientModal: {
         flex: 1,
     },
     closeAndHeadingContainer: {
-        marginTop: Platform.OS === "ios" ? 40 : 0,
+        // marginTop: Platform.OS === "ios" ? 40 : 0,
         justifyContent: "center",
         alignItems: "center",
         height: 60,

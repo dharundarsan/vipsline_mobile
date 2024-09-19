@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text, TextInput, ScrollView} from "react-native";
+import {View, StyleSheet, Text, TextInput, ScrollView, Platform} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
 import React, {useEffect, useState} from "react";
 import Divider from "../../ui/Divider";
@@ -107,7 +107,7 @@ const CartItem = (props) => {
                 <View style={styles.itemDetailsContainer}>
                     <Text style={[TextTheme.labelLarge, styles.itemQuantityText]}>1x</Text>
                     <View style={styles.amountContainer}>
-                        <Text style={[TextTheme.bodyLarge, styles.currencySymbol]}>₹</Text>
+                        <Text style={Platform.OS === "ios"? [TextTheme.bodyLarge,styles.iosCurrencySymbol] : [TextTheme.bodyLarge,styles.currencySymbol]}>₹</Text>
                         {/*<Text style={[TextTheme.bodyLarge, styles.amountText]}>{props.data.total_price}</Text>*/}
                         <Text
                             style={[TextTheme.bodyLarge, styles.amountText]}>{editedData ? editedData.price : props.data.price}</Text>
@@ -212,6 +212,14 @@ const styles = StyleSheet.create({
         borderTopColor: Colors.transparent,
         borderBottomColor: Colors.transparent,
         borderRightColor: Colors.grey400,
+        borderWidth: 1,
+        fontWeight: "500",
+    },
+    iosCurrencySymbol:{
+        borderColor:Colors.transparent,
+        paddingRight: 5,
+        paddingLeft: 10,
+        paddingVertical: 5,
         borderWidth: 1,
         fontWeight: "500",
     },

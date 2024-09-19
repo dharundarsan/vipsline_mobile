@@ -269,7 +269,7 @@ const MainDrawerNavigator = () => {
                 borderBottomWidth: 0.5,     // Helps define a stronger bottom line
                 borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
             },
-            // headerLeft: () => <CustomDrawerIcon navigation={navigation} />,
+            headerLeft: () => <CustomDrawerIcon navigation={navigation} />,
             drawerIcon: ({ focused }) => (
                 <Image
                     source={require('./assets/icons/drawerIcons/drawer.png')}

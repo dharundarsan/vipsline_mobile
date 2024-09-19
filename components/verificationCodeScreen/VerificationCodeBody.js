@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus} from "../../store/authSlice";
 import {useNavigation} from "@react-navigation/native";
 import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
+import sendOTPApi from '../../util/apis/sendOTPApi';
 
 export default function VerificationCodeBody(props) {
 
@@ -87,7 +88,14 @@ export default function VerificationCodeBody(props) {
 
             <View style={styles.resendOtpContainer}>
                 <Text style={[textTheme.titleMedium, styles.didntGetCodeText]}>Didn't get a code?</Text>
-                <Pressable onPress={timer === 0 ? resendOTPHandler : null}>
+                <Pressable onPress={() => {
+                        if(timer === 0) {
+                            resendOTPHandler();
+                            sendOTPApi(props.mobileNumber, "BUSINESS")
+                        }
+                    
+                    }}
+                    style={{justifyContent:"center"}}>
                     <Text style={[textTheme.titleSmall, styles.resendOtp]}>
 
                         Resend OTP {

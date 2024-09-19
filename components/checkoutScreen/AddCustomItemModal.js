@@ -17,7 +17,8 @@ const AddCustomItemModal = (props) => {
     const [itemPrice, setItemPrice] = useState(props.edited ? props.data.price : 0);
     const dispatch = useDispatch();
 
-    return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}>
+    return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}
+    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Custom Item</Text>
             <PrimaryButton
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
     },
