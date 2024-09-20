@@ -51,7 +51,8 @@ const EditCartModal = (props) => {
         api();
     }, [selectedDiscountMode]);
 
-    return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}>
+    return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}
+    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Edit {props.data.resource_category_name}</Text>
             <PrimaryButton
@@ -218,7 +219,6 @@ const styles = StyleSheet.create({
     }
     ,
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal:
             20,
         paddingVertical:

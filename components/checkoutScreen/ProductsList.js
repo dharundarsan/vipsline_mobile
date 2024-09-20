@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, ScrollView, ScrollViewBase, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, BackHandler, FlatList, ScrollView, ScrollViewBase, StyleSheet, Text, TextInput, View } from "react-native";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import { Ionicons } from '@expo/vector-icons';
@@ -46,6 +46,21 @@ const ProductsList = (props) => {
             products: categoryObj[key]
         }))
     ).flat() : [];
+    
+    // useEffect(() => {
+    //     console.log("1");
+    //     const backAction = () => {
+    //         console.log("3212");
+    //         return true;  // Always return true to indicate that the event has been handled.
+    //     };
+    
+    //     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    
+    //     return () => {
+    //         backHandler.remove();  // Ensure that the event listener is removed properly.
+    //     };
+    // }, [props.selectedCategory]);
+    
     return (
         <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>

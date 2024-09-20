@@ -105,7 +105,7 @@ export default function BusinessCard(props) {
                 <Text style={[textTheme.bodyMedium]}>
                     {props.address}
                 </Text>
-                <Text style={styles.buttonStyle}>
+                <Text style={props.status === "verified" ? [styles.buttonStyle,{overflow:"hidden"}] : styles.buttonStyle}>
                     {status}
                 </Text>
             </View>
