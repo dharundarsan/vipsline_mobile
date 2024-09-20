@@ -70,7 +70,7 @@ const CheckoutScreen = () => {
 
     useEffect(() => {
         if(businessId !== "") {
-            clearCartAPI();
+            // clearCartAPI();
             dispatch(clearCustomItems());
             dispatch(clearLocalCart());
             dispatch(clearSalesNotes());

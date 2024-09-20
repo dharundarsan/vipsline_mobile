@@ -22,18 +22,17 @@ import {formatDate} from "../../util/Helpers";
 
 const EditCartModal = (props) => {
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("cash");
-    const [discountValue, setDiscountValue] = useState(props.data.price - props.data.discounted_price);
-    const [discountAmount, setDiscountAmount] = useState(props.data.price - props.data.discounted_price);
+    const [discountValue, setDiscountValue] = useState(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);
+    const [discountAmount, setDiscountAmount] = useState(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);
     const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
 
     useEffect(() => {
-        // setPrice(props.data.total_price === undefined ? props.data.price : props.data.total_price)
         setPrice(props.data.price)
-        setDiscountValue(props.data.price - props.data.discounted_price)
-        setDiscountAmount(props.data.price - props.data.discounted_price)
+        setDiscountValue(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price)
+        setDiscountAmount(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price)
     }, [props]);
 
 

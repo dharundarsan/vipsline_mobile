@@ -8,12 +8,12 @@ import Divider from "../../ui/Divider";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {
     addItemToCart,
-    addItemToEditedCart,
+    addItemToEditedCart, cartSlice,
     modifyPrepaidDetails,
     updateCalculatedPrice,
     updateEditedCart
 } from "../../store/cartSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {shadowStyling} from "../../util/Helpers";
 
 const PrepaidModal = (props) => {
@@ -24,6 +24,7 @@ const PrepaidModal = (props) => {
     const [description, setDescription] = useState(props.edited ? props.data.wallet_bonus : "")
     const dispatch = useDispatch();
     const prepaidAmountRef = useRef(null);
+    const prepaid_wallet = useSelector(state => state.cart.prepaid_wallet)
 
 
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}>
@@ -105,6 +106,10 @@ const PrepaidModal = (props) => {
                     dispatch(updateCalculatedPrice());
                     props.onCloseModal();
                 } else {
+                    if(prepaid_wallet[0].wallet_amount !== ""){
+                        ToastAndroid.show("Prepaid already in the cart", ToastAndroid.SHORT)
+                        return;
+                    }
                     dispatch(addItemToCart({
                         description: description,
                         wallet_amount: parseFloat(prepaidAmount),

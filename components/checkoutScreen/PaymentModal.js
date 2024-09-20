@@ -168,7 +168,7 @@ const PaymentModal = (props) => {
                 {
                     mode: "cash",
                     shown: true,
-                    amount: props.price,
+                    amount: 0,
                     name: "Cash"
                 }, {
                     mode: "card",
