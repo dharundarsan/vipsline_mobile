@@ -4,6 +4,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import Toast from 'react-native-simple-toast';
 
 
 const ProductItem = (props) => {
@@ -58,7 +59,10 @@ const ProductItem = (props) => {
                           pressableStyle={styles.selectProductItemPressable}
                           onPress={() => {
                               if (props.data.available_quantity === 0) {
-                                  ToastAndroid.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", ToastAndroid.LONG)
+                                  // ToastAndroid.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", ToastAndroid.LONG)
+                                  Toast.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", Toast.LONG, {
+                                      tapToDismissEnabled: true,
+                                  })
                                   return;
                               }
                               dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));

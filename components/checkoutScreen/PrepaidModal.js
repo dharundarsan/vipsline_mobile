@@ -28,7 +28,7 @@ const PrepaidModal = (props) => {
 
 
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}
-    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+                  presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Prepaid</Text>
             <PrimaryButton
@@ -45,26 +45,26 @@ const PrepaidModal = (props) => {
                                  dropdownItems={["Add prepaid", "Balance carry forward"]} value={prepaidSource}
                                  onChangeValue={setPrepaidSource}/>
                 <CustomTextInput label={"Prepaid amount"} type={"price"} placeholder={"0.00"}
-                    value={prepaidAmount.toString()}
-                    validator={(text) => {
-                        if (parseFloat(text) === 0 || text === "") return "Price is required";
-                        else return true;
-                    }}
-                    onSave={(callback) => {
-                        prepaidAmountRef.current = callback;
-                    }}
-                    onEndEditing={(price) => {
-                        if (price === "") return 0
-                        setPrepaidAmount(parseFloat(price))
-                    }}
-                    onChangeText={setPrepaidAmount} />
+                                 value={prepaidAmount.toString()}
+                                 validator={(text) => {
+                                     if (parseFloat(text) === 0 || text === "") return "Price is required";
+                                     else return true;
+                                 }}
+                                 onSave={(callback) => {
+                                     prepaidAmountRef.current = callback;
+                                 }}
+                                 onEndEditing={(price) => {
+                                     if (price === "") return 0
+                                     setPrepaidAmount(parseFloat(price))
+                                 }}
+                                 onChangeText={setPrepaidAmount}/>
                 <CustomTextInput label={"Prepaid Bonus"} type={"price"} placeholder={"0.00"}
-                    value={prepaidBonus.toString()}
-                    onChangeText={setPrepaidBonus}
-                    onEndEditing={(price) => {
-                        if (price === "") setPrepaidBonus(0)
-                        else setPrepaidBonus(parseFloat(price))
-                    }} />
+                                 value={prepaidBonus.toString()}
+                                 onChangeText={setPrepaidBonus}
+                                 onEndEditing={(price) => {
+                                     if (price === "") setPrepaidBonus(0)
+                                     else setPrepaidBonus(parseFloat(price))
+                                 }}/>
                 <CustomTextInput label={"Description"} type={"multiLine"} value={description}
                                  onChangeText={setDescription}/>
                 <View style={styles.noteContainer}>
@@ -107,7 +107,7 @@ const PrepaidModal = (props) => {
                     dispatch(updateCalculatedPrice());
                     props.onCloseModal();
                 } else {
-                    if(prepaid_wallet[0].wallet_amount !== ""){
+                    if (prepaid_wallet[0].wallet_amount !== "") {
                         ToastAndroid.show("Prepaid already in the cart", ToastAndroid.SHORT)
                         return;
                     }
