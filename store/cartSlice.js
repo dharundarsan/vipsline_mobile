@@ -108,7 +108,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
         );
         dispatch(updateItem(response.data.data));
         if (clientId !== undefined) {
-            dispatch(modifyClientId({ type: "update", payload: clientId }));
+            dispatch(modifyClientId({type: "update", payload: clientId}));
         }
         dispatch(updateCalculatedPrice(clientId !== undefined || null || "" ? clientId : clientInfo.clientId !== undefined || null || "" ? clientInfo.clientId : clientId));
         dispatch(updateTotalChargeAmount(cart.calculatedPrice.data[0].extra_charges_value));
@@ -121,7 +121,14 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
 
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
-        additional_services: cart.customItems,
+        additional_services: cart.customItems.map(customItem => {
+            return {
+                "amount": customItem.price,
+                "id": customItem.id,
+                "name": customItem.name,
+                "resource_id": customItem.resource_id
+            }
+        }),
         cart: cart.items
             .filter(item => {
                     if (item.gender === "membership") {
@@ -152,7 +159,7 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
                         membership_id: item.id,
                         membership_number: "",
                         res_cat_id: originalData.resource_category_id,
-                        resource_id: item.resource_id,
+                        resource_id: originalData.resource_id,
                         type: "AMOUNT",
                         valid_from: item.valid_from,
                         valid_till: item.valid_until,
@@ -206,7 +213,6 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
 }
 
 export const removeItemFromCart = (itemId) => async (dispatch, getState) => {
-    console.log(itemId)
     const {cart} = getState();
 
     let authToken = ""
@@ -314,6 +320,7 @@ export const cartSlice = createSlice({
             state.customItems = [];
             state.additionalDiscounts = [];
             state.chargesData = initialCartState.chargesData;
+            state.prepaid_wallet = initialCartState.prepaid_wallet;
         },
         updateCustomItem(state, action) {
             state.customItems = state.customItems.map(item => {
@@ -325,6 +332,9 @@ export const cartSlice = createSlice({
                 }
                 return item;
             })
+        },
+        clearCustomItems(state, action) {
+            state.customItems = [];
         },
         setCalculatedPrice(state, action) {
             state.calculatedPrice = action.payload;
@@ -384,7 +394,7 @@ export const cartSlice = createSlice({
             }
         },
         modifyClientId(state, action) {
-            const { type, payload } = action.payload;
+            const {type, payload} = action.payload;
             switch (type) {
                 case "clear":
                     state.prepaidClientId = undefined;
@@ -423,14 +433,16 @@ export const cartSlice = createSlice({
                     break;
                 case "updateResourceId":
                     // if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
+                    console.log(state.editedCart.filter(item => item.gender === "prepaid"))
                     if (state.prepaid_wallet.length > 0) {
+                        console.log(payload)
                         // state.prepaid_wallet[0].source = "add_prepaid";
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
                             source: "add_prepaid"
                         }]
                     }
-                    if (state.prepaid_wallet.length > 0) {
+                    if (state.prepaid_wallet.length > 0  || state.editedCart.filter(item => item.gender === "prepaid").length > 0) {
                         // state.prepaid_wallet[0].resource_id = payload;
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
@@ -471,6 +483,7 @@ export const {
     modifyClientMembershipId,
     modifyPrepaidDetails,
     modifyClientId,
+    clearCustomItems
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

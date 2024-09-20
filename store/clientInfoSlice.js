@@ -6,8 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const initialClientInfoState = {
     isClientSelected: false,
     details: {},
-    membershipDetails:[],
-    packageDetails:[],
+    membershipDetails: [],
+    packageDetails: [],
     fetchingAnalytics: false,
     analyticDetails: [],
     clientId: "",
@@ -21,7 +21,7 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-            }
+    }
 }
 
 export const loadClientInfoFromDb = (clientId) => async (dispatch) => {
@@ -114,10 +114,9 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
 
 
         dispatch(updateAnalyticDetails(response.data.data[0]));
-    }
-    catch (e) {
+    } catch (e) {
         console.log("error" + e)
-            }
+    }
 
     try {
         const response = await axios.post(
@@ -133,9 +132,8 @@ export const loadAnalyticsClientDetailsFromDb = (pageSize, pageNo, user_id) => a
             }
         );
         dispatch(updateFeedback(response.data.data[0].no_of_feedbacks));
+    } catch (e) {
     }
-    catch (e) {
-            }
 
 }
 
@@ -164,7 +162,6 @@ export const clientInfoSlice = createSlice({
         }
     }
 });
-
 
 
 export const {

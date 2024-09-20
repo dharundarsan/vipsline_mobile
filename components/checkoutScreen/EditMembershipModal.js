@@ -29,13 +29,21 @@ const EditMembershipModal = (props) => {
     const [validUntilDate, setValidUntilDate] = useState(date + (props.data.duration * 24 * 60 * 60 * 1000));
     const [membershipPrice, setMembershipPrice] = useState(props.data.price);
     const [membershipId, setMembershipId] = useState(props.data.id);
+    const cartItems = useSelector(state => state.cart.items);
+    const editedCart = useSelector(state => state.cart.editedCart);
 
     const handleSave = () => {
+
+        if(cartItems.some(item => item.membership_id === props.data.id || editedCart.some(item => item.membership_id === props.data.id))){
+            ToastAndroid.show("Membership already in cart", ToastAndroid.LONG);
+            return;
+        }
 
         if (new Date(validFromDate).getTime() !== new Date(date).getTime() ||
             new Date(validUntilDate).getTime() !== new Date(date + (props.data.duration * 24 * 60 * 60 * 1000)).getTime() ||
             membershipPrice !== props.data.price ||
             membershipId !== props.data.id) {
+            console.log({"valid_until": formatDate(validUntilDate, "yyyy-mm-dd")})
             dispatch(addItemToEditedCart({
                 ...props.data,
                 gender:"membership",
@@ -71,7 +79,8 @@ const EditMembershipModal = (props) => {
     }
 
     return <>
-        <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}>
+        <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}
+        presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={styles.headingAndCloseContainer}>
                 <Text style={[textTheme.titleLarge, styles.heading]}>{props.data.name}</Text>
                 <PrimaryButton
@@ -112,7 +121,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
     },

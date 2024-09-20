@@ -6,11 +6,12 @@ import DropdownModal from "./DropdownModal";
 import PrimaryButton from "./PrimaryButton";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {formatDate} from "../util/Helpers";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 /**
- * CustomTextInput component for various types of text inputs, including text, email, phone number, and dropdown.
+ * CustomTextInput component for various types of text inputs, including text, email, phone number, date and dropdown.
  *
  * @param {Object} props - Props for the CustomTextInput component.
  * @param {'text' | 'email' | 'phoneNo' | 'dropdown' | 'multiLine' | 'date' | 'number' | 'price'} props.type - The type of input to display.
@@ -28,7 +29,8 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
  * @param {function} props.onEndEditing - Function to call when the text input change complete.
  * @param {function} [props.onChangeValue] - Function to call when the selected value changes in dropdown.
  * @param {function} [props.onSave] - Function to call when the save button is pressed.
- *
+ * @param {Date} [props.minimumDate] - This optional prop defines the earliest date that the user can select.
+ * @param {Date} [props.maximumDate] - This optional prop defines the latest date that the user can select.
  * @returns {React.ReactElement} A styled custom text input component.
  */
 const CustomTextInput = (props) => {
@@ -53,6 +55,18 @@ const CustomTextInput = (props) => {
             }
         }
         return true;
+    };
+
+
+    const handleConfirm = (selectedDate) => {
+        setIsDateTimePickerVisible(false);
+        if (selectedDate) {
+            props.onChangeValue(new Date(selectedDate.getTime())); // Pass the selected date to parent via callback
+        }
+    };
+
+    const handleCancel = () => {
+        setIsDateTimePickerVisible(false); // Hide picker on cancel
     };
 
     useEffect(() => {
@@ -229,23 +243,33 @@ const CustomTextInput = (props) => {
         content = (
             <>
                 {(isDateTimePickerVisible) && (
-                    <RNDateTimePicker
-                    maximumDate={props.maximumDate}
-                    minimumDate={props.minimumDate}
-                        value={props.value === undefined || props.value === null ? new Date(Date.now()) : new Date(props.value)}
-                        mode="date"
-                        display="default"
-                        onChange={(event, selectedDate) => {
-                            if (event.type === "dismissed") {
-                                setIsDateTimePickerVisible(false);
-                                return;
-                            }
-                            setIsDateTimePickerVisible(false);
-                            if (selectedDate) {
-                                props.onChangeValue(new Date(selectedDate.getTime()));
-                            }
-                        }}
-                    />
+                     <DateTimePickerModal
+                     isVisible={isDateTimePickerVisible}       // Visibility state
+                     mode="date"                              // Mode is set to "date"
+                     maximumDate={props.maximumDate}          // Maximum date from props
+                     minimumDate={props.minimumDate}          // Minimum date from props
+                     date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)} // Initial date
+                     onConfirm={handleConfirm}                // Function called on date selection
+                     onCancel={handleCancel}                  // Function called on cancel
+                     themeVariant="light"
+                 />
+                    // <RNDateTimePicker
+                    // maximumDate={props.maximumDate}
+                    // minimumDate={props.minimumDate}
+                    //     value={props.value === undefined || props.value === null ? new Date(Date.now()) : new Date(props.value)}
+                    //     mode="date"
+                    //     display="default"
+                    //     onChange={(event, selectedDate) => {
+                    //         if (event.type === "dismissed") {
+                    //             setIsDateTimePickerVisible(false);
+                    //             return;
+                    //         }
+                    //         setIsDateTimePickerVisible(false);
+                    //         if (selectedDate) {
+                    //             props.onChangeValue(new Date(selectedDate.getTime()));
+                    //         }
+                    //     }}
+                    // />
                 )}
                 <PrimaryButton
                     buttonStyle={styles.dateTimeButtom}

@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
     BackHandler,
     FlatList,
@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
 import Divider from "../../ui/Divider";
@@ -21,24 +21,24 @@ import {
     MaterialCommunityIcons,
     AntDesign
 } from "@expo/vector-icons";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import ServicesList from "./ServicesList";
 import ProductsList from "./ProductsList";
 import MembershipsAndPackagesList from "./MembershipsAndPackagesList";
 import textTheme from "../../constants/TextTheme";
-import {capitalizeFirstLetter, formatDate, shadowStyling} from "../../util/Helpers";
+import { capitalizeFirstLetter, formatDate, shadowStyling } from "../../util/Helpers";
 import AddCustomItemModal from "./AddCustomItemModal";
 import PrepaidModal from "./PrepaidModal";
 
 
 const modalCategoryListData = [
-    {id: "services", title: "SERVICES"},
-    {id: "products", title: "PRODUCTS"},
-    {id: "customItem", title: "CUSTOM ITEM"},
-    {id: "memberships", title: "MEMBERSHIP"},
-    {id: "prepaid", title: "PREPAID"},
-    {id: "packages", title: "PACKAGES"},
+    { id: "services", title: "SERVICES" },
+    { id: "products", title: "PRODUCTS" },
+    { id: "customItem", title: "CUSTOM ITEM" },
+    { id: "memberships", title: "MEMBERSHIP" },
+    { id: "prepaid", title: "PREPAID" },
+    { id: "packages", title: "PACKAGES" },
     // {id: 6, title: "GIFT VOUCHER"},
 ];
 
@@ -48,7 +48,29 @@ const AddItemModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(Date.now());
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
+    useEffect(() => {
+        if (selectedCategory === "products") {
+            console.log("1");
 
+            const backAction = () => {
+                console.log("3212");
+
+                // if (selectedCategory==="products") {
+                //     setIsModalVisible(false);
+                // onCloseModal();
+                return true;
+                // }
+                // return false;
+            };
+
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+            
+            return () => {
+                console.log("123");
+                
+                return backHandler.remove()};
+        }
+    }, [selectedCategory]);
     const openDatePicker = () => {
         setIsDatePickerVisible(true);
     };
@@ -58,7 +80,7 @@ const AddItemModal = (props) => {
             flex: 1,
         },
         backAndCloseContainer: {
-            marginTop: Platform.OS === "ios" ? 50 : 0,
+            // marginTop: Platform.OS === "ios" ? 50 : 0,
             height: 60,
             flexDirection: "row",
             justifyContent: selectedCategory == null ? "" : "space-between",
@@ -129,7 +151,7 @@ const AddItemModal = (props) => {
                     </Text>
                     <Pressable
                         style={styles.datePressable}
-                        android_ripple={{color: Colors.ripple}}
+                        android_ripple={{ color: Colors.ripple }}
                         onPress={openDatePicker}
                     >
                         <Text style={TextTheme.titleMedium}>
@@ -157,12 +179,12 @@ const AddItemModal = (props) => {
                     )}
                 </View>
             </View>
-            <Divider/>
+            <Divider />
             <FlatList
                 bounces={false}
                 data={modalCategoryListData}
                 // contentContainerStyle={{borderBottomColor:Colors.grey500,borderBottomWidth:1}}
-                renderItem={({item}) => {
+                renderItem={({ item }) => {
                     return (
                         <PrimaryButton
                             buttonStyle={styles.categoryListItemButton}
@@ -195,39 +217,47 @@ const AddItemModal = (props) => {
         content = <ServicesList closeOverallModal={() => {
             setSelectedCategory(null)
             props.closeModal()
-        }}/>
+        }} />
     } else if (selectedCategory === "products") {
-        content = <ProductsList closeOverallModal={() => {
-            setSelectedCategory(null)
-            props.closeModal()
-        }}/>
+        content = <ProductsList selectedCategory={selectedCategory}
+            onCloseModal={() => setSelectedCategory(null)}
+            closeOverallModal={() => {
+                setSelectedCategory(null)
+                props.closeModal()
+            }} />
     } else if (selectedCategory === "memberships") {
         content =
             <MembershipsAndPackagesList category={"memberships"} closeOverallModal={() => {
                 setSelectedCategory(null)
                 props.closeModal()
-            }}/>
+            }} />
     } else if (selectedCategory === "packages") {
         content =
             <MembershipsAndPackagesList category={"packages"} closeOverallModal={() => {
                 setSelectedCategory(null)
                 props.closeModal()
-            }}/>
+            }} />
     } else if (selectedCategory === "customItem") {
         content = <AddCustomItemModal isVisible={true} onCloseModal={() => {
             setSelectedCategory(null)
-        }} closeOverallModal={props.closeModal}/>
+        }} closeOverallModal={props.closeModal} />
     } else if (selectedCategory === "prepaid") {
         content = <PrepaidModal isVisible={true} onCloseModal={() => {
             setSelectedCategory(null)
-        }} closeOverallModal={props.closeModal}/>
+        }} closeOverallModal={props.closeModal} />
     }
 
     return (
         <Modal
             animationType={"slide"}
             visible={props.visible}
-            onRequestClose={props.closeModal}
+            presentationStyle="pageSheet"
+            onRequestClose={
+                () => {
+                    props.closeModal()
+                    setSelectedCategory(null)
+                }
+            }
         >
             <View style={[styles.backAndCloseContainer, shadowStyling]}>
                 {
@@ -237,7 +267,7 @@ const AddItemModal = (props) => {
                             setSelectedCategory(null);
                         }}
                     >
-                        <AntDesign name="arrowleft" size={24} color="black"/>
+                        <AntDesign name="arrowleft" size={24} color="black" />
                     </PrimaryButton>
                 }
                 <View style={styles.newSaleTextContainer}>
@@ -251,7 +281,7 @@ const AddItemModal = (props) => {
                         props.closeModal();
                     }}
                 >
-                    <Ionicons name="close" size={25} color="black"/>
+                    <Ionicons name="close" size={25} color="black" />
                 </PrimaryButton>
             </View>
             {content}

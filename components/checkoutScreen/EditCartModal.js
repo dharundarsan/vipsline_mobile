@@ -18,21 +18,21 @@ import {
     updateCustomItem,
 } from "../../store/cartSlice";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import {formatDate} from "../../util/Helpers";
 
 const EditCartModal = (props) => {
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("cash");
-    const [discountValue, setDiscountValue] = useState(props.data.price - props.data.discounted_price);
-    const [discountAmount, setDiscountAmount] = useState(props.data.price - props.data.discounted_price);
+    const [discountValue, setDiscountValue] = useState(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);
+    const [discountAmount, setDiscountAmount] = useState(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);
     const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
 
     useEffect(() => {
-        // setPrice(props.data.total_price === undefined ? props.data.price : props.data.total_price)
         setPrice(props.data.price)
-        setDiscountValue(props.data.price - props.data.discounted_price)
-        setDiscountAmount(props.data.price - props.data.discounted_price)
+        setDiscountValue(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price)
+        setDiscountAmount(props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price)
     }, [props]);
 
 
@@ -51,7 +51,8 @@ const EditCartModal = (props) => {
         api();
     }, [selectedDiscountMode]);
 
-    return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}>
+    return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}
+    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Edit {props.data.resource_category_name}</Text>
             <PrimaryButton
@@ -177,8 +178,17 @@ const EditCartModal = (props) => {
                             edited: true
                         }))
                     } else if (props.data.gender === "membership") {
+                        const date = new Date(Date.now()).setHours(0, 0, 0, 0)
+                        const validFromDate = date;
+                        const validUntilDate = date + (props.data.duration * 24 * 60 * 60 * 1000)
+                        console.log("Gotha")
+                        console.log(props.data)
+                        console.log(props.data.duration)
+                        console.log(props.data.valid_from)
+                        console.log(props.data.valid_until)
                         await dispatch(editMembership({
-                            id: props.data.id === undefined ? props.data.membership_id : props.data.id, data: {
+                            id: props.data.id === undefined ? props.data.membership_id : props.data.id,
+                            data: {
                                 amount: price,
                                 price: price,
                                 total_price: price,
@@ -186,7 +196,9 @@ const EditCartModal = (props) => {
                                 disc_value: discountAmount,
                                 type: "AMOUNT",
                                 id: props.data.membership_id,
-                                res_cat_id: props.data.resource_category_id
+                                res_cat_id: props.data.resource_category_id,
+                                valid_from: props.data.valid_from === undefined ? formatDate(validFromDate, "yyyy-mm-dd") : props.data.valid_from,
+                                valid_until: props.data.valid_until === undefined ?  formatDate(validUntilDate, "yyyy-mm-dd") : props.data.valid_until,
                             }
                         }))
                         // await dispatch(loadCartFromDB());
@@ -207,7 +219,6 @@ const styles = StyleSheet.create({
     }
     ,
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal:
             20,
         paddingVertical:

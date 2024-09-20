@@ -84,7 +84,6 @@ export default function ClientDetails(props) {
                     isVisible={updateModalVisibility}
                     details={details}
                     onCloseModal={() => setUpdateModalVisibility(false)}
-
                 />
                 <Text style={[textTheme.titleMedium, styles.title]}>
                     {props.title}

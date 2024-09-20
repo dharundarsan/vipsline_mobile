@@ -1,5 +1,5 @@
 import {FlatList, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import PrimaryButton from "../../ui/PrimaryButton";
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
@@ -21,9 +21,8 @@ import {useDispatch} from "react-redux";
  */
 
 
-const MoreOptionDropDownModal = (props) => {
+const MoreOptionDropDownModal = React.memo((props) => {
     const textRef = useRef(null);
-
     return <Modal transparent={true} animationType={"fade"} visible={props.isVisible} style={styles.dropdownModal}>
         <TouchableOpacity style={styles.modalContent} onPress={props.onCloseModal} activeOpacity={1} >
             <FlatList style={styles.dropdownList} data={props.dropdownItems}  renderItem={({item}) => {
@@ -49,7 +48,7 @@ const MoreOptionDropDownModal = (props) => {
                            textStyle={[textTheme.bodyLarge, styles.closeButtonText]}/>
         </TouchableOpacity>
     </Modal>
-}
+})
 
 const styles = StyleSheet.create({
     dropdownModal: {
