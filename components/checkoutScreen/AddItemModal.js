@@ -48,7 +48,29 @@ const AddItemModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(Date.now());
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
+    useEffect(() => {
+        if (selectedCategory === "products") {
+            console.log("1");
 
+            const backAction = () => {
+                console.log("3212");
+
+                // if (selectedCategory==="products") {
+                //     setIsModalVisible(false);
+                // onCloseModal();
+                return true;
+                // }
+                // return false;
+            };
+
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+            
+            return () => {
+                console.log("123");
+                
+                return backHandler.remove()};
+        }
+    }, [selectedCategory]);
     const openDatePicker = () => {
         setIsDatePickerVisible(true);
     };
@@ -197,10 +219,12 @@ const AddItemModal = (props) => {
             props.closeModal()
         }} />
     } else if (selectedCategory === "products") {
-        content = <ProductsList closeOverallModal={() => {
-            setSelectedCategory(null)
-            props.closeModal()
-        }} />
+        content = <ProductsList selectedCategory={selectedCategory}
+            onCloseModal={() => setSelectedCategory(null)}
+            closeOverallModal={() => {
+                setSelectedCategory(null)
+                props.closeModal()
+            }} />
     } else if (selectedCategory === "memberships") {
         content =
             <MembershipsAndPackagesList category={"memberships"} closeOverallModal={() => {

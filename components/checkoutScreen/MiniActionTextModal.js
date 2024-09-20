@@ -51,6 +51,7 @@ const MiniActionTextModal = React.memo((props) => {
     });
   };
   const getChargeData = useSelector(state => state.cart.chargesData);
+  const getDiscountDetails = useSelector(state => state.cart.additionalDiscounts)
   const insets = useSafeAreaInsets();
   return (
     <Modal transparent={true} visible={props.isVisible} animationType="fade">
@@ -88,10 +89,15 @@ const MiniActionTextModal = React.memo((props) => {
                       }
                       props.setChargesInputData(updatedChargeData);
                     }
-                    // Close the modal regardless of clickedValue
+                    else if(props.clickedValue === "Apply Discount"){
+                      if(getDiscountDetails.length === 0 ){
+                        props.setDiscountValue("");
+                      }
+                    }
                     props.onCloseModal();
 
-                  }}
+                  }
+                }
                 >
                   <Entypo
                     name="cross"

@@ -11,7 +11,7 @@ import {formatDate} from "../util/Helpers";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 /**
- * CustomTextInput component for various types of text inputs, including text, email, phone number, and dropdown.
+ * CustomTextInput component for various types of text inputs, including text, email, phone number, date and dropdown.
  *
  * @param {Object} props - Props for the CustomTextInput component.
  * @param {'text' | 'email' | 'phoneNo' | 'dropdown' | 'multiLine' | 'date' | 'number' | 'price'} props.type - The type of input to display.
@@ -29,7 +29,8 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
  * @param {function} props.onEndEditing - Function to call when the text input change complete.
  * @param {function} [props.onChangeValue] - Function to call when the selected value changes in dropdown.
  * @param {function} [props.onSave] - Function to call when the save button is pressed.
- *
+ * @param {Date} [props.minimumDate] - This optional prop defines the earliest date that the user can select.
+ * @param {Date} [props.maximumDate] - This optional prop defines the latest date that the user can select.
  * @returns {React.ReactElement} A styled custom text input component.
  */
 const CustomTextInput = (props) => {

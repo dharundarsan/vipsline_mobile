@@ -1,18 +1,18 @@
-import {Modal, ScrollView, StyleSheet, Text, View, ToastAndroid, Platform} from "react-native";
+import { Modal, ScrollView, StyleSheet, Text, View, ToastAndroid, Platform } from "react-native";
 import CustomTextInput from "../../ui/CustomTextInput";
-import React, {useState, useRef, useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import DropdownModal from "../../ui/DropdownModal";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
-import {formatDate} from "../../util/Helpers";
-import {useDispatch} from "react-redux";
-import {loadClientCountFromDb} from "../../store/clientSlice";
+import { formatDate } from "../../util/Helpers";
+import { useDispatch } from "react-redux";
+import { loadClientCountFromDb } from "../../store/clientSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {shadowStyling} from "../../util/Helpers";
+import { shadowStyling } from "../../util/Helpers";
 import Toast from "react-native-root-toast";
 
 const CreateClientModal = (props) => {
@@ -99,32 +99,32 @@ const CreateClientModal = (props) => {
                 state: "Tamilnadu",
             });
             // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
-            Toast.show("User added Successfully",{
-                duration:Toast.durations.LONG,
+            Toast.show("User added Successfully", {
+                duration: Toast.durations.LONG,
                 position: Toast.positions.BOTTOM,
-                shadow:false,
-                backgroundColor:"black",
-                opacity:1
+                shadow: false,
+                backgroundColor: "black",
+                opacity: 1
             })
             clearForm();
             dispatch(loadClientCountFromDb());
             props.onCloseModal();
         } catch (e) {
             // ToastAndroid.show(e, ToastAndroid.LONG),
-            Toast.show(e,{
-                duration:Toast.durations.LONG,
+            Toast.show(e, {
+                duration: Toast.durations.LONG,
                 position: Toast.positions.BOTTOM,
-                shadow:false,
-                backgroundColor:"black",
-                opacity:1
+                shadow: false,
+                backgroundColor: "black",
+                opacity: 1
             })
         }
 
     };
 
     return (
-        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} 
-        presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}
+            presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Add a new client</Text>
                 <PrimaryButton
@@ -132,13 +132,14 @@ const CreateClientModal = (props) => {
                     pressableStyle={styles.closeButtonPressable}
                     onPress={props.onCloseModal}
                 >
-                    <Ionicons name="close" size={25} color="black"/>
+                    <Ionicons name="close" size={25} color="black" />
                 </PrimaryButton>
             </View>
             <ScrollView>
                 <View style={styles.modalContent}>
                     <Text style={[textTheme.bodyMedium, styles.headingText]}>Basic Information</Text>
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="text"
                         label="First name"
                         placeholder="Enter client's first name"
@@ -153,6 +154,7 @@ const CreateClientModal = (props) => {
                         }}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="text"
                         label="Last name"
                         placeholder="Enter client's last name"
@@ -167,6 +169,7 @@ const CreateClientModal = (props) => {
                         }}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="phoneNo"
                         label="Mobile"
                         placeholder="0123456789"
@@ -181,24 +184,32 @@ const CreateClientModal = (props) => {
                         }}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="email"
                         label="Email address"
                         placeholder="Enter email address"
                         value={email}
                         onChangeText={setEmail}
                         validator={(text) => {
-                            if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "") return "Email is invalid";
-                            else return true;
+                            if (text.trim().length === 0) {
+                                return true;
+                            }
+                            else {
+                                if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "") return "Email is invalid";
+                                else return true;
+                            }
                         }}
                     />
                     <CustomTextInput
                         type="dropdown"
                         label="Gender"
+                        labelTextStyle={textTheme.bodyMedium}
                         value={gender}
                         onChangeValue={setGender}
                         dropdownItems={["Male", "Female", "Others"]}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="dropdown"
                         label="Client source"
                         value={clientSource}
@@ -206,20 +217,22 @@ const CreateClientModal = (props) => {
                         dropdownItems={["Justdial", "Google", "Facebook", "Instagram", "SMS Campaign", "Walk-in", "Membership", "Others"]}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="date"
                         label="Date of birth"
                         maximumDate={new Date()}
-                        value={ dateOfBirth === null || dateOfBirth === undefined ? null : new Date(dateOfBirth)}
+                        value={dateOfBirth === null || dateOfBirth === undefined ? null : new Date(dateOfBirth)}
                         onChangeValue={(value) => {
                             setIsDobSelected(true);
                             setDateOfBirth(value);
                         }}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="date"
                         label="Anniversary"
                         maximumDate={new Date()}
-                        value={ anniversaryDate === null || anniversaryDate === undefined ? null : new Date(anniversaryDate)}
+                        value={anniversaryDate === null || anniversaryDate === undefined ? null : new Date(anniversaryDate)}
                         onChangeValue={(value) => {
                             setIsAnniversarySelected(true);
                             setAnniversaryDate(value);
@@ -227,6 +240,7 @@ const CreateClientModal = (props) => {
                     />
                     <Text style={[textTheme.bodyMedium, styles.headingText]}>Additional Infomation</Text>
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="text"
                         label="GST number"
                         placeholder="Enter client's GSTIN"
@@ -234,6 +248,7 @@ const CreateClientModal = (props) => {
                         onChangeText={setGstNo}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="phoneNo"
                         label="Secondary Number"
                         placeholder="0123456789"
@@ -241,6 +256,7 @@ const CreateClientModal = (props) => {
                         onChangeText={setSecondaryNo}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="multiLine"
                         label="Client notes"
                         placeholder="Enter Notes"
@@ -248,6 +264,7 @@ const CreateClientModal = (props) => {
                         onChangeText={setClientNotes}
                     />
                     <CustomTextInput
+                        labelTextStyle={textTheme.bodyMedium}
                         type="multiLine"
                         label="Client address"
                         placeholder="Enter client address details"
@@ -257,7 +274,7 @@ const CreateClientModal = (props) => {
                 </View>
             </ScrollView>
             <View style={styles.saveButtonContainer}>
-                <PrimaryButton label={"Save"} onPress={handleSave}/>
+                <PrimaryButton label={"Save"} onPress={handleSave} />
             </View>
         </Modal>
     );
