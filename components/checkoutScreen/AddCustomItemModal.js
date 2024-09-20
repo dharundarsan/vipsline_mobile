@@ -7,16 +7,18 @@ import React, {useState} from "react";
 import Colors from "../../constants/Colors";
 import {formatDate, shadowStyling} from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {addCustomItems, addItemToCart, updateCalculatedPrice} from "../../store/cartSlice";
+import {addCustomItems, addItemToCart, updateCalculatedPrice, updateCustomItem} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import CustomTextInput from "../../ui/CustomTextInput";
 import Toast from "react-native-root-toast";
 
 const AddCustomItemModal = (props) => {
-    const [itemName, setItemName] = useState("");
-    const [itemPrice, setItemPrice] = useState(0);
+    const [itemName, setItemName] = useState(props.edited ? props.data.name : "");
+    const [itemPrice, setItemPrice] = useState(props.edited ? props.data.price : 0);
     const dispatch = useDispatch();
 
-    return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}>
+    return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}
+    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Add Custom Item</Text>
             <PrimaryButton
@@ -27,47 +29,56 @@ const AddCustomItemModal = (props) => {
             </PrimaryButton>
         </View>
         <View style={styles.modalContent}>
-            <Text style={[textTheme.labelLarge]}>Custom Item Name</Text>
-            <View style={[styles.inputContainer, styles.nameInputContainer]}>
-                <TextInput style={[textTheme.bodyLarge, styles.inputText]} value={itemName}
-                           onChangeText={(name) => setItemName(name)}/>
-            </View>
-            <Text style={[textTheme.labelLarge]}>Price</Text>
-            <View style={styles.inputContainer}>
-                <FontAwesome style={styles.rupeeSymbol} name="rupee" size={20} color={Colors.grey600}/>
-                <TextInput style={[textTheme.bodyLarge, styles.inputText]} keyboardType={"number-pad"}
-                           onChangeText={(price) => setItemPrice(price)} value={itemPrice.toString()}/>
-            </View>
+            <CustomTextInput label={"Custom Item Name"} type={"text"} onChangeText={setItemName} value={itemName}/>
+            <CustomTextInput label={"Price"}
+                             type={"price"}
+                             placeholder={"0.00"}
+                             value={itemPrice.toString()}
+                             onChangeText={setItemPrice}
+                             onEndEditing={price => {
+                                 if (price === "") setItemPrice(0)
+                                 else setItemPrice(parseFloat(price))
+                             }}/>
         </View>
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={() => {
-                if(itemPrice === 0 || !parseInt(itemPrice) ){
-                    // ToastAndroid.show("Invalid Amount", ToastAndroid.SHORT);
-                    Toast.show("Invalid Amount",{
-                        duration:Toast.durations.SHORT,
-                        position: Toast.positions.BOTTOM,
-                        shadow:false,
-                        backgroundColor:"black",
-                        opacity:1
-                    })
+                if (itemName.trim() === "") {
+                    ToastAndroid.show("Please enter item name", ToastAndroid.SHORT)
                     return;
                 }
-                let converted = parseInt(itemPrice, 10);
-                let convertedString = converted.toString();
-                props.onCloseModal();
-                props.closeOverallModal()
-                dispatch(addCustomItems({
-                    name: itemName,
-                    price: convertedString,
-                    resource_category_name: null,
-                    total_price: convertedString,
-                    category: "custom_item",
-                    gender: "custom_item",
-                    amount: convertedString,
-                    resource_id: null,
-                }))
+                if (itemPrice === 0 || !parseFloat(itemPrice) ) {
+                    ToastAndroid.show("Invalid Amount", ToastAndroid.SHORT)
+                    return;
+                }
+                let price;
+
+                if (itemName === "") price = 0
+                else price = parseFloat(itemPrice)
+
+                if (props.edited) {
+                    dispatch(updateCustomItem({
+                        amount: price,
+                        price: price,
+                        total_price: price,
+                        item_id: props.data.item_id,
+                    }))
+                    props.onCloseModal();
+                } else {
+                    dispatch(addCustomItems({
+                        name: itemName,
+                        price: price.toString(),
+                        resource_category_name: null,
+                        total_price: price.toString(),
+                        category: "custom_item",
+                        gender: "custom_item",
+                        amount: price.toString(),
+                        resource_id: null,
+                    }))
+                    props.onCloseModal();
+                    props.closeOverallModal()
+                }
                 dispatch(updateCalculatedPrice());
-            }} label={"Add to cart"}/>
+            }} label={props.edited ? "Save" : "Add to cart"}/>
         </View>
     </Modal>
 }
@@ -77,7 +88,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
     },
@@ -94,30 +105,9 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 30,
     },
-    inputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: Colors.grey400,
-        borderRadius: 5,
-        paddingRight: 20,
-        marginTop: 10,
-        marginBottom: 30,
-    },
     nameInputContainer: {
         paddingHorizontal: 15,
         paddingVertical: 7,
-    },
-    rupeeSymbol: {
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        marginRight: 15,
-        borderRightWidth: 1,
-        borderRightColor: Colors.grey400,
-    },
-    inputText: {
-        fontWeight: "500",
-        flex: 1,
     },
     addToCartButtonContainer: {
         marginHorizontal: 30,

@@ -16,7 +16,7 @@ import UpdateClientModal from "./UpdateClientModal";
 import DeleteClient from "./DeleteClientModal";
 import { useDispatch, useSelector } from "react-redux";
 import { checkNullUndefined, dateFormatter } from "../../util/Helpers";
-import { loadClientInfoFromDb } from "../../store/clientInfoSlice";
+import { clearClientInfo, loadClientInfoFromDb } from "../../store/clientInfoSlice";
 import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
 
 /**
@@ -93,20 +93,29 @@ export default function clientInfoModal(props) {
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
     const [selectedOption, setSelectedOption] = useState("");
 
-    const [modalVisibility, setModalVisibility] = useState(false)
+    // const [modalVisibility, setModalVisibility] = useState(false)
 
     const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
     const [deleteClientModalVisibility, setDeleteClientModalVisibility] = useState(false);
-
+    
     useEffect(() => {
         if (selectedOption === "editClient") {
-            setEditClientModalVisibility(true);
+
+            // setTimeout(()=>{
+
+            // },1000)
+
             setSelectedOption("");
+            props.setModalVisibility(false);
+            // props.setVisible(false);
+            props.editClientOption("edit");
+            setEditClientModalVisibility(true);
         }
         else if (selectedOption === "deleteClient") {
             setDeleteClientModalVisibility(true);
             setSelectedOption("");
-            setModalVisibility(false);
+            props.setModalVisibility(false);
+            props.setModalVisibility(false);
         }
     }, [selectedOption]);
 
@@ -122,8 +131,8 @@ export default function clientInfoModal(props) {
     if (clientMoreDetails === null) {
         content = <ScrollView>
             <MoreOptionDropDownModal
-                isVisible={modalVisibility}
-                onCloseModal={() => setModalVisibility(false)}
+                isVisible={props.modalVisibility}
+                onCloseModal={() => props.setModalVisibility(false)}
                 dropdownItems={[
                     "Edit client",
                     "Delete client",
@@ -139,7 +148,7 @@ export default function clientInfoModal(props) {
                     dispatch(loadClientFiltersFromDb(10, "All"));
                     dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
                     setEditClientModalVisibility(false);
-                    setModalVisibility(false);
+                    props.setModalVisibility(false);
 
                 }}
                 details={details}
@@ -150,8 +159,9 @@ export default function clientInfoModal(props) {
                 isVisible={deleteClientModalVisibility}
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
-                    setModalVisibility(false);
-                    dispatch(loadClientInfoFromDb(props.id))
+                    props.setModalVisibility(false);
+                    // dispatch(loadClientInfoFromDb(props.id))
+                    dispatch(clearClientInfo());
 
                 }}
                 header={"Delete Client"}
@@ -178,7 +188,7 @@ export default function clientInfoModal(props) {
                     <PrimaryButton
                         buttonStyle={styles.updateOrDeleteOption}
                         onPress={() => {
-                            setModalVisibility(true);
+                            props.setModalVisibility(true);
                         }}
                         pressableStyle={[styles.pressable, { paddingHorizontal: 12 }]}
                     >
@@ -186,7 +196,7 @@ export default function clientInfoModal(props) {
                     </PrimaryButton>
                     <PrimaryButton buttonStyle={styles.callButton}
                         onPress={() => {
-                            if(checkNullUndefined(details.mobile_1)){
+                            if (checkNullUndefined(details.mobile_1)) {
                                 Linking.openURL(`tel:${details.mobile_1}`)
                             }
                         }
@@ -243,7 +253,7 @@ export default function clientInfoModal(props) {
     }
 
     return (
-        <Modal visible={props.visible} animationType={"slide"}>
+        <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet" onRequestClose={props.onClose}>
             <View style={styles.closeAndHeadingContainer}>
                 {
                     clientMoreDetails === null ?
@@ -271,13 +281,13 @@ export default function clientInfoModal(props) {
                 {
                     clientMoreDetails === null ?
                         null :
-                    <ClientCard
-                        name={props.name}
-                        card={styles.clientProfileCard}
-                        cardInnerContainer={styles.cardInnerContainer}
-                        rippleColor={Colors.white}
-                        onPress={() => null}
-                    />
+                        <ClientCard
+                            name={props.name}
+                            card={styles.clientProfileCard}
+                            cardInnerContainer={styles.cardInnerContainer}
+                            rippleColor={Colors.white}
+                            onPress={() => null}
+                        />
                 }
 
             </View>
@@ -306,7 +316,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         ...Platform.select({
             ios: {
-                marginTop: 32,
+                // marginTop: 32,
             },
             android: {
                 // marginTop: 0,
@@ -335,7 +345,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     phone: {
-        width:"150%"
+        width: "150%"
     },
     optionsContainer: {
         flexDirection: "row",

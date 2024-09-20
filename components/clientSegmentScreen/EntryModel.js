@@ -1,9 +1,10 @@
 import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import Colors from "../../constants/Colors"
-import {RadioButton} from "react-native-paper";
+// import {RadioButton} from "react-native-paper";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {updateMaxEntry, updateSearchClientMaxEntry} from "../../store/clientFilterSlice";
+import RadioButton from "./../../ui/RadioButton"
 
 
 /**
@@ -27,18 +28,30 @@ export default function EntryModel(props) {
 
     const [checkedNumber, setCheckedNumber] = useState(10);
 
-    const normalMaxEntry = useSelector(state   => state.clientFilter.maxEntry);
-    const searchMaxEntry = useSelector(state   => state.clientFilter.searchMaxEntry);
+    const normalMaxEntry = useSelector(state => state.clientFilter.maxEntry);
+    const searchMaxEntry = useSelector(state => state.clientFilter.searchMaxEntry);
+
+    const [selectedOption, setSelectedOption] = useState(null);
+
+    const options = [
+        {label: '10', value: 10},
+        {label: '25', value: 25},
+        {label: '50', value: 50},
+        {label: '100', value: 100},
+    ];
+
+    // useEffect(() => {
+    //     console.log(selectedOption);
+    // }, [selectedOption]);
 
     useEffect(() => {
         setCheckedNumber(10);
     }, [props.filterPressed]);
 
     useEffect(() => {
-        if(props.query === "") {
+        if (props.query === "") {
             setCheckedNumber(normalMaxEntry);
-        }
-        else {
+        } else {
             setCheckedNumber(searchMaxEntry);
         }
     }, [normalMaxEntry, searchMaxEntry]);
@@ -50,66 +63,29 @@ export default function EntryModel(props) {
             animationType="slide"
             transparent={true}
         >
-            <TouchableOpacity activeOpacity={1} style={{flex:1, justifyContent:"center", backgroundColor:Colors.ripple}} onPress={()=>{
-                props.setIsModalVisible(false);
-            }}>
+            <TouchableOpacity activeOpacity={1}
+                              style={{flex: 1, justifyContent: "center", backgroundColor: Colors.ripple}}
+                              onPress={() => {
+                                  props.setIsModalVisible(false);
+                              }}>
 
-            <View style={styles.model}>
-                <View style={styles.innerContainer}>
-                <Text>10</Text>
-                <RadioButton
-                    value="first"
-                    status={ checkedNumber === 10 ? 'checked' : 'unchecked' }
-                    onPress={() => {
-                        setCheckedNumber(10);
-                        props.setIsModalVisible(false);
-                        dispatch(updateMaxEntry(10));
-                        dispatch(updateSearchClientMaxEntry(10));
+                <View style={styles.model}>
+                    <View style={styles.innerContainer}>
 
-                    }}
-                />
-                </View>
-                <View style={styles.innerContainer}>
-                    <Text>25</Text>
-                    <RadioButton
-                        value="first"
-                        status={ checkedNumber === 25 ? 'checked' : 'unchecked' }
-                        onPress={() => {
-                            setCheckedNumber(25);
-                            props.setIsModalVisible(false);
-                            dispatch(updateMaxEntry(25));
-                            dispatch(updateSearchClientMaxEntry(25));
+                        <RadioButton
+                            options={options}
+                            value={selectedOption}
+                            onValueChange={setSelectedOption}
+                            onPress={(value) => {
+                                setCheckedNumber(value)
+                                props.setIsModalVisible(false);
+                                dispatch(updateMaxEntry(value));
+                                dispatch(updateSearchClientMaxEntry(value));
+                            }}
+                        />
+                    </View>
 
-                        }}
-                    />
                 </View>
-                <View style={styles.innerContainer}>
-                    <Text>50</Text>
-                <RadioButton
-                    value="second"
-                    status={ checkedNumber === 50 ? 'checked' : 'unchecked' }
-                    onPress={() => {
-                        setCheckedNumber(50)
-                        props.setIsModalVisible(false);
-                        dispatch(updateMaxEntry(50));
-                        dispatch(updateSearchClientMaxEntry(50));
-                    }}
-                />
-                </View>
-                <View style={styles.innerContainer}>
-                    <Text>100</Text>
-                <RadioButton
-                    value="third"
-                    status={ checkedNumber === 100 ? 'checked' : 'unchecked' }
-                    onPress={() => {
-                        setCheckedNumber(100)
-                        props.setIsModalVisible(false);
-                        dispatch(updateMaxEntry(100));
-                        dispatch(updateSearchClientMaxEntry(100));
-                    }}
-                />
-                </View>
-            </View>
             </TouchableOpacity>
         </Modal>
     );
@@ -124,11 +100,14 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.grey200,
         borderRadius: 24,
         margin: 'auto',
+        borderWidth: 1.5,
+        overflow: 'hidden'
     },
     innerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
         justifyContent: 'space-around',
+
     },
 })

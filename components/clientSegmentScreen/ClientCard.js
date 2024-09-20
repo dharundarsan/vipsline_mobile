@@ -52,7 +52,7 @@ export default function ClientCard(props) {
 
     return (<>
             <Pressable
-                style={[styles.card, props.card]}
+                style={({pressed}) => pressed ? [styles.card, props.card, styles.opacity] : [styles.card, props.card]}
                 android_ripple={{color: props.rippleColor ? props.rippleColor : Colors.ripple}}
                 onPress={() => {
                     props.onPress(props.clientId)
@@ -129,4 +129,7 @@ const styles = StyleSheet.create({
     email: {
         color: Colors.grey650
     },
+    opacity: {
+        opacity: 0.5
+    }
 })

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
     StyleSheet,
     Text,
@@ -21,69 +21,18 @@ const Cart = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const cartItems = useSelector((state) => state.cart.items);
-    const editedMembership = useSelector((state) => state.cart.editedMembership);
     const editedCart = useSelector((state) => state.cart.editedCart);
-    const packageCart = useSelector((state) => state.cart.packageCart);
     const staffs = useSelector((state) => state.staff.staffs);
     // const [customItems, setCustomItems] = useState([]);
     // const [calculatedPrice, setCalculatedPrice] = useState([]);
     const dispatch = useDispatch()
     const customItems = useSelector(state => state.cart.customItems)
-    // useEffect(() => {
-    //     if (cartItems.length === 0 && editedMembership.length === 0 && customItems.length === 0 && editedCart.length === 0) {
-    //         setCalculatedPrice([]);
-    //     }
-    //
-    //     if (editedCart.length > 1) return;
-    //
+    const [finalCart, setFinalCart] = useState([])
 
-    //     calculateCartPriceAPI({
-    //         additional_discounts: [],
-    //         additional_services: customItems,
-    //         cart: cartItems.length === 0 ? [] : cartItems.map(item => {
-    //             return {id: item.item_id}
-    //         }),
-    //         coupon_code: "",
-    //         edited_cart: [...editedMembership.map(item => {
-    //             return {
-    //                 amount: item.price,
-    //                 bonus_value: 0,
-    //                 disc_value: 0,
-    //                 itemId: item.item_id,
-    //                 membership_id: item.id,
-    //                 membership_number: "",
-    //                 res_cat_id:  282773,
-    //                 resource_id: item.resource_id,
-    //                 type: "AMOUNT",
-    //                 valid_from: item.valid_from,
-    //                 valid_till: item.valid_until,
-    //                 wallet_amount: 0,
-    //             }
-    //         }),
-    //             ...editedCart.map(item => ({
-    //                 amount: item.amount,
-    //                 bonus_value: 0,
-    //                 disc_value: item.disc_value,
-    //                 itemId: item.item_id,
-    //                 membership_id: 0,
-    //                 res_cat_id: item.resource_category_id,
-    //                 resource_id: item.resource_id,
-    //                 type: "AMOUNT",
-    //                 valid_from: "",
-    //                 valid_till: "",
-    //                 wallet_amount: 0,
-    //             }))],
-    //         extra_charges: [],
-    //         isWalletSelected: false,
-    //         promo_code: "",
-    //         user_coupon: "",
-    //         walkin: "yes",
-    //         wallet_amt: 0
-    //     }).then(result => {
-    //         setCalculatedPrice(result);
-    //     })
-    //
-    // }, [customItems, editedMembership, editedCart, cartItems]);
+    const memoizedFinalCart = useMemo(() => {
+        return [...cartItems, ...customItems];
+    }, [cartItems, customItems]);
+
 
     const openAddItemModal = () => {
         setIsModalVisible(true);
@@ -139,7 +88,7 @@ const Cart = () => {
     return (
         <View style={styles.cart}>
             <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>
-            {cartItems.length === 0 && customItems.length === 0 && editedCart.length === 0 && editedMembership.length === 0 && packageCart.length === 0 ?
+            {cartItems.length === 0 && customItems.length === 0 ?
                 <View style={styles.emptyCartContainer}>
                     <MaterialIcons style={styles.icon} name="add-shopping-cart" size={40} color={Colors.highlight}/>
                     <Text style={[TextTheme.titleMedium, styles.emptyCartText]}>Your cart is empty</Text>
@@ -150,11 +99,11 @@ const Cart = () => {
                 <>
                     <View style={{flex: 1}}>
                         <FlatList fadingEdgeLength={50} style={{flexGrow: 0}}
-                                  data={[...cartItems, ...editedCart, ...customItems, ...editedMembership]}
-                                  // keyExtractor={(item, index) => {
-                                  //     console.log(item.item_id);
-                                  //     return item.item_id
-                                  // }}
+                                  removeClippedSubviews={false}
+                                  data={memoizedFinalCart}
+                                  keyExtractor={(item, index) => {
+                                      return item.item_id
+                                  }}
                                   renderItem={({item}) => <CartItem staffs={staffs} data={item}/>}
                         />
                         <PrimaryButton buttonStyle={styles.addItemsWithLogoButton} onPress={openAddItemModal}>

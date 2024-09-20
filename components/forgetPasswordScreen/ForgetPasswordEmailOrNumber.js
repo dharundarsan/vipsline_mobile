@@ -4,7 +4,7 @@ import Colors from "../../constants/Colors";
 import {Ionicons} from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
 import textTheme from "../../constants/TextTheme";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import axios from "axios";
 
 export default function ForgetPasswordEmailOrNumber(props) {
@@ -17,6 +17,13 @@ export default function ForgetPasswordEmailOrNumber(props) {
 
     const [isUserTyping, setIsUserTyping] = useState(false);
     const [isUserFound, setIsUserFound] = useState(true);
+
+    const [emailPrompt, setEmailPrompt] = useState("");
+
+    const textRef = useRef(null);
+
+    const [isTyping, setIsTyping] = useState(false);
+    const [isSendOtpPressed, setIsSendOtpPressed] = useState(false);
 
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
     const platform = "BUSINESS";
@@ -32,6 +39,11 @@ export default function ForgetPasswordEmailOrNumber(props) {
         setIsFocussed(false);
     }
 
+    function isAlphaNumeric(str) {
+        return /^[A-Za-z0-9]+$/.test(str);
+    }
+
+
     async function findUser() {
         let response = "something went wrong"
         try {
@@ -41,33 +53,30 @@ export default function ForgetPasswordEmailOrNumber(props) {
             })
             responseUserMessage = response.data.message;
 
+        } catch (error) {
         }
-        catch (error) {
-                    }
 
-                return responseUserMessage;
+        return responseUserMessage;
     }
 
     async function sendOtp() {
         setIsLoading(true);
-        if(await findUser() === "user found") {
+        if (await findUser() === "user found") {
             try {
                 const response = await axios.post(
                     BaseURL + "/user/sendOtp",
                     {
-                        userName:mobileNumber,
-                        platform:platform,
+                        userName: mobileNumber,
+                        platform: platform,
                     })
 
                 setIsUserFound(true);
                 props.otpHandler();
                 props.setMobileNumber(mobileNumber);
+            } catch (error) {
             }
-            catch (error) {
-                            }
 
-        }
-        else {
+        } else {
             setIsUserFound(false);
         }
 
@@ -95,14 +104,18 @@ export default function ForgetPasswordEmailOrNumber(props) {
             width: '100%',
             borderWidth: 2,
             paddingVertical: 8,
-            borderColor: isFocussed ? isUserFound ? Colors.highlight : Colors.error : !isUserFound ? Colors.error :Colors.grey400,
+            borderColor:
+                isUserTyping ?
+                    Colors.highlight:
+                    isUserFound ?
+                        Colors.highlight :
+                        Colors.error,
             borderRadius: 6,
             paddingHorizontal: 12,
         },
         mobileNumberContainer: {
             alignItems: "flex-start",
-            // borderWidth: 2,
-            width:'100%',
+            width: '100%',
         },
         sendOtpButton: {
             width: '85%',
@@ -127,35 +140,56 @@ export default function ForgetPasswordEmailOrNumber(props) {
                     navigation.goBack();
                 }}
             >
-                <Ionicons name="arrow-back-sharp" size={24} color="white" />
+                <Ionicons name="arrow-back-sharp" size={24} color="white"/>
             </PrimaryButton>
             <Text style={[textTheme.titleMedium, styles.forgetPasswordText]}>Forget Password</Text>
 
             <View style={styles.inputContainer}>
                 <Text style={[textTheme.titleMedium, styles.inputLabel]}>Mobile number / Email</Text>
                 <TextInput
+                    ref={textRef}
                     style={[textTheme.titleSmall, styles.mobileNumberInput]}
                     placeholder='Mobile number / Email'
-                    keyboardType= "number-pad"
                     onFocus={onFocusHandler}
                     onBlur={onFocusOutHandler}
                     value={mobileNumber}
                     onChangeText={(text) => {
                         setMobileNumber(text);
                         setIsUserTyping(true);
+                        setIsSendOtpPressed(false)
+
                     }}
                     maxLength={10}
                 />
                 {
-                    !isUserFound ?
-                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number / Email</Text> :
-                        <Text > </Text>
+                    isUserTyping ?
+                        <Text></Text> :
+                        isSendOtpPressed ?
+                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number / Email is required </Text> :
+                        !isUserFound ?
+                            <Text style={[textTheme.titleSmall, {color: Colors.error}]}>
+                                Incorrect Mobile number / email
+                            </Text> :
+                            <Text></Text>
+
+
                 }
             </View>
             <PrimaryButton
                 buttonStyle={styles.sendOtpButton}
-                onPress={async () => {
-                    await sendOtp();
+                onPress={() => {
+                    if (isLoading) {
+                        return null;
+                    }
+                    else {
+                        sendOtp().then(r => null);
+                        setEmailPrompt("");
+                        setIsUserTyping(false)
+                    }
+
+                    setIsSendOtpPressed(true)
+
+
                 }}
             >
                 {

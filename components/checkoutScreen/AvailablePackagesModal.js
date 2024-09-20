@@ -31,7 +31,8 @@ const AvailablePackagesModal = (props) => {
         fetchPackages();
     }, [clientId, businessId]);
 
-    return <Modal style={styles.availablePackagesModal} animationType={"slide"}>
+    return <Modal style={styles.availablePackagesModal} animationType={"slide"}
+            presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         {isPackageModalVisible && <PackageModal redeem={true}
                                                 data={packageModalData}
                                                 isVisible={isPackageModalVisible}
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
         alignItems: "center",

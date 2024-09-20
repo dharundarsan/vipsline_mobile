@@ -12,38 +12,47 @@ import getDiscountAPI from "../../util/apis/getDiscountAPI";
 import Divider from "../../ui/Divider";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    addItemToEditedCart,
+    addItemToEditedCart, editMembership,
     loadCartFromDB,
     updateCalculatedPrice,
     updateCustomItem,
-    updateEditedCart, updateEditedMembership
 } from "../../store/cartSlice";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 
 const EditCartModal = (props) => {
-    const [selectedDiscountMode, setSelectedDiscountMode] = useState("percentage");
-    const [discountValue, setDiscountValue] = useState(0);
-    const [discountAmount, setDiscountAmount] = useState(0);
-            const [price, setPrice] = useState(props.data.price);
+    const [selectedDiscountMode, setSelectedDiscountMode] = useState("cash");
+    const [discountValue, setDiscountValue] = useState(props.data.price - props.data.discounted_price);
+    const [discountAmount, setDiscountAmount] = useState(props.data.price - props.data.discounted_price);
+    const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
-            const cartItems = useSelector((state) => state.cart.items);
-    const editedMembership = useSelector((state) => state.cart.editedMembership);
+    const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
 
     useEffect(() => {
         // setPrice(props.data.total_price === undefined ? props.data.price : props.data.total_price)
         setPrice(props.data.price)
-        setDiscountValue(0)
-        setDiscountAmount(0)
+        setDiscountValue(props.data.price - props.data.discounted_price)
+        setDiscountAmount(props.data.price - props.data.discounted_price)
     }, [props]);
 
 
     useEffect(() => {
-        setDiscountValue(0);
-        setDiscountAmount(0);
+        const api = async () => {
+            if (selectedDiscountMode === "percentage") {
+                setDiscountAmount(await getDiscountAPI({
+                    price: price,
+                    disc_percent: discountValue
+                }))
+            } else {
+                setDiscountAmount(parseFloat(discountValue));
+            }
+        }
+
+        api();
     }, [selectedDiscountMode]);
 
-    return <Modal visible={props.isVisible} style={styles.editCartModal}>
+    return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}
+    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Edit {props.data.resource_category_name}</Text>
             <PrimaryButton
@@ -129,7 +138,7 @@ const EditCartModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={async () => {
                 if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
-                    if (props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" ) {
+                    if (props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General") {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
                             amount: price,
@@ -142,13 +151,12 @@ const EditCartModal = (props) => {
                             membership_id: props.data.membership_id,
                             res_cat_id: props.data.resource_category_id,
                             resource_id: props.data.resource_id,
-                            type: "AMOUNT",
+                            type: selectedDiscountMode === "cash" ? "AMOUNT" : "PERCENT",
                             valid_from: "",
                             valid_till: "",
                             wallet_amount: props.data.wallet_amount,
                             edited: true
                         }))
-                        dispatch(updateEditedCart());
                     } else if (props.data.gender === "Products") {
                         dispatch(await addItemToEditedCart({
                             ...props.data,
@@ -160,7 +168,7 @@ const EditCartModal = (props) => {
                             membership_id: 0,
                             product_id: props.data.product_id,
                             resource_id: props.data.resource_id,
-                            type: "AMOUNT",
+                            type: selectedDiscountMode === "cash" ? "AMOUNT" : "PERCENT",
                             total_price: price,
                             price: price,
                             res_cat_id: props.data.resource_category_id,
@@ -169,25 +177,20 @@ const EditCartModal = (props) => {
                             wallet_amount: props.data.wallet_amount,
                             edited: true
                         }))
-                        dispatch(updateEditedCart());
-                    } else if (props.data.gender === "custom_item") {
-                        dispatch(updateCustomItem({
-                            amount: price,
-                            price: price,
-                            total_price: price,
-                            item_id: props.data.item_id,
-                        }))
                     } else if (props.data.gender === "membership") {
-                        await dispatch(updateEditedMembership({
-                            type: "edit", id: props.data.item_id, data: {
+                        await dispatch(editMembership({
+                            id: props.data.id === undefined ? props.data.membership_id : props.data.id, data: {
                                 amount: price,
+                                price: price,
+                                total_price: price,
                                 bonus_value: 0,
                                 disc_value: discountAmount,
                                 type: "AMOUNT",
+                                id: props.data.membership_id,
                                 res_cat_id: props.data.resource_category_id
                             }
                         }))
-                        await dispatch(loadCartFromDB());
+                        // await dispatch(loadCartFromDB());
                     }
                     dispatch(updateCalculatedPrice());
                     props.onCloseModal()
@@ -205,7 +208,6 @@ const styles = StyleSheet.create({
     }
     ,
     headingAndCloseContainer: {
-        marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal:
             20,
         paddingVertical:
