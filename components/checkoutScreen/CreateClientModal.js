@@ -142,10 +142,10 @@ const CreateClientModal = (props) => {
                         placeholder="Enter client's last name"
                         value={lastName}
                         onChangeText={setLastName}
-                        validator={(text) => {
-                            if (text.length === 0) return "Last name is required";
-                            else return true;
-                        }}
+                        // validator={(text) => {
+                        //     if (text.length === 0) return "Last name is required";
+                        //     else return true;
+                        // }}
                         onSave={(callback) => {
                             lastNameRef.current = callback;
                         }}

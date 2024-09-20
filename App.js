@@ -59,7 +59,6 @@ const AuthStack = createNativeStackNavigator();
 const LandingStack = createNativeStackNavigator();
 
 
-// const MainStack = createNativeStackNavigator();
 
 export default function App() {
     const [loaded, error] = useFonts({

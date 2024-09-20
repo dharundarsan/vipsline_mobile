@@ -74,50 +74,6 @@ export default function ClientSegmentScreen() {
 
     const currentFilterClientCount = useSelector(state => state.clientFilter.totalClients);
 
-    const [pageNo1, setPageNo1] = useState(0);
-    const [maxEntry1, setMaxEntry1] = useState(10);
-
-    const [isLoading, setIsLoading] = useState(false);
-
-    const [toggle, setToggle] = useState(false);
-
-    // const clientFilter = useCallback(async (pageSize, pageNo, filter) => {
-    //     if (isLoading) return; // Prevent initiating another request if one is already ongoing
-    //
-    //     setIsLoading(true);
-    //     try {
-    //         const response = await axios.post(
-    //             `${process.env.EXPO_PUBLIC_API_URI}/client/getClientReportBySegmentForBusiness?pageNo=${pageNo}&pageSize=${pageSize}`,
-    //             {
-    //                 business_id: `${process.env.EXPO_PUBLIC_BUSINESS_ID}`,
-    //                 fromDate: "",
-    //                 sortItem: "name",
-    //                 sortOrder: "asc",
-    //                 toDate: "",
-    //                 type: filter,
-    //             },
-    //             {
-    //                 headers: {
-    //                     Authorization: `Bearer ${process.env.EXPO_PUBLIC_AUTH_KEY}`
-    //                 }
-    //             }
-    //         );
-    //         let count = response.data.data.pop();
-    //         return response.data.data;
-    //     } catch (error) {
-    //         console.error("Error fetching data1: ", error);
-    //
-    //     } finally {
-    //         setIsLoading(false); // Ensure loading state is reset after completion or failure
-    //     }
-    // }, [isLoading]);
-    //
-    // const loadMoreClients = () => {
-    //     const newPageNo = pageNo1 + 1;
-    //     setPageNo1(newPageNo);
-    //     clientFilter(maxEntry1, newPageNo, clientFilterNames(filterPressed));
-    // };
-
 
     const [searchClientTotalCount, setSearchClientTotalCount] = useState(0);
 
@@ -170,18 +126,6 @@ export default function ClientSegmentScreen() {
 
 
     function renderItem(itemData) {
-
-
-        // if(searchQuery === "" && (currentFilterClientCount !== clientCount)) {
-        //     if(toggle) {
-        //         setToggle(false)
-        //     }
-        //     else{
-        //         setToggle(true);
-        //     }
-        //             //     return ;
-        // }
-
         return (
             <ClientCard
                 name={itemData.item.name}
