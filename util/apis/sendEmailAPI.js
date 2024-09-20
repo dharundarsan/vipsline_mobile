@@ -2,6 +2,7 @@ import axios from "axios";
 import { ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 export default async function sendEmailAPI(email, bookingId) {
 
     let authToken = ""
@@ -40,7 +41,9 @@ export default async function sendEmailAPI(email, bookingId) {
             }
         );
 
-        ToastAndroid.show("Email sent successfully!", ToastAndroid.LONG);
+        return "success";
+
+        // ToastAndroid.show("Email sent successfully!", ToastAndroid.LONG);
     } catch (error) {
                 ToastAndroid.show("Failed to send email.", ToastAndroid.LONG);
     }

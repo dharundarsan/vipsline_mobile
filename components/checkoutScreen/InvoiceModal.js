@@ -29,6 +29,11 @@ import {
     modifyPrepaidDetails
 } from "../../store/cartSlice";
 
+import Toast from "../../ui/Toast";
+
+
+
+
 const InvoiceModal = (props) => {
 
     const details = useSelector(state => state.invoice.details);
@@ -59,7 +64,7 @@ const InvoiceModal = (props) => {
     const [cancelReason, setCancelReason] = useState("");
 
     const [isCancelled, setIsCancelled] = useState(false);
-    const [totalDiscount, setTotalDiscount] = useState(0);
+
     // const [businessId, setBusinessId] = useState("");
 
     const calculatedPrice = useSelector(state => state.cart.calculatedPrice);
@@ -67,6 +72,7 @@ const InvoiceModal = (props) => {
     const businessId = useSelector(state => state.authDetails.businessId);
 
     const walletBalance = useSelector(state => state.invoice.walletBalance);
+
 
 
     let centralGST = (details.total * 0.09);
@@ -111,6 +117,9 @@ const InvoiceModal = (props) => {
     }, [selectedClientDetails]);
 
 
+
+
+
     const calculateTotalDifference = (organizedList) => {
         return organizedList.reduce((total, category) => {
             const categoryTotal = category.list.reduce((subTotal, item) => {
@@ -134,6 +143,7 @@ const InvoiceModal = (props) => {
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
+
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -165,6 +175,7 @@ const InvoiceModal = (props) => {
                         setEmailModalVisibility(true);
                     } else if (value === "Cancel Invoice") {
                         setCancelInvoiceModalVisibility(true);
+
                     }
                 }}
             />
@@ -187,6 +198,7 @@ const InvoiceModal = (props) => {
                         setSMSModalVisibility(false)
                     }
                 }}
+                buttonOneOnPress={() => setSMSModalVisibility(false)}
                 onSave={(callback) => {
                     phoneNoRef.current = callback;
                 }}
@@ -202,14 +214,18 @@ const InvoiceModal = (props) => {
                 buttonTwoName={"Send"}
                 onCloseModal={() => setEmailModalVisibility(false)}
                 onChangeText={(text) => setEmail(text)}
-                value={email}
+                value={email.trim()}
                 buttonTwoOnPress={async () => {
                     const emailValid = emailRef.current();
                     if (emailValid) {
-                        await sendEmailAPI(email, bookingId);
+                        let msg = await sendEmailAPI(email, bookingId);
                         setEmailModalVisibility(false);
+                        if(msg === "success") {
+
+                        }
                     }
                 }}
+                buttonOneOnPress={() => setEmailModalVisibility(false)}
                 validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
                 onSave={(callback) => {
                     emailRef.current = callback;
@@ -220,7 +236,10 @@ const InvoiceModal = (props) => {
                 title={"Cancel Invoice"}
                 visible={cancelInvoiceModalVisibility}
                 placeholder={"Enter the Valid Reason"}
-                onCloseModal={() => setCancelInvoiceModalVisibility(false)}
+                onCloseModal={() => {
+                    setCancelInvoiceModalVisibility(false)
+                    setCancelReason("")
+                }}
                 type={"multiLine"}
                 label={"Reason"}
                 buttonOneName={"Cancel Invoice"}
@@ -237,6 +256,7 @@ const InvoiceModal = (props) => {
                         setCancelInvoiceModalVisibility(false);
                         cancelInvoiceAPI(cancelReason, bookingId);
                         // props.onCloseModal();
+                        setCancelReason("")
                     }
                 }}
                 buttonOneStyle={{borderColor: Colors.error, borderWidth: 1.5}}
@@ -290,6 +310,7 @@ styles.heading]}>Invoice</Text>*/}
             </PrimaryButton>
         </View>
         <ScrollView>
+
             <View style={styles.modalContent}>
                 {
                     isCancelled ?
@@ -563,7 +584,9 @@ styles.heading]}>Invoice</Text>*/}
                             styles.thankYouText]}>{invoiceDetails.footer_message_2}</Text> :
                     <></>
             }
+            {/*<Toast ref={toastRef} />*/}
         </ScrollView>
+        {/*<Toast ref={toastRef} />*/}
     </Modal>
 }
 
@@ -649,10 +672,14 @@ const styles = StyleSheet.create({
         margin: 20,
     },
     cartItemTable: {
+        position: 'relative',
         paddingVertical: 10,
         paddingHorizontal: 15,
+        zIndex: 1
     },
     cartItemTableHead: {
+        position: 'relative',
+        zIndex:2,
         backgroundColor: "#E7E8FF",
         paddingVertical: 10
     },
@@ -660,6 +687,7 @@ const styles = StyleSheet.create({
         borderBottomColor: Colors.grey300,
         borderBottomWidth: 1,
         paddingVertical: 10,
+        zIndex: 1
     },
     calculatepriceRow: {
         flexDirection: "row",
