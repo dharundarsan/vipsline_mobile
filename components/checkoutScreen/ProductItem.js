@@ -59,7 +59,6 @@ const ProductItem = (props) => {
     return <PrimaryButton buttonStyle={styles.selectProductItemButton}
                           pressableStyle={styles.selectProductItemPressable}
                           onPress={() => {
-
                               if (props.data.available_quantity === 0) {
                                   // ToastAndroid.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", ToastAndroid.LONG)
                                   Toast.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", Toast.LONG, {

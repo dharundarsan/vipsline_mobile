@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text, Pressable} from "react-native";
+import {View, StyleSheet, Text, Pressable, Platform} from "react-native";
 import Colors from "../../constants/Colors"
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
@@ -51,6 +51,49 @@ export default function ClientCard(props) {
     const phone = props.phone;
     const email = props.email;
 
+
+
+    const styles = StyleSheet.create({
+        card: {
+            width: '100%',
+            paddingVertical: 20,
+            paddingHorizontal: 10,
+            justifyContent: 'center',
+        },
+        clientProfile: {
+            borderRadius: radius,
+            width: radius,
+            height: radius,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: Colors.lightGreen
+        },
+        text: {
+            fontWeight: '600',
+            color: Colors.highlight
+        },
+        innerContainer: {
+            marginLeft: 16,
+            flexDirection: 'row',
+            alignItems: "center",
+        },
+        clientDetailsContainer: {
+            marginLeft: 16,
+        },
+        name: {
+
+        },
+        phone: {
+            color: Colors.grey650
+        },
+        email: {
+            color: Colors.grey650
+        },
+        opacity: {
+            opacity: Platform.OS === 'ios' ? 0.5 : 1,
+        }
+    })
+
     return (<>
             <Pressable
                 style={({pressed}) => pressed ? [styles.card, props.card, styles.opacity] : [styles.card, props.card]}
@@ -70,13 +113,11 @@ export default function ClientCard(props) {
 
                     <View style={[styles.clientDetailsContainer, props.clientDetailsContainer]}>
                         {
-                            props.name !== undefined ?
-                                <Text style={[textTheme.titleSmall, props.nameText]}>{name}</Text> : null
+                            props.name !== undefined ? <Text style={[textTheme.titleSmall, props.nameText]}>{name}</Text> : null
                         }
                         {
                             props.phone !== undefined ?
-                                < Text
-                                    style={[textTheme.bodyMedium, styles.phone, props.phoneText]}>{phone}</Text> : null
+                                < Text style={[textTheme.bodyMedium, styles.phone, props.phoneText]}>{phone}</Text> : null
                         }
                         {
                             email !== undefined && email !== null && email.trim().length !== 0 ?
@@ -89,7 +130,7 @@ export default function ClientCard(props) {
             </Pressable>
             {
                 props.divider ?
-                    <Divider/> :
+                    <Divider /> :
                     null
             }
 
@@ -97,41 +138,3 @@ export default function ClientCard(props) {
     );
 }
 
-const styles = StyleSheet.create({
-    card: {
-        width: '100%',
-        paddingVertical: 20,
-        paddingHorizontal: 10,
-        justifyContent: 'center',
-    },
-    clientProfile: {
-        borderRadius: radius,
-        width: radius,
-        height: radius,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colors.lightGreen
-    },
-    text: {
-        fontWeight: '600',
-        color: Colors.highlight
-    },
-    innerContainer: {
-        marginLeft: 16,
-        flexDirection: 'row',
-        alignItems: "center",
-    },
-    clientDetailsContainer: {
-        marginLeft: 16,
-    },
-    name: {},
-    phone: {
-        color: Colors.grey650
-    },
-    email: {
-        color: Colors.grey650
-    },
-    opacity: {
-        opacity: 0.5
-    }
-})

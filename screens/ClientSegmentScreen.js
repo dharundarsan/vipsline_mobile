@@ -21,7 +21,7 @@ import {
     loadClientInfoFromDb,
     updateClientId
 } from "../store/clientInfoSlice";
-import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../store/clientFilterSlice";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb, resetClientFilter} from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
 import { clearClientsList, loadClientCountFromDb, loadClientsFromDb } from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
@@ -87,6 +87,9 @@ export default function ClientSegmentScreen() {
     const businessId = useSelector(state => state.authDetails.businessId);
     const [selectedOption, setSelectedOption] = useState("");
 
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSearchLoading, setIsSearchLoading] = useState(false);
+
     useEffect(() => {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
     }, [allClientCountHelper]);
@@ -100,21 +103,53 @@ export default function ClientSegmentScreen() {
 
 
     useEffect(() => {
-        dispatch(loadClientCountFromDb());
-        setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
+        const clientCount = chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
+        setClientCount(clientCount);
+        async function func(){
+            setIsLoading(true)
+            await dispatch(loadClientCountFromDb());
+            if(clientCount < 10) {
+                await dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
+            }
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 400)
+
+        }
+        func()
+
     }, [filterPressed]);
 
+    // useEffect(() => {
+    //     // dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
+    //     // setTimeout(() => {
+    //         if(clientCount !== currentFilterClientCount) {
+    //             console.log(clientCount);
+    //             console.log(currentFilterClientCount);
+    //             dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
+    //         }
+    //     // }, 1000)
+    // }, [currentFilterClientCount]);
+
     useEffect(() => {
+        setIsSearchLoading(true)
         dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
         if (currentFilterClientCount !== clientCount) {
             dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
         }
+        setTimeout(() => {
+            setIsSearchLoading(false);
+        }, 200)
+
     }, [searchQuery]);
 
 
     useFocusEffect(
         useCallback(() => {
-            return () => setFilterPressed("all_clients_count");
+            return () => {
+                setFilterPressed("all_clients_count");
+                dispatch(clearClientInfo());
+            }
         }, [])
     )
 
@@ -173,20 +208,17 @@ export default function ClientSegmentScreen() {
         if (option === "edit") {
             // setIsClientInfoModalVisible(false);
             {
-                // Platform.OS === "ios" ?
-                //     setTimeout(()=>{
-                //         setEditClientModalVisibility(true);
-                //     },1000) :
+                console.log(editClientModalVisibility);
                 setEditClientModalVisibility(true);
             }
 
         }
     }
-    
+
     return (
         <ScrollView style={styles.scrollView}>
 
-            
+
             <View style={styles.clientSegment}>
                 {
                     isModalVisible &&
@@ -198,21 +230,21 @@ export default function ClientSegmentScreen() {
                     />
                 }
 
-                {/* {
-                    editClientModalVisibility &&
-                    <UpdateClientModal
-                        isVisible={editClientModalVisibility}
-                        onCloseModal={() => {
-                            dispatch(loadClientInfoFromDb(clientId))
-                            dispatch(loadClientFiltersFromDb(10, "All"));
-                            dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
-                            setEditClientModalVisibility(false);
-                            setModalVisibility(false);
-                        }}
-                        details={details}
+                {/*{*/}
+                {/*    editClientModalVisibility &&*/}
+                {/*    <UpdateClientModal*/}
+                {/*        isVisible={editClientModalVisibility}*/}
+                {/*        onCloseModal={() => {*/}
+                {/*            dispatch(loadClientInfoFromDb(clientId))*/}
+                {/*            dispatch(loadClientFiltersFromDb(10, "All"));*/}
+                {/*            dispatch(loadSearchClientFiltersFromDb(10, "All", ""));*/}
+                {/*            setEditClientModalVisibility(false);*/}
+                {/*            setModalVisibility(false);*/}
+                {/*        }}*/}
+                {/*        details={details}*/}
 
-                    />
-                } */}
+                {/*    />*/}
+                {/*}*/}
 
 
 
@@ -236,11 +268,14 @@ export default function ClientSegmentScreen() {
                     setSearchQuery={setSearchQuery}
                     setFilterPressed={setFilterPressed}
                     onClose={() => setIsClientInfoModalVisible(false)}
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+
                     />
                 }
 
                 {
-                    modalVisibility && 
+                    modalVisibility &&
                     <MoreOptionDropDownModal
                     selectedOption={selectedOption}
                     setSelectedOption={setSelectedOption}
@@ -263,8 +298,8 @@ export default function ClientSegmentScreen() {
                     <ClientFiltersCategories
                         changeSelectedFilter={changeSelectedFilter}
                         filterPressed={filterPressed}
-                        isLoading={isFetching}
-                        searchLoading={isSearchClientFetching}
+                        isLoading={isLoading}
+                        searchLoading={isSearchLoading}
                     />
                 </View>
 

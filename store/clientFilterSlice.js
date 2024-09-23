@@ -62,7 +62,7 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
                 }
             }
         );
-                          dispatch(updateTotalClientCount(response.data.data.pop().count));
+        dispatch(updateTotalClientCount(response.data.data.pop().count));
         dispatch(updateClientsList(response.data.data));
         dispatch(updateFetchingState(false));
     } catch (error) {
