@@ -219,7 +219,9 @@ export default function ClientSegmentScreen() {
                 {
                     isClientInfoModalVisible &&
                     <ClientInfoModal
+                    selectedOption={selectedOption}
                     modalVisibility={modalVisibility}
+                    setSelectedOption={setSelectedOption}
                     setModalVisibility={setModalVisibility}
                     setEditClientModalVisibility={setEditClientModalVisibility}
                     visible={isClientInfoModalVisible}

@@ -233,6 +233,7 @@ const UpdateClientModal = React.memo((props) => {
                         dropdownItems={["Justdial", "Google", "Facebook", "Instagram", "SMS Campaign", "Walk-in", "Membership", "Others"]}
                     />
                     <CustomTextInput
+                        maximumDate={new Date()}
                         type="date"
                         label="Date of birth"
                         value={ clientData.dateOfBirth === undefined || clientData.dateOfBirth === null ? null : new Date(clientData.dateOfBirth)}
@@ -242,6 +243,7 @@ const UpdateClientModal = React.memo((props) => {
                         }}
                     />
                     <CustomTextInput
+                        maximumDate={new Date()}
                         type="date"
                         label="Anniversary"
                         value={clientData.anniversaryDate === null || clientData.anniversaryDate === undefined ? null : new Date(clientData.anniversaryDate)}

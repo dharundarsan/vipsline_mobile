@@ -91,7 +91,7 @@ export default function clientInfoModal(props) {
 
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
-    const [selectedOption, setSelectedOption] = useState("");
+    // const [selectedOption, setSelectedOption] = useState("");
 
     // const [modalVisibility, setModalVisibility] = useState(false)
 
@@ -99,25 +99,25 @@ export default function clientInfoModal(props) {
     const [deleteClientModalVisibility, setDeleteClientModalVisibility] = useState(false);
     
     useEffect(() => {
-        if (selectedOption === "editClient") {
+        if (props.selectedOption === "editClient") {
 
             // setTimeout(()=>{
 
             // },1000)
 
-            setSelectedOption("");
+            props.setSelectedOption("");
             props.setModalVisibility(false);
             // props.setVisible(false);
             props.editClientOption("edit");
             setEditClientModalVisibility(true);
         }
-        else if (selectedOption === "deleteClient") {
+        else if (props.selectedOption === "deleteClient") {
             setDeleteClientModalVisibility(true);
-            setSelectedOption("");
+            props.setSelectedOption("");
             props.setModalVisibility(false);
             props.setModalVisibility(false);
         }
-    }, [selectedOption]);
+    }, [props.selectedOption]);
 
 
     function clientInfoCategoryPressHandler(id) {
@@ -137,7 +137,7 @@ export default function clientInfoModal(props) {
                     "Edit client",
                     "Delete client",
                 ]}
-                setOption={setSelectedOption}
+                setOption={props.setSelectedOption}
 
             />
 
