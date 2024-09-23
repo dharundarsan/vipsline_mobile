@@ -7,6 +7,7 @@ import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
 import PackageModal from "./PackageModal";
 import {useState} from "react";
+import * as Haptics from "expo-haptics";
 
 const PackageItem = (props) => {
     const dispatch = useDispatch();
@@ -56,12 +57,16 @@ const PackageItem = (props) => {
     return <PrimaryButton buttonStyle={styles.packageItemButton}
                           pressableStyle={styles.packageItemPressable}
                           onPress={() => {
+
                               setIsPackageModalVisible(true);
                               // dispatch(addItemToCart(props.data));
                           }}>
         {isPackageModalVisible && <PackageModal redeem={false} isVisible={isPackageModalVisible} data={props.data}
                                                 closeOverallModal={props.closeOverallModal}
-                                                onCloseModal={() => setIsPackageModalVisible(false)
+                                                onCloseModal={() => {
+
+                                                    setIsPackageModalVisible(false)
+                                                }
                                                 }/>}
         <View style={styles.leftBar}></View>
         <View style={styles.packageItemInnerContainer}>

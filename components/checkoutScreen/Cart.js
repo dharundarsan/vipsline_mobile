@@ -15,7 +15,8 @@ import CartItem from "./CartItem";
 import CheckoutSection from "./CheckoutSection";
 import {useDispatch, useSelector} from "react-redux";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
-import { updateDiscount } from '../../store/cartSlice';
+import {updateDiscount} from '../../store/cartSlice';
+import * as Haptics from "expo-haptics";
 
 const Cart = () => {
 
@@ -35,6 +36,7 @@ const Cart = () => {
 
 
     const openAddItemModal = () => {
+
         setIsModalVisible(true);
     }
 
@@ -87,14 +89,22 @@ const Cart = () => {
 
     return (
         <View style={styles.cart}>
-            <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={openAddItemModal}/>
+            {isModalVisible &&
+                <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={() => {
+
+
+                    openAddItemModal()
+                }}/>}
             {cartItems.length === 0 && customItems.length === 0 ?
                 <View style={styles.emptyCartContainer}>
                     <MaterialIcons style={styles.icon} name="add-shopping-cart" size={40} color={Colors.highlight}/>
                     <Text style={[TextTheme.titleMedium, styles.emptyCartText]}>Your cart is empty</Text>
                     <Text style={styles.selectServiceText}>Select an service or item to checkout</Text>
                     <PrimaryButton label="Add items to cart" buttonStyle={styles.addItemButton}
-                                   onPress={openAddItemModal}/>
+                                   onPress={() => {
+
+                                       openAddItemModal()
+                                   }}/>
                 </View> :
                 <>
                     <View style={{flex: 1}}>

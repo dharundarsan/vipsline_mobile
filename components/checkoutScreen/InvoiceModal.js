@@ -28,7 +28,7 @@ import {
     modifyClientMembershipId,
     modifyPrepaidDetails
 } from "../../store/cartSlice";
-
+import * as Haptics from "expo-haptics";
 
 
 const InvoiceModal = (props) => {
@@ -69,7 +69,6 @@ const InvoiceModal = (props) => {
     const businessId = useSelector(state => state.authDetails.businessId);
 
     const walletBalance = useSelector(state => state.invoice.walletBalance);
-
 
 
     let centralGST = (details.total * 0.09);
@@ -114,9 +113,6 @@ const InvoiceModal = (props) => {
     }, [selectedClientDetails]);
 
 
-
-
-
     const calculateTotalDifference = (organizedList) => {
         return organizedList.reduce((total, category) => {
             const categoryTotal = category.list.reduce((subTotal, item) => {
@@ -138,23 +134,24 @@ const InvoiceModal = (props) => {
     }
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
-            visible={props.isVisible} 
-            // presentationStyle="pageSheet" onRequestClose={()=>{
-            //     clearCartAPI();
-            //     dispatch(modifyClientMembershipId({type: "clear"}))
-            //     dispatch(clearSalesNotes());
-            //     dispatch(clearLocalCart());
-            //     dispatch(clearClientInfo());
-            //     dispatch(clearCalculatedPrice());
-            //     dispatch(modifyPrepaidDetails({type: "clear"}))
-            // }}
-            >
+                  visible={props.isVisible}
+        // presentationStyle="pageSheet" onRequestClose={()=>{
+        //     clearCartAPI();
+        //     dispatch(modifyClientMembershipId({type: "clear"}))
+        //     dispatch(clearSalesNotes());
+        //     dispatch(clearLocalCart());
+        //     dispatch(clearClientInfo());
+        //     dispatch(clearCalculatedPrice());
+        //     dispatch(modifyPrepaidDetails({type: "clear"}))
+        // }}
+    >
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
 
             <DropdownModal
                 isVisible={actionModalVisibility}
                 onCloseModal={() => {
+
                     setActionModalVisibility(false)
                 }}
                 dropdownItems={[
@@ -175,14 +172,14 @@ const InvoiceModal = (props) => {
                 imageWidth={24}
                 primaryViewChildrenStyle={styles.dropdownInnerContainer}
                 onChangeValue={(value) => {
+
                     if (value === "SMS") {
                         setSMSModalVisibility(true);
-
                     } else if (value === "Email") {
                         setEmailModalVisibility(true);
                     } else if (value === "Cancel Invoice") {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                         setCancelInvoiceModalVisibility(true);
-
                     }
                 }}
             />
@@ -195,18 +192,26 @@ const InvoiceModal = (props) => {
                 label={"Client Mobile"}
                 buttonOneName={"Cancel"}
                 buttonTwoName={"Send"}
-                onCloseModal={() => setSMSModalVisibility(false)}
+                onCloseModal={() => {
+
+                    setSMSModalVisibility(false)
+                }}
                 onChangeText={(text) => setPhone(text)}
                 value={phone[1]}
                 buttonTwoOnPress={async () => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                     const phoneNoValid = phoneNoRef.current();
                     if (phoneNoValid) {
                         await sendSMSAPI(selectedClientDetails.name, phone[1]);
                         setSMSModalVisibility(false)
                     }
                 }}
-                buttonOneOnPress={() => setSMSModalVisibility(false)}
+                buttonOneOnPress={() => {
+
+                    setSMSModalVisibility(false)
+                }}
                 onSave={(callback) => {
+
                     phoneNoRef.current = callback;
                 }}
                 validator={(text) => text.length !== 10 ? "Phone number is invalid" : true}
@@ -219,7 +224,10 @@ const InvoiceModal = (props) => {
                 label={"Client email"}
                 buttonOneName={"Cancel"}
                 buttonTwoName={"Send"}
-                onCloseModal={() => setEmailModalVisibility(false)}
+                onCloseModal={() => {
+
+                    setEmailModalVisibility(false)
+                }}
                 onChangeText={(text) => setEmail(text)}
                 value={email.trim()}
                 buttonTwoOnPress={async () => {
@@ -227,7 +235,7 @@ const InvoiceModal = (props) => {
                     if (emailValid) {
                         let msg = await sendEmailAPI(email, bookingId);
                         setEmailModalVisibility(false);
-                        if(msg === "success") {
+                        if (msg === "success") {
 
                         }
                     }
@@ -235,6 +243,7 @@ const InvoiceModal = (props) => {
                 buttonOneOnPress={() => setEmailModalVisibility(false)}
                 validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
                 onSave={(callback) => {
+
                     emailRef.current = callback;
                 }}
             />
@@ -244,6 +253,7 @@ const InvoiceModal = (props) => {
                 visible={cancelInvoiceModalVisibility}
                 placeholder={"Enter the Valid Reason"}
                 onCloseModal={() => {
+
                     setCancelInvoiceModalVisibility(false)
                     setCancelReason("")
                 }}
@@ -252,6 +262,7 @@ const InvoiceModal = (props) => {
                 buttonOneName={"Cancel Invoice"}
                 validator={(text) => text.trim().length === 0 ? "Provide a valid Reason" : true}
                 onSave={(callback) => {
+
                     cancelReasonRef.current = callback;
                 }}
                 value={cancelReason}
@@ -274,6 +285,7 @@ const InvoiceModal = (props) => {
             <DropdownModal
                 isVisible={optionModalVisibility}
                 onCloseModal={() => {
+
                     setOptionModalVisibility(false)
                 }}
                 dropdownItems={[
@@ -338,6 +350,7 @@ styles.heading]}>Invoice</Text>*/}
                             buttonStyle={styles.backToCheckoutButton}
                             label={"Back to checkout"}
                             onPress={() => {
+
                                 clearCartAPI();
                                 dispatch(modifyClientMembershipId({type: "clear"}))
                                 dispatch(clearSalesNotes());
@@ -349,7 +362,10 @@ styles.heading]}>Invoice</Text>*/}
                             }}
                         />
                         <PrimaryButton
-                            onPress={() => setOptionModalVisibility(true)}
+                            onPress={() => {
+
+                                setOptionModalVisibility(true)
+                            }}
                             buttonStyle={styles.backToCheckoutOptionsButton}>
                             <MaterialIcons name="keyboard-arrow-down"
                                            size={24}
@@ -364,6 +380,7 @@ styles.heading]}>Invoice</Text>*/}
                                 textStyle={styles.actionsButtonText}
                                 label={"Actions"}
                                 onPress={() => {
+
                                     setActionModalVisibility(true);
                                 }}
                             /> :
@@ -686,7 +703,7 @@ const styles = StyleSheet.create({
     },
     cartItemTableHead: {
         position: 'relative',
-        zIndex:2,
+        zIndex: 2,
         backgroundColor: "#E7E8FF",
         paddingVertical: 10
     },

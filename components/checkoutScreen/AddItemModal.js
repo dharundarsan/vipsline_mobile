@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {
     BackHandler,
     FlatList,
@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
 import Divider from "../../ui/Divider";
@@ -21,31 +21,34 @@ import {
     MaterialCommunityIcons,
     AntDesign
 } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import axios from "axios";
 import ServicesList from "./ServicesList";
 import ProductsList from "./ProductsList";
 import MembershipsAndPackagesList from "./MembershipsAndPackagesList";
 import textTheme from "../../constants/TextTheme";
-import { capitalizeFirstLetter, formatDate, shadowStyling } from "../../util/Helpers";
+import {capitalizeFirstLetter, formatDate, shadowStyling} from "../../util/Helpers";
 import AddCustomItemModal from "./AddCustomItemModal";
 import PrepaidModal from "./PrepaidModal";
+import {updateAppointmentDate} from "../../store/cartSlice";
+import * as Haptics from "expo-haptics";
 
 
 const modalCategoryListData = [
-    { id: "services", title: "SERVICES" },
-    { id: "products", title: "PRODUCTS" },
-    { id: "customItem", title: "CUSTOM ITEM" },
-    { id: "memberships", title: "MEMBERSHIP" },
-    { id: "prepaid", title: "PREPAID" },
-    { id: "packages", title: "PACKAGES" },
+    {id: "services", title: "SERVICES"},
+    {id: "products", title: "PRODUCTS"},
+    {id: "customItem", title: "CUSTOM ITEM"},
+    {id: "memberships", title: "MEMBERSHIP"},
+    {id: "prepaid", title: "PREPAID"},
+    {id: "packages", title: "PACKAGES"},
     // {id: 6, title: "GIFT VOUCHER"},
 ];
 
 const AddItemModal = (props) => {
     const dispatch = useDispatch();
+    const appointmentDate = useSelector(state => state.cart.appointment_date);
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(Date.now());
+    const [selectedDate, setSelectedDate] = useState(appointmentDate);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
     useEffect(() => {
@@ -64,14 +67,16 @@ const AddItemModal = (props) => {
             };
 
             const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            
+
             return () => {
                 console.log("123");
-                
-                return backHandler.remove()};
+
+                return backHandler.remove()
+            };
         }
     }, [selectedCategory]);
     const openDatePicker = () => {
+
         setIsDatePickerVisible(true);
     };
 
@@ -151,7 +156,7 @@ const AddItemModal = (props) => {
                     </Text>
                     <Pressable
                         style={styles.datePressable}
-                        android_ripple={{ color: Colors.ripple }}
+                        android_ripple={{color: Colors.ripple}}
                         onPress={openDatePicker}
                     >
                         <Text style={TextTheme.titleMedium}>
@@ -174,22 +179,24 @@ const AddItemModal = (props) => {
                                 setSelectedDate(
                                     date.nativeEvent.timestamp
                                 );
+                                dispatch(updateAppointmentDate(date.nativeEvent.timestamp));
                             }}
                         />
                     )}
                 </View>
             </View>
-            <Divider />
+            <Divider/>
             <FlatList
                 bounces={false}
                 data={modalCategoryListData}
                 // contentContainerStyle={{borderBottomColor:Colors.grey500,borderBottomWidth:1}}
-                renderItem={({ item }) => {
+                renderItem={({item}) => {
                     return (
                         <PrimaryButton
                             buttonStyle={styles.categoryListItemButton}
                             pressableStyle={styles.categoryListItemPressable}
                             onPress={() => {
+
                                 setSelectedCategory(item.id);
                             }}
                         >
@@ -217,34 +224,38 @@ const AddItemModal = (props) => {
         content = <ServicesList closeOverallModal={() => {
             setSelectedCategory(null)
             props.closeModal()
-        }} />
+        }}/>
     } else if (selectedCategory === "products") {
         content = <ProductsList selectedCategory={selectedCategory}
-            onCloseModal={() => setSelectedCategory(null)}
-            closeOverallModal={() => {
-                setSelectedCategory(null)
-                props.closeModal()
-            }} />
+                                onCloseModal={() => {
+                                    setSelectedCategory(null)
+                                }}
+                                closeOverallModal={() => {
+                                    setSelectedCategory(null)
+                                    props.closeModal()
+                                }}/>
     } else if (selectedCategory === "memberships") {
         content =
             <MembershipsAndPackagesList category={"memberships"} closeOverallModal={() => {
                 setSelectedCategory(null)
                 props.closeModal()
-            }} />
+            }}/>
     } else if (selectedCategory === "packages") {
         content =
             <MembershipsAndPackagesList category={"packages"} closeOverallModal={() => {
                 setSelectedCategory(null)
                 props.closeModal()
-            }} />
+            }}/>
     } else if (selectedCategory === "customItem") {
         content = <AddCustomItemModal isVisible={true} onCloseModal={() => {
+
             setSelectedCategory(null)
-        }} closeOverallModal={props.closeModal} />
+        }} closeOverallModal={props.closeModal}/>
     } else if (selectedCategory === "prepaid") {
         content = <PrepaidModal isVisible={true} onCloseModal={() => {
+
             setSelectedCategory(null)
-        }} closeOverallModal={props.closeModal} />
+        }} closeOverallModal={props.closeModal}/>
     }
 
     return (
@@ -264,10 +275,11 @@ const AddItemModal = (props) => {
                     selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
                         buttonStyle={styles.backButton}
                         onPress={() => {
+
                             setSelectedCategory(null);
                         }}
                     >
-                        <AntDesign name="arrowleft" size={24} color="black" />
+                        <AntDesign name="arrowleft" size={24} color="black"/>
                     </PrimaryButton>
                 }
                 <View style={styles.newSaleTextContainer}>
@@ -277,11 +289,12 @@ const AddItemModal = (props) => {
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     onPress={() => {
+
                         setSelectedCategory(null);
                         props.closeModal();
                     }}
                 >
-                    <Ionicons name="close" size={25} color="black" />
+                    <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
             {content}

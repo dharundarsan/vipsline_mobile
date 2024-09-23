@@ -1,28 +1,29 @@
 import PrimaryButton from "../../ui/PrimaryButton";
-import { FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {FontAwesome6, Ionicons} from "@expo/vector-icons";
+import {Platform, Pressable, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import Entypo from '@expo/vector-icons/Entypo';
-import { clearClientInfo, loadClientInfoFromDb, updateClientId } from "../../store/clientInfoSlice";
+import {clearClientInfo, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MemberShipDetailModal from "./MemberShipDetailModal";
 
-import { loadCartFromDB, modifyClientId, modifyClientMembershipId, updateCalculatedPrice } from "../../store/cartSlice";
+import {loadCartFromDB, modifyClientId, modifyClientMembershipId, updateCalculatedPrice} from "../../store/cartSlice";
 
-import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 import PackageModal from "./PackageModal";
 import AvailablePackagesModal from "./AvailablePackagesModal";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {TouchableOpacity} from "react-native-gesture-handler";
 import UpdateClientModal from "../clientSegmentScreen/UpdateClientModal";
+import * as Haptics from "expo-haptics";
 
 
 const AddClientButton = (props) => {
@@ -44,15 +45,14 @@ const AddClientButton = (props) => {
         // setStoreMembershipId(clientMembershipId)
         // console.log("clientId " + clientInfo.client_id);
         dispatch(updateClientId(clientId))
-        dispatch(modifyClientMembershipId({ type: "add", payload: clientMembershipId }))
+        dispatch(modifyClientMembershipId({type: "add", payload: clientMembershipId}))
         dispatch(loadCartFromDB(clientInfo.client_id))
         // console.log(JSON.stringify(clientInfo.membershipDetails[0].client_id,null,3));
 
         if (clientInfo.membershipDetails[0].client_id !== undefined) {
-            dispatch(modifyClientId({ type: "update", payload: clientInfo.membershipDetails[0].client_id }))
-        }
-        else {
-            dispatch(modifyClientId({ type: "clear" }))
+            dispatch(modifyClientId({type: "update", payload: clientInfo.membershipDetails[0].client_id}))
+        } else {
+            dispatch(modifyClientId({type: "clear"}))
         }
         // dispatch(updateCalculatedPrice())
     }
@@ -65,14 +65,14 @@ const AddClientButton = (props) => {
 
             if (clientInfo.membershipDetails.length === 1 && clientInfo.isClientSelected) {
                 if (clientInfo.membershipDetails[0].id !== undefined || clientInfo.membershipDetails[0].client_id !== undefined) {
-                    dispatch(modifyClientMembershipId({ type: "add", payload: clientInfo.membershipDetails[0].id }))
+                    dispatch(modifyClientMembershipId({type: "add", payload: clientInfo.membershipDetails[0].id}))
                     onApplyMembership(clientInfo.membershipDetails[0].id, clientInfo.membershipDetails[0].client_id)
                 }
             }
             // console.log("storeMembershipId " + storeMembershipId);
 
             if (((storeMembershipId !== undefined) && clientInfo.membershipDetails[0] !== undefined)) {
-                dispatch(modifyClientMembershipId({ type: "add", payload: clientInfo.membershipDetails[0].id }))
+                dispatch(modifyClientMembershipId({type: "add", payload: clientInfo.membershipDetails[0].id}))
                 onApplyMembership(clientInfo.membershipDetails[0].id, clientInfo.membershipDetails[0].client_id)
             }
         }
@@ -83,6 +83,7 @@ const AddClientButton = (props) => {
     const openRedeemPackageModalHandler = () => {
         setIsAvailablePackageModalVisible(true);
     }
+
     function editClientOption(option) {
         if (option === "edit") {
             setEditClientModalVisibility(true);
@@ -93,7 +94,7 @@ const AddClientButton = (props) => {
         <>
             {
                 clientInfo.isClientSelected ?
-                    <View style={{ borderBottomWidth: 1, borderColor: Colors.highlight }}>
+                    <View style={{borderBottomWidth: 1, borderColor: Colors.highlight}}>
                         {isVisibileModal && (
                             <ClientInfoModal
                                 setFilterPressed={setFilterPressed}
@@ -107,7 +108,7 @@ const AddClientButton = (props) => {
                                 setVisible={setIsVisibleModal}
                                 closeModal={() => {
                                     setIsVisibleModal(false);
-                                    dispatch(modifyClientId({ type: "clear" }))
+                                    dispatch(modifyClientId({type: "clear"}))
                                     dispatch(clearClientInfo());
                                 }}
                                 onClose={() => {
@@ -132,7 +133,7 @@ const AddClientButton = (props) => {
                         /> */}
                         {isAvailablePackagesModalVisible &&
                             <AvailablePackagesModal isVisible={isAvailablePackagesModalVisible}
-                                onCloseModal={() => setIsAvailablePackageModalVisible(false)} />
+                                                    onCloseModal={() => setIsAvailablePackageModalVisible(false)}/>
                         }
                         <View style={styles.clientCardContainer}>
                             <ClientCard
@@ -154,54 +155,67 @@ const AddClientButton = (props) => {
                                     || clientInfo.packageDetails.length !== 0
                                     || clientInfo.details.wallet_balance !== undefined
                                         ? (
-                                        isClientInfo ? (
-                                            <Pressable style={[styles.activePlan, {
-                                                flexDirection: 'row', alignItems: "center",
-                                                borderColor: Colors.transparent
-                                            }]} onPress={() => {
-                                                setIsVisibleModal(true);
-                                            }}>
-                                                <MaterialIcons name="sort" size={17} color={Colors.highlight} />
-                                                <Text
-                                                    style={{ color: Colors.highlight }}
-                                                >
-                                                    client info
-                                                </Text>
-                                            </Pressable>
-                                        ) : (
-                                            <TouchableOpacity
-                                                onPress={() => setIsClientInfo(true)}>
-                                                <SimpleLineIcons
-                                                    name="options"
-                                                    size={24}
-                                                    color="black"
-                                                />
-                                            </TouchableOpacity>
-                                        )
-                                    ) :
+                                            isClientInfo ? (
+                                                <PrimaryButton
+                                                    buttonStyle={{backgroundColor: Colors.transparent}}
+                                                    pressableStyle={{
+                                                        flexDirection: "row",
+                                                        paddingHorizontal: 10,
+                                                        width: "auto"
+                                                    }}
+                                                    onPress={() => {
+
+                                                        setIsVisibleModal(true);
+                                                    }}>
+                                                    <MaterialIcons name="sort" size={17} color={Colors.highlight}/>
+                                                    <Text
+                                                        style={{color: Colors.highlight}}
+                                                    >
+                                                        Client info
+                                                    </Text>
+                                                </PrimaryButton>
+                                            ) : (
+                                                <PrimaryButton
+                                                    buttonStyle={{backgroundColor: Colors.transparent}}
+                                                    onPress={() => {
+
+                                                        setIsClientInfo(true)
+                                                    }}>
+                                                    <SimpleLineIcons
+                                                        name="options"
+                                                        size={24}
+                                                        color="black"
+                                                    />
+                                                </PrimaryButton>
+                                            )
+                                        ) :
                                         <Pressable style={[styles.activePlan, {
                                             flexDirection: 'row', alignItems: "center",
                                             borderColor: Colors.transparent
                                         }]} onPress={() => {
+
                                             setIsVisibleModal(true);
                                         }}>
-                                            <MaterialIcons name="sort" size={17} color={Colors.highlight} />
+                                            <MaterialIcons name="sort" size={17} color={Colors.highlight}/>
                                             <Text
-                                                style={{ color: Colors.highlight }}
+                                                style={{color: Colors.highlight}}
                                             >
                                                 client info
                                             </Text>
                                         </Pressable>
                                 }
-                                <TouchableOpacity onPress={() => {
-                                    onApplyMembership(null, undefined)
-                                    setIsClientInfo(false)
-                                    dispatch(modifyClientMembershipId({ type: "clear" }));
-                                    dispatch(clearClientInfo())
-                                }} >
-                                    <Ionicons name="close" size={24} color="black" />
+                                <PrimaryButton
+                                    buttonStyle={{backgroundColor: Colors.transparent}}
+                                    onPress={() => {
 
-                                </TouchableOpacity>
+                                        onApplyMembership(null, undefined)
+                                        setIsClientInfo(false)
+                                        dispatch(modifyClientMembershipId({type: "clear"}));
+                                        dispatch(clearClientInfo())
+                                    }}>
+                                    <Ionicons name="close" size={24} color="black"/>
+
+                                </PrimaryButton>
 
                             </View>
                         </View>
@@ -211,33 +225,33 @@ const AddClientButton = (props) => {
                                     clientInfo.details.wallet_balance !== 0 &&
                                     clientInfo.details.wallet_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
-                                        pressableStyle={styles.activePlanPressable}>
+                                                   pressableStyle={styles.activePlanPressable}>
                                         <Text style={styles.activePlanText}>
-                                            Bal <Text style={{ color: Colors.highlight }}> -
-                                                ₹{clientInfo.details.wallet_balance}</Text>
+                                            Bal <Text style={{color: Colors.highlight}}> -
+                                            ₹{clientInfo.details.wallet_balance}</Text>
                                         </Text>
                                     </PrimaryButton>
                                 }
                                 <MemberShipDetailModal isMembershipModalVisible={isMembershipModalVisible}
-                                    membershipDetails={clientInfo.membershipDetails}
-                                    closeModal={() => setIsMembershipModalVisible(false)}
-                                    onApplyMembership={onApplyMembership}
-                                    storedMembershipId={storeMembershipId}
+                                                       membershipDetails={clientInfo.membershipDetails}
+                                                       closeModal={() => setIsMembershipModalVisible(false)}
+                                                       onApplyMembership={onApplyMembership}
+                                                       storedMembershipId={storeMembershipId}
                                 />
                                 {clientInfo.membershipDetails.length !== 0 &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
-                                        pressableStyle={styles.activePlanPressable}
-                                        onPress={() => setIsMembershipModalVisible(true)}
+                                                   pressableStyle={styles.activePlanPressable}
+                                                   onPress={() => setIsMembershipModalVisible(true)}
                                     >
-                                        <Feather name="user-check" size={17} color="black" />
+                                        <Feather name="user-check" size={17} color="black"/>
                                         <Text> Membership</Text>
                                     </PrimaryButton>}
                                 {clientInfo.packageDetails.length !== 0 &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
-                                        pressableStyle={styles.activePlanPressable}
-                                        onPress={openRedeemPackageModalHandler}
+                                                   pressableStyle={styles.activePlanPressable}
+                                                   onPress={openRedeemPackageModalHandler}
                                     >
-                                        <MaterialCommunityIcons name="clipboard-list-outline" size={17} color="black" />
+                                        <MaterialCommunityIcons name="clipboard-list-outline" size={17} color="black"/>
                                         <Text style={styles.activePlanText}> Package</Text>
                                     </PrimaryButton>
                                 }
@@ -246,13 +260,17 @@ const AddClientButton = (props) => {
                         }
                     </View>
                     :
-                    <PrimaryButton buttonStyle={styles.addClientButton} onPress={props.onPress}>
+                    <PrimaryButton buttonStyle={styles.addClientButton} onPress={() => {
+
+
+                        props.onPress()
+                    }}>
                         <View style={styles.addClientButtonInnerContainer}>
-                            <FontAwesome name="plus-square-o" size={24} color={Colors.highlight} />
+                            <FontAwesome name="plus-square-o" size={24} color={Colors.highlight}/>
                             <Text
                                 style={[TextTheme.bodyLarge, styles.addClientButtonText]}>{
-                                    clientInfo.isClientSelected ?
-                                        clientInfo.details.name : "Add Client"}</Text>
+                                clientInfo.isClientSelected ?
+                                    clientInfo.details.name : "Add Client"}</Text>
                         </View>
                     </PrimaryButton>
             }

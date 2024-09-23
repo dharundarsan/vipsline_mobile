@@ -7,6 +7,7 @@ import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
 import EditMembershipModal from "./EditMembershipModal";
 import React, {useState} from "react";
+import * as Haptics from "expo-haptics";
 
 const MembershipItem = (props) => {
     const dispatch = useDispatch();
@@ -60,6 +61,7 @@ const MembershipItem = (props) => {
         />
         <PrimaryButton buttonStyle={styles.membershipItemButton} pressableStyle={styles.membershipItemPressable}
                        onPress={() => {
+
                            setIsEditMembershipModalVisible(true);
                        }}>
             <View style={styles.leftBar}></View>

@@ -71,7 +71,7 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                 }
             }),
             client_membership_id: cartSliceState.clientMembershipID,
-            appointment_date: formatDate(Date.now(), "yyyy-mm-dd"),
+            appointment_date: formatDate(cartSliceState.appointment_date, "yyyy-mm-dd"),
             business_id: businessId,
             cart: cartSliceState.items
                 .filter(item => {
