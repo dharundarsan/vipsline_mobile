@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Image, Pressable} from "react-native";
+import {View, Text, StyleSheet, Image, Pressable, Platform} from "react-native";
 import Colors from "../../constants/Colors";
 import {useEffect, useState} from "react";
 import textTheme from "../../constants/TextTheme";
@@ -64,7 +64,7 @@ export default function ClientFilterCard(props) {
             color: props.isPressed ? Colors.white : Colors.black,
         },
         opacity:{
-            opacity:0.5,
+            opacity:Platform.OS === 'ios' ? 0.5 : 1,
         }
     })
 
