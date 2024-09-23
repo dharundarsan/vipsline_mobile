@@ -91,6 +91,8 @@ export default function ClientSegmentScreen() {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
     }, [allClientCountHelper]);
 
+    console.log(filterPressed);
+
 
     useFocusEffect(
         useCallback(() => {
@@ -102,6 +104,7 @@ export default function ClientSegmentScreen() {
     useEffect(() => {
         dispatch(loadClientCountFromDb());
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
+        dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
     }, [filterPressed]);
 
     useEffect(() => {
@@ -173,10 +176,7 @@ export default function ClientSegmentScreen() {
         if (option === "edit") {
             // setIsClientInfoModalVisible(false);
             {
-                // Platform.OS === "ios" ?
-                //     setTimeout(()=>{
-                //         setEditClientModalVisibility(true);
-                //     },1000) :
+                console.log(editClientModalVisibility);
                 setEditClientModalVisibility(true);
             }
 
@@ -198,21 +198,21 @@ export default function ClientSegmentScreen() {
                     />
                 }
 
-                {/* {
-                    editClientModalVisibility &&
-                    <UpdateClientModal
-                        isVisible={editClientModalVisibility}
-                        onCloseModal={() => {
-                            dispatch(loadClientInfoFromDb(clientId))
-                            dispatch(loadClientFiltersFromDb(10, "All"));
-                            dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
-                            setEditClientModalVisibility(false);
-                            setModalVisibility(false);
-                        }}
-                        details={details}
+                {/*{*/}
+                {/*    editClientModalVisibility &&*/}
+                {/*    <UpdateClientModal*/}
+                {/*        isVisible={editClientModalVisibility}*/}
+                {/*        onCloseModal={() => {*/}
+                {/*            dispatch(loadClientInfoFromDb(clientId))*/}
+                {/*            dispatch(loadClientFiltersFromDb(10, "All"));*/}
+                {/*            dispatch(loadSearchClientFiltersFromDb(10, "All", ""));*/}
+                {/*            setEditClientModalVisibility(false);*/}
+                {/*            setModalVisibility(false);*/}
+                {/*        }}*/}
+                {/*        details={details}*/}
 
-                    />
-                } */}
+                {/*    />*/}
+                {/*}*/}
 
 
 
@@ -236,6 +236,9 @@ export default function ClientSegmentScreen() {
                     setSearchQuery={setSearchQuery}
                     setFilterPressed={setFilterPressed}
                     onClose={() => setIsClientInfoModalVisible(false)}
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+
                     />
                 }
 

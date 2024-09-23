@@ -50,7 +50,6 @@ import {updateAuthStatus} from "./store/authSlice";
 import clearCartAPI from "./util/apis/clearCartAPI";
 import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "./store/cartSlice";
 import {clearClientInfo} from "./store/clientInfoSlice";
-import Toast from 'react-native-toast-message';
 
 enableScreens();
 
@@ -213,8 +212,7 @@ const AppNavigator = () => {
             <SafeAreaProvider>
                 {isAuthenticated ?
                 <>
-                    <MainDrawerNavigator/>    
-                    <Toast />
+                    <MainDrawerNavigator/>
                 </>
                     : <AuthNavigator/>}
             </SafeAreaProvider>
