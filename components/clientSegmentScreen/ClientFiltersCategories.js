@@ -7,8 +7,6 @@ import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 import Toast from "react-native-root-toast";
 
 
-
-
 export default function ClientFiltersCategories(props) {
 
     const totalClientCount = useSelector(state => state.client.clientCount[0].all_clients_count)
@@ -17,15 +15,19 @@ export default function ClientFiltersCategories(props) {
     const churnClientCount = useSelector(state => state.client.clientCount[0].churn_clients_count)
     const leadsClientCount = useSelector(state => state.client.clientCount[0].leads_clients_count)
 
+
+    const isSearchClientFetching = useSelector(state => state.clientFilter.isFetchingSearchClient);
+    const isFetching = useSelector(state => state.clientFilter.isFetching);
+
     const scrollViewRef = useRef(null);
 
     useFocusEffect(useCallback(
         () => {
-            if (scrollViewRef.current) {
-                scrollViewRef.current.scrollTo({ y: 0, animated: true });
-            }
-
-            return () => null;
+            return () => {
+                if (scrollViewRef.current) {
+                    scrollViewRef.current.scrollTo({y: 0, animated: true});
+                }
+            };
         },
         [],
     ));
@@ -33,13 +35,13 @@ export default function ClientFiltersCategories(props) {
 
     function fetchingToast() {
         // ToastAndroid.show("fetching please wait!", 0.1);
-        Toast.show("Fetching Please Wait!",{
-            delay:0.1,
-            duration:Toast.durations.LONG,
+        Toast.show("Fetching Please Wait!", {
+            delay: 0.1,
+            duration: Toast.durations.LONG,
             position: Toast.positions.BOTTOM,
-            shadow:false,
-            backgroundColor:"black",
-            opacity:1
+            shadow: false,
+            backgroundColor: "black",
+            opacity: 1
         })
     }
 
