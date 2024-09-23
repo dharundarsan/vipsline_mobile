@@ -86,11 +86,12 @@ const MiniActionTextModal = React.memo((props) => {
         <KeyboardAvoidingView
           behavior="position"
           style={{
-            maxHeight: "80%", backgroundColor: Colors.white,
-            paddingBottom: insets.bottom
+            backgroundColor: Colors.white,
+            // paddingBottom: insets.bottom
+            maxHeight: "90%" 
           }}
         >
-          <SafeAreaView style={{ maxHeight: "85%" }}>
+          <SafeAreaView style={{ maxHeight: "90%" }}>
             <View style={styles.modalContent}>
               <View style={[styles.modalTitle,shadowStyling]}>
                 <Text></Text>

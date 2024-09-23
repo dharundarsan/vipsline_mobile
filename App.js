@@ -62,19 +62,6 @@ const LandingStack = createNativeStackNavigator();
 
 
 export default function App() {
-    const [loaded, error] = useFonts({
-        'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
-        'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
-    });
-    useEffect(() => {
-        if (loaded || error) {
-            SplashScreen.hideAsync();
-        }
-    }, [loaded, error]);
-
-    if (!loaded && !error) {
-        return null;
-    }
     return (
 
         <Provider store={store}>
@@ -202,11 +189,30 @@ const AppNavigator = () => {
 
     };
 
+    // useEffect(() => {
+    //     checkAuthentication(); // Initial auth check
+    // }, [reduxAuthStatus]); // Dependency on Redux authentication status
+
+    const [loaded, error] = useFonts({
+        'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
+        'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
+    });
     useEffect(() => {
-        checkAuthentication(); // Initial auth check
-    }, [reduxAuthStatus]); // Dependency on Redux authentication status
+        if (loaded) {
+            // async function check() {
+            checkAuthentication()
+            // }
+            // check()
+            SplashScreen.hideAsync();
+        }
+        else if(error){
+            console.error(error);
+        }
+    }, [loaded, error,reduxAuthStatus]);
 
-
+    if (!loaded && !error) {
+        return null;
+    }
     return (
         <NavigationContainer>
             <SafeAreaProvider>
