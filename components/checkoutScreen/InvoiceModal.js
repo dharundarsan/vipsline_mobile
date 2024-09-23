@@ -28,10 +28,6 @@ import {
     modifyClientMembershipId,
     modifyPrepaidDetails
 } from "../../store/cartSlice";
-import Toast from "react-native-root-toast";
-
-import Toast from "../../ui/Toast";
-
 
 
 
