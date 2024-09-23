@@ -31,7 +31,6 @@ import {
 
 
 
-
 const InvoiceModal = (props) => {
 
     const details = useSelector(state => state.invoice.details);
