@@ -21,6 +21,7 @@ import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import { shadowStyling } from "../../util/Helpers";
 const MiniActionTextModal = React.memo((props) => {
   const dispatch = useDispatch();
   const [selectedDiscountMode, setSelectedDiscountMode] = useState("PERCENTAGE")
@@ -50,6 +51,7 @@ const MiniActionTextModal = React.memo((props) => {
     });
   };
   const getChargeData = useSelector(state => state.cart.chargesData);
+  const getDiscountDetails = useSelector(state => state.cart.additionalDiscounts)
   const insets = useSafeAreaInsets();
   return (
     <Modal transparent={true} visible={props.isVisible} animationType="fade">
@@ -67,7 +69,7 @@ const MiniActionTextModal = React.memo((props) => {
         >
           <SafeAreaView style={{ maxHeight: "85%" }}>
             <View style={styles.modalContent}>
-              <View style={styles.modalTitle}>
+              <View style={[styles.modalTitle,shadowStyling]}>
                 <Text></Text>
                 <Text style={[textTheme.titleLarge, styles.deleteClientText]}>
                   {props.title}
@@ -87,10 +89,15 @@ const MiniActionTextModal = React.memo((props) => {
                       }
                       props.setChargesInputData(updatedChargeData);
                     }
-                    // Close the modal regardless of clickedValue
+                    else if(props.clickedValue === "Apply Discount"){
+                      if(getDiscountDetails.length === 0 ){
+                        props.setDiscountValue("");
+                      }
+                    }
                     props.onCloseModal();
 
-                  }}
+                  }
+                }
                 >
                   <Entypo
                     name="cross"
@@ -214,16 +221,30 @@ const MiniActionTextModal = React.memo((props) => {
                                 const chargeError = errorHandler.charges[index]; // Access the error for the current index
                                 return (
                                   <View key={index}>
-                                    <Text
-                                      style={[
-                                        TextTheme.bodyMedium,
-                                        styles.chargeHeader,
-                                        chargeError?.nameError ? { color: Colors.error } : null // Apply error color if nameError is true
-                                      ]}
-                                      onPress={() => removeInput(index)}
-                                    >
-                                      Item name
-                                    </Text>
+                                    <View style={styles.itemContainer}>
+                                      <Text
+                                        style={[
+                                          TextTheme.bodyMedium,
+                                          styles.chargeHeader,
+                                          chargeError?.nameError ? { color: Colors.error } : null // Apply error color if nameError is true
+                                        ]}
+                                      // onPress={() => removeInput(index)}
+                                      >
+                                        Item name
+                                      </Text>
+                                      {
+                                        index !== 0 ?
+                                      <TouchableOpacity
+                                        onPress={() => removeInput(index)}>
+                                        <Entypo
+                                          name="cross"
+                                          size={24}
+                                          color="black"
+                                        />
+                                      </TouchableOpacity>
+                                      : <View></View>
+                                      }
+                                    </View>
                                     <TextInput
                                       style={[
                                         styles.textInputBox,
@@ -367,7 +388,7 @@ const MiniActionTextModal = React.memo((props) => {
                         await props.addCharges();
                         await props.updateCharges();
                       }
-                                          }
+                    }
                     else if (props.clickedValue === "Add Sales Notes") {
                       if (props.salesNote.trim().length === 0) {
                         setErrorHandler(prev => ({
@@ -533,6 +554,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 0,
   },
+  itemContainer: {
+    justifyContent:"space-between",
+    flexDirection: "row",
+    alignItems: "center"
+  }
 });
 
 export default MiniActionTextModal;

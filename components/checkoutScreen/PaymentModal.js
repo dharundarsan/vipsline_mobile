@@ -29,6 +29,7 @@ import {modifyPrepaidDetails, updateCalculatedPrice} from "../../store/cartSlice
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import Loader from 'react-native-three-dots-loader'
 import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
+import Toast from "react-native-root-toast";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -36,7 +37,7 @@ const PaymentModal = (props) => {
 
     const clientInfo = useSelector(state => state.clientInfo.details);
     const isPrepaidAvailable = clientInfo.wallet_status && clientInfo.wallet_balance !== undefined && clientInfo.wallet_balance !== 0;
-    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? "prepaid" : "cash");
+    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : "cash");
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
     const [splitResponse, setSplitResponse] = useState([]);
@@ -167,7 +168,7 @@ const PaymentModal = (props) => {
                 {
                     mode: "cash",
                     shown: true,
-                    amount: props.price,
+                    amount: 0,
                     name: "Cash"
                 }, {
                     mode: "card",
@@ -370,7 +371,9 @@ const PaymentModal = (props) => {
     const findIsPrepaid = () => {
         return cartSliceState.items.find(item => item.gender === "prepaid");
     }
-    return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}>
+    return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
+    // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
+    >
         <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
             setIsSplitPaymentDropdownVisible(false)
         }}
@@ -386,7 +389,7 @@ const PaymentModal = (props) => {
         }
 
         <View
-            style={[styles.headingAndCloseContainer, {marginTop: Platform.OS === "ios" ? insets.top : 0}, shadowStyling]}>
+            style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
@@ -535,7 +538,14 @@ const PaymentModal = (props) => {
                                     onEndEditing={(text) => {
                                         if (item.mode === "prepaid") {
                                             if (parseFloat(text) > clientInfo.wallet_balance) {
-                                                ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
+                                                // ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
+                                                Toast.show("Prepaid split amount is greater than the prepaid balance", {
+                                                    duration: Toast.durations.LONG,
+                                                    position: Toast.positions.BOTTOM,
+                                                    shadow: false,
+                                                    backgroundColor: "black",
+                                                    opacity: 1
+                                                })
                                                 return;
                                             }
                                         }
@@ -549,7 +559,14 @@ const PaymentModal = (props) => {
 
                                         if (totalValue > props.price) {
                                             setIsError(true);
-                                            ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
+                                            // ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
+                                            Toast.show("Split Payments are not summing upto transaction total. Please check.", {
+                                                duration: Toast.durations.SHORT,
+                                                position: Toast.positions.BOTTOM,
+                                                shadow: false,
+                                                backgroundColor: "black",
+                                                opacity: 1
+                                            })
                                             return;
                                         } else if (totalValue > props.price) {
                                             setIsError(false);
@@ -630,7 +647,12 @@ const PaymentModal = (props) => {
             <PrimaryButton buttonStyle={styles.optionButton}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
-            <PrimaryButton buttonStyle={styles.checkoutButton} pressableStyle={[styles.checkoutButtonPressable, isLoading ? {justifyContent: "center", paddingVertical: 0, paddingHorizontal: 0} : null]}
+            <PrimaryButton buttonStyle={styles.checkoutButton}
+                           pressableStyle={[styles.checkoutButtonPressable, isLoading ? {
+                               justifyContent: "center",
+                               paddingVertical: 0,
+                               paddingHorizontal: 0
+                           } : null]}
                            onPress={async () => {
                                setIsLoading(true);
                                if (selectedPaymentOption === "prepaid" || (selectedPaymentOption === "split_payment" && splitUpState.some(item => (item.mode === "prepaid" && item.shown)))) {
@@ -642,7 +664,10 @@ const PaymentModal = (props) => {
 
                                                    return;
                                                } else {
-                                                   setIsInvoiceModalVisible(true);
+                                                   props.setIsInvoiceModalVisible(true);
+                                                   setTimeout(() => {
+                                                       props.onCloseModal();
+                                                   }, 100)
                                                }
 
                                                updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
@@ -673,7 +698,10 @@ const PaymentModal = (props) => {
 
                                                    return;
                                                } else {
-                                                   setIsInvoiceModalVisible(true);
+                                                   props.setIsInvoiceModalVisible(true);
+                                                   setTimeout(() => {
+                                                       props.onCloseModal();
+                                                   }, 100)
                                                }
 
                                                updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
@@ -700,10 +728,13 @@ const PaymentModal = (props) => {
 
                                            return;
                                        } else {
-                                           setIsInvoiceModalVisible(true);
+                                           props.setIsInvoiceModalVisible(true);
+                                           setTimeout(() => {
+                                               props.onCloseModal();
+                                           }, 100)
                                        }
-
                                        updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+
                                        setTimeout(() => {
                                            updateLiveStatusAPI(response.data[0].booking_id);
 
@@ -733,10 +764,10 @@ const PaymentModal = (props) => {
             >
                 {
                     isLoading ?
-                        <View style={{ flex: 1}}>
-                            <ThreeDotActionIndicator />
+                        <View style={{flex: 1}}>
+                            <ThreeDotActionIndicator/>
                         </View>
-                         :
+                        :
                         <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 }
                 {
@@ -759,7 +790,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        // marginTop: Platform.OS === "ios" ? 50 : 0,
+        marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingVertical: 15,
         alignItems: "center",
     },

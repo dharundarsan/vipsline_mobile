@@ -1,19 +1,19 @@
-import {View, Text, StyleSheet, Image, FlatList, ScrollView} from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Platform } from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
-import React, {useCallback, useEffect, useLayoutEffect, useState} from "react";
-import appliedFilter, {chooseFilterCount, clientFilterNames} from "../util/chooseFilter";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import appliedFilter, { chooseFilterCount, clientFilterNames } from "../util/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import ClientFiltersCategories from "../components/clientSegmentScreen/ClientFiltersCategories";
 import ClientCard from "../components/clientSegmentScreen/ClientCard";
 import SearchBar from "../ui/SearchBar";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddClient from "../components/clientSegmentScreen/AddClient";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
 import Pagination from "../components/clientSegmentScreen/Pagination";
-import {Bullets} from "react-native-easy-content-loader";
+import { Bullets } from "react-native-easy-content-loader";
 import ClientInfoModal from "../components/clientSegmentScreen/ClientInfoModal";
 import {
     clearClientInfo,
@@ -21,14 +21,16 @@ import {
     loadClientInfoFromDb,
     updateClientId
 } from "../store/clientInfoSlice";
-import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../store/clientFilterSlice";
+import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
-import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
+import { clearClientsList, loadClientCountFromDb, loadClientsFromDb } from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
-import {clientFilterAPI} from "../util/apis/clientFilterAPI";
+import { clientFilterAPI } from "../util/apis/clientFilterAPI";
 import axios from "axios";
-import {checkNullUndefined} from "../util/Helpers";
-import {useFocusEffect} from "@react-navigation/native";
+import { checkNullUndefined } from "../util/Helpers";
+import { useFocusEffect } from "@react-navigation/native";
+import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientModal";
+import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
 
 
 export default function ClientSegmentScreen() {
@@ -57,6 +59,11 @@ export default function ClientSegmentScreen() {
     const [clientPhone, setClientPhone] = useState("");
 
     const [clientId, setClientId] = useState("");
+
+    const [modalVisibility, setModalVisibility] = useState(false)
+    const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
+
+    const details = useSelector(state => state.clientInfo.details);
     const isSearchClientFetching = useSelector(state => state.clientFilter.isFetchingSearchClient);
 
     const allClientCountHelper = useSelector(state => state.client.clientCount)
@@ -78,10 +85,13 @@ export default function ClientSegmentScreen() {
     const [searchClientTotalCount, setSearchClientTotalCount] = useState(0);
 
     const businessId = useSelector(state => state.authDetails.businessId);
+    const [selectedOption, setSelectedOption] = useState("");
 
     useEffect(() => {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
     }, [allClientCountHelper]);
+
+    console.log(filterPressed);
 
 
     useFocusEffect(
@@ -94,6 +104,7 @@ export default function ClientSegmentScreen() {
     useEffect(() => {
         dispatch(loadClientCountFromDb());
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
+        dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
     }, [filterPressed]);
 
     useEffect(() => {
@@ -105,7 +116,7 @@ export default function ClientSegmentScreen() {
 
 
     useFocusEffect(
-        useCallback( ()=> {
+        useCallback(() => {
             return () => setFilterPressed("all_clients_count");
         }, [])
     )
@@ -161,18 +172,56 @@ export default function ClientSegmentScreen() {
         setFilterPressed(filter);
     }
 
+    function editClientOption(option) {
+        if (option === "edit") {
+            // setIsClientInfoModalVisible(false);
+            {
+                console.log(editClientModalVisibility);
+                setEditClientModalVisibility(true);
+            }
+
+        }
+    }
 
     return (
         <ScrollView style={styles.scrollView}>
+
+
             <View style={styles.clientSegment}>
-                <EntryModel
+                {
+                    isModalVisible &&
+                    <EntryModel
                     isModalVisible={isModalVisible}
                     setIsModalVisible={setIsModalVisible}
                     filterPressed={filterPressed}
                     query={searchQuery}
-                />
+                    />
+                }
 
-                <ClientInfoModal
+                {/*{*/}
+                {/*    editClientModalVisibility &&*/}
+                {/*    <UpdateClientModal*/}
+                {/*        isVisible={editClientModalVisibility}*/}
+                {/*        onCloseModal={() => {*/}
+                {/*            dispatch(loadClientInfoFromDb(clientId))*/}
+                {/*            dispatch(loadClientFiltersFromDb(10, "All"));*/}
+                {/*            dispatch(loadSearchClientFiltersFromDb(10, "All", ""));*/}
+                {/*            setEditClientModalVisibility(false);*/}
+                {/*            setModalVisibility(false);*/}
+                {/*        }}*/}
+                {/*        details={details}*/}
+
+                {/*    />*/}
+                {/*}*/}
+
+
+
+                {
+                    isClientInfoModalVisible &&
+                    <ClientInfoModal
+                    modalVisibility={modalVisibility}
+                    setModalVisibility={setModalVisibility}
+                    setEditClientModalVisibility={setEditClientModalVisibility}
                     visible={isClientInfoModalVisible}
                     setVisible={setIsClientInfoModalVisible}
                     closeModal={() => {
@@ -180,17 +229,38 @@ export default function ClientSegmentScreen() {
                         dispatch(clearClientInfo());
                         dispatch(loadClientFiltersFromDb(10, "All"));
                     }}
+                    editClientOption={editClientOption}
                     name={clientName}
                     phone={clientPhone}
                     id={clientId}
                     setSearchQuery={setSearchQuery}
                     setFilterPressed={setFilterPressed}
                     onClose={() => setIsClientInfoModalVisible(false)}
-                />
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
 
-                <AddClient/>
+                    />
+                }
 
-                <Divider color={Colors.grey250}/>
+                {
+                    modalVisibility &&
+                    <MoreOptionDropDownModal
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+                    isVisible={modalVisibility}
+                    onCloseModal={() => setModalVisibility(false)}
+                    dropdownItems={[
+                        "Edit client",
+                        "Delete client",
+                    ]}
+                    setOption={setSelectedOption}
+                    setModalVisibility={setModalVisibility}
+                    />
+                }
+
+                <AddClient />
+
+                <Divider color={Colors.grey250} />
 
                 <View style={styles.clientFilterContainer}>
                     <ClientFiltersCategories
@@ -202,7 +272,7 @@ export default function ClientSegmentScreen() {
                 </View>
 
                 <View style={styles.currentFilter}>
-                    <View style={styles.descBullet}/>
+                    <View style={styles.descBullet} />
                     <Text
                         style={[textTheme.titleSmall, styles.descText]}
                     >
@@ -240,13 +310,13 @@ export default function ClientSegmentScreen() {
                 </View>
 
                 <View style={styles.clientCount}>
-                    <Image source={require("../assets/icons/menu.png")} style={styles.menuImage}/>
+                    <Image source={require("../assets/icons/menu.png")} style={styles.menuImage} />
                     <Text style={[textTheme.bodyMedium, styles.clientCountText]}>
                         Client count : {
-                        searchQuery === "" ?
-                            clientCount :
-                            searchClientTotalCount
-                    }
+                            searchQuery === "" ?
+                                clientCount :
+                                searchClientTotalCount
+                        }
                     </Text>
                 </View>
 
@@ -273,7 +343,7 @@ export default function ClientSegmentScreen() {
                                             borderBottomWidth: 1,
                                             borderBottomColor: Colors.grey250
                                         }}
-                                        avatarStyles={{marginLeft: 16}}
+                                        avatarStyles={{ marginLeft: 16 }}
                                     />
                             }
 
@@ -305,7 +375,7 @@ export default function ClientSegmentScreen() {
                                             borderBottomWidth: 1,
                                             borderBottomColor: Colors.grey250
                                         }}
-                                        avatarStyles={{marginLeft: 16}}
+                                        avatarStyles={{ marginLeft: 16 }}
                                     />
 
                             }

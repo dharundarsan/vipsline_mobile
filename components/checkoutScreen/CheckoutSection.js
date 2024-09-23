@@ -33,6 +33,8 @@ import { checkNullUndefined } from "../../util/Helpers";
 import { loadBusinessesListFromDb } from "../../store/listOfBusinessSlice";
 import { updateTotalClientCount } from "../../store/clientFilterSlice";
 import { clearClientInfo } from "../../store/clientInfoSlice";
+import Toast from "react-native-root-toast";
+import InvoiceModal from "./InvoiceModal";
 
 
 const CheckoutSection = (props) => {
@@ -75,7 +77,7 @@ const CheckoutSection = (props) => {
     const cartDetails = useSelector(state => state.cart.items);
 
     useEffect(() => {
-        const updatedCategory = { service: 0, product: 0, package: 0 };
+        const updatedCategory = {service: 0, product: 0, package: 0};
 
         cartDetails.forEach(item => {
             if (["Women", "Men", "General"].includes(item.gender)) {
@@ -142,25 +144,23 @@ const CheckoutSection = (props) => {
     const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
     const [salesnote, setSalesnote] = useState("");
-    const [chargesInputData, setChargesInputData] = useState([{ index: 0 }]);
+    const [chargesInputData, setChargesInputData] = useState([{index: 0}]);
     const [data, setData] = useState([{}])
 
-    useEffect(()=>{
+    useEffect(() => {
         // console.log(JSON.stringify(cartItems,null,3));
         // if(cartItems.length === 0){
-            dispatch(updateDiscount([]));
+        dispatch(updateDiscount([]));
         // }
-    },[])
+    }, [])
 
     function openModal(title, value) {
         setTitle(title);
         setClickedValue(value);
     }
 
-
-    const checkoutDiscount = useSelector(state => state.checkoutAction.additionalDiscounts)
-    const checkoutCharges = useSelector(state => state.checkoutAction.chargesData);
-
+    const invoiceDetails = useSelector(state => state.invoice.details);
+    const moreInvoiceDetails = useSelector(state => state.invoice.invoiceDetails);
     const customDiscount = useSelector(state => state.cart.additionalDiscounts);
 
 
@@ -170,7 +170,7 @@ const CheckoutSection = (props) => {
         }
 
         if (type === "clear") {
-
+            setDiscountValue("")
             dispatch(updateDiscount([]));
             setSelectedDiscountMode("PERCENTAGE")
         } else {
@@ -220,41 +220,43 @@ const CheckoutSection = (props) => {
 
     function clearCharges() {
 
-        setChargesInputData([{ index: 0 }])
-        dispatch(updateChargeData([{ index: 0, name: "", amount: 0, }]));
+        setChargesInputData([{index: 0}])
+        dispatch(updateChargeData([{index: 0, name: "", amount: 0,}]));
         dispatch(updateCalculatedPrice());
 
         setActionModal(false);
     }
-    function clearSaleNotes(){
+
+    function clearSaleNotes() {
         setSalesnote("");
         dispatch(clearSalesNotes());
         setActionModal(false);
     }
+    const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     return <View style={styles.checkoutSection}>
 
 
         {ActionModal && <MiniActionTextModal isVisible={ActionModal}
-            onCloseModal={() => {
-                setActionModal(false)
-            }}
-            selectedDiscountMode={selectedDiscountMode}
-            setSelectedDiscountMode={setSelectedDiscountMode}
-            clearSalesNotes={clearSaleNotes}
-            chargesInputData={chargesInputData}
-            setChargesInputData={setChargesInputData}
-            title={title}
-            clickedValue={clickedValue}
-            data={data}
-            setDiscountValue={setDiscountValue}
-            discountValue={discountValue}
-            onChangeValue={setSalesnote}
-            salesNote={salesnote}
-            addDiscount={addDiscount}
-            addCharges={addCharges}
-            updateCharges={updateCharges}
-            UpdateSalesNotes={UpdateSalesNotes}
-            clearCharges={clearCharges}
+                                             onCloseModal={() => {
+                                                 setActionModal(false)
+                                             }}
+                                             selectedDiscountMode={selectedDiscountMode}
+                                             setSelectedDiscountMode={setSelectedDiscountMode}
+                                             clearSalesNotes={clearSaleNotes}
+                                             chargesInputData={chargesInputData}
+                                             setChargesInputData={setChargesInputData}
+                                             title={title}
+                                             clickedValue={clickedValue}
+                                             data={data}
+                                             setDiscountValue={setDiscountValue}
+                                             discountValue={discountValue}
+                                             onChangeValue={setSalesnote}
+                                             salesNote={salesnote}
+                                             addDiscount={addDiscount}
+                                             addCharges={addCharges}
+                                             updateCharges={updateCharges}
+                                             UpdateSalesNotes={UpdateSalesNotes}
+                                             clearCharges={clearCharges}
         />}
         {isDelete && <DeleteClient
             isVisible={isDelete}
@@ -270,7 +272,7 @@ const CheckoutSection = (props) => {
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
                 await clearCartAPI();
-                dispatch(modifyClientMembershipId({ type: "clear" }))
+                dispatch(modifyClientMembershipId({type: "clear"}))
                 clearSaleNotes();
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
@@ -321,7 +323,16 @@ const CheckoutSection = (props) => {
                 onCloseModal={() => {
                     setIsPaymentModalVisible(false)
                 }}
+                setIsInvoiceModalVisible={setIsInvoiceModalVisible}
                 price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} />
+        }
+        {
+            isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
+                <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
+                    setIsInvoiceModalVisible(false);
+                    // props.onCloseModal();
+                }}/> :
+                null
         }
         <View style={styles.checkoutDetailRow}>
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
@@ -446,17 +457,31 @@ const CheckoutSection = (props) => {
         }
         <View style={styles.buttonContainer}>
             <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
-                <Entypo name="dots-three-horizontal" size={24} color="black" />
+                <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton}
                 pressableStyle={styles.checkoutButtonPressable}
                 onPress={() => {
                     if (!clientInfo.isClientSelected) {
-                        ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                        // ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                        Toast.show("Please select client",{
+                            duration:Toast.durations.LONG,
+                            position: Toast.positions.BOTTOM,
+                            shadow:false,
+                            backgroundColor:"black",
+                            opacity:1
+                        })
                         return;
                     }
                     if (!dispatch(checkStaffOnCartItems())) {
-                        ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                        // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                        Toast.show("Please select staff",{
+                            duration:Toast.durations.LONG,
+                            position: Toast.positions.BOTTOM,
+                            shadow:false,
+                            backgroundColor:"black",
+                            opacity:1
+                        })
                         return;
                     }
                     setIsPaymentModalVisible(true)
@@ -465,7 +490,7 @@ const CheckoutSection = (props) => {
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
                     <Text
                         style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}</Text>
-                    <Feather name="arrow-right-circle" size={24} color={Colors.white} />
+                    <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                 </View>
             </PrimaryButton>
         </View>

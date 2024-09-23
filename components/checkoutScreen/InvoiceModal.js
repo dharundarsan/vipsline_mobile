@@ -29,7 +29,6 @@ import {
     modifyPrepaidDetails
 } from "../../store/cartSlice";
 
-import Toast from "../../ui/Toast";
 
 
 
@@ -141,7 +140,17 @@ const InvoiceModal = (props) => {
     }
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
-                  visible={props.isVisible}>
+            visible={props.isVisible} 
+            // presentationStyle="pageSheet" onRequestClose={()=>{
+            //     clearCartAPI();
+            //     dispatch(modifyClientMembershipId({type: "clear"}))
+            //     dispatch(clearSalesNotes());
+            //     dispatch(clearLocalCart());
+            //     dispatch(clearClientInfo());
+            //     dispatch(clearCalculatedPrice());
+            //     dispatch(modifyPrepaidDetails({type: "clear"}))
+            // }}
+            >
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
 

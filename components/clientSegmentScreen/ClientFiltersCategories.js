@@ -4,6 +4,9 @@ import {ScrollView, StyleSheet, ToastAndroid} from "react-native";
 import {useSelector} from "react-redux";
 import {useCallback, useEffect, useRef} from "react";
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import Toast from "react-native-root-toast";
+
+
 
 
 export default function ClientFiltersCategories(props) {
@@ -29,7 +32,15 @@ export default function ClientFiltersCategories(props) {
 
 
     function fetchingToast() {
-        ToastAndroid.show("fetching please wait!", 0.1);
+        // ToastAndroid.show("fetching please wait!", 0.1);
+        Toast.show("Fetching Please Wait!",{
+            delay:0.1,
+            duration:Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow:false,
+            backgroundColor:"black",
+            opacity:1
+        })
     }
 
     return (

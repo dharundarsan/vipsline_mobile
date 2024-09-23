@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-root-toast";
 
 export default async function sendSMSAPI(name, mobile) {
     let authToken = ""
@@ -39,8 +40,22 @@ export default async function sendSMSAPI(name, mobile) {
             }
         );
 
-        ToastAndroid.show("SMS send successfully!", ToastAndroid.LONG);
+        // ToastAndroid.show("SMS send successfully!", ToastAndroid.LONG);
+        Toast.show("SMS Send Successfully",{
+            duration:Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow:false,
+            backgroundColor:"black",
+            opacity:1
+        })
     } catch (error) {
-                ToastAndroid.show("Failed to send SMS.", ToastAndroid.LONG);
+        // ToastAndroid.show("Failed to send SMS.", ToastAndroid.LONG);
+        Toast.show("Failed To Send SMS",{
+            duration:Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow:false,
+            backgroundColor:"black",
+            opacity:1
+        })
     }
 }

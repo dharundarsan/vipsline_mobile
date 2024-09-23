@@ -20,6 +20,7 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Font from 'expo-font';
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -210,7 +211,9 @@ const AppNavigator = () => {
         <NavigationContainer>
             <SafeAreaProvider>
                 {isAuthenticated ?
+                <>
                     <MainDrawerNavigator/>
+                </>
                     : <AuthNavigator/>}
             </SafeAreaProvider>
         </NavigationContainer>
@@ -263,7 +266,7 @@ const MainDrawerNavigator = () => {
                 borderBottomWidth: 0.5,     // Helps define a stronger bottom line
                 borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
             },
-            // headerLeft: () => <CustomDrawerIcon navigation={navigation} />,
+            headerLeft: () => <CustomDrawerIcon navigation={navigation} />,
             drawerIcon: ({ focused }) => (
                 <Image
                     source={require('./assets/icons/drawerIcons/drawer.png')}

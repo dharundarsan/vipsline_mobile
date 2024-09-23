@@ -7,6 +7,7 @@ import Divider from "../../ui/Divider";
 import PrimaryButton from "../../ui/PrimaryButton";
 import React, {useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
+import { shadowStyling } from "../../util/Helpers";
 
 const MemberShipDetailModal = React.memo((props) => {
     const insets = useSafeAreaInsets();
@@ -39,22 +40,24 @@ const MemberShipDetailModal = React.memo((props) => {
     }, [isModalVisible]);
 
     return (
-        <Modal visible={isModalVisible} animationType="slide" onRequestClose={props.closeModal}>
+        <Modal visible={isModalVisible} animationType="slide" onRequestClose={props.closeModal}
+        presentationStyle="pageSheet">
             <View style={[styles.modalContainer]}>
                 <View style={[
                     styles.modalContainer,
                     {
-                        paddingTop: Platform.OS === 'ios' ? insets.top : 0,
-                        paddingBottom: insets.bottom, // Apply bottom padding on both platforms
+                        // marginTop:20
+                        // paddingTop: Platform.OS === 'ios' ? insets.top : 0,
+                        // paddingBottom: insets.bottom, // Apply bottom padding on both platforms
                     },
                 ]}>
-                    <View style={styles.headerContainer}>
-                        <Text style={[styles.header, TextTheme.bodyLarge]}>Available Membership</Text>
+                    <View style={[styles.headerContainer,shadowStyling]}>
+                        <Text style={[styles.header, TextTheme.titleLarge]}>Available Membership</Text>
                         <AntDesign
                             name="close"
                             size={24}
                             color="black"
-                            style={{position: "absolute", right: 10}}
+                            style={{position: "absolute", right: 10,top:20}}
                             onPress={() => {
                                 setIsModalVisible(false);
                                 props.closeModal();
@@ -108,9 +111,11 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
     },
     headerContainer: {
+        // paddingHorizontal: 20,
+        paddingVertical: 15,
         flexDirection: "row",
         justifyContent: "center",
-        paddingBottom: 10,
+        // paddingBottom: 10,
     },
     membershipDetails: {
         flexDirection: "row",

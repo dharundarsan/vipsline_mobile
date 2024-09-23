@@ -1,6 +1,8 @@
 import axios from "axios";
 import { ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+// import Toast from "react-native-root-toast";
 
 
 export default async function sendEmailAPI(email, bookingId) {

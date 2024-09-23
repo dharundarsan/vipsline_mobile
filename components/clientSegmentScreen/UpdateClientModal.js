@@ -11,6 +11,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
 import updateClientAPI from "../../util/apis/updateClientAPI";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import Toast from "react-native-root-toast";
 
 /**
  * UpdateClientModal Component
@@ -41,7 +42,7 @@ import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
  */
 
 
-const UpdateClientModal = (props) => {
+const UpdateClientModal = React.memo((props) => {
     // const details = useSelector(state => state.clientInfo.details);
     const details = props.details;
 
@@ -98,9 +99,8 @@ const UpdateClientModal = (props) => {
 
 
 
-    useEffect(() => {
-        existingValues();
-    }, [props.isVisible, details]);
+
+    
 
     const handleUpdate = async () => {
         const firstNameValid = firstNameRef.current();
@@ -133,10 +133,24 @@ const UpdateClientModal = (props) => {
             // dispatch(loadClientCountFromDb());
             dispatch(loadClientInfoFromDb(clientDetails.id));
             props.onCloseModal();
-            ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
+            // ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
+            Toast.show("User updated successfully",{
+                duration:Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow:false,
+                backgroundColor:"black",
+                opacity:1
+            })
             // props.onUpdate();
         } catch (e) {
-                        ToastAndroid.show(e + "error", ToastAndroid.LONG);
+                        // ToastAndroid.show(e + "error", ToastAndroid.LONG);
+                        Toast.show(e+" error",{
+                            duration:Toast.durations.LONG,
+                            position: Toast.positions.BOTTOM,
+                            shadow:false,
+                            backgroundColor:"black",
+                            opacity:1
+                        })
         }
     };
 
@@ -147,9 +161,13 @@ const UpdateClientModal = (props) => {
         }));
     };
 
+    useEffect(() => {
+        existingValues();
+    }, [props.isVisible, details]);
 
     return (
-        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}>
+        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} 
+        presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={styles.closeAndHeadingContainer}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Edit client</Text>
                 <PrimaryButton
@@ -179,7 +197,7 @@ const UpdateClientModal = (props) => {
                         placeholder="Enter client's last name"
                         value={clientData.lastName}
                         onChangeText={(value) => handleChange("lastName", value)}
-                        validator={(text) => text.length === 0 ? "Last name is required" : true}
+                        // validator={(text) => text.length === 0 ? "Last name is required" : true}
                         onSave={(callback) => { lastNameRef.current = callback; }}
                     />
                     <CustomTextInput
@@ -197,7 +215,7 @@ const UpdateClientModal = (props) => {
                         placeholder="Enter email address"
                         value={clientData.email}
                         onChangeText={(value) => handleChange("email", value)}
-                        validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is invalid" : true}
+                        validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
                         onSave={(callback) => { emailRef.current = callback; }}
                     />
                     <CustomTextInput
@@ -268,14 +286,14 @@ const UpdateClientModal = (props) => {
             </View>
         </Modal>
     );
-};
+});
 
 const styles = StyleSheet.create({
     createClientModal: {
         flex: 1,
     },
     closeAndHeadingContainer: {
-        marginTop: Platform.OS === "ios" ? 40 : 0,
+        // marginTop: Platform.OS === "ios" ? 40 : 0,
         justifyContent: "center",
         alignItems: "center",
         height: 60,

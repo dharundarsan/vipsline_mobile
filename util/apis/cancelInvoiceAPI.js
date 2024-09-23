@@ -1,6 +1,6 @@
 import axios from "axios";
-import { ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-root-toast";
 
 export default async function cancelInvoiceAPI(status, bookingId) {
     let authToken = ""
@@ -30,8 +30,22 @@ export default async function cancelInvoiceAPI(status, bookingId) {
             }
         );
 
-        ToastAndroid.show("Invoice Cancelled successfully!", ToastAndroid.LONG);
+        // ToastAndroid.show("Invoice Cancelled successfully!", ToastAndroid.LONG);
+        Toast.show("Invoice Cancelled Succuessfully",{
+            duration:Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow:false,
+            backgroundColor:"black",
+            opacity:1
+        })
     } catch (error) {
-                ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
+                // ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
+        Toast.show("Falied To Cancel Invoice",{
+            duration:Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow:false,
+            backgroundColor:"black",
+            opacity:1
+        })
     }
 }
