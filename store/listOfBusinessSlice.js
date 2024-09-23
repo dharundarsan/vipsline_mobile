@@ -55,6 +55,13 @@ export const listOfBusinessSlice = createSlice({
         },
         updateIsBusinessSelected(state, action) {
             state.isBusinessSelected = action.payload;
+        },
+        clearListOfBusiness(state,action) {
+            state.listOfBusinesses = [],
+            state.isBusinessSelected = [],
+            state.isFetching = false,
+            state.selectedBusiness = {},
+            state.isBusinessSelected = false
         }
     }
 });
@@ -64,6 +71,7 @@ export const {
     updateSelectedBusinessDetails,
     updateBusinessNotificationDetails,
     updateIsBusinessSelected,
+    clearListOfBusiness,
 } = listOfBusinessSlice.actions;
 
 export default listOfBusinessSlice.reducer;

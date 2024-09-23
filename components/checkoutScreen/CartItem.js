@@ -136,6 +136,7 @@ const CartItem = (props) => {
                                                dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
                                                    dispatch(updateLoadingState(false));
                                                    dispatch(removeItemFromEditedCart(props.data.item_id))
+                                                   dispatch(modifyPrepaidDetails({type: "clear"}));
                                                })
                                            } else if (props.data.gender === "custom_item") {
                                                dispatch(removeCustomItems(props.data.id))

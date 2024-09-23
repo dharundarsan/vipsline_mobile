@@ -64,6 +64,7 @@ const MembershipsAndPackagesList = (props) => {
                     </View> :
                         <FlatList
                             data={filteredData}
+                            removeClippedSubviews={false}
                             renderItem={({ item }) => {
                                 return (props.category === "memberships" ?
                                     <MembershipItem data={item}
@@ -106,10 +107,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginTop: "-40%"
-        // position:'absolute',
-        // top:"50%",
-        // left:"50%",
-        // transform: [{ translateX: -50 }, { translateY: -50 }],
     },
 });
 

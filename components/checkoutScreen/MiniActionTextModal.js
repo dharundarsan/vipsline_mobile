@@ -14,7 +14,7 @@ import TextTheme from "../../constants/TextTheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import CustomTextInput from "../../ui/CustomTextInput";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
@@ -53,6 +53,29 @@ const MiniActionTextModal = React.memo((props) => {
   const getChargeData = useSelector(state => state.cart.chargesData);
   const getDiscountDetails = useSelector(state => state.cart.additionalDiscounts)
   const insets = useSafeAreaInsets();
+  useEffect(() => {
+    if (errorHandler.charges.length > 0) {
+      const hasAmountError = errorHandler.charges.every(element =>
+        element.amountError !== undefined && element.amountError === false
+      );
+  
+      const hasNameError = errorHandler.charges.every(element =>
+        element.nameError !== undefined && element.nameError === false
+      );
+  
+      const hasContents = props.chargesInputData.every(element =>
+        element.amount !== undefined && element.amount !== "" &&
+        element.name !== undefined && element.name !== ""
+      );
+  
+      if (hasAmountError && hasNameError && hasContents) {
+        // Proceed with save only if no errors
+        props.addCharges();
+        props.updateCharges();
+        props.onCloseModal();
+      }
+    }
+  }, [errorHandler, props.chargesInputData, props]);
   return (
     <Modal transparent={true} visible={props.isVisible} animationType="fade">
       <TouchableOpacity
@@ -63,11 +86,12 @@ const MiniActionTextModal = React.memo((props) => {
         <KeyboardAvoidingView
           behavior="position"
           style={{
-            maxHeight: "80%", backgroundColor: Colors.white,
-            paddingBottom: insets.bottom
+            backgroundColor: Colors.white,
+            // paddingBottom: insets.bottom
+            maxHeight: "90%" 
           }}
         >
-          <SafeAreaView style={{ maxHeight: "85%" }}>
+          <SafeAreaView style={{ maxHeight: "90%" }}>
             <View style={styles.modalContent}>
               <View style={[styles.modalTitle,shadowStyling]}>
                 <Text></Text>
@@ -113,7 +137,7 @@ const MiniActionTextModal = React.memo((props) => {
                   return (
                     <View style={{ marginTop: 0 }}>
                       {item.header ?
-                        <Text style={[TextTheme.bodyMedium, errorHandler.discount || errorHandler.salesNote ?
+                        <Text style={[{paddingTop:15},TextTheme.bodyMedium, errorHandler.discount || errorHandler.salesNote ?
                           { color: Colors.error } : null]}>{item.header}</Text>
                         : null
                       }
@@ -356,7 +380,6 @@ const MiniActionTextModal = React.memo((props) => {
                       props.addDiscount(selectedDiscountMode);
                     }
                     else if (props.clickedValue === "Add Charges") {
-
                       const updatedChargesErrors = props.chargesInputData.map((item) => {
                         return {
                           index: item.index,
@@ -369,25 +392,28 @@ const MiniActionTextModal = React.memo((props) => {
                         ...prev,
                         charges: updatedChargesErrors,
                       }));
+                    //   console.log(2);
+                      
+                    //   const hasAmountError = errorHandler.charges.every(element =>
+                    //     element.amountError !== undefined && element.amountError === false
+                    //   );
 
+                    //   const hasNameError = errorHandler.charges.every(element =>
+                    //     element.nameError !== undefined && element.nameError === false
+                    //   );
 
-                      const hasAmountError = errorHandler.charges.every(element =>
-                        element.amountError !== undefined && element.amountError === false
-                      );
+                    //   const hasContents = props.chargesInputData.every(element =>
+                    //     element.amount !== undefined && element.amount !== "" &&
+                    //     element.name !== undefined && element.name !== ""
+                    //   )
 
-                      const hasNameError = errorHandler.charges.every(element =>
-                        element.nameError !== undefined && element.nameError === false
-                      );
-                      const hasContents = props.chargesInputData.every(element =>
-                        element.amount !== undefined && element.name !== undefined
-                      )
-
-
-
-                      if (hasAmountError && hasNameError && hasContents) {
-                        await props.addCharges();
-                        await props.updateCharges();
-                      }
+                    //   if (hasAmountError && hasNameError && hasContents) {
+                    //     props.addCharges().then(() => {
+                    //         props.updateCharges().then(() => {
+                    //             props.onCloseModal();
+                    //         });
+                    //     });
+                    // }
                     }
                     else if (props.clickedValue === "Add Sales Notes") {
                       if (props.salesNote.trim().length === 0) {

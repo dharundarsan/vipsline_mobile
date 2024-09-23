@@ -30,7 +30,7 @@ import textTheme from "../../constants/TextTheme";
 import { capitalizeFirstLetter, formatDate, shadowStyling } from "../../util/Helpers";
 import AddCustomItemModal from "./AddCustomItemModal";
 import PrepaidModal from "./PrepaidModal";
-
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const modalCategoryListData = [
     { id: "services", title: "SERVICES" },
@@ -164,18 +164,32 @@ const AddItemModal = (props) => {
                         />
                     </Pressable>
                     {isDatePickerVisible && (
-                        <RNDateTimePicker
-                            value={new Date(selectedDate)}
-                            maximumDate={new Date(Date.now())}
-                            mode="date"
-                            display="default"
-                            onChange={(date) => {
-                                setIsDatePickerVisible(false);
-                                setSelectedDate(
-                                    date.nativeEvent.timestamp
-                                );
-                            }}
-                        />
+                        // <RNDateTimePicker
+                        //     value={new Date(selectedDate)}
+                        //     maximumDate={new Date(Date.now())}
+                        //     mode="date"
+                        //     display="default"
+                        //     onChange={(date) => {
+                        //         setIsDatePickerVisible(false);
+                        //         setSelectedDate(
+                        //             date.nativeEvent.timestamp
+                        //         );
+                        //     }}
+                        // />
+                        <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode="date"
+                        maximumDate={new Date(Date.now())}
+                        date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)}
+                        onConfirm={(date) => {
+                                    setIsDatePickerVisible(false);
+                                    setSelectedDate(
+                                        date
+                                    );
+                                }}
+                        onCancel={()=>setIsDatePickerVisible(false)}
+                        themeVariant="light"
+                    />
                     )}
                 </View>
             </View>

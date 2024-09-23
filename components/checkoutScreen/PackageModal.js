@@ -209,8 +209,9 @@ const PackageModal = (props) => {
 
                 props.onCloseModal();
             } : async () => {
-                if (!props.redeem)
-                    dispatch(addItemToCart({ package_id: props.data.id }));
+                if (!props.redeem) {
+                    await dispatch(addItemToCart({package_id: props.data.id}));
+                }
                 selectedSittingItems.forEach((item) => {
                     if (props.redeem) {
                         dispatch(addItemToCart({
