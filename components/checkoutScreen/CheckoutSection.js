@@ -108,7 +108,6 @@ const CheckoutSection = (props) => {
             justifyContent: "space-around",
             borderBottomWidth: 1,
             borderBottomColor: Colors.grey600,
-            borderStyle: "dashed",
             paddingVertical: 5,
         }, checkoutDetailText: {
             marginRight: 8
@@ -338,7 +337,7 @@ const CheckoutSection = (props) => {
                 }}/> :
                 null
         }
-        <View style={styles.checkoutDetailRow}>
+        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
             {/*<Text*/}
             {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { calculatedPrice.length !== 0 ? calculatedPrice[0].total_discount_in_price : 0}</Text>*/}
@@ -381,12 +380,12 @@ const CheckoutSection = (props) => {
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
         </View>
 
-        <View style={styles.checkoutDetailRow}>
+        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length !== 0 ? calculatedPrice[0].total_price_after_discount : 0}</Text>
         </View>
-        <View style={styles.checkoutDetailRow}>
+        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
             <View>
                 {
                     checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
@@ -419,26 +418,26 @@ const CheckoutSection = (props) => {
         </View>
         {
             totalChargeAmount !== 0 ?
-                <View style={styles.checkoutDetailRow}>
-                    <View>
-                        {
-                            chargesAmount[0].amount === 0 ?
-                                <Pressable style={styles.checkoutDetailInnerContainer}>
-                                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
-                                    <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
-                                </Pressable> :
-                                <Popover popoverStyle={styles.popoverStyle}
-                                         from={
-                                             (<Pressable style={styles.checkoutDetailInnerContainer}>
-                                                 <Text
-                                                     style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
-                                                 <MaterialCommunityIcons name="information-outline" size={24}
-                                                                         color="black"/>
-                                             </Pressable>)
-                                         }
-                                         offset={Platform.OS === "ios" ? 0 : 32}
-                                >
-                                    {
+            <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
+            <View>
+                {
+                    chargesAmount[0].amount === 0 ?
+                        <Pressable style={styles.checkoutDetailInnerContainer}>
+                            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                            <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                        </Pressable> :
+                        <Popover popoverStyle={styles.popoverStyle}
+                                 from={
+                                     (<Pressable style={styles.checkoutDetailInnerContainer}>
+                                         <Text
+                                             style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                         <MaterialCommunityIcons name="information-outline" size={24}
+                                                                 color="black"/>
+                                     </Pressable>)
+                                 }
+                                 offset={Platform.OS === "ios" ? 0 : 32}
+                        >
+                            {
 
                                         chargesAmount.map((item, index) => {
                                             return (

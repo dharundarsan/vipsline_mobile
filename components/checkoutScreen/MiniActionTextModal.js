@@ -14,7 +14,7 @@ import TextTheme from "../../constants/TextTheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import CustomTextInput from "../../ui/CustomTextInput";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Feather, Ionicons, MaterialIcons} from "@expo/vector-icons";
@@ -46,253 +46,269 @@ const MiniActionTextModal = React.memo((props) => {
             if (idToRemove === 0) return prev; // Prevent removing the first item if needed
             const updatedInputs = prev.filter((item) => item.index !== idToRemove);
 
-            return updatedInputs.map((item, index) => ({
-                ...item,
-                index: index, // Reassign sequential IDs
-            }));
-        });
-    };
-    const getChargeData = useSelector(state => state.cart.chargesData);
-    const getDiscountDetails = useSelector(state => state.cart.additionalDiscounts)
-    const insets = useSafeAreaInsets();
-    return (
-        <Modal transparent={true} visible={props.isVisible} animationType="fade">
-            <TouchableOpacity
-                activeOpacity={1}
-                style={styles.modalOverlay}
-            >
-                <KeyboardAvoidingView
-                    behavior="position"
-                    style={{
-                        maxHeight: "80%", backgroundColor: Colors.white,
-                        paddingBottom: insets.bottom
-                    }}
-                >
-                    <SafeAreaView style={{maxHeight: "85%"}}>
-                        <View style={styles.modalContent}>
-                            <View style={[styles.modalTitle, shadowStyling, {elevation: 2}]}>
-                                <Text></Text>
-                                <Text style={[textTheme.titleLarge, styles.deleteClientText]}>
-                                    {props.title}
-                                </Text>
-                                <PrimaryButton buttonStyle={{backgroundColor: Colors.transparent, position: "absolute", right: 10,}}
-                                               onPress={() => {
-                                                   if (props.clickedValue === "Add Charges") {
-                                                       // Access Redux state and update chargesInputData
-                                                       let updatedChargeData = getChargeData.map(item => ({
-                                                           ...item,
-                                                           amount: Number(item.amount) // Convert amount to a number
-                                                       }));
-                                                       if (updatedChargeData.index === undefined) {
-                                                           updatedChargeData = [{index: 0}];
-                                                       }
-                                                       props.setChargesInputData(updatedChargeData);
-                                                   } else if (props.clickedValue === "Apply Discount") {
-                                                       if (getDiscountDetails.length === 0) {
-                                                           props.setDiscountValue("");
-                                                       }
-                                                   }
-                                                   props.onCloseModal();
+      return updatedInputs.map((item, index) => ({
+        ...item,
+        index: index, // Reassign sequential IDs
+      }));
+    });
+  };
+  const getChargeData = useSelector(state => state.cart.chargesData);
+  const getDiscountDetails = useSelector(state => state.cart.additionalDiscounts)
+  const insets = useSafeAreaInsets();
+  useEffect(() => {
+    if (errorHandler.charges.length > 0) {
+      const hasAmountError = errorHandler.charges.every(element =>
+        element.amountError !== undefined && element.amountError === false
+      );
 
-                                               }
-                                               }
-                                >
-                                    <Ionicons name="close" size={25} color="black"/>
-                                </PrimaryButton>
-                            </View>
-                            <FlatList
-                                data={props.data}
-                                style={styles.flatList}
-                                renderItem={({item}) => {
-                                    return (
-                                        <View style={{marginTop: 0}}>
-                                            {item.header ?
-                                                <Text
-                                                    style={[TextTheme.bodyMedium, errorHandler.discount || errorHandler.salesNote ?
-                                                        {color: Colors.error} : null]}>{item.header}</Text>
-                                                : null
-                                            }
-                                            <View
-                                                style={[
-                                                    styles.inputContainer,
-                                                    item.typeToggle !== 0 && {
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                    },
-                                                ]}
-                                            >
-                                                {item.boxType === "multiLineBox" ? (
-                                                    <View>
-                                                        <CustomTextInput type={"multiLine"}
-                                                                         onChangeText={props.onChangeValue}
-                                                                         value={props.salesNote}
-                                                                         textInputStyle={errorHandler.salesNote ?
-                                                                             {borderColor: Colors.error} : null}/>
-                                                    </View>
-                                                ) : item.boxType === "textBox" ? (
-                                                    <TextInput
-                                                        style={[styles.textInputBox, errorHandler.discount ? {borderColor: Colors.error} : null]}
-                                                        onChangeText={(value) => {
-                                                            props.setDiscountValue(value);
-                                                        }}
-                                                        value={props.discountValue.toString()}
-                                                        keyboardType="number-pad"
-                                                    />
-                                                ) : item.boxType === "priceBox" ? (
-                                                    <View style={styles.priceBoxContainer}>
-                                                        <FontAwesome
-                                                            name="rupee"
-                                                            size={20}
-                                                            color="black"
-                                                            style={styles.rupeeIcon}
-                                                        />
-                                                        <TextInput style={styles.priceTextInput}/>
-                                                    </View>
-                                                ) : null}
-                                                {item.typeToggle !== 0 ? (
-                                                    <View style={styles.toggleBox}>
-                                                        <PrimaryButton
-                                                            onPress={() => {
-                                                                props.setSelectedDiscountMode("PERCENTAGE");
-                                                                setSelectedDiscountMode("PERCENTAGE");
-                                                            }}
-                                                            buttonStyle={[
-                                                                styles.percentAndAmountButton,
-                                                                // props.selectedDiscountMode === "PERCENTAGE"
-                                                                props.selectedDiscountMode === "PERCENTAGE"
-                                                                    ? {backgroundColor: Colors.highlight}
-                                                                    : {},
-                                                                {
-                                                                    borderTopRightRadius: 0,
-                                                                    borderBottomRightRadius: 0,
-                                                                    marginLeft: 10,
-                                                                },
-                                                            ]}
-                                                            pressableStyle={styles.percentAndAmountPressable}
-                                                        >
-                                                            <Feather
-                                                                name="percent"
-                                                                size={20}
-                                                                color={
-                                                                    // props.selectedDiscountMode === "PERCENTAGE"
-                                                                    props.selectedDiscountMode === "PERCENTAGE"
-                                                                        ? Colors.white
-                                                                        : Colors.black
-                                                                }
-                                                            />
-                                                        </PrimaryButton>
-                                                        <PrimaryButton
-                                                            onPress={() => {
-                                                                props.setSelectedDiscountMode("AMOUNT");
-                                                                setSelectedDiscountMode("AMOUNT");
-                                                            }}
-                                                            buttonStyle={[
-                                                                styles.percentAndAmountButton,
-                                                                // props.selectedDiscountMode === "AMOUNT"
-                                                                props.selectedDiscountMode === "AMOUNT"
-                                                                    ? {backgroundColor: Colors.highlight}
-                                                                    : {},
-                                                                {
-                                                                    borderTopLeftRadius: 0,
-                                                                    borderBottomLeftRadius: 0,
-                                                                },
-                                                            ]}
-                                                            pressableStyle={styles.percentAndAmountPressable}
-                                                        >
-                                                            <MaterialIcons
-                                                                name="currency-rupee"
-                                                                size={20}
-                                                                color={
-                                                                    // props.selectedDiscountMode === "AMOUNT"
-                                                                    props.selectedDiscountMode === "AMOUNT"
-                                                                        ? Colors.white
-                                                                        : Colors.black
-                                                                }
-                                                            />
-                                                        </PrimaryButton>
-                                                    </View>
-                                                ) : null}
-                                                {
-                                                    item.boxType === "Charges" ? (
-                                                        <ScrollView>
-                                                            {props.chargesInputData.map((item, index) => {
-                                                                const chargeError = errorHandler.charges[index]; // Access the error for the current index
-                                                                return (
-                                                                    <View key={index}>
-                                                                        <View style={styles.itemContainer}>
-                                                                            <Text
-                                                                                style={[
-                                                                                    TextTheme.bodyMedium,
-                                                                                    styles.chargeHeader,
-                                                                                    chargeError?.nameError ? {color: Colors.error} : null // Apply error color if nameError is true
-                                                                                ]}
-                                                                                // onPress={() => removeInput(index)}
-                                                                            >
-                                                                                Item name
-                                                                            </Text>
-                                                                            {
-                                                                                index !== 0 ?
-                                                                                    <TouchableOpacity
-                                                                                        onPress={() => removeInput(index)}>
-                                                                                        <Ionicons name="close" size={25} color="black"/>
-                                                                                    </TouchableOpacity>
-                                                                                    : <View></View>
-                                                                            }
-                                                                        </View>
-                                                                        <TextInput
-                                                                            style={[
-                                                                                styles.textInputBox,
-                                                                                chargeError?.nameError ? {borderColor: Colors.error} : null // Apply error border color if nameError is true
-                                                                            ]}
-                                                                            value={item.name} // Track the value from the state
-                                                                            onChangeText={(value) => {
-                                                                                // Update the specific item in the state
-                                                                                props.setChargesInputData((prev) =>
-                                                                                    prev.map((inputItem, idx) =>
-                                                                                        idx === index ? {
-                                                                                            ...inputItem,
-                                                                                            name: value
-                                                                                        } : inputItem
-                                                                                    )
-                                                                                );
-                                                                            }}
-                                                                        />
-                                                                        <Text
-                                                                            style={[
-                                                                                TextTheme.bodyMedium,
-                                                                                styles.chargeHeader,
-                                                                                chargeError?.amountError ? {color: Colors.error} : null
-                                                                            ]}
-                                                                        >
-                                                                            Price
-                                                                        </Text>
-                                                                        <View
-                                                                            style={[styles.chargePriceBoxContainer, chargeError?.amountError ? {borderColor: Colors.error} : null]}>
-                                                                            <FontAwesome
-                                                                                name="rupee"
-                                                                                size={20}
-                                                                                color="black"
-                                                                                style={styles.rupeeIcon}
-                                                                            />
-                                                                            <TextInput
-                                                                                style={styles.priceTextInput}
-                                                                                keyboardType="number-pad"
-                                                                                value={item.amount} // Track the value from the state
-                                                                                onChangeText={(value) => {
-                                                                                    props.setChargesInputData((prev) =>
-                                                                                        prev.map((inputItem, idx) =>
-                                                                                            idx === index ? {
-                                                                                                ...inputItem,
-                                                                                                amount: value
-                                                                                            } : inputItem
-                                                                                        )
-                                                                                    );
-                                                                                }}
-                                                                            />
-                                                                        </View>
-                                                                    </View>
-                                                                );
-                                                            })}
+      const hasNameError = errorHandler.charges.every(element =>
+        element.nameError !== undefined && element.nameError === false
+      );
+
+      const hasContents = props.chargesInputData.every(element =>
+        element.amount !== undefined && element.amount !== "" &&
+        element.name !== undefined && element.name !== ""
+      );
+
+      if (hasAmountError && hasNameError && hasContents) {
+        // Proceed with save only if no errors
+        props.addCharges();
+        props.updateCharges();
+        props.onCloseModal();
+      }
+    }
+  }, [errorHandler, props.chargesInputData, props]);
+  return (
+    <Modal transparent={true} visible={props.isVisible} animationType="fade">
+      <TouchableOpacity
+        // onPress={props.onCloseModal}
+        activeOpacity={1}
+        style={styles.modalOverlay}
+      >
+        <KeyboardAvoidingView
+          behavior="position"
+          style={{
+            backgroundColor: Colors.white,
+            // paddingBottom: insets.bottom
+            maxHeight: "90%"
+          }}
+        >
+          <SafeAreaView style={{ maxHeight: "90%" }}>
+            <View style={styles.modalContent}>
+              <View style={[styles.modalTitle,shadowStyling]}>
+                <Text></Text>
+                <Text style={[textTheme.titleLarge, styles.deleteClientText]}>
+                  {props.title}
+                </Text>
+                  <PrimaryButton buttonStyle={{backgroundColor: Colors.transparent, position: "absolute", right: 10,}}
+
+                  onPress={() => {
+                    if (props.clickedValue === "Add Charges") {
+                      // Access Redux state and update chargesInputData
+                      let updatedChargeData = getChargeData.map(item => ({
+                        ...item,
+                        amount: Number(item.amount) // Convert amount to a number
+                      }));
+                      if (updatedChargeData.index === undefined) {
+                        updatedChargeData = [{ index: 0 }];
+                      }
+                      props.setChargesInputData(updatedChargeData);
+                    }
+                    else if(props.clickedValue === "Apply Discount"){
+                      if(getDiscountDetails.length === 0 ){
+                        props.setDiscountValue("");
+                      }
+                    }
+                    props.onCloseModal();
+
+                  }
+                }
+                >
+                      <Ionicons name="close" size={25} color="black"/>
+                  </PrimaryButton>
+              </View>
+              <FlatList
+                data={props.data}
+                style={styles.flatList}
+                renderItem={({ item }) => {
+                  return (
+                    <View style={{ marginTop: 0 }}>
+                      {item.header ?
+                        <Text style={[{paddingTop:15},TextTheme.bodyMedium, errorHandler.discount || errorHandler.salesNote ?
+                          { color: Colors.error } : null]}>{item.header}</Text>
+                        : null
+                      }
+                      <View
+                        style={[
+                          styles.inputContainer,
+                          item.typeToggle !== 0 && {
+                            flexDirection: "row",
+                            alignItems: "center",
+                          },
+                        ]}
+                      >
+                        {item.boxType === "multiLineBox" ? (
+                          <View>
+                            <CustomTextInput type={"multiLine"} onChangeText={props.onChangeValue} value={props.salesNote} textInputStyle={errorHandler.salesNote ?
+                              { borderColor: Colors.error } : null} />
+                          </View>
+                        ) : item.boxType === "textBox" ? (
+                          <TextInput
+                            style={[styles.textInputBox, errorHandler.discount ? { borderColor: Colors.error } : null]}
+                            onChangeText={(value) => {
+                              props.setDiscountValue(value);
+                            }}
+                            value={props.discountValue.toString()}
+                            keyboardType="number-pad"
+                          />
+                        ) : item.boxType === "priceBox" ? (
+                          <View style={styles.priceBoxContainer}>
+                            <FontAwesome
+                              name="rupee"
+                              size={20}
+                              color="black"
+                              style={styles.rupeeIcon}
+                            />
+                            <TextInput style={styles.priceTextInput} />
+                          </View>
+                        ) : null}
+                        {item.typeToggle !== 0 ? (
+                          <View style={styles.toggleBox}>
+                            <PrimaryButton
+                              onPress={() => {
+                                props.setSelectedDiscountMode("PERCENTAGE");
+                                setSelectedDiscountMode("PERCENTAGE");
+                              }}
+                              buttonStyle={[
+                                styles.percentAndAmountButton,
+                                // props.selectedDiscountMode === "PERCENTAGE"
+                                props.selectedDiscountMode === "PERCENTAGE"
+                                  ? { backgroundColor: Colors.highlight }
+                                  : {},
+                                {
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  marginLeft: 10,
+                                },
+                              ]}
+                              pressableStyle={styles.percentAndAmountPressable}
+                            >
+                              <Feather
+                                name="percent"
+                                size={20}
+                                color={
+                                  // props.selectedDiscountMode === "PERCENTAGE"
+                                  props.selectedDiscountMode === "PERCENTAGE"
+                                    ? Colors.white
+                                    : Colors.black
+                                }
+                              />
+                            </PrimaryButton>
+                            <PrimaryButton
+                              onPress={() => {
+                                props.setSelectedDiscountMode("AMOUNT");
+                                setSelectedDiscountMode("AMOUNT");
+                              }}
+                              buttonStyle={[
+                                styles.percentAndAmountButton,
+                                // props.selectedDiscountMode === "AMOUNT"
+                                props.selectedDiscountMode === "AMOUNT"
+                                  ? { backgroundColor: Colors.highlight }
+                                  : {},
+                                {
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                },
+                              ]}
+                              pressableStyle={styles.percentAndAmountPressable}
+                            >
+                              <MaterialIcons
+                                name="currency-rupee"
+                                size={20}
+                                color={
+                                  // props.selectedDiscountMode === "AMOUNT"
+                                  props.selectedDiscountMode === "AMOUNT"
+                                    ? Colors.white
+                                    : Colors.black
+                                }
+                              />
+                            </PrimaryButton>
+                          </View>
+                        ) : null}
+                        {
+                          item.boxType === "Charges" ? (
+                            <ScrollView>
+                              {props.chargesInputData.map((item, index) => {
+                                const chargeError = errorHandler.charges[index]; // Access the error for the current index
+                                return (
+                                  <View key={index}>
+                                    <View style={styles.itemContainer}>
+                                      <Text
+                                        style={[
+                                          TextTheme.bodyMedium,
+                                          styles.chargeHeader,
+                                          chargeError?.nameError ? { color: Colors.error } : null // Apply error color if nameError is true
+                                        ]}
+                                      // onPress={() => removeInput(index)}
+                                      >
+                                        Item name
+                                      </Text>
+                                      {
+                                        index !== 0 ?
+                                      <TouchableOpacity
+                                        onPress={() => removeInput(index)}>
+                                          <Ionicons name="close" size={25} color="black"/>
+                                      </TouchableOpacity>
+                                      : <View></View>
+                                      }
+                                    </View>
+                                    <TextInput
+                                      style={[
+                                        styles.textInputBox,
+                                        chargeError?.nameError ? { borderColor: Colors.error } : null // Apply error border color if nameError is true
+                                      ]}
+                                      value={item.name} // Track the value from the state
+                                      onChangeText={(value) => {
+                                        // Update the specific item in the state
+                                        props.setChargesInputData((prev) =>
+                                          prev.map((inputItem, idx) =>
+                                            idx === index ? { ...inputItem, name: value } : inputItem
+                                          )
+                                        );
+                                      }}
+                                    />
+                                    <Text
+                                      style={[
+                                        TextTheme.bodyMedium,
+                                        styles.chargeHeader,
+                                        chargeError?.amountError ? { color: Colors.error } : null
+                                      ]}
+                                    >
+                                      Price
+                                    </Text>
+                                    <View style={[styles.chargePriceBoxContainer, chargeError?.amountError ? { borderColor: Colors.error } : null]}>
+                                      <FontAwesome
+                                        name="rupee"
+                                        size={20}
+                                        color="black"
+                                        style={styles.rupeeIcon}
+                                      />
+                                      <TextInput
+                                        style={styles.priceTextInput}
+                                        keyboardType="number-pad"
+                                        value={item.amount} // Track the value from the state
+                                        onChangeText={(value) => {
+                                          props.setChargesInputData((prev) =>
+                                            prev.map((inputItem, idx) =>
+                                              idx === index ? { ...inputItem, amount: value } : inputItem
+                                            )
+                                          );
+                                        }}
+                                      />
+                                    </View>
+                                  </View>
+                                );
+                              })}
 
 
                                                             <PrimaryButton
@@ -336,86 +352,91 @@ const MiniActionTextModal = React.memo((props) => {
                                         } else if (props.clickedValue === "Add Charges") {
                                             props.clearCharges()
 
-                                        }
-                                    }}
-                                    style={styles.closeAction}>
-                                    <Text
-                                        style={[
-                                            {color: Colors.error, textAlign: "center"},
-                                            TextTheme.labelLarge,
-                                        ]}
-                                    >
-                                        Clear
-                                    </Text>
+                    }
+                  }}
+                  style={styles.closeAction}>
+                  <Text
+                    style={[
+                      { color: Colors.error, textAlign: "center" },
+                      TextTheme.labelLarge,
+                    ]}
+                  >
+                    Clear
+                  </Text>
                                 </PrimaryButton>
                                 <PrimaryButton
                                     buttonStyle={{flex: 10}}
-                                    onPress={async () => {
-                                        if (props.clickedValue === "Apply Discount") {
-                                            if (props.discountValue.trim().length === 0) {
-                                                setErrorHandler((prev) => ({
-                                                    ...prev,
-                                                    discount: true
-                                                }));
-                                                return;
-                                            }
-                                            props.addDiscount(selectedDiscountMode);
-                                        } else if (props.clickedValue === "Add Charges") {
+                  onPress={async () => {
+                    if (props.clickedValue === "Apply Discount") {
+                      if (props.discountValue.trim().length === 0) {
+                        setErrorHandler((prev) => ({
+                          ...prev,
+                          discount: true
+                        }));
+                        return;
+                      }
+                      props.addDiscount(selectedDiscountMode);
+                    }
+                    else if (props.clickedValue === "Add Charges") {
+                      const updatedChargesErrors = props.chargesInputData.map((item) => {
+                        return {
+                          index: item.index,
+                          nameError: !item.name?.trim(), // true if name is empty or missing
+                          amountError: !item.amount?.trim(), // true if amount is empty or missing
+                        };
+                      });
 
-                                            const updatedChargesErrors = props.chargesInputData.map((item) => {
-                                                return {
-                                                    index: item.index,
-                                                    nameError: !item.name?.trim(), // true if name is empty or missing
-                                                    amountError: !item.amount?.trim(), // true if amount is empty or missing
-                                                };
-                                            });
+                      setErrorHandler((prev) => ({
+                        ...prev,
+                        charges: updatedChargesErrors,
+                      }));
+                    //   console.log(2);
 
-                                            setErrorHandler((prev) => ({
-                                                ...prev,
-                                                charges: updatedChargesErrors,
-                                            }));
+                    //   const hasAmountError = errorHandler.charges.every(element =>
+                    //     element.amountError !== undefined && element.amountError === false
+                    //   );
 
+                    //   const hasNameError = errorHandler.charges.every(element =>
+                    //     element.nameError !== undefined && element.nameError === false
+                    //   );
 
-                                            const hasAmountError = errorHandler.charges.every(element =>
-                                                element.amountError !== undefined && element.amountError === false
-                                            );
+                    //   const hasContents = props.chargesInputData.every(element =>
+                    //     element.amount !== undefined && element.amount !== "" &&
+                    //     element.name !== undefined && element.name !== ""
+                    //   )
 
-                                            const hasNameError = errorHandler.charges.every(element =>
-                                                element.nameError !== undefined && element.nameError === false
-                                            );
-                                            const hasContents = props.chargesInputData.every(element =>
-                                                element.amount !== undefined && element.name !== undefined
-                                            )
-
-
-                                            if (hasAmountError && hasNameError && hasContents) {
-                                                await props.addCharges();
-                                                await props.updateCharges();
-                                            }
-                                        } else if (props.clickedValue === "Add Sales Notes") {
-                                            if (props.salesNote.trim().length === 0) {
-                                                setErrorHandler(prev => ({
-                                                    ...prev,
-                                                    salesNote: true
-                                                }));
-                                                return;
-                                            }
-                                            await props.UpdateSalesNotes();
-                                        }
-                                    }}
-                                    style={styles.saveAction}
-                                >
-                                    <Text style={[{color: Colors.white, textAlign: "center"}, TextTheme.labelLarge]}>
-                                        Save
-                                    </Text>
+                    //   if (hasAmountError && hasNameError && hasContents) {
+                    //     props.addCharges().then(() => {
+                    //         props.updateCharges().then(() => {
+                    //             props.onCloseModal();
+                    //         });
+                    //     });
+                    // }
+                    }
+                    else if (props.clickedValue === "Add Sales Notes") {
+                      if (props.salesNote.trim().length === 0) {
+                        setErrorHandler(prev => ({
+                          ...prev,
+                          salesNote: true
+                        }));
+                        return;
+                      }
+                      await props.UpdateSalesNotes();
+                    }
+                  }}
+                  style={styles.saveAction}
+                >
+                  <Text style={[{ color: Colors.white, textAlign: "center" }, TextTheme.labelLarge]}>
+                    Save
+                  </Text>
                                 </PrimaryButton>
-                            </View>
-                        </View>
-                    </SafeAreaView>
-                </KeyboardAvoidingView>
-            </TouchableOpacity>
-        </Modal>
-    );
+              </View>
+            </View>
+          </SafeAreaView>
+        </KeyboardAvoidingView>
+      </TouchableOpacity>
+    </Modal>
+  );
 });
 
 const styles = StyleSheet.create({

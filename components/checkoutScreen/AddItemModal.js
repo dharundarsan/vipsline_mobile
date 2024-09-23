@@ -33,6 +33,7 @@ import PrepaidModal from "./PrepaidModal";
 import {updateAppointmentDate} from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
 
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const modalCategoryListData = [
     {id: "services", title: "SERVICES"},
@@ -53,8 +54,10 @@ const AddItemModal = (props) => {
     const [womenServicesData, setWomenServicesData] = useState();
     useEffect(() => {
         if (selectedCategory === "products") {
+            console.log("1");
 
             const backAction = () => {
+                console.log("3212");
 
                 // if (selectedCategory==="products") {
                 //     setIsModalVisible(false);
@@ -67,14 +70,11 @@ const AddItemModal = (props) => {
             const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
             return () => {
-                console.log("123");
-
                 return backHandler.remove()
             };
         }
     }, [selectedCategory]);
     const openDatePicker = () => {
-
         setIsDatePickerVisible(true);
     };
 
@@ -167,18 +167,32 @@ const AddItemModal = (props) => {
                         />
                     </Pressable>
                     {isDatePickerVisible && (
-                        <RNDateTimePicker
-                            value={new Date(selectedDate)}
-                            maximumDate={new Date(Date.now())}
+                        // <RNDateTimePicker
+                        //     value={new Date(selectedDate)}
+                        //     maximumDate={new Date(Date.now())}
+                        //     mode="date"
+                        //     display="default"
+                        //     onChange={(date) => {
+                        //         setIsDatePickerVisible(false);
+                        //         setSelectedDate(
+                        //             date.nativeEvent.timestamp
+                        //         );
+                        //     }}
+                        // />
+                        <DateTimePickerModal
+                            isVisible={isDatePickerVisible}
                             mode="date"
-                            display="default"
-                            onChange={(date) => {
+                            maximumDate={new Date(Date.now())}
+                            date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)}
+                            onConfirm={(date) => {
                                 setIsDatePickerVisible(false);
                                 setSelectedDate(
-                                    date.nativeEvent.timestamp
+                                    date
                                 );
-                                dispatch(updateAppointmentDate(date.nativeEvent.timestamp));
+                                dispatch(updateAppointmentDate(date));
                             }}
+                            onCancel={() => setIsDatePickerVisible(false)}
+                            themeVariant="light"
                         />
                     )}
                 </View>
@@ -194,7 +208,6 @@ const AddItemModal = (props) => {
                             buttonStyle={styles.categoryListItemButton}
                             pressableStyle={styles.categoryListItemPressable}
                             onPress={() => {
-
                                 setSelectedCategory(item.id);
                             }}
                         >
@@ -225,9 +238,7 @@ const AddItemModal = (props) => {
         }}/>
     } else if (selectedCategory === "products") {
         content = <ProductsList selectedCategory={selectedCategory}
-                                onCloseModal={() => {
-                                    setSelectedCategory(null)
-                                }}
+                                onCloseModal={() => setSelectedCategory(null)}
                                 closeOverallModal={() => {
                                     setSelectedCategory(null)
                                     props.closeModal()
@@ -246,12 +257,10 @@ const AddItemModal = (props) => {
             }}/>
     } else if (selectedCategory === "customItem") {
         content = <AddCustomItemModal isVisible={true} onCloseModal={() => {
-
             setSelectedCategory(null)
         }} closeOverallModal={props.closeModal}/>
     } else if (selectedCategory === "prepaid") {
         content = <PrepaidModal isVisible={true} onCloseModal={() => {
-
             setSelectedCategory(null)
         }} closeOverallModal={props.closeModal}/>
     }
@@ -273,7 +282,6 @@ const AddItemModal = (props) => {
                     selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
                         buttonStyle={styles.backButton}
                         onPress={() => {
-
                             setSelectedCategory(null);
                         }}
                     >
@@ -287,7 +295,6 @@ const AddItemModal = (props) => {
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     onPress={() => {
-
                         setSelectedCategory(null);
                         props.closeModal();
                     }}

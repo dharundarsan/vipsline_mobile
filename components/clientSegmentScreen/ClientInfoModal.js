@@ -110,7 +110,6 @@ export default function clientInfoModal(props) {
             props.setModalVisibility(false);
             // props.setVisible(false);
             props.editClientOption("edit");
-            console.log("true")
             setEditClientModalVisibility(true);
         }
         else if (props.selectedOption === "deleteClient") {
@@ -119,7 +118,6 @@ export default function clientInfoModal(props) {
             props.setModalVisibility(false);
             props.setModalVisibility(false);
         }
-            console.log("1")
     }, [props.selectedOption]);
 
 
