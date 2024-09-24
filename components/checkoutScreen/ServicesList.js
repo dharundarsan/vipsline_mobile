@@ -72,9 +72,9 @@ const ServicesList = React.memo((props) => {
             <View style={styles.commonSelectTemplate}>
                 <View style={styles.headingAndSearchContainer}>
                     <View style={styles.headingAndSearchContainer}>
-                        <SearchBar filter={true}
+                        <SearchBar filter={false}
                                    onPressFilter={() => {
-                                                                          }}
+                                   }}
                                    onChangeText={filterServicesData}
                                    placeholder={"Search by service name or prices"}/>
                     </View>
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     parentCategoryAndGenderContainer: {
         marginHorizontal: 20,
         marginVertical: 20,
-        width:'65%',
+        width: '65%',
         flexDirection: "row",
         // justifyContent:"center",
         alignItems: "center",

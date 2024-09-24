@@ -1,19 +1,19 @@
 import {
     KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View
 } from "react-native";
-import { DataTable } from "react-native-paper";
+import {DataTable} from "react-native-paper";
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
-import { Keyboard } from "react-native";
-import { useState, useEffect, useRef } from "react";
+import {Entypo, MaterialCommunityIcons} from '@expo/vector-icons';
+import {Feather} from '@expo/vector-icons';
+import {Keyboard} from "react-native";
+import {useState, useEffect, useRef} from "react";
 import PaymentModal from "./PaymentModal";
 import Popover from "react-native-popover-view";
-import { loadWalletPriceFromDb } from "../../store/invoiceSlice";
-import { useDispatch, useSelector } from "react-redux";
+import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
+import {useDispatch, useSelector} from "react-redux";
 import {
     checkStaffOnCartItems, clearCalculatedPrice,
     clearLocalCart,
@@ -28,13 +28,14 @@ import MiniActionTextModal from "./MiniActionTextModal";
 import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import clearCartAPI from "../../util/apis/clearCartAPI";
-import { updateChargeData, updateDiscount, updateSalesNotes } from "../../store/cartSlice";
-import { checkNullUndefined } from "../../util/Helpers";
-import { loadBusinessesListFromDb } from "../../store/listOfBusinessSlice";
-import { updateTotalClientCount } from "../../store/clientFilterSlice";
-import { clearClientInfo } from "../../store/clientInfoSlice";
+import {updateChargeData, updateDiscount, updateSalesNotes} from "../../store/cartSlice";
+import {checkNullUndefined} from "../../util/Helpers";
+import {loadBusinessesListFromDb} from "../../store/listOfBusinessSlice";
+import {updateTotalClientCount} from "../../store/clientFilterSlice";
+import {clearClientInfo} from "../../store/clientInfoSlice";
 import Toast from "react-native-root-toast";
 import InvoiceModal from "./InvoiceModal";
+import * as Haptics from 'expo-haptics';
 
 
 const CheckoutSection = (props) => {
@@ -164,20 +165,18 @@ const CheckoutSection = (props) => {
 
 
     async function addDiscount(discountMode, type) {
-        const addDiscount = {
-            name: "Custom Discount", type: discountMode, amount: discountValue
-        }
-
         if (type === "clear") {
             setDiscountValue("")
             dispatch(updateDiscount([]));
             setSelectedDiscountMode("PERCENTAGE")
         } else {
+            const addDiscount = {
+                name: "Custom Discount", type: discountMode, amount: discountValue
+            }
             setSelectedDiscountMode(discountMode)
             dispatch(updateDiscount(addDiscount));
         }
         dispatch(updateCalculatedPrice());
-
         setActionModal(false);
     }
 
@@ -231,6 +230,7 @@ const CheckoutSection = (props) => {
         dispatch(clearSalesNotes());
         setActionModal(false);
     }
+
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     return <View style={styles.checkoutSection}>
 
@@ -239,6 +239,7 @@ const CheckoutSection = (props) => {
                                              onCloseModal={() => {
                                                  setActionModal(false)
                                              }}
+                                             total_price_after_discount={calculatedPrice[0].total_price_after_discount}
                                              selectedDiscountMode={selectedDiscountMode}
                                              setSelectedDiscountMode={setSelectedDiscountMode}
                                              clearSalesNotes={clearSaleNotes}
@@ -281,10 +282,12 @@ const CheckoutSection = (props) => {
         {isModalOpen && <DropdownModal
             isVisible={isModalOpen}
             onCloseModal={() => {
+
                 setIsModalOpen(false)
             }}
             dropdownItems={["Apply Discount", "Add Charges", "Add Sales Notes", "Cancel Sales"]}
             onChangeValue={(value) => {
+
                 if (value === "Apply Discount") {
                     openModal("Add Discount", value)
                     setData([{
@@ -319,11 +322,11 @@ const CheckoutSection = (props) => {
         />}
         {isPaymentModalVisible &&
             <PaymentModal isVisible={isPaymentModalVisible}
-                onCloseModal={() => {
-                    setIsPaymentModalVisible(false)
-                }}
-                setIsInvoiceModalVisible={setIsInvoiceModalVisible}
-                price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} />
+                          onCloseModal={() => {
+                              setIsPaymentModalVisible(false)
+                          }}
+                          setIsInvoiceModalVisible={setIsInvoiceModalVisible}
+                          price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
         }
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
@@ -340,38 +343,40 @@ const CheckoutSection = (props) => {
             <View>
                 {
                     checkNullUndefined(calculatedPrice[0]) ? calculatedPrice[0].total_discount_in_price === 0 ?
-                        <Pressable style={styles.checkoutDetailInnerContainer}>
-                            <Text
-                                style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-                            <MaterialCommunityIcons name="information-outline" size={24}
-                                                    color="black" />
-                        </Pressable> :
+                            <Pressable style={styles.checkoutDetailInnerContainer}>
+                                <Text
+                                    style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                                <MaterialCommunityIcons name="information-outline" size={24}
+                                                        color="black"/>
+                            </Pressable> :
 
-                    <Popover popoverStyle={styles.popoverStyle}
-                        from={<Pressable style={styles.checkoutDetailInnerContainer}>
-                            <Text
-                                style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-                            <MaterialCommunityIcons name="information-outline" size={24}
-                                color="black" />
-                        </Pressable>}
-                        offset={Platform.OS === "ios" ? 0 : 32}
-                    >
-                        {discountCategory.service !== "0" ?
-                            <Text>Service Discount: ₹{discountCategory.service}</Text> : null}
-                        {discountCategory.product !== "0" ?
-                            <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
-                        {discountCategory.package !== "0" ?
-                            <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
-                        {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount)?
-                            <Text>Custom Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text>: null}
-                        {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" && customDiscount !== undefined && customDiscount.length === 0 ?
-                            <Text>No discounts applied</Text> : null}
-                    </Popover> :
+                            <Popover popoverStyle={styles.popoverStyle}
+                                     from={<Pressable style={styles.checkoutDetailInnerContainer}>
+                                         <Text
+                                             style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                                         <MaterialCommunityIcons name="information-outline" size={24}
+                                                                 color="black"/>
+                                     </Pressable>}
+                                     offset={Platform.OS === "ios" ? 0 : 32}
+                            >
+                                {discountCategory.service !== "0" ?
+                                    <Text>Service Discount: ₹{discountCategory.service}</Text> : null}
+                                {discountCategory.product !== "0" ?
+                                    <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
+                                {discountCategory.package !== "0" ?
+                                    <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
+                                {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount) ?
+                                    <Text>Custom
+                                        Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text> : null}
+                                {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" && customDiscount !== undefined && customDiscount.length === 0 ?
+                                    <Text>No discounts applied</Text> : null}
+                            </Popover> :
                         <></>
                 }
             </View>
 
-            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
+            <Text
+                style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
         </View>
 
         <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
@@ -386,25 +391,25 @@ const CheckoutSection = (props) => {
                         <Pressable style={styles.checkoutDetailInnerContainer}>
                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
                                 (18%)</Text>
-                            <MaterialCommunityIcons name="information-outline" size={24} color="black" />
+                            <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
                         </Pressable> :
-                    <Popover popoverStyle={styles.popoverStyle}
-                        from={<Pressable style={styles.checkoutDetailInnerContainer}>
-                            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
-                                (18%)</Text>
-                            <MaterialCommunityIcons name="information-outline" size={24} color="black" />
-                        </Pressable>}
-                        offset={Platform.OS === "ios" ? 0 : 32}
-                    >
-                        {calculatedPrice.length === 0 ? null : calculatedPrice[0].tax_details.map((item, index) => (
-                            <View key={index} style={styles.calculatepriceRow}>
-                                <Text style={[textTheme.bodyMedium, styles.checkoutDetailText]}>
-                                    {item.name + ": "} ₹ {item.value}
-                                </Text>
-                            </View>))
+                        <Popover popoverStyle={styles.popoverStyle}
+                                 from={<Pressable style={styles.checkoutDetailInnerContainer}>
+                                     <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
+                                         (18%)</Text>
+                                     <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                 </Pressable>}
+                                 offset={Platform.OS === "ios" ? 0 : 32}
+                        >
+                            {calculatedPrice.length === 0 ? null : calculatedPrice[0].tax_details.map((item, index) => (
+                                <View key={index} style={styles.calculatepriceRow}>
+                                    <Text style={[textTheme.bodyMedium, styles.checkoutDetailText]}>
+                                        {item.name + ": "} ₹ {item.value}
+                                    </Text>
+                                </View>))
 
-                        }
-                    </Popover>
+                            }
+                        </Popover>
                 }
             </View>
             <Text
@@ -433,58 +438,63 @@ const CheckoutSection = (props) => {
                         >
                             {
 
-                                chargesAmount.map((item, index) => {
-                                    return (
-                                        <View key={index}>
-                                            <Text key={index}>{item.name} : ₹ {item.amount}</Text>
-                                        </View>
+                                        chargesAmount.map((item, index) => {
+                                            return (
+                                                <View key={index}>
+                                                    <Text key={index}>{item.name} : ₹ {item.amount}</Text>
+                                                </View>
 
-                                    )
-                                })
-                            }
-                        </Popover>
-                }
-            </View>
+                                            )
+                                        })
+                                    }
+                                </Popover>
+                        }
+                    </View>
 
-            {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
-            {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>*/}
-            {/*    ₹ {checkNullUndefined(chargesAmount[0].amount) ? chargesAmount[0].amount : null}*/}
-            {/*</Text>*/}
-                <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {totalChargeAmount}</Text>
-            </View> :
+                    {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>*/}
+                    {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>*/}
+                    {/*    ₹ {checkNullUndefined(chargesAmount[0].amount) ? chargesAmount[0].amount : null}*/}
+                    {/*</Text>*/}
+                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {totalChargeAmount}</Text>
+                </View> :
                 <></>
         }
         <View style={styles.buttonContainer}>
-            <PrimaryButton buttonStyle={styles.optionButton} onPress={() => setIsModalOpen(true)}>
+            <PrimaryButton buttonStyle={styles.optionButton} onPress={() => {
+
+                setIsModalOpen(true)
+            }}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton}
-                pressableStyle={styles.checkoutButtonPressable}
-                onPress={() => {
-                    if (!clientInfo.isClientSelected) {
-                        // ToastAndroid.show("Please select client", ToastAndroid.LONG);
-                        Toast.show("Please select client",{
-                            duration:Toast.durations.LONG,
-                            position: Toast.positions.BOTTOM,
-                            shadow:false,
-                            backgroundColor:"black",
-                            opacity:1
-                        })
-                        return;
-                    }
-                    if (!dispatch(checkStaffOnCartItems())) {
-                        // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
-                        Toast.show("Please select staff",{
-                            duration:Toast.durations.LONG,
-                            position: Toast.positions.BOTTOM,
-                            shadow:false,
-                            backgroundColor:"black",
-                            opacity:1
-                        })
-                        return;
-                    }
-                    setIsPaymentModalVisible(true)
-                }}>
+                           pressableStyle={styles.checkoutButtonPressable}
+                           onPress={() => {
+
+
+                               if (!clientInfo.isClientSelected) {
+                                   // ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                                   Toast.show("Please select client", {
+                                       duration: Toast.durations.LONG,
+                                       position: Toast.positions.BOTTOM,
+                                       shadow: false,
+                                       backgroundColor: "black",
+                                       opacity: 1
+                                   })
+                                   return;
+                               }
+                               if (!dispatch(checkStaffOnCartItems())) {
+                                   // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                                   Toast.show("Please select staff", {
+                                       duration: Toast.durations.LONG,
+                                       position: Toast.positions.BOTTOM,
+                                       shadow: false,
+                                       backgroundColor: "black",
+                                       opacity: 1
+                                   })
+                                   return;
+                               }
+                               setIsPaymentModalVisible(true)
+                           }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
                     <Text

@@ -4,6 +4,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import * as Haptics from "expo-haptics";
 
 
 const ProductItem = (props) => {

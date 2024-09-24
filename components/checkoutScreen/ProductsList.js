@@ -68,7 +68,7 @@ const ProductsList = (props) => {
                     productsData[0] !== null ?
                         <>
                             <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
-                            <SearchBar filter={true}
+                            <SearchBar filter={false}
                                 onPressFilter={() => {
                                 }}
                                 onChangeText={filterProductsData}

@@ -11,6 +11,7 @@ import {addCustomItems, addItemToCart, updateCalculatedPrice, updateCustomItem} 
 import {useDispatch} from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
 import Toast from "react-native-root-toast";
+import * as Haptics from "expo-haptics";
 
 const AddCustomItemModal = (props) => {
     const [itemName, setItemName] = useState(props.edited ? props.data.name : "");
@@ -42,6 +43,7 @@ const AddCustomItemModal = (props) => {
         </View>
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                 if (itemName.trim() === "") {
                     ToastAndroid.show("Please enter item name", ToastAndroid.SHORT)
                     return;

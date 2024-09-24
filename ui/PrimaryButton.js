@@ -2,6 +2,7 @@ import {Pressable, StyleSheet, Text, View, Platform} from "react-native";
 import Colors from "../constants/Colors";
 import TextTheme from "../constants/TextTheme";
 import React from "react";
+import * as Haptics from "expo-haptics";
 
 /**
  * PrimaryButton component for reusable styled button with custom text and press handling.
@@ -54,7 +55,10 @@ const PrimaryButton = (props) => {
                         ios: props.disableRipple ? {} : { opacity: pressed ? 0.3 : 1},
                     }),
                 ]}
-                onPress={props.onPress}
+                onPress={() => {
+                    Haptics.selectionAsync()
+                    props.onPress()
+                }}
                 android_ripple={ props.disableRipple ? {} : { color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)' }}
             >
                 {props.children ? props.children :

@@ -1,7 +1,8 @@
-import {View, StyleSheet, Text, Pressable} from "react-native";
+import {View, StyleSheet, Text, Pressable, Platform} from "react-native";
 import Colors from "../../constants/Colors"
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
+import * as Haptics from "expo-haptics";
 
 
 /**
@@ -46,15 +47,59 @@ import textTheme from "../../constants/TextTheme";
 const radius = 38;
 
 export default function ClientCard(props) {
-    const name = props.name !== undefined && props.name.trim()!=="" ? props.name.toString() : "Z";
+    const name = props.name !== undefined && props.name.trim() !== "" ? props.name.toString() : "Z";
     const phone = props.phone;
     const email = props.email;
+
+
+
+    const styles = StyleSheet.create({
+        card: {
+            width: '100%',
+            paddingVertical: 20,
+            paddingHorizontal: 10,
+            justifyContent: 'center',
+        },
+        clientProfile: {
+            borderRadius: radius,
+            width: radius,
+            height: radius,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: Colors.lightGreen
+        },
+        text: {
+            fontWeight: '600',
+            color: Colors.highlight
+        },
+        innerContainer: {
+            marginLeft: 16,
+            flexDirection: 'row',
+            alignItems: "center",
+        },
+        clientDetailsContainer: {
+            marginLeft: 16,
+        },
+        name: {
+
+        },
+        phone: {
+            color: Colors.grey650
+        },
+        email: {
+            color: Colors.grey650
+        },
+        opacity: {
+            opacity: Platform.OS === 'ios' ? 0.5 : 1,
+        }
+    })
 
     return (<>
             <Pressable
                 style={({pressed}) => pressed ? [styles.card, props.card, styles.opacity] : [styles.card, props.card]}
                 android_ripple={{color: props.rippleColor ? props.rippleColor : Colors.ripple}}
                 onPress={() => {
+                    Haptics.selectionAsync()
                     props.onPress(props.clientId)
                 }}
             >
@@ -93,43 +138,3 @@ export default function ClientCard(props) {
     );
 }
 
-const styles = StyleSheet.create({
-    card: {
-        width: '100%',
-        paddingVertical: 20,
-        paddingHorizontal: 10,
-        justifyContent: 'center',
-    },
-    clientProfile: {
-        borderRadius: radius,
-        width: radius,
-        height: radius,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colors.lightGreen
-    },
-    text: {
-        fontWeight: '600',
-        color: Colors.highlight
-    },
-    innerContainer: {
-        marginLeft: 16,
-        flexDirection: 'row',
-        alignItems: "center",
-    },
-    clientDetailsContainer: {
-        marginLeft: 16,
-    },
-    name: {
-
-    },
-    phone: {
-        color: Colors.grey650
-    },
-    email: {
-        color: Colors.grey650
-    },
-    opacity: {
-        opacity: 0.5
-    }
-})

@@ -6,6 +6,7 @@ import React, {useEffect, useState} from "react";
 import Colors from "../../constants/Colors";
 import {useDispatch} from "react-redux";
 import {addItemToCart, removeItemFromCart} from "../../store/cartSlice";
+import * as Haptics from "expo-haptics";
 
 const PackageSittingItem = (props) => {
     const [filteredEditedData, setFilteredEditedData] = useState([])
@@ -65,11 +66,16 @@ const PackageSittingItem = (props) => {
                                            isMinReached ? () => {
                                                } :
                                                props.edited ? async () => {
-                                                       props.editSittingCountInEditedPackageDetails({...filteredEditedData[0], counter: sittingCount - 1})
+
+                                                       props.editSittingCountInEditedPackageDetails({
+                                                           ...filteredEditedData[0],
+                                                           counter: sittingCount - 1
+                                                       })
                                                        setSittingCount(prev => prev - 1)
                                                    }
                                                    :
                                                    () => {
+
                                                        props.deleteSittingItems(props.data);
                                                        setSittingCount(prev => prev - 1)
                                                    }
@@ -86,10 +92,15 @@ const PackageSittingItem = (props) => {
                                            isMaxReached ? () => {
                                                } :
                                                props.edited ? () => {
-                                                       props.editSittingCountInEditedPackageDetails({...filteredEditedData[0], counter: sittingCount + 1})
+
+                                                       props.editSittingCountInEditedPackageDetails({
+                                                           ...filteredEditedData[0],
+                                                           counter: sittingCount + 1
+                                                       })
                                                        setSittingCount(prev => prev + 1)
                                                    } :
                                                    () => {
+
                                                        props.addSittingItems(props.data);
                                                        setSittingCount(prev => prev + 1)
                                                    }} buttonStyle={[styles.toggleButton, {

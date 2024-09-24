@@ -30,7 +30,8 @@ const initialCartState = {
         resource_id: "",
         source: "",
         wallet_amount: "",
-    }]
+    }],
+    appointment_date: Date.now()
 };
 
 async function getBusinessId() {
@@ -321,6 +322,7 @@ export const cartSlice = createSlice({
             state.additionalDiscounts = [];
             state.chargesData = initialCartState.chargesData;
             state.prepaid_wallet = initialCartState.prepaid_wallet;
+            state.appointment_date = initialCartState.appointment_date
         },
         updateCustomItem(state, action) {
             state.customItems = state.customItems.map(item => {
@@ -404,6 +406,9 @@ export const cartSlice = createSlice({
                     break;
             }
         },
+        updateAppointmentDate(state, action) {
+            state.appointment_date = action.payload;
+        },
         modifyPrepaidDetails(state, action) {
             const {type, payload} = action.payload;
             switch (type) {
@@ -483,7 +488,8 @@ export const {
     modifyClientMembershipId,
     modifyPrepaidDetails,
     modifyClientId,
-    clearCustomItems
+    clearCustomItems,
+    updateAppointmentDate
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

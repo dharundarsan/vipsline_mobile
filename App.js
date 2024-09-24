@@ -1,11 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
+import {StatusBar} from 'expo-status-bar';
 import {Alert, BackHandler, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {CommonActions, NavigationContainer, useNavigation} from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
-import React, { useCallback, useState ,useEffect } from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {AntDesign, FontAwesome5} from '@expo/vector-icons';
+import React, {useCallback, useState, useEffect} from 'react';
+import {Provider, useDispatch, useSelector} from 'react-redux';
 import CheckoutScreen from './screens/CheckoutScreen';
 import CustomDrawer from './components/common/CustomDrawer';
 import AuthScreen from './screens/AuthScreen';
@@ -20,7 +20,7 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Font from 'expo-font';
-import { RootSiblingParent } from 'react-native-root-siblings';
+import {RootSiblingParent} from 'react-native-root-siblings';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -60,8 +60,20 @@ const AuthStack = createNativeStackNavigator();
 const LandingStack = createNativeStackNavigator();
 
 
-
 export default function App() {
+    const [loaded, error] = useFonts({
+        'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
+        'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
+    });
+    useEffect(() => {
+        if (loaded || error) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded, error]);
+
+    if (!loaded && !error) {
+        return null;
+    }
     return (
 
         <Provider store={store}>
@@ -110,12 +122,12 @@ async function isAuthenticatedFunc() {
 
 }
 
-function CustomDrawerIcon({ navigation }) {
+function CustomDrawerIcon({navigation}) {
     return (
         <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
             <Image
                 source={require('./assets/icons/drawerIcons/drawer.png')}
-                style={{ width: 24, height: 24, marginLeft: 16}}
+                style={{width: 24, height: 24, marginLeft: 16}}
             />
         </TouchableOpacity>
     );
@@ -155,7 +167,7 @@ const AppNavigator = () => {
                         }, // Exit the app when 'Yes' is pressed
                     }
                 ],
-                { cancelable: false }
+                {cancelable: false}
             );
             return true; // Return true to prevent the default back button behavior
         };
@@ -189,35 +201,18 @@ const AppNavigator = () => {
 
     };
 
-    // useEffect(() => {
-    //     checkAuthentication(); // Initial auth check
-    // }, [reduxAuthStatus]); // Dependency on Redux authentication status
-
-    const [loaded, error] = useFonts({
-        'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
-        'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
-    });
     useEffect(() => {
-        if (loaded) {
-            // async function check() {
-            checkAuthentication()
-            // }
-            // check()
-            SplashScreen.hideAsync();
-        }
-        else if(error){
-            console.error(error);
-        }
-    }, [loaded, error,reduxAuthStatus]);
+        checkAuthentication(); // Initial auth check
+    }, [reduxAuthStatus]); // Dependency on Redux authentication status
 
-    if (!loaded && !error) {
-        return null;
-    }
+
     return (
         <NavigationContainer>
             <SafeAreaProvider>
                 {isAuthenticated ?
-                    <MainDrawerNavigator/>    
+                    <>
+                        <MainDrawerNavigator/>
+                    </>
                     : <AuthNavigator/>}
             </SafeAreaProvider>
         </NavigationContainer>
@@ -247,7 +242,7 @@ const MainDrawerNavigator = () => {
         navigation.dispatch(
             CommonActions.reset({
                 index: 0,
-                routes: [{ name: 'List of Business' }],
+                routes: [{name: 'List of Business'}],
             })
         );
     }, []);
@@ -270,11 +265,11 @@ const MainDrawerNavigator = () => {
                 borderBottomWidth: 0.5,     // Helps define a stronger bottom line
                 borderColor: 'rgba(0,0,0,0.1)' // Subtle color to simulate the bottom shadow
             },
-            headerLeft: () => <CustomDrawerIcon navigation={navigation} />,
-            drawerIcon: ({ focused }) => (
+            headerLeft: () => <CustomDrawerIcon navigation={navigation}/>,
+            drawerIcon: ({focused}) => (
                 <Image
                     source={require('./assets/icons/drawerIcons/drawer.png')}
-                    style={{ width: 24, height: 24}}
+                    style={{width: 24, height: 24}}
                 />
             )
         })}

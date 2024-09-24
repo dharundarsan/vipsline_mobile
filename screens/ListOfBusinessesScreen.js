@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus, updateBusinessId, updateBusinessName} from "../store/authSlice";
 import {
     loadBusinessesListFromDb,
+    loadBusinessNotificationDetails,
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
@@ -26,6 +27,7 @@ import {useFocusEffect} from "@react-navigation/native";
 import {clearClientInfo} from "../store/clientInfoSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
 import {clearCustomItems, clearLocalCart} from "../store/cartSlice";
+import * as Haptics from "expo-haptics";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -99,6 +101,8 @@ export default function ListOfBusinessesScreen({navigation}) {
                 imageURL={itemData.item.photo}
                 status={itemData.item.verificationStatus}
                 onPress={async () => {
+                    Haptics.selectionAsync()
+
                     await storeData(itemData.item.id);
                     dispatch(updateBusinessId(itemData.item.id));
                     dispatch(updateIsBusinessSelected(true));

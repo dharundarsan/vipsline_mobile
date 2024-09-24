@@ -28,7 +28,7 @@ import {
     modifyClientMembershipId,
     modifyPrepaidDetails
 } from "../../store/cartSlice";
-
+import * as Haptics from "expo-haptics";
 
 
 const InvoiceModal = (props) => {
@@ -69,7 +69,6 @@ const InvoiceModal = (props) => {
     const businessId = useSelector(state => state.authDetails.businessId);
 
     const walletBalance = useSelector(state => state.invoice.walletBalance);
-
 
 
     let centralGST = (details.total * 0.09);
@@ -114,9 +113,6 @@ const InvoiceModal = (props) => {
     }, [selectedClientDetails]);
 
 
-
-
-
     const calculateTotalDifference = (organizedList) => {
         return organizedList.reduce((total, category) => {
             const categoryTotal = category.list.reduce((subTotal, item) => {
@@ -138,17 +134,17 @@ const InvoiceModal = (props) => {
     }
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
-            visible={props.isVisible} 
-            // presentationStyle="pageSheet" onRequestClose={()=>{
-            //     clearCartAPI();
-            //     dispatch(modifyClientMembershipId({type: "clear"}))
-            //     dispatch(clearSalesNotes());
-            //     dispatch(clearLocalCart());
-            //     dispatch(clearClientInfo());
-            //     dispatch(clearCalculatedPrice());
-            //     dispatch(modifyPrepaidDetails({type: "clear"}))
-            // }}
-            >
+                  visible={props.isVisible}
+        // presentationStyle="pageSheet" onRequestClose={()=>{
+        //     clearCartAPI();
+        //     dispatch(modifyClientMembershipId({type: "clear"}))
+        //     dispatch(clearSalesNotes());
+        //     dispatch(clearLocalCart());
+        //     dispatch(clearClientInfo());
+        //     dispatch(clearCalculatedPrice());
+        //     dispatch(modifyPrepaidDetails({type: "clear"}))
+        // }}
+    >
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
 
@@ -177,12 +173,11 @@ const InvoiceModal = (props) => {
                 onChangeValue={(value) => {
                     if (value === "SMS") {
                         setSMSModalVisibility(true);
-
                     } else if (value === "Email") {
                         setEmailModalVisibility(true);
                     } else if (value === "Cancel Invoice") {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                         setCancelInvoiceModalVisibility(true);
-
                     }
                 }}
             />
@@ -199,6 +194,7 @@ const InvoiceModal = (props) => {
                 onChangeText={(text) => setPhone(text)}
                 value={phone[1]}
                 buttonTwoOnPress={async () => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                     const phoneNoValid = phoneNoRef.current();
                     if (phoneNoValid) {
                         await sendSMSAPI(selectedClientDetails.name, phone[1]);
@@ -221,7 +217,7 @@ const InvoiceModal = (props) => {
                 buttonTwoName={"Send"}
                 onCloseModal={() => setEmailModalVisibility(false)}
                 onChangeText={(text) => setEmail(text)}
-                value={email.trim()}
+                value={ checkNullUndefined(email) ? email.trim() : ""}
                 buttonTwoOnPress={async () => {
                     const emailValid = emailRef.current();
                     if (emailValid) {
@@ -686,7 +682,7 @@ const styles = StyleSheet.create({
     },
     cartItemTableHead: {
         position: 'relative',
-        zIndex:2,
+        zIndex: 2,
         backgroundColor: "#E7E8FF",
         paddingVertical: 10
     },

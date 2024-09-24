@@ -97,8 +97,9 @@ export default function clientInfoModal(props) {
 
     const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
     const [deleteClientModalVisibility, setDeleteClientModalVisibility] = useState(false);
-    
+
     useEffect(() => {
+
         if (props.selectedOption === "editClient") {
 
             // setTimeout(()=>{

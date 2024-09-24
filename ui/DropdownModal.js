@@ -110,9 +110,10 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
         borderBottomWidth: 1,
         borderBottomColor: Colors.grey250,
+        borderRadius:0
     },
     closeButtonPressable: {
-        paddingVertical: 15,
+        paddingVertical: 15
     },
     closeButtonText: {
         color: Colors.black,
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         justifyContent: "flex-end",
-        backgroundColor: Colors.ripple,
+        backgroundColor: "#D9D9D999",
     },
     dropdownList: {
         backgroundColor: Colors.white,

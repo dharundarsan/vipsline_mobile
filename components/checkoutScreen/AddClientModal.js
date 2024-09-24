@@ -15,6 +15,7 @@ import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} 
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {shadowStyling} from "../../util/Helpers";
+import * as Haptics from "expo-haptics";
 
 const AddClientModal = (props) => {
     // const pageNo = useSelector(state => state.client.pageNo);
@@ -118,6 +119,7 @@ const AddClientModal = (props) => {
                 <Divider/>
                 <PrimaryButton buttonStyle={styles.createClientButton} pressableStyle={styles.createClientPressable}
                                onPress={() => {
+
                                    setIsCreateClientModalVisible(true);
                                }}>
                     <Feather name="plus" size={24} color={Colors.highlight}/>
@@ -137,6 +139,8 @@ const AddClientModal = (props) => {
                                 email={item.username}
                                 divider={true}
                                 onPress={(clientId) => {
+
+
                                     props.closeModal();
                                     dispatch(loadClientInfoFromDb(item.id));
                                     dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));

@@ -8,23 +8,26 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
 } from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import CustomTextInput from "../../ui/CustomTextInput";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { shadowStyling } from "../../util/Helpers";
+import { Col } from "react-native-table-component";
+
 const MiniActionTextModal = React.memo((props) => {
-  const dispatch = useDispatch();
   const [selectedDiscountMode, setSelectedDiscountMode] = useState("PERCENTAGE")
+  const [discountValue, setDiscountValue] = useState(props.discountValue);
   const [errorHandler, setErrorHandler] = useState({
     discount: false,
     charges: [],
@@ -58,16 +61,16 @@ const MiniActionTextModal = React.memo((props) => {
       const hasAmountError = errorHandler.charges.every(element =>
         element.amountError !== undefined && element.amountError === false
       );
-  
+
       const hasNameError = errorHandler.charges.every(element =>
         element.nameError !== undefined && element.nameError === false
       );
-  
+
       const hasContents = props.chargesInputData.every(element =>
         element.amount !== undefined && element.amount !== "" &&
         element.name !== undefined && element.name !== ""
       );
-  
+
       if (hasAmountError && hasNameError && hasContents) {
         // Proceed with save only if no errors
         props.addCharges();
@@ -75,32 +78,33 @@ const MiniActionTextModal = React.memo((props) => {
         props.onCloseModal();
       }
     }
-  }, [errorHandler, props.chargesInputData, props]);
+  }, [errorHandler, props.chargesInputData]);
+
   return (
-    <Modal transparent={true} visible={props.isVisible} animationType="fade">
+    <Modal transparent={true} visible={props.isVisible} animationType="fade" >
       <TouchableOpacity
-        // onPress={props.onCloseModal}
+        // onPress={props.onCloseModal} 
         activeOpacity={1}
         style={styles.modalOverlay}
       >
         <KeyboardAvoidingView
-          behavior="position"
+          keyboardVerticalOffset={Platform.OS === "ios" ? -insets.bottom : 0}
+          behavior={Platform.OS==="ios" ? "position" : ""}
           style={{
             backgroundColor: Colors.white,
-            // paddingBottom: insets.bottom
-            maxHeight: "90%" 
+            paddingBottom: Platform.OS === "ios" ? insets.bottom : 0,
+            maxHeight: "100%"
           }}
         >
           <SafeAreaView style={{ maxHeight: "90%" }}>
             <View style={styles.modalContent}>
-              <View style={[styles.modalTitle,shadowStyling]}>
+              <View style={[styles.modalTitle, shadowStyling]}>
                 <Text></Text>
                 <Text style={[textTheme.titleLarge, styles.deleteClientText]}>
                   {props.title}
                 </Text>
-                <TouchableOpacity style={({ pressed }) => [
-                  { opacity: pressed ? 1 : 1 }
-                ]}
+                <PrimaryButton buttonStyle={{ backgroundColor: Colors.transparent, position: "absolute", right: 10, }}
+
                   onPress={() => {
                     if (props.clickedValue === "Add Charges") {
                       // Access Redux state and update chargesInputData
@@ -113,22 +117,18 @@ const MiniActionTextModal = React.memo((props) => {
                       }
                       props.setChargesInputData(updatedChargeData);
                     }
-                    else if(props.clickedValue === "Apply Discount"){
-                      if(getDiscountDetails.length === 0 ){
+                    else if (props.clickedValue === "Apply Discount") {
+                      if (getDiscountDetails.length === 0) {
                         props.setDiscountValue("");
                       }
                     }
                     props.onCloseModal();
 
                   }
-                }
+                  }
                 >
-                  <Entypo
-                    name="cross"
-                    size={24}
-                    color="black"
-                  />
-                </TouchableOpacity>
+                  <Ionicons name="close" size={25} color="black" />
+                </PrimaryButton>
               </View>
               <FlatList
                 data={props.data}
@@ -137,7 +137,7 @@ const MiniActionTextModal = React.memo((props) => {
                   return (
                     <View style={{ marginTop: 0 }}>
                       {item.header ?
-                        <Text style={[{paddingTop:15},TextTheme.bodyMedium, errorHandler.discount || errorHandler.salesNote ?
+                        <Text style={[{ paddingTop: 15 }, TextTheme.bodyMedium, errorHandler.discount || errorHandler.salesNote ?
                           { color: Colors.error } : null]}>{item.header}</Text>
                         : null
                       }
@@ -245,12 +245,12 @@ const MiniActionTextModal = React.memo((props) => {
                                 const chargeError = errorHandler.charges[index]; // Access the error for the current index
                                 return (
                                   <View key={index}>
-                                    <View style={styles.itemContainer}>
+                                    <Pressable style={styles.itemContainer} onPress={()=>null}>
                                       <Text
                                         style={[
                                           TextTheme.bodyMedium,
                                           styles.chargeHeader,
-                                          chargeError?.nameError ? { color: Colors.error } : null // Apply error color if nameError is true
+                                          chargeError?.nameError ? { color: Colors.error } : null, // Apply error color if nameError is true
                                         ]}
                                       // onPress={() => removeInput(index)}
                                       >
@@ -258,17 +258,13 @@ const MiniActionTextModal = React.memo((props) => {
                                       </Text>
                                       {
                                         index !== 0 ?
-                                      <TouchableOpacity
-                                        onPress={() => removeInput(index)}>
-                                        <Entypo
-                                          name="cross"
-                                          size={24}
-                                          color="black"
-                                        />
-                                      </TouchableOpacity>
-                                      : <View></View>
+                                          <TouchableOpacity
+                                            onPress={() => removeInput(index)}>
+                                            <Ionicons name="close" size={25} color="black" />
+                                          </TouchableOpacity>
+                                          : <View></View>
                                       }
-                                    </View>
+                                    </Pressable>
                                     <TextInput
                                       style={[
                                         styles.textInputBox,
@@ -284,15 +280,19 @@ const MiniActionTextModal = React.memo((props) => {
                                         );
                                       }}
                                     />
-                                    <Text
+                                    <Pressable
+                                      onPress={()=>null}
+                                    >
+                                      <Text
                                       style={[
                                         TextTheme.bodyMedium,
                                         styles.chargeHeader,
                                         chargeError?.amountError ? { color: Colors.error } : null
-                                      ]}
-                                    >
+                                      ]}>
                                       Price
-                                    </Text>
+
+                                      </Text>
+                                    </Pressable>
                                     <View style={[styles.chargePriceBoxContainer, chargeError?.amountError ? { borderColor: Colors.error } : null]}>
                                       <FontAwesome
                                         name="rupee"
@@ -344,17 +344,20 @@ const MiniActionTextModal = React.memo((props) => {
                 }}
               />
               <View style={styles.actionButton}>
-                <TouchableOpacity
+                <PrimaryButton
+                  buttonStyle={{
+                    backgroundColor: Colors.transparent,
+                    flex: 4,
+                    borderColor: Colors.grey300,
+                    borderWidth: 1
+                  }}
                   onPress={() => {
                     if (props.clickedValue === "Apply Discount") {
                       props.addDiscount(selectedDiscountMode, "clear");
-                    }
-                    else if (props.clickedValue === "Add Sales Notes") {
+                    } else if (props.clickedValue === "Add Sales Notes") {
                       props.clearSalesNotes();
-                    }
-                    else if (props.clickedValue === "Add Charges") {
+                    } else if (props.clickedValue === "Add Charges") {
                       props.clearCharges()
-
                     }
                   }}
                   style={styles.closeAction}>
@@ -366,10 +369,12 @@ const MiniActionTextModal = React.memo((props) => {
                   >
                     Clear
                   </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </PrimaryButton>
+                <PrimaryButton
+                  buttonStyle={{ flex: 10 }}
                   onPress={async () => {
                     if (props.clickedValue === "Apply Discount") {
+                      setDiscountValue(props.discountValue);
                       if (props.discountValue.trim().length === 0) {
                         setErrorHandler((prev) => ({
                           ...prev,
@@ -377,6 +382,20 @@ const MiniActionTextModal = React.memo((props) => {
                         }));
                         return;
                       }
+                      if(selectedDiscountMode === "AMOUNT"){
+                        if((props.total_price_after_discount - props.discountValue) <= 0 ){
+                          props.setDiscountValue(discountValue)
+                          props.onCloseModal();
+                          return;
+                        }
+                      }
+                      else if(selectedDiscountMode === "PERCENTAGE"){
+                        if(props.discountValue >= 100 ){
+                          props.setDiscountValue(discountValue)
+                            props.onCloseModal();
+                            return;
+                        }
+                    }
                       props.addDiscount(selectedDiscountMode);
                     }
                     else if (props.clickedValue === "Add Charges") {
@@ -392,28 +411,6 @@ const MiniActionTextModal = React.memo((props) => {
                         ...prev,
                         charges: updatedChargesErrors,
                       }));
-                    //   console.log(2);
-                      
-                    //   const hasAmountError = errorHandler.charges.every(element =>
-                    //     element.amountError !== undefined && element.amountError === false
-                    //   );
-
-                    //   const hasNameError = errorHandler.charges.every(element =>
-                    //     element.nameError !== undefined && element.nameError === false
-                    //   );
-
-                    //   const hasContents = props.chargesInputData.every(element =>
-                    //     element.amount !== undefined && element.amount !== "" &&
-                    //     element.name !== undefined && element.name !== ""
-                    //   )
-
-                    //   if (hasAmountError && hasNameError && hasContents) {
-                    //     props.addCharges().then(() => {
-                    //         props.updateCharges().then(() => {
-                    //             props.onCloseModal();
-                    //         });
-                    //     });
-                    // }
                     }
                     else if (props.clickedValue === "Add Sales Notes") {
                       if (props.salesNote.trim().length === 0) {
@@ -431,7 +428,7 @@ const MiniActionTextModal = React.memo((props) => {
                   <Text style={[{ color: Colors.white, textAlign: "center" }, TextTheme.labelLarge]}>
                     Save
                   </Text>
-                </TouchableOpacity>
+                </PrimaryButton>
               </View>
             </View>
           </SafeAreaView>
@@ -443,11 +440,10 @@ const MiniActionTextModal = React.memo((props) => {
 
 const styles = StyleSheet.create({
   modalOverlay: {
-    // flex: 1,
-    height: "100%",
-    // maxHeight:"10%",
+    flex: 1,
+    // height: "100%",
     justifyContent: "flex-end",
-    backgroundColor: Colors.ripple,
+    backgroundColor: Colors.dim, 
   },
   modalContent: {
     width: "100%",
@@ -459,10 +455,11 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   modalTitle: {
-    elevation: 0.4,
-    padding: 10,
+    // elevation: 0.4,
+    marginBottom: 15,
+    paddingVertical: 12,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
   },
   toggleBox: {
@@ -470,7 +467,7 @@ const styles = StyleSheet.create({
     // width: "100%",  // Ensure the toggleBox takes the full width of the parent container
   },
   percentAndAmountButton: {
-    // flex: 1, 
+    // flex: 1,
     width: 50,
     borderColor: Colors.grey400,
     borderWidth: 1,
@@ -581,7 +578,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   itemContainer: {
-    justifyContent:"space-between",
+    justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "center"
   }
