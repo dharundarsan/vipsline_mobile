@@ -4,6 +4,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart, updateCalculatedPrice, updateCalculatedprice} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
+import * as Haptics from "expo-haptics";
 
 const ServiceItem = (props) => {
     const dispatch = useDispatch();
@@ -51,13 +52,14 @@ const ServiceItem = (props) => {
     return <PrimaryButton buttonStyle={styles.selectServiceItemButton}
                           pressableStyle={styles.selectServiceItemPressable}
                           onPress={async () => {
+
                               props.closeOverallModal();
                               dispatch(addItemToCart({resource_category: props.data.id, resource_id: ""}))
                           }}
     >
         <View style={styles.leftBar}></View>
         <View style={styles.nameAndPriceContainer}>
-            <Text style={[textTheme.bodyMedium,{maxWidth:"80%"}]}>{props.data.name}</Text>
+            <Text style={[textTheme.bodyMedium, {maxWidth: "80%"}]}>{props.data.name}</Text>
 
             <View style={styles.priceContainer}>
                 {

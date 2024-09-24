@@ -9,6 +9,7 @@ ProgramData/
 %ProgramData%/
 .dockerignore
 Dockerfile
+build-*
 # Expo
 .expo/
 dist/

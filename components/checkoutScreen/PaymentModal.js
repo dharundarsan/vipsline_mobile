@@ -25,11 +25,21 @@ import {useSafeAreaInsets} from "react-native-safe-area-context";
 import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
 import {shadowStyling} from "../../util/Helpers";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import {modifyPrepaidDetails, updateCalculatedPrice} from "../../store/cartSlice";
+import {
+    clearCalculatedPrice,
+    clearLocalCart, clearSalesNotes,
+    modifyClientMembershipId,
+    modifyPrepaidDetails,
+    updateCalculatedPrice
+} from "../../store/cartSlice";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import Loader from 'react-native-three-dots-loader'
 import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
 import Toast from "react-native-root-toast";
+import clearCartAPI from "../../util/apis/clearCartAPI";
+import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
+import {clearClientInfo} from "../../store/clientInfoSlice";
+import * as Haptics from "expo-haptics";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -52,6 +62,8 @@ const PaymentModal = (props) => {
     const invoiceDetails = useSelector(state => state.invoice.details);
     const moreInvoiceDetails = useSelector(state => state.invoice.invoiceDetails);
     const [isLoading, setIsLoading] = useState(false);
+    const [isOptionsDropdownModalVisible, setIsOptionsDropdownModalVisible] = useState(false)
+    const [isCancelSalesModalVisible, setIsCancelSalesModalVisible] = useState(false)
 
 
     const [splitUpState, setSplitUpState] = useState([
@@ -372,16 +384,58 @@ const PaymentModal = (props) => {
         return cartSliceState.items.find(item => item.gender === "prepaid");
     }
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
-    // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
+        // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
     >
-        <DropdownModal isVisible={isSplitPaymentDropdownVisible} onCloseModal={() => {
-            setIsSplitPaymentDropdownVisible(false)
-        }}
-                       dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
-                       onChangeValue={setAddedSplitPayment}/>
+        {
+            isSplitPaymentDropdownVisible &&
+            <DropdownModal isVisible={isSplitPaymentDropdownVisible}
+                           onCloseModal={() => {
+
+                               setIsSplitPaymentDropdownVisible(false)
+                           }}
+                           dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
+                           onChangeValue={(value) => {
+
+                               setAddedSplitPayment(value)
+                           }}/>
+        }
+        {isCancelSalesModalVisible && <DeleteClient
+            isVisible={isCancelSalesModalVisible}
+            onCloseModal={() => {
+                setIsCancelSalesModalVisible(false)
+                // setModalVisibility(false);
+                // dispatch(loadClientInfoFromDb(props.id))
+            }}
+            header={"Cancel Sale"}
+            content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
+            onCloseClientInfoAfterDeleted={async () => {
+                await clearCartAPI();
+                dispatch(modifyClientMembershipId({type: "clear"}))
+                dispatch(clearSalesNotes());
+                dispatch(clearLocalCart());
+                dispatch(clearClientInfo());
+                dispatch(clearCalculatedPrice())
+            }}
+        />}
+        {
+            isOptionsDropdownModalVisible && <DropdownModal isVisible={isOptionsDropdownModalVisible}
+                                                            onCloseModal={() => setIsOptionsDropdownModalVisible(false)}
+                                                            dropdownItems={["Cancel Sales"]}
+                                                            imageWidth={25}
+                                                            imageHeight={25}
+                                                            primaryViewChildrenStyle={{
+                                                                flexDirection: "row",
+                                                                alignItems: "center"
+                                                            }}
+                                                            iconImage={[require("../../assets/icons/checkout/actionmenu/cancelsale.png")]}
+                                                            onChangeValue={(value) => {
+                                                                if (value === "Cancel Sales") setIsCancelSalesModalVisible(true)
+                                                            }}/>
+        }
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
                 <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
+
                     setIsInvoiceModalVisible(false);
                     props.onCloseModal();
                 }}/> :
@@ -393,7 +447,10 @@ const PaymentModal = (props) => {
             <Text style={[textTheme.titleLarge, styles.heading]}>Select Payment</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={props.onCloseModal}
+                onPress={() => {
+
+                    props.onCloseModal()
+                }}
             >
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
@@ -404,7 +461,9 @@ const PaymentModal = (props) => {
                     <View style={styles.paymentOptionsRow}>
                         <PrimaryButton
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "cash" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => setSelectedPaymentOption("cash")}
+                            onPress={() => {
+                                setSelectedPaymentOption("cash")
+                            }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "cash" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
@@ -415,7 +474,10 @@ const PaymentModal = (props) => {
                         </PrimaryButton>
                         <PrimaryButton
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "card" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => setSelectedPaymentOption("card")}
+                            onPress={() => {
+
+                                setSelectedPaymentOption("card")
+                            }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "card" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
@@ -428,7 +490,10 @@ const PaymentModal = (props) => {
                     <View style={styles.paymentOptionsRow}>
                         <PrimaryButton
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "digital payments" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => setSelectedPaymentOption("digital payments")}
+                            onPress={() => {
+
+                                setSelectedPaymentOption("digital payments")
+                            }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "digital payments" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
@@ -439,7 +504,10 @@ const PaymentModal = (props) => {
                         </PrimaryButton>
                         <PrimaryButton
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => setSelectedPaymentOption("split_payment")}
+                            onPress={() => {
+
+                                setSelectedPaymentOption("split_payment")
+                            }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "split_payment" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
@@ -454,6 +522,7 @@ const PaymentModal = (props) => {
                     <PrimaryButton
                         buttonStyle={[styles.paymentOptionButton, {marginBottom: 20}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
                         onPress={() => {
+
                             if (clientInfo.wallet_balance < props.price) {
                                 setSelectedPaymentOption("split_payment")
                             } else {
@@ -576,6 +645,7 @@ const PaymentModal = (props) => {
                                     }}
                                 />
                                 <PrimaryButton buttonStyle={styles.splitInputCloseButton} onPress={() => {
+
                                     // setPaymentOrder(prev => prev.slice(0, prev.length - 1));
                                     setPaymentOrder(prev => prev.filter((order) => order !== item.mode));
                                     setRecentlyChanged(prev => prev.filter(ele => ele !== item.mode));
@@ -622,7 +692,10 @@ const PaymentModal = (props) => {
                     }}/>
                     {isPrepaidAvailable ? shownCount !== 4 ?
                             <View style={styles.addPaymentButtonContainer}>
-                                <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
+                                <PrimaryButton onPress={() => {
+
+                                    setIsSplitPaymentDropdownVisible(true)
+                                }}
                                                buttonStyle={styles.addPaymentButton}
                                                pressableStyle={styles.addPaymentButtonPressable}>
                                     <Entypo name="plus" size={15} color="black"/>
@@ -632,7 +705,10 @@ const PaymentModal = (props) => {
                             null :
                         shownCount !== 3 ?
                             <View style={styles.addPaymentButtonContainer}>
-                                <PrimaryButton onPress={() => setIsSplitPaymentDropdownVisible(true)}
+                                <PrimaryButton onPress={() => {
+
+                                    setIsSplitPaymentDropdownVisible(true)
+                                }}
                                                buttonStyle={styles.addPaymentButton}
                                                pressableStyle={styles.addPaymentButtonPressable}>
                                     <Entypo name="plus" size={15} color="black"/>
@@ -644,7 +720,9 @@ const PaymentModal = (props) => {
         </ScrollView>
         <Divider/>
         <View style={[styles.buttonContainer, {paddingBottom: insets.bottom}]}>
-            <PrimaryButton buttonStyle={styles.optionButton}>
+            <PrimaryButton buttonStyle={styles.optionButton} onPress={() => {
+                setIsOptionsDropdownModalVisible(true)
+            }}>
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton}
@@ -654,6 +732,7 @@ const PaymentModal = (props) => {
                                paddingHorizontal: 0
                            } : null]}
                            onPress={async () => {
+                               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                                setIsLoading(true);
                                if (selectedPaymentOption === "prepaid" || (selectedPaymentOption === "split_payment" && splitUpState.some(item => (item.mode === "prepaid" && item.shown)))) {
                                    if (selectedPaymentOption === "prepaid") {

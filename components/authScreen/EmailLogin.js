@@ -71,6 +71,8 @@ export default function EmailLogin() {
         let response = '';
         let isAuthenticationSuccessful = false;
         if (await findUser(email, platform)) {
+            setIsIsUserFound(true);
+            setEmailPrompt("");
             try {
                 response = await axios.post(BaseURL + '/authenticateWithPassword', {
                     platform: platform,
@@ -90,12 +92,19 @@ export default function EmailLogin() {
                 "" :
                 response.data.message === "User authenticated";
         }
+        else {
+            setIsIsUserFound(false);
+            setEmailPrompt("Incorrect email");
+        }
+
 
 
         if (isAuthenticationSuccessful) {
+            setPasswordPrompt("");
             setIsPasswordValid(true);
             dispatch(updateAuthStatus(true));
         } else {
+            setPasswordPrompt("Incorrect password")
             setIsPasswordValid(false);
             dispatch(updateAuthStatus(false));
         }
@@ -193,8 +202,8 @@ export default function EmailLogin() {
                     <Text></Text> :
                 emailPrompt.trim().length > 0 ?
                     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>{emailPrompt}</Text> :
-                    !isUserFound ?
-                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect email</Text> :
+                    // !isUserFound ?
+                    //     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect email</Text> :
                         <Text></Text>
             }
             <Text style={[textTheme.titleSmall, styles.inputLabel]}>Password</Text>
@@ -217,8 +226,8 @@ export default function EmailLogin() {
                     <Text></Text> :
                 passwordPrompt.trim().length > 0 ?
                     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>{passwordPrompt}</Text> :
-                    !isPasswordValid ?
-                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect password</Text> :
+                    // !isPasswordValid ?
+                    //     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect password</Text> :
                         <Text></Text>
             }
             <View style={{
@@ -250,34 +259,48 @@ export default function EmailLogin() {
             </View>
             <PrimaryButton
                 buttonStyle={styles.signInButton}
-                onPress={() => {
+                onPress={async () => {
                     if(isLoading) {
+                        // console.log("1")
                         return null;
                     }
                     if(email.trim().length === 0 && password.trim().length > 0) {
                         setEmailPrompt("Email is required");
                         setPasswordPrompt("");
-                        return
+                        // console.log("2")
+
                     }
                     else if(email.trim().length > 0 && password.trim().length === 0){
                         setPasswordPrompt("Password is required")
                         setEmailPrompt("");
-                        return
-                    }
-                    else {
-                        setEmailPrompt("")
-                        setPasswordPrompt("")
+                        // console.log("3")
 
                     }
-                    if(email.trim().length === 0 && password.trim().length === 0) {
+
+                    else if(email.trim().length === 0 && password.trim().length === 0) {
                         setEmailPrompt("Email is required")
                         setPasswordPrompt("Password is required")
-
+                        // console.log("4")
                     }
                     else {
-                        signInHandler().then(r => null);
+                        await signInHandler();
                         setIsEmailTyping(false);
                         setIsPasswordTyping(false)
+                        // console.log(isUserFound);
+                        // console.log(isPasswordValid);
+                        // if(isUserFound) {
+                        //     setEmailPrompt("");
+                        // }
+                        // else {
+                        //     setEmailPrompt("Incorrect email");
+                        // }
+                        // if(isPasswordValid) {
+                        //     setPasswordPrompt("");
+                        // }
+                        // else {
+                        //     setPasswordPrompt("Incorrect password")
+                        // }
+                        // console.log("5")
                     }
 
 

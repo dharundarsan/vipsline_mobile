@@ -21,6 +21,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {addItemToCart, addItemToEditedCart} from "../../store/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
+import * as Haptics from "expo-haptics";
 
 const EditMembershipModal = (props) => {
     const dispatch = useDispatch();
@@ -33,7 +34,7 @@ const EditMembershipModal = (props) => {
     const editedCart = useSelector(state => state.cart.editedCart);
 
     const handleSave = () => {
-
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if(cartItems.some(item => item.membership_id === props.data.id || editedCart.some(item => item.membership_id === props.data.id))){
             ToastAndroid.show("Membership already in cart", ToastAndroid.LONG);
             return;

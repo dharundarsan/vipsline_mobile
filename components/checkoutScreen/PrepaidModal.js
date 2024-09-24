@@ -15,6 +15,7 @@ import {
 } from "../../store/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {shadowStyling} from "../../util/Helpers";
+import * as Haptics from "expo-haptics";
 
 const PrepaidModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
@@ -79,6 +80,7 @@ const PrepaidModal = (props) => {
         <Divider/>
         <View style={styles.saveButtonContainer}>
             <PrimaryButton onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                 if (!prepaidAmountRef.current()) return;
                 if (prepaidBonus > prepaidAmount) {
                     ToastAndroid.show("Prepaid bonus should be lesser or equal to actual amount", ToastAndroid.LONG)

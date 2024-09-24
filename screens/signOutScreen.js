@@ -4,6 +4,7 @@ import PrimaryButton from "../ui/PrimaryButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useDispatch} from "react-redux";
 import {clearBusinessId, updateAuthStatus} from "../store/authSlice";
+import { clearListOfBusiness } from '../store/listOfBusinessSlice';
 
 const SignOutPrompt = ({ navigation }) => {
 
@@ -21,7 +22,10 @@ const SignOutPrompt = ({ navigation }) => {
             await AsyncStorage.removeItem('businessId');
             dispatch(updateAuthStatus(false));
         } catch (e) {}
+        console.log("12");
+        
         dispatch(clearBusinessId());
+        dispatch(clearListOfBusiness())
 
         Alert.alert("Signed out", "You have been signed out successfully.");
         navigation.navigate("Checkout");

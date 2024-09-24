@@ -61,7 +61,7 @@ export default function DeleteClient(props) {
                     <Text style={[textTheme.bodyLarge]}>{props.content}</Text>
                     <View style={styles.deleteClientCardButtonContainer}>
                         <PrimaryButton
-                            label={"cancel"}
+                            label={"Cancel"}
                             buttonStyle={styles.cancelButton}
                             pressableStyle={styles.cancelButtonPressable}
                             textStyle={[textTheme.titleMedium, styles.cancelButtonText]}
@@ -98,7 +98,8 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         position: "absolute",
-        right: 0,
+        right: 10,
+        top:5,
         backgroundColor: Colors.white,
     },
     closeButtonPressable: {
@@ -119,12 +120,13 @@ const styles = StyleSheet.create({
     },
     label: {
         width: "100%",
+        paddingVertical:5,
         backgroundColor: Colors.background,
         alignItems: "center",
         elevation: 0.5,
     },
     deleteClientText: {
-        paddingVertical: 10
+        paddingVertical: 10,
     },
     deleteClientCardContainer: {
         paddingVertical: 10,

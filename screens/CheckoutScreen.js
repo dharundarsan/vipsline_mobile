@@ -1,4 +1,4 @@
-import { Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {ActivityIndicator, Image, Platform, Pressable, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
@@ -7,7 +7,7 @@ import AddClientButton from "../components/checkoutScreen/AddClientButton";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import title from "react-native-paper/src/components/Typography/v2/Title";
 import {useCallback, useEffect, useLayoutEffect, useState} from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -36,7 +36,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 
 const CheckoutScreen = () => {
@@ -47,60 +47,47 @@ const CheckoutScreen = () => {
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [searchClientQuery, setSearchClientQuery] = useState("");
+    const [isLoading, setIsLoading] = useState(false)
 
     const businessId = useSelector(state => state.authDetails.businessId);
 
-    // const checkAuthentication = async () => {
-    //     try {
-    //         const authKey = await AsyncStorage.getItem('authKey');
-    //         if (authKey !== null) {
-    //             setIsAuthenticated(true); // Update local state if the user is authenticated
-    //         } else {
-    //             setIsAuthenticated(false);
-    //         }
-    //     } catch (e) {
-    //                     setIsAuthenticated(false);
-    //     }
-    // };
-    //
-    //
-    // useEffect(() => {
-    //     checkAuthentication(); // Initial auth check
-    // }, [reduxAuthStatus, isAuthenticated]); // Dependency on Redux authentication status
-
-
     useEffect(() => {
-        if(businessId !== "") {
-            // clearCartAPI();
-            dispatch(clearCustomItems());
-            dispatch(clearLocalCart());
-            dispatch(clearSalesNotes());
-            dispatch(modifyClientMembershipId({type: "clear"}))
-            dispatch(loadServicesDataFromDb("women"));
-            dispatch(loadServicesDataFromDb("men"));
-            dispatch(loadServicesDataFromDb("kids"));
-            dispatch(loadServicesDataFromDb("general"));
-            dispatch(loadProductsDataFromDb());
-            dispatch(loadPackagesDataFromDb());
-            dispatch(loadMembershipsDataFromDb());
-            dispatch(loadClientsFromDb());
-            dispatch(loadClientCountFromDb());
-            dispatch(loadClientFiltersFromDb(10, "All"));
-            dispatch(loadBusinessesListFromDb());
-            dispatch(loadLoginUserDetailsFromDb());
-            dispatch(loadStaffsFromDB());
-            dispatch(loadCartFromDB());
-            // dispatch(loadBookingDetailsFromDb());
+        const loadData = async () => {
+            setIsLoading(true)
+            if (businessId !== "") {
+                await clearCartAPI();
+                dispatch(clearCustomItems());
+                dispatch(clearLocalCart());
+                dispatch(clearSalesNotes());
+                dispatch(modifyClientMembershipId({type: "clear"}))
+                await dispatch(loadServicesDataFromDb("women"));
+                await dispatch(loadServicesDataFromDb("men"));
+                await dispatch(loadServicesDataFromDb("kids"));
+                await dispatch(loadServicesDataFromDb("general"));
+                await dispatch(loadProductsDataFromDb());
+                await dispatch(loadPackagesDataFromDb());
+                await dispatch(loadMembershipsDataFromDb());
+                // await dispatch(loadClientsFromDb());
+                await dispatch(loadClientCountFromDb());
+                await dispatch(loadClientFiltersFromDb(10, "All"));
+                await dispatch(loadBusinessesListFromDb());
+                await dispatch(loadLoginUserDetailsFromDb());
+                await dispatch(loadStaffsFromDB());
+                // dispatch(loadCartFromDB());
+                // dispatch(loadBookingDetailsFromDb());
+            }
+            setIsLoading(false)
         }
+        loadData();
 
     }, [businessId]);
 
 
-
     useFocusEffect(
+
         useCallback(() => {
             // Function to execute whenever the drawer screen is opened
-            if(businessId !== "") {
+            if (businessId !== "") {
                 dispatch(loadClientsFromDb());
             }
             // Optional cleanup function when screen is unfocused
@@ -110,43 +97,23 @@ const CheckoutScreen = () => {
         }, [businessId])
     );
 
-
-    //
-    // useEffect(() => {
-    //     dispatch(loadServicesDataFromDb("women"));
-    //     dispatch(loadServicesDataFromDb("men"));
-    //     dispatch(loadServicesDataFromDb("kids"));
-    //     dispatch(loadServicesDataFromDb("general"));
-    //     dispatch(loadProductsDataFromDb());
-    //     dispatch(loadPackagesDataFromDb());
-    //     dispatch(loadMembershipsDataFromDb());
-    //     dispatch(loadClientsFromDb());
-    //     dispatch(loadClientCountFromDb());
-    //     dispatch(loadClientFiltersFromDb(10, "All"));
-    //     dispatch(loadBusinessesListFromDb());
-    //     dispatch(loadLoginUserDetailsFromDb());
-    //     dispatch(loadStaffsFromDB());
-    //     dispatch(loadCartFromDB());
-    //     dispatch(loadBookingDetailsFromDb());
-    // }, []);
-
-
     return (
-        <View style={[styles.checkoutScreen, {
-            paddingBottom: insets.bottom
-        }]}>
-            <AddClientModal setSearchClientQuery={setSearchClientQuery}
-            searchClientQuery={searchClientQuery}
-            closeModal={() => {
-                setIsAddClientModalVisible(false)
-            }} isVisible={isAddClientModalVisible} />
-            <AddClientButton setSearchClientQuery={setSearchClientQuery}
-            searchClientQuery={searchClientQuery}
-            onPress={() => {
-                setIsAddClientModalVisible(true)
-            }} />
-            <Cart />
-        </View>
+        isLoading ? <ActivityIndicator size={"large"} style={{flex: 1, backgroundColor: Colors.white}}/> :
+            <View style={[styles.checkoutScreen, {
+                paddingBottom: insets.bottom
+            }]}>
+                <AddClientModal setSearchClientQuery={setSearchClientQuery}
+                                searchClientQuery={searchClientQuery}
+                                closeModal={() => {
+                                    setIsAddClientModalVisible(false)
+                                }} isVisible={isAddClientModalVisible}/>
+                <AddClientButton setSearchClientQuery={setSearchClientQuery}
+                                 searchClientQuery={searchClientQuery}
+                                 onPress={() => {
+                                     setIsAddClientModalVisible(true)
+                                 }}/>
+                <Cart/>
+            </View>
     );
 }
 
