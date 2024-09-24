@@ -31,7 +31,7 @@ const PrepaidModal = (props) => {
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}
                   presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
-            <Text style={[textTheme.titleLarge, styles.heading]}>Add Prepaid</Text>
+            <Text style={[textTheme.titleLarge, styles.heading]}>{props.edited ? "Edit Prepaid" : "Add Prepaid"}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}
@@ -59,7 +59,7 @@ const PrepaidModal = (props) => {
                                      setPrepaidAmount(parseFloat(price))
                                  }}
                                  onChangeText={setPrepaidAmount}/>
-                <CustomTextInput label={"Prepaid Bonus"} type={"price"} placeholder={"0.00"}
+                <CustomTextInput label={"Bonus amount"} type={"price"} placeholder={"0.00"}
                                  value={prepaidBonus.toString()}
                                  onChangeText={setPrepaidBonus}
                                  onEndEditing={(price) => {
@@ -74,7 +74,7 @@ const PrepaidModal = (props) => {
                         Value)</Text>
                 </View>
                 <Text style={[textTheme.titleMedium, styles.totalCreditText]}>Total Prepaid Credit
-                    ₹{prepaidAmount + prepaidBonus}</Text>
+                    ₹{parseFloat(prepaidAmount) + parseFloat(prepaidBonus)}</Text>
             </ScrollView>
         </View>
         <Divider/>

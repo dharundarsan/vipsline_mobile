@@ -156,7 +156,7 @@ const AddItemModal = (props) => {
                         onPress={openDatePicker}
                     >
                         <Text style={TextTheme.titleMedium}>
-                            {formatDate(selectedDate)}
+                            {formatDate(selectedDate, "dd short-month year")}
                         </Text>
                         <MaterialCommunityIcons
                             name="calendar-month-outline"

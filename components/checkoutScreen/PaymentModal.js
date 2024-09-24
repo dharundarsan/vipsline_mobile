@@ -40,6 +40,7 @@ import clearCartAPI from "../../util/apis/clearCartAPI";
 import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import * as Haptics from "expo-haptics";
+import {AlertNotificationRoot} from "react-native-alert-notification";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -386,6 +387,7 @@ const PaymentModal = (props) => {
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
         // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
     >
+
         {
             isSplitPaymentDropdownVisible &&
             <DropdownModal isVisible={isSplitPaymentDropdownVisible}
@@ -867,106 +869,167 @@ const PaymentModal = (props) => {
 const styles = StyleSheet.create({
     paymentModal: {
         flex: 1,
-    },
+    }
+    ,
     headingAndCloseContainer: {
         marginTop: Platform.OS === "ios" ? 50 : 0,
-        paddingVertical: 15,
-        alignItems: "center",
-    },
+        paddingVertical:
+            15,
+        alignItems:
+            "center",
+    }
+    ,
     heading: {
         fontWeight: 500
-    },
+    }
+    ,
     closeButton: {
         position: "absolute",
-        right: 0,
-        top: 5,
-        backgroundColor: Colors.background,
-    },
+        right:
+            0,
+        top:
+            5,
+        backgroundColor:
+        Colors.background,
+    }
+    ,
     modalContent: {
         flex: 1,
-        padding: 25,
-    },
+        padding:
+            25,
+    }
+    ,
     paymentOptionsContainer: {
         marginTop: 10,
-        gap: 15,
-        marginBottom: 25,
-    },
+        gap:
+            15,
+        marginBottom:
+            25,
+    }
+    ,
     paymentOptionsRow: {
         gap: 15,
-        flexDirection: "row",
-    },
+        flexDirection:
+            "row",
+    }
+    ,
     paymentOptionButton: {
         backgroundColor: Colors.background,
-        overflow: "visible",
-        borderRadius: 10,
-        borderWidth: 1,
-        alignItems: "center",
-        flex: 1,
-        borderColor: Colors.grey400,
-    },
+        overflow:
+            "visible",
+        borderRadius:
+            10,
+        borderWidth:
+            1,
+        alignItems:
+            "center",
+        flex:
+            1,
+        borderColor:
+        Colors.grey400,
+    }
+    ,
     paymentOptionSelected: {
         borderRadius: 10,
-        borderColor: Colors.highlight,
-        borderWidth: 2,
-    },
+        borderColor:
+        Colors.highlight,
+        borderWidth:
+            2,
+    }
+    ,
     tickContainer: {
         position: "absolute",
-        right: -15,
-        top: -15,
-        zIndex: 10,
-    },
+        right:
+            -15,
+        top:
+            -15,
+        zIndex:
+            10,
+    }
+    ,
     paymentOptionButtonPressable: {
         paddingHorizontal: 0,
-        paddingVertical: 20,
-    },
+        paddingVertical:
+            20,
+    }
+    ,
     addPaymentButtonContainer: {
         flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center"
-    },
+        justifyContent:
+            "center",
+        alignItems:
+            "center"
+    }
+    ,
     addPaymentButton: {
         backgroundColor: Colors.grey100,
-        borderWidth: 1,
-        borderRadius: 8,
-        borderColor: Colors.grey400,
-        alignSelf: "flex-start"
-    },
+        borderWidth:
+            1,
+        borderRadius:
+            8,
+        borderColor:
+        Colors.grey400,
+        alignSelf:
+            "flex-start"
+    }
+    ,
     addPaymentButtonPressable: {
         paddingVertical: 5,
-        paddingHorizontal: 20,
-        gap: 5,
-        justifyContent: "flex-start",
-        flexDirection: "row",
-    },
+        paddingHorizontal:
+            20,
+        gap:
+            5,
+        justifyContent:
+            "flex-start",
+        flexDirection:
+            "row",
+    }
+    ,
     buttonContainer: {
         flexDirection: "row",
-        margin: 10,
-        gap: 10,
-        padding: 3,
-    },
+        margin:
+            10,
+        gap:
+            10,
+        padding:
+            3,
+    }
+    ,
     optionButton: {
-        backgroundColor: Colors.transparent, borderColor: Colors.grey900, borderWidth: 1,
-    },
+        backgroundColor: Colors.transparent, borderColor:
+        Colors.grey900, borderWidth:
+            1,
+    }
+    ,
     checkoutButton: {
         flex: 1,
-    },
+    }
+    ,
     checkoutButtonPressable: {
         // flex:1,
         flexDirection: "row",
-        justifyContent: "space-between",
-        alignContent: "space-between", // alignItems:"stretch",
+        justifyContent:
+            "space-between",
+        alignContent:
+            "space-between", // alignItems:"stretch",
         // alignSelf:"auto",
-    },
+    }
+    ,
     checkoutButtonAmountAndArrowContainer: {
-        flexDirection: "row", gap: 25,
-    },
+        flexDirection: "row", gap:
+            25,
+    }
+    ,
     checkoutButtonText: {
         color: Colors.white
-    },
+    }
+    ,
     splitInputAndCloseContainer: {
         gap: 10,
-        flexDirection: "row",
-    },
+        flexDirection:
+            "row",
+    }
+    ,
     splitInputCloseButton: {
         backgroundColor: Colors.background,
     }
