@@ -4,7 +4,6 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
-import Toast from 'react-native-simple-toast';
 import * as Haptics from "expo-haptics";
 
 

@@ -217,7 +217,7 @@ const InvoiceModal = (props) => {
                 buttonTwoName={"Send"}
                 onCloseModal={() => setEmailModalVisibility(false)}
                 onChangeText={(text) => setEmail(text)}
-                value={email.trim()}
+                value={ checkNullUndefined(email) ? email.trim() : ""}
                 buttonTwoOnPress={async () => {
                     const emailValid = emailRef.current();
                     if (emailValid) {

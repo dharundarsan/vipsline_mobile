@@ -54,10 +54,8 @@ const AddItemModal = (props) => {
     const [womenServicesData, setWomenServicesData] = useState();
     useEffect(() => {
         if (selectedCategory === "products") {
-            console.log("1");
 
             const backAction = () => {
-                console.log("3212");
 
                 // if (selectedCategory==="products") {
                 //     setIsModalVisible(false);
@@ -187,9 +185,9 @@ const AddItemModal = (props) => {
                             onConfirm={(date) => {
                                 setIsDatePickerVisible(false);
                                 setSelectedDate(
-                                    date
+                                    new Date(date).getTime()
                                 );
-                                dispatch(updateAppointmentDate(date));
+                                dispatch(updateAppointmentDate(new Date(date).getTime()));
                             }}
                             onCancel={() => setIsDatePickerVisible(false)}
                             themeVariant="light"
