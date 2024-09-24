@@ -269,7 +269,12 @@ export default function ClientSegmentScreen() {
                     id={clientId}
                     setSearchQuery={setSearchQuery}
                     setFilterPressed={setFilterPressed}
-                    onClose={() => setIsClientInfoModalVisible(false)}
+                    onClose={() => {
+                        setIsClientInfoModalVisible(false)
+                        dispatch(clearClientInfo())
+                    }}
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
 
                     />
                 }

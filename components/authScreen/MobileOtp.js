@@ -135,11 +135,13 @@ export default function MobileOtp() {
                 {
                     isUserTyping ?
                         <Text></Text> :
-                        isSendOtpPressed ?
+                        mobileNumber.trim().length === 0 && isSendOtpPressed ?
                             <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number is required</Text> :
-                    !isUserFound ?
-                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number</Text> :
-                        <Text> </Text>
+                        !isUserFound ?
+                            <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number</Text> :
+                        // isSendOtpPressed ?
+                        //     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number is required</Text> :
+                            <Text> </Text>
                 }
                 <PrimaryButton
                     buttonStyle={styles.sendOtpButton}
