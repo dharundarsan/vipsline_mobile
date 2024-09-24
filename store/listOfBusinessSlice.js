@@ -8,7 +8,7 @@ const initialClientState = {
     isFetching: false,
     selectedBusiness: {},
     isBusinessSelected: false,
-
+    businessNotificationDetails:{}
 };
 
 export const loadBusinessesListFromDb = () => async (dispatch) => {
@@ -19,7 +19,7 @@ export const loadBusinessesListFromDb = () => async (dispatch) => {
             authToken = value;
         }
     } catch (e) {
-        console.log("auth token fetching error. (inside listOfBusinessSlice loadBusinessListFromDb)" + e);
+        console.error("auth token fetching error. (inside listOfBusinessSlice loadBusinessListFromDb)" + e);
     }
 
 
@@ -39,7 +39,33 @@ export const loadBusinessesListFromDb = () => async (dispatch) => {
         console.error(e);
     }
 };
+export const loadBusinessNotificationDetails = () => async(dispatch,getState) => {
+    const {authDetails} = getState();
+    let authToken = ""
+    try {
+        const value = await AsyncStorage.getItem('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.error("auth token fetching error. (inside listOfBusinessSlice loadBusinessListFromDb)" + e);
+    }
+    
+    await axios.post(process.env.EXPO_PUBLIC_API_URI+'/business/getBusinessNotificationDetails',{
+        business_id: authDetails.businessId
+    },
+        {
+            headers:{
+                authorization: "Bearer " + authToken
+            }
+        }
+    ).then(res => {
+        dispatch(updateBusinessNotificationDetails(res.data));
+    }).catch (error => {
+        console.error("Error Fetching Business Notification Details. "+error);
+    })
 
+}
 export const listOfBusinessSlice = createSlice({
     name: "businesses",
     initialState: initialClientState,
@@ -62,7 +88,10 @@ export const listOfBusinessSlice = createSlice({
             state.isFetching = false,
             state.selectedBusiness = {},
             state.isBusinessSelected = false
-        }
+        },
+        updateBusinessNotificationDetails(state,action){
+            state.businessNotificationDetails = action.payload;
+        },
     }
 });
 

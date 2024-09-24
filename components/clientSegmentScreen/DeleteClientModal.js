@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     modalContent: {
         flex: 1,
         justifyContent: "flex-end",
-        backgroundColor: Colors.ripple,
+        backgroundColor: Colors.dim300,
     },
     dropdownList: {
         backgroundColor: Colors.white,

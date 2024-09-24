@@ -6,9 +6,11 @@ import Colors from "../constants/Colors";
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row-reverse',  // Place radio button on the right
-        alignItems: 'center',
-        justifyContent: 'space-around',
+        alignItems: 'center',          // Vertically align items
+        justifyContent:"center",
         padding: 10,
+        gap:85,
+        backgroundColor:Colors.white
     },
     pressed: {
         backgroundColor: '#e0e0e0',  // Grey background when pressed
@@ -34,6 +36,8 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 16,
+        flexShrink: 1,   // Ensure text doesn't overflow and keeps circles aligned
+        minWidth: 40,    // Adjust this value to ensure consistent spacing
     },
 });
 
@@ -48,7 +52,7 @@ const RadioButton = ({ options, value, onValueChange, onPress }) => {
     };
 
     return (
-        <View style={{ width: '100%' }}>
+        <View style={{ width: '100%'}}>
             {options.map((option) => (
                 <Pressable
                     key={option.value}

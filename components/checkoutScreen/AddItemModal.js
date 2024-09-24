@@ -52,6 +52,9 @@ const AddItemModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(appointmentDate);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
+
+    const businessDetails = useSelector(state => state.businesses);
+
     useEffect(() => {
         if (selectedCategory === "products") {
 
@@ -180,6 +183,8 @@ const AddItemModal = (props) => {
                         <DateTimePickerModal
                             isVisible={isDatePickerVisible}
                             mode="date"
+                            minimumDate={businessDetails.businessNotificationDetails.data[0].back_date_invoice_allowed === false 
+                            ? new Date(Date.now()) : undefined }
                             maximumDate={new Date(Date.now())}
                             date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)}
                             onConfirm={(date) => {

@@ -42,7 +42,6 @@ const EditCartModal = (props) => {
     const [discountValue, setDiscountValue] = useState(initialDiscountValue);
     const [discountAmount, setDiscountAmount] = useState(initialDiscountAmount);
     const [price, setPrice] = useState(props.data.price);
-
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
 

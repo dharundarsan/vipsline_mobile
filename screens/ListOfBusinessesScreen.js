@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus, updateBusinessId, updateBusinessName} from "../store/authSlice";
 import {
     loadBusinessesListFromDb,
+    loadBusinessNotificationDetails,
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
