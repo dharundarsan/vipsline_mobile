@@ -270,8 +270,6 @@ export default function ClientSegmentScreen() {
                     setSearchQuery={setSearchQuery}
                     setFilterPressed={setFilterPressed}
                     onClose={() => setIsClientInfoModalVisible(false)}
-                    selectedOption={selectedOption}
-                    setSelectedOption={setSelectedOption}
 
                     />
                 }

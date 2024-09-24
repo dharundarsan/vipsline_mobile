@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         justifyContent: "flex-end",
-        backgroundColor: Colors.ripple
+        backgroundColor: Colors.dim300,
     },
     dropdownList: {
         backgroundColor: Colors.white,

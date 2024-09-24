@@ -22,7 +22,6 @@ import {formatDate} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
 
 const EditCartModal = (props) => {
-    console.log(props.data)
     const [selectedDiscountMode, setSelectedDiscountMode] = useState("cash");
     const [discountValue, setDiscountValue] = useState(props.data.edited ? props.data.disc_value : props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);
     const [discountAmount, setDiscountAmount] = useState(props.data.edited ? props.data.disc_value : props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);

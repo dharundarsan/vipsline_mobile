@@ -165,20 +165,18 @@ const CheckoutSection = (props) => {
 
 
     async function addDiscount(discountMode, type) {
-        const addDiscount = {
-            name: "Custom Discount", type: discountMode, amount: discountValue
-        }
-
         if (type === "clear") {
             setDiscountValue("")
             dispatch(updateDiscount([]));
             setSelectedDiscountMode("PERCENTAGE")
         } else {
+            const addDiscount = {
+                name: "Custom Discount", type: discountMode, amount: discountValue
+            }
             setSelectedDiscountMode(discountMode)
             dispatch(updateDiscount(addDiscount));
         }
         dispatch(updateCalculatedPrice());
-
         setActionModal(false);
     }
 
@@ -241,6 +239,7 @@ const CheckoutSection = (props) => {
                                              onCloseModal={() => {
                                                  setActionModal(false)
                                              }}
+                                             total_price_after_discount={calculatedPrice[0].total_price_after_discount}
                                              selectedDiscountMode={selectedDiscountMode}
                                              setSelectedDiscountMode={setSelectedDiscountMode}
                                              clearSalesNotes={clearSaleNotes}
