@@ -159,6 +159,7 @@ export default function clientInfoModal(props) {
 
             <DeleteClient
                 isVisible={deleteClientModalVisibility}
+                deleteClient={true}
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     props.setModalVisibility(false);

@@ -72,7 +72,7 @@ export default function DeleteClient(props) {
                             buttonStyle={styles.deleteButton}
                             textStyle={[textTheme.titleMedium]}
                             onPress={() => {
-                                deleteClientAPI(currentClientId);
+                                if(props.deleteClient) deleteClientAPI(currentClientId);
                                 props.onCloseModal();
                                 props.onCloseClientInfoAfterDeleted();
                                 dispatch(loadClientCountFromDb());
