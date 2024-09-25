@@ -38,6 +38,7 @@ const AddClientButton = (props) => {
     const [isAvailablePackagesModalVisible, setIsAvailablePackageModalVisible] = useState(false);
     const [modalVisibility, setModalVisibility] = useState(false)
     const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
+    const [selectedOption, setSelectedOption] = useState("");
 
     const details = useSelector(state => state.clientInfo.details);
 
@@ -89,7 +90,6 @@ const AddClientButton = (props) => {
             setEditClientModalVisibility(true);
         }
     }
-
     return (
         <>
             {
@@ -97,6 +97,8 @@ const AddClientButton = (props) => {
                     <View style={{borderBottomWidth: 1, borderColor: Colors.highlight}}>
                         {isVisibileModal && (
                             <ClientInfoModal
+                                selectedOption={selectedOption}
+                                setSelectedOption={setSelectedOption}
                                 setFilterPressed={setFilterPressed}
                                 searchClientQuery={props.searchClientQuery}
                                 setSearchQuery={props.setSearchClientQuery}
@@ -114,9 +116,9 @@ const AddClientButton = (props) => {
                                 onClose={() => {
                                     setIsVisibleModal(false);
                                 }}
-                                phone={clientInfo.details?.mobile_1}
-                                name={clientInfo.details?.firstName}
-                                id={clientInfo.details?.id}
+                                phone={clientInfo.details.mobile_1}
+                                name={clientInfo.details.firstName}
+                                id={clientInfo.details.id}
                             />
                         )}
                         {/* <UpdateClientModal

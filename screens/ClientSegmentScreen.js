@@ -273,9 +273,6 @@ export default function ClientSegmentScreen() {
                         setIsClientInfoModalVisible(false)
                         dispatch(clearClientInfo())
                     }}
-                    selectedOption={selectedOption}
-                    setSelectedOption={setSelectedOption}
-
                     />
                 }
 
