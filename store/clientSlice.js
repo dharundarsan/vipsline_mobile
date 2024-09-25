@@ -22,7 +22,11 @@ async function getBusinessId() {
     }
 }
 
+var count = 0;
 export const loadClientsFromDb = () => async (dispatch, getState) => {
+    count++;
+    console.log(count);
+    
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
@@ -51,7 +55,7 @@ export const loadClientsFromDb = () => async (dispatch, getState) => {
         dispatch(updateFetchingState(true));
         const response = await axios.post(
 
-            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${0}&pageSize=40`,
+            `${process.env.EXPO_PUBLIC_API_URI}/business/getClientDetailsOfBusiness?pageNo=${0}&pageSize=50`,
             {
                 business_id: await getBusinessId(),
             },
@@ -102,7 +106,7 @@ export const clientSlice = createSlice({
     initialState: initialClientState,
     reducers: {
         updateClientsList(state, action) {
-            state.clients.push(...action.payload);
+            state.clients = action.payload;
             state.pageNo++;
         },
         updateClientCount(state, action) {

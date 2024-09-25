@@ -19,6 +19,7 @@ import { checkNullUndefined, dateFormatter } from "../../util/Helpers";
 import { clearClientInfo, loadClientInfoFromDb } from "../../store/clientInfoSlice";
 import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
+import { loadClientsFromDb } from "../../store/clientSlice";
 
 /**
  * ClientInfoModal Component
@@ -163,7 +164,7 @@ export default function clientInfoModal(props) {
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     props.setModalVisibility(false);
-                    // dispatch(loadClientInfoFromDb(props.id))
+                    dispatch(loadClientsFromDb())
                     dispatch(clearClientInfo());
 
                 }}

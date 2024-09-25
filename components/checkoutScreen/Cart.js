@@ -124,7 +124,7 @@ const Cart = () => {
                             </View>
                         </PrimaryButton>
                     </View>
-                    <CheckoutSection/>
+                    <CheckoutSection />
                 </>
             }
         </View>

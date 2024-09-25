@@ -10,7 +10,7 @@ import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
 import { formatDate } from "../../util/Helpers";
 import { useDispatch } from "react-redux";
-import { loadClientCountFromDb } from "../../store/clientSlice";
+import { loadClientCountFromDb, loadClientsFromDb } from "../../store/clientSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { shadowStyling } from "../../util/Helpers";
 import Toast from "react-native-root-toast";
