@@ -34,6 +34,7 @@ import {updateAppointmentDate} from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import {AlertNotificationRoot} from "react-native-alert-notification";
 
 const modalCategoryListData = [
     {id: "services", title: "SERVICES"},
@@ -183,8 +184,8 @@ const AddItemModal = (props) => {
                         <DateTimePickerModal
                             isVisible={isDatePickerVisible}
                             mode="date"
-                            minimumDate={businessDetails.businessNotificationDetails.data[0].back_date_invoice_allowed === false 
-                            ? new Date(Date.now()) : undefined }
+                            minimumDate={businessDetails.businessNotificationDetails.data[0].back_date_invoice_allowed === false
+                                ? new Date(Date.now()) : undefined}
                             maximumDate={new Date(Date.now())}
                             date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)}
                             onConfirm={(date) => {
@@ -280,32 +281,41 @@ const AddItemModal = (props) => {
                 }
             }
         >
-            <View style={[styles.backAndCloseContainer, shadowStyling]}>
-                {
-                    selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
-                        buttonStyle={styles.backButton}
+            <AlertNotificationRoot theme={"light"}
+                                   toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
+                                   colors={[{
+                                       // label: Colors.white,
+                                       card: Colors.grey200,
+                                       // card: "#ff7171",
+                                       // card: "#b73737",
+                                   }]}>
+                <View style={[styles.backAndCloseContainer, shadowStyling]}>
+                    {
+                        selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
+                            buttonStyle={styles.backButton}
+                            onPress={() => {
+                                setSelectedCategory(null);
+                            }}
+                        >
+                            <AntDesign name="arrowleft" size={24} color="black"/>
+                        </PrimaryButton>
+                    }
+                    <View style={styles.newSaleTextContainer}>
+                        <Text
+                            style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
+                    </View>
+                    <PrimaryButton
+                        buttonStyle={styles.closeButton}
                         onPress={() => {
                             setSelectedCategory(null);
+                            props.closeModal();
                         }}
                     >
-                        <AntDesign name="arrowleft" size={24} color="black"/>
+                        <Ionicons name="close" size={25} color="black"/>
                     </PrimaryButton>
-                }
-                <View style={styles.newSaleTextContainer}>
-                    <Text
-                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
                 </View>
-                <PrimaryButton
-                    buttonStyle={styles.closeButton}
-                    onPress={() => {
-                        setSelectedCategory(null);
-                        props.closeModal();
-                    }}
-                >
-                    <Ionicons name="close" size={25} color="black"/>
-                </PrimaryButton>
-            </View>
-            {content}
+                {content}
+            </AlertNotificationRoot>
         </Modal>
     );
 }

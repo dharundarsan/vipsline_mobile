@@ -5,6 +5,7 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
 import * as Haptics from "expo-haptics";
+import {ALERT_TYPE, Toast} from "react-native-alert-notification";
 
 
 const ProductItem = (props) => {
@@ -60,9 +61,15 @@ const ProductItem = (props) => {
                           onPress={() => {
                               if (props.data.available_quantity === 0) {
                                   // ToastAndroid.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", ToastAndroid.LONG)
-                                  Toast.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", Toast.LONG, {
-                                      tapToDismissEnabled: true,
-                                  })
+                                  // Toast.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", Toast.LONG, {
+                                  //     tapToDismissEnabled: true,
+                                  // })
+                                  Toast.show({
+                                      type: ALERT_TYPE.WARNING,
+                                      title: "Zero stock warning",
+                                      textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                      autoClose: 1500,
+                                  });
                                   return;
                               }
                               dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
