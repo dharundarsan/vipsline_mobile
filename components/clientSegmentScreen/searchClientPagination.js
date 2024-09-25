@@ -56,11 +56,13 @@ export default function SearchClientPagination(props) {
 
     useEffect(() => {
         dispatch(updateSearchClientMaxEntry(10))
-                dispatch(resetSearchClientFilter());
-                dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
+        dispatch(resetSearchClientFilter());
+        dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
         // setTotalCount(totalCount);
         setLowerCount(1);
         setUpperCount(10 > getTotalCount ? getTotalCount : 10);
+        props.setSearchClientTotalCount(getTotalCount);
+        console.log(getTotalCount);
 
     }, [props.filterPressed]);
 
