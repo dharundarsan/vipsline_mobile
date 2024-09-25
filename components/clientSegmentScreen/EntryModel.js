@@ -60,18 +60,17 @@ export default function EntryModel(props) {
         <Modal
             style={{alignItems: 'center', justifyContent: 'center'}}
             visible={props.isModalVisible}
-            animationType="slide"
+            animationType="fade"
             transparent={true}
         >
             <TouchableOpacity activeOpacity={1}
-                              style={{flex: 1, justifyContent: "center", backgroundColor: Colors.ripple}}
+                              style={{flex: 1, justifyContent: "center", backgroundColor: Colors.dim}}
                               onPress={() => {
                                   props.setIsModalVisible(false);
                               }}>
 
                 <View style={styles.model}>
                     <View style={styles.innerContainer}>
-
                         <RadioButton
                             options={options}
                             value={selectedOption}

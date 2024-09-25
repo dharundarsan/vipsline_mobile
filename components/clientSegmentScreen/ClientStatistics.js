@@ -2,6 +2,7 @@ import ClientStatisticsCard from "./ClientStatisticsCard";
 import {View, Text, StyleSheet, FlatList} from "react-native"
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useState} from "react";
+import Colors from "../../constants/Colors";
 
 
 /**
@@ -78,6 +79,7 @@ const styles = StyleSheet.create({
     statistics: {
         flex: 1,
         alignItems: "center",
+
     },
     salesStatisticsCard: {
         width: "95%",
