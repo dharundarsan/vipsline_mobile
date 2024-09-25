@@ -359,6 +359,12 @@ export default function ClientSegmentScreen() {
 
 
                 {
+                    clientCount === 0 ?
+                        <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                            <Text style={[textTheme.titleSmall]}>
+                                No clients to display
+                            </Text>
+                        </View> :
                     searchQuery === "" ?
                         <>
                             {

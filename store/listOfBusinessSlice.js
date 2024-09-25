@@ -76,9 +76,9 @@ export const listOfBusinessSlice = createSlice({
         updateSelectedBusinessDetails(state, action) {
             state.selectedBusiness = action.payload;
         },
-        updateBusinessNotificationDetails(state, action) {
-            state.selectedBusiness = {...state.selectedBusiness, ...action.payload};
-        },
+        // updateBusinessNotificationDetails(state, action) {
+        //     state.selectedBusiness = {...state.selectedBusiness, ...action.payload};
+        // },
         updateIsBusinessSelected(state, action) {
             state.isBusinessSelected = action.payload;
         },
