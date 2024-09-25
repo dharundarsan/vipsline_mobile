@@ -79,15 +79,18 @@ export default function ClientCard(props) {
         },
         clientDetailsContainer: {
             marginLeft: 16,
+            flex: 1,
+            flexDirection: 'column',
         },
         name: {
-
+            width:"80%",
         },
         phone: {
             color: Colors.grey650
         },
         email: {
-            color: Colors.grey650
+            width:"80%",
+            color: Colors.grey650,
         },
         opacity: {
             opacity: Platform.OS === 'ios' ? 0.5 : 1,
@@ -113,7 +116,8 @@ export default function ClientCard(props) {
 
                     <View style={[styles.clientDetailsContainer, props.clientDetailsContainer]}>
                         {
-                            props.name !== undefined ? <Text style={[textTheme.titleSmall, props.nameText]}>{name}</Text> : null
+                            props.name !== undefined ? <Text style={[textTheme.titleSmall, props.nameText]} ellipsizeMode="tail"
+                            numberOfLines={1}>{name}</Text> : null
                         }
                         {
                             props.phone !== undefined ?
@@ -121,7 +125,8 @@ export default function ClientCard(props) {
                         }
                         {
                             email !== undefined && email !== null && email.trim().length !== 0 ?
-                                <Text style={[textTheme.bodyMedium, styles.email]}>{email}</Text> : null
+                                <Text style={[textTheme.bodyMedium, styles.email]} ellipsizeMode="tail"
+                                numberOfLines={1}>{email.trim()}</Text> : null
                         }
 
                         {/*<Text>{name}</Text>*/}

@@ -22,20 +22,28 @@ import {formatDate} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
 
 const EditCartModal = (props) => {
-    const [selectedDiscountMode, setSelectedDiscountMode] = useState("cash");
-    const [discountValue, setDiscountValue] = useState(props.data.edited ? props.data.disc_value : props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);
-    const [discountAmount, setDiscountAmount] = useState(props.data.edited ? props.data.disc_value : props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price);
+    const editedCart = useSelector((state) => state.cart.editedCart);
+    const editedItem = editedCart.find(item => props.data.item_id === item.item_id) || {};
+
+    const isEdited = props.data.edited;
+    const hasDiscountedPrice = props.data.discounted_price !== 0;
+
+    const initialDiscountMode = editedItem.type === "PERCENT" ? "percentage" :
+        editedItem.type === "AMOUNT" ? "cash" :
+            hasDiscountedPrice ? "cash" : "percentage";
+
+    const initialDiscountValue = isEdited
+        ? editedItem.type === "PERCENT" ? (props.data.disc_value / props.data.price) * 100 : props.data.disc_value
+        : hasDiscountedPrice ? props.data.price - props.data.discounted_price : 0;
+
+    const initialDiscountAmount = isEdited ? props.data.disc_value : (hasDiscountedPrice ? props.data.price - props.data.discounted_price : 0);
+
+    const [selectedDiscountMode, setSelectedDiscountMode] = useState(initialDiscountMode);
+    const [discountValue, setDiscountValue] = useState(initialDiscountValue);
+    const [discountAmount, setDiscountAmount] = useState(initialDiscountAmount);
     const [price, setPrice] = useState(props.data.price);
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
-    const editedCart = useSelector((state) => state.cart.editedCart);
-
-    useEffect(() => {
-        setPrice(props.data.price)
-        setDiscountValue(props.data.edited ? props.data.disc_value : props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price)
-        setDiscountAmount(props.data.edited ? props.data.disc_value : props.data.discounted_price === 0 ? 0 : props.data.price - props.data.discounted_price)
-    }, [props]);
-
 
     useEffect(() => {
         const api = async () => {
@@ -83,21 +91,23 @@ const EditCartModal = (props) => {
                         <CustomTextInput labelTextStyle={textTheme.titleMedium} flex={1} type={"number"}
                                          label={"Enter discount"}
                                          value={discountValue.toString()}
-                                         onChangeText={(value) => {
+                                         onChangeText={setDiscountValue}
+                                         onEndEditing={async (value) => {
                                              if (value === "") {
                                                  setDiscountValue(0)
-                                                 setDiscountAmount(0);
+                                                 setDiscountAmount(0)
                                                  return;
-                                             } else if (selectedDiscountMode === "percentage" && parseFloat(value) > 100) setDiscountValue(prev => prev);
-                                             else if (selectedDiscountMode === "cash" && parseFloat(value) > parseFloat(price)) {
+                                             } else if (selectedDiscountMode === "percentage" && parseFloat(value) > 100) {
+                                                 setDiscountValue(prev => prev);
+                                             } else if (selectedDiscountMode === "cash" && parseFloat(value) > parseFloat(price)) {
                                                  setDiscountValue(prev => prev);
                                                  return;
-                                             } else setDiscountValue(parseFloat(value));
+                                             } else {
+                                                 setDiscountValue(parseFloat(value));
+                                             }
                                              if (selectedDiscountMode === "cash") {
                                                  setDiscountAmount(parseFloat(value));
                                              }
-                                         }}
-                                         onEndEditing={async (value) => {
                                              if (selectedDiscountMode === "percentage") {
                                                  setDiscountAmount(await getDiscountAPI({
                                                      price: price,
@@ -143,7 +153,7 @@ const EditCartModal = (props) => {
                     ToastAndroid.show("Discount should not be greater than price", ToastAndroid.SHORT);
                     return;
                 }
-                if (price !== parseFloat(props.data.price) || discountAmount !== 0 || discountValue !== 0) {
+                if (price !== parseFloat(props.data.price) || discountAmount !== props.data.dicounted_amount) {
                     if (props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General") {
                         dispatch(await addItemToEditedCart({
                             ...props.data,

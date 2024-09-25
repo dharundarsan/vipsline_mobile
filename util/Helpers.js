@@ -36,6 +36,8 @@ export const formatDate = (date, format) => {
             return `${day} ${months[month]} ${year}`;
         case "yyyy-d-m":
             return `${day}-${month + 1}-${year}`;
+        case "dd short-month year":
+            return `${day} ${months[month].slice(0,3)} ${year}`;
         default:
             return `${day} ${months[month]} ${year}`;
     }

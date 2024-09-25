@@ -96,6 +96,7 @@ const AddClientModal = (props) => {
         <Modal visible={props.isVisible} animationType={"slide"}
         presentationStyle="pageSheet" onRequestClose={props.closeModal}>
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
+                dispatch(loadClientsFromDb());
                 setIsCreateClientModalVisible(false);
             }}/>
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>

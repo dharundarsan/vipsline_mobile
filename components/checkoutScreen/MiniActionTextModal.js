@@ -55,6 +55,7 @@ const MiniActionTextModal = React.memo((props) => {
   };
   const getChargeData = useSelector(state => state.cart.chargesData);
   const getDiscountDetails = useSelector(state => state.cart.additionalDiscounts)
+  const getSalesNotes = useSelector(state => state.cart.salesNotes);
   const insets = useSafeAreaInsets();
   useEffect(() => {
     if (errorHandler.charges.length > 0) {
@@ -120,6 +121,11 @@ const MiniActionTextModal = React.memo((props) => {
                     else if (props.clickedValue === "Apply Discount") {
                       if (getDiscountDetails.length === 0) {
                         props.setDiscountValue("");
+                      }
+                    }
+                    else if (props.clickedValue === "Add Sales Notes"){
+                      if(getSalesNotes.trim() === ""){
+                        props.onChangeValue("");
                       }
                     }
                     props.onCloseModal();
@@ -382,21 +388,7 @@ const MiniActionTextModal = React.memo((props) => {
                         }));
                         return;
                       }
-                      if(selectedDiscountMode === "AMOUNT"){
-                        if((props.total_price_after_discount - props.discountValue) <= 0 ){
-                          props.setDiscountValue(discountValue)
-                          props.onCloseModal();
-                          return;
-                        }
-                      }
-                      else if(selectedDiscountMode === "PERCENTAGE"){
-                        if(props.discountValue >= 100 ){
-                          props.setDiscountValue(discountValue)
-                            props.onCloseModal();
-                            return;
-                        }
-                    }
-                      props.addDiscount(selectedDiscountMode);
+                      props.addDiscount(selectedDiscountMode,"update",discountValue);
                     }
                     else if (props.clickedValue === "Add Charges") {
                       const updatedChargesErrors = props.chargesInputData.map((item) => {

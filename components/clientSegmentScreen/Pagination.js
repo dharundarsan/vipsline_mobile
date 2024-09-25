@@ -60,11 +60,12 @@ export default function Pagination(props) {
 
         currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         dispatch(resetClientFilter());
-        dispatch(loadClientFiltersFromDb(10, clientFilterNames(props.filterPressed)))
+        if(currentClientCount > 10) {
+            dispatch(loadClientFiltersFromDb(10, clientFilterNames(props.filterPressed)))
+        }
         setTotalCount(currentClientCount);
         setLowerCount(1);
         setUpperCount(10 > currentClientCount ? currentClientCount : 10);
-
 
     }, [props.filterPressed]);
 

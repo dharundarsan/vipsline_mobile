@@ -34,6 +34,7 @@ import {updateAppointmentDate} from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
 
 const modalCategoryListData = [
     {id: "services", title: "SERVICES"},
@@ -78,7 +79,14 @@ const AddItemModal = (props) => {
     const openDatePicker = () => {
         setIsDatePickerVisible(true);
     };
-
+    function showToast(){
+        Toast.show({
+            type: ALERT_TYPE.WARNING,
+            title: "You are trying to raise this invoice on a previous date",
+            // textBody: "Invoice generated",
+            autoClose: 3000,
+        });
+    }
     const styles = StyleSheet.create({
         modalOverlay: {
             flex: 1,
@@ -145,7 +153,15 @@ const AddItemModal = (props) => {
 
     let content;
     if (selectedCategory === null) {
-        content = <View style={styles.modalContent}>
+        content = <AlertNotificationRoot theme={"light"}
+        toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
+        colors={[{
+            label:Colors.white,
+            // card: Colors.grey200,
+            // card: "#ff7171",
+            card: "#b73737",
+        }]}>
+
             <View style={styles.modalHeader}>
                 <View style={styles.dateContainer}>
                     <Text
@@ -159,7 +175,7 @@ const AddItemModal = (props) => {
                         onPress={openDatePicker}
                     >
                         <Text style={TextTheme.titleMedium}>
-                            {formatDate(selectedDate)}
+                            {formatDate(selectedDate, "dd short-month year")}
                         </Text>
                         <MaterialCommunityIcons
                             name="calendar-month-outline"
@@ -188,6 +204,15 @@ const AddItemModal = (props) => {
                             maximumDate={new Date(Date.now())}
                             date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)}
                             onConfirm={(date) => {
+                                const now = new Date();
+                                const formatForComparison = (date) => {
+                                    return new Date(date).toISOString().split(':').slice(0, 2).join(':') + ':00.000Z';
+                                };
+                                const formattedCurrentDate = formatForComparison(now);
+                                const formattedSelectedDate = formatForComparison(date);
+                                if (formattedCurrentDate !== formattedSelectedDate) {
+                                    showToast();
+                                }
                                 setIsDatePickerVisible(false);
                                 setSelectedDate(
                                     new Date(date).getTime()
@@ -233,7 +258,7 @@ const AddItemModal = (props) => {
                 }}
                 keyExtractor={(item) => item.id.toString()}
             />
-        </View>
+        </AlertNotificationRoot>
     } else if (selectedCategory === "services") {
         content = <ServicesList closeOverallModal={() => {
             setSelectedCategory(null)

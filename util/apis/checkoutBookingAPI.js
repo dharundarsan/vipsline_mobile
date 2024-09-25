@@ -41,14 +41,11 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
-import {ToastAndroid} from "react-native";
-import Toast from "react-native-root-toast";
+import {ALERT_TYPE, Toast} from "react-native-alert-notification";
 
 export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {
     let authToken = "";
     let businessId = "";
-
-    console.log(JSON.stringify(cartSliceState, null, 3))
 
     try {
         authToken = await AsyncStorage.getItem('authKey') || "";
@@ -196,9 +193,6 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
                 Authorization: `Bearer ${authToken}`
             }
         });
-        if (response.data.other_message) {
-            ToastAndroid.show(response.data.other_message, ToastAndroid.SHORT);
-        }
         return response.data;
     } catch (error) {
         console.error("Error during checkoutBookingAPI call:", error);

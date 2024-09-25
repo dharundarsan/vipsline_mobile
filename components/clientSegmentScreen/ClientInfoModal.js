@@ -18,6 +18,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkNullUndefined, dateFormatter } from "../../util/Helpers";
 import { clearClientInfo, loadClientInfoFromDb } from "../../store/clientInfoSlice";
 import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
+import ContentLoader from "../../ui/ContentLoader";
+import { loadClientsFromDb } from "../../store/clientSlice";
 
 /**
  * ClientInfoModal Component
@@ -130,7 +132,7 @@ export default function clientInfoModal(props) {
     let content;
 
     if (clientMoreDetails === null) {
-        content = <ScrollView>
+        content = <ScrollView style={{width: "100%", height: '100%'}}>
             <MoreOptionDropDownModal
                 isVisible={props.modalVisibility}
                 onCloseModal={() => props.setModalVisibility(false)}
@@ -161,7 +163,7 @@ export default function clientInfoModal(props) {
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     props.setModalVisibility(false);
-                    // dispatch(loadClientInfoFromDb(props.id))
+                    dispatch(loadClientsFromDb())
                     dispatch(clearClientInfo());
 
                 }}
@@ -209,7 +211,7 @@ export default function clientInfoModal(props) {
                         </View>
 
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={[styles.pressable, styles.pressableStyle]}>
+                    <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>
                         <Text style={[textTheme.bodyMedium, { color: Colors.white }]}>
                             Book now
                         </Text>
@@ -253,8 +255,12 @@ export default function clientInfoModal(props) {
             />
     }
 
+
+
     return (
-        <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet" onRequestClose={props.onClose}>
+        <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet" onRequestClose={props.onClose} >
+
+
             <View style={styles.closeAndHeadingContainer}>
                 {
                     clientMoreDetails === null ?
@@ -292,6 +298,7 @@ export default function clientInfoModal(props) {
                 }
 
             </View>
+
             {
                 clientMoreDetails === null ?
                     null :
@@ -299,7 +306,33 @@ export default function clientInfoModal(props) {
                         <Divider />
                     </>
             }
-            {content}
+
+
+            <View style={{alignItems: 'center', width: "100%",}}>
+
+            {
+                Object.keys(details).length !== 0 ?
+                    content :
+                    <View style={{height: '100%', width: '95%', alignItems: 'center',}}>
+                    <ContentLoader
+                        row={[1, 3, 1, 1, 1, 1, 1, 1, 1, 1]}
+                        size={[
+                            [{width: '35%'}],
+                            [{width: '30%'}, {width: '30%'}, {width: '30%'}],
+                            [{height: 160, marginTop: 50}],
+                            [null],
+                            [{marginTop: 0}],
+                            [{marginTop: 0}],
+                            [{marginTop: 0}],
+                            [{marginTop: 0}],
+                            [{marginTop: 0}],
+                            [{marginTop: 0}],
+                        ]
+                        }
+                    />
+                    </View>
+            }
+            </View>
 
         </Modal>
     );
@@ -380,7 +413,7 @@ const styles = StyleSheet.create({
         width: '90%',
         marginTop: 16,
         overflow: 'hidden',
-        marginBottom: 32
+        marginBottom: 100,
     },
     backButton: {
         position: "absolute",
