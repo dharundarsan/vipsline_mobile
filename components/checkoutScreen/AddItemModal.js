@@ -194,7 +194,7 @@ const AddItemModal = (props) => {
                             minimumDate={businessDetails.businessNotificationDetails.data[0].back_date_invoice_allowed === false
                                 ? new Date(Date.now()) : undefined}
                             maximumDate={new Date(Date.now())}
-                            date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)}
+                            date={new Date(selectedDate)}
                             onConfirm={(date) => {
                                 const now = new Date();
                                 const formatForComparison = (date) => {
