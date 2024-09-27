@@ -28,12 +28,14 @@ import {clearClientInfo} from "../store/clientInfoSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
 import {clearCustomItems, clearLocalCart} from "../store/cartSlice";
 import * as Haptics from "expo-haptics";
+import { useLocationContext } from '../context/LocationContext';
 
 
 export default function ListOfBusinessesScreen({navigation}) {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
+    const { getLocation } = useLocationContext();
 
     useFocusEffect(
         useCallback(() => {
@@ -43,6 +45,10 @@ export default function ListOfBusinessesScreen({navigation}) {
             clearCartAPI();
         }, [])
     );
+
+    useFocusEffect(()=>{
+        getLocation("List of Business");
+    })
 
     useLayoutEffect(() => {
         // dispatch(loadServicesDataFromDb("women"));

@@ -90,6 +90,8 @@ const AddClientButton = (props) => {
             setEditClientModalVisibility(true);
         }
     }
+    console.log(JSON.stringify(clientInfo,null,3));
+    
     return (
         <>
             {

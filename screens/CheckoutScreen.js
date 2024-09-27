@@ -38,19 +38,26 @@ import { loadBookingDetailsFromDb } from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
+import { useLocationContext } from "../context/LocationContext";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
-    const navigation = useNavigation();
+    // const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [searchClientQuery, setSearchClientQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false)
-
+    const cartItems = useSelector(state => state.cart.items)
     const businessId = useSelector(state => state.authDetails.businessId);
+
+    const { getLocation } = useLocationContext();
+
+    useFocusEffect(()=>{
+        getLocation("CheckoutScreen");
+    })
 
     useEffect(() => {
         const loadData = async () => {
