@@ -50,7 +50,7 @@ const AddClientButton = (props) => {
         dispatch(loadCartFromDB(clientInfo.client_id))
         // console.log(JSON.stringify(clientInfo.membershipDetails[0].client_id,null,3));
 
-        if (clientInfo.membershipDetails[0].client_id !== undefined) {
+        if (clientInfo.membershipDetails[0]?.client_id !== undefined) {
             dispatch(modifyClientId({type: "update", payload: clientInfo.membershipDetails[0].client_id}))
         } else {
             dispatch(modifyClientId({type: "clear"}))
