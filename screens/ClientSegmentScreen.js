@@ -28,12 +28,13 @@ import textTheme from "../constants/TextTheme";
 import { clientFilterAPI } from "../util/apis/clientFilterAPI";
 import axios from "axios";
 import { checkNullUndefined } from "../util/Helpers";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientModal";
 import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
+import { useLocationContext } from "../context/LocationContext";
 
 
-export default function ClientSegmentScreen() {
+export default function ClientSegmentScreen(props) {
 
     const dispatch = useDispatch();
     const [filterPressed, setFilterPressed] = useState("all_clients_count");
@@ -89,6 +90,11 @@ export default function ClientSegmentScreen() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isSearchLoading, setIsSearchLoading] = useState(false);
+
+    const { getLocation,currentLocation } = useLocationContext();
+    useFocusEffect(useCallback(()=>{
+        getLocation("Clients")
+    },[currentLocation]))
 
     useEffect(() => {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
@@ -356,6 +362,12 @@ export default function ClientSegmentScreen() {
 
 
                 {
+                    clientCount === 0 ?
+                        <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                            <Text style={[textTheme.titleSmall]}>
+                                No clients to display
+                            </Text>
+                        </View> :
                     searchQuery === "" ?
                         <>
                             {

@@ -38,47 +38,57 @@ import { loadBookingDetailsFromDb } from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
+import { useLocationContext } from "../context/LocationContext";
 
 
 const CheckoutScreen = () => {
     const dispatch = useDispatch();
-    const navigation = useNavigation();
+    // const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [searchClientQuery, setSearchClientQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false)
-
+    const cartItems = useSelector(state => state.cart.items)
     const businessId = useSelector(state => state.authDetails.businessId);
+
+    const { getLocation, reload, setReload } = useLocationContext();
+
+    useFocusEffect(useCallback(() => {
+        getLocation("CheckoutScreen");
+    }, []))
 
     useEffect(() => {
         const loadData = async () => {
-            setIsLoading(true)
-            if (businessId !== "") {
-                await clearCartAPI();
-                dispatch(clearCustomItems());
-                dispatch(clearLocalCart());
-                dispatch(clearSalesNotes());
-                dispatch(modifyClientMembershipId({ type: "clear" }))
-                await dispatch(loadServicesDataFromDb("women"));
-                await dispatch(loadServicesDataFromDb("men"));
-                await dispatch(loadServicesDataFromDb("kids"));
-                await dispatch(loadServicesDataFromDb("general"));
-                await dispatch(loadProductsDataFromDb());
-                await dispatch(loadPackagesDataFromDb());
-                await dispatch(loadMembershipsDataFromDb());
-                // await dispatch(loadClientsFromDb());
-                await dispatch(loadClientCountFromDb());
-                await dispatch(loadClientFiltersFromDb(10, "All"));
-                await dispatch(loadBusinessesListFromDb());
-                await dispatch(loadLoginUserDetailsFromDb());
-                await dispatch(loadStaffsFromDB());
-                await dispatch(loadBusinessNotificationDetails());
-                // dispatch(loadCartFromDB());
-                // dispatch(loadBookingDetailsFromDb());
+            if (!reload) {
+                setIsLoading(true)
+                if (businessId !== "") {
+                    await clearCartAPI();
+                    dispatch(clearCustomItems());
+                    dispatch(clearLocalCart());
+                    dispatch(clearSalesNotes());
+                    dispatch(modifyClientMembershipId({ type: "clear" }))
+                    await dispatch(loadServicesDataFromDb("women"));
+                    await dispatch(loadServicesDataFromDb("men"));
+                    await dispatch(loadServicesDataFromDb("kids"));
+                    await dispatch(loadServicesDataFromDb("general"));
+                    await dispatch(loadProductsDataFromDb());
+                    await dispatch(loadPackagesDataFromDb());
+                    await dispatch(loadMembershipsDataFromDb());
+                    // await dispatch(loadClientsFromDb());
+                    await dispatch(loadClientCountFromDb());
+                    await dispatch(loadClientFiltersFromDb(10, "All"));
+                    await dispatch(loadBusinessesListFromDb());
+                    await dispatch(loadLoginUserDetailsFromDb());
+                    await dispatch(loadStaffsFromDB());
+                    await dispatch(loadBusinessNotificationDetails());
+                    // dispatch(loadCartFromDB());
+                    // dispatch(loadBookingDetailsFromDb());
+                }
+                setIsLoading(false)
             }
-            setIsLoading(false)
+            setReload(false);
         }
         loadData();
 

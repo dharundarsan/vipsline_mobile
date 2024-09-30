@@ -9,7 +9,7 @@ import * as Haptics from "expo-haptics";
  *
  * @param {Object} props - Props for the PrimaryButton component.
  * @param {string} props.label - The text to display inside the button. Not applicable when children is present.
- * @param {function} props.onPress - Function to call when the button is pressed.
+ * @param {function?} props.onPress - Function to call when the button is pressed.
  // * @param {Colors} props.backgroundColor - Background color of the button
  * @param {String || number} [props.height] - Height of the button.
  * @param {String || number} [props.width] - Width of the button.
@@ -48,18 +48,18 @@ const PrimaryButton = (props) => {
     return (
         <View style={[styles.primaryButton, props.buttonStyle]}>
             <Pressable
-                style={({ pressed }) => [
+                style={({pressed}) => [
                     styles.pressable,
                     props.pressableStyle,
                     Platform.select({
-                        ios: props.disableRipple ? {} : { opacity: pressed ? 0.3 : 1},
+                        ios: props.disableRipple ? {} : {opacity: pressed ? 0.3 : 1},
                     }),
                 ]}
                 onPress={() => {
                     Haptics.selectionAsync()
-                    props.onPress()
+                    if (props.onPress !== undefined) props.onPress()
                 }}
-                android_ripple={ props.disableRipple ? {} : { color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)' }}
+                android_ripple={props.disableRipple ? {} : {color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)'}}
             >
                 {props.children ? props.children :
                     <Text style={[TextTheme.titleSmall, styles.buttonLabel, props.textStyle]}>

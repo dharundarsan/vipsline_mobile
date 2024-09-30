@@ -11,6 +11,7 @@ import ProductItem from "./ProductItem";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import SearchBar from "../../ui/SearchBar";
+import { checkNullUndefined } from "../../util/Helpers";
 
 const ProductsList = (props) => {
     const productsData = useSelector(state => state.catalogue.products.items);
@@ -60,12 +61,13 @@ const ProductsList = (props) => {
     //         backHandler.remove();  // Ensure that the event listener is removed properly.
     //     };
     // }, [props.selectedCategory]);
+    console.log(productsData[0]);
     
     return (
         <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>
                 {
-                    productsData[0] !== null ?
+                    checkNullUndefined(productsData[0]) ?
                         <>
                             <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
                             <SearchBar filter={false}
@@ -78,7 +80,7 @@ const ProductsList = (props) => {
                 }
             </View>
             {
-                productsData[0] === null ? <View style={styles.noDataMessage}>
+                productsData[0] === null || productsData[0] === undefined ? <View style={styles.noDataMessage}>
                     <Text style={TextTheme.titleMedium}>No Products Available</Text>
                 </View>
                     :
@@ -148,7 +150,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: "-50%"
+        marginTop: "-8%"
     }
 });
 

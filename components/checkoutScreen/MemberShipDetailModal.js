@@ -30,6 +30,7 @@ const MemberShipDetailModal = React.memo((props) => {
         const backAction = () => {
             if (isModalVisible) {
                 setIsModalVisible(false);
+
                 props.closeModal();
                 return true;
             }

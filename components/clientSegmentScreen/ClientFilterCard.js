@@ -75,7 +75,7 @@ export default function ClientFilterCard(props) {
 
     return (
         <Pressable style={({pressed}) => pressed ? [styles.clientCard,styles.opacity] : styles.clientCard}
-           onPress={props.onPress} android_ripple={{color:Colors.grey200}}
+           onPress={props.onPress} android_ripple={{color:Colors.ripple}}
         >
             <View style={styles.innerContainer}>
                 <View style={styles.iconContainer}>

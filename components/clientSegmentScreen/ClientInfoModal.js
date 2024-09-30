@@ -160,6 +160,7 @@ export default function clientInfoModal(props) {
 
             <DeleteClient
                 isVisible={deleteClientModalVisibility}
+                deleteClient={true}
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     props.setModalVisibility(false);
@@ -306,33 +307,38 @@ export default function clientInfoModal(props) {
                         <Divider />
                     </>
             }
-
-
-            <View style={{alignItems: 'center', width: "100%",}}>
-
             {
                 Object.keys(details).length !== 0 ?
-                    content :
-                    <View style={{height: '100%', width: '95%', alignItems: 'center',}}>
-                    <ContentLoader
-                        row={[1, 3, 1, 1, 1, 1, 1, 1, 1, 1]}
-                        size={[
-                            [{width: '35%'}],
-                            [{width: '30%'}, {width: '30%'}, {width: '30%'}],
-                            [{height: 160, marginTop: 50}],
-                            [null],
-                            [{marginTop: 0}],
-                            [{marginTop: 0}],
-                            [{marginTop: 0}],
-                            [{marginTop: 0}],
-                            [{marginTop: 0}],
-                            [{marginTop: 0}],
-                        ]
-                        }
-                    />
-                    </View>
+                    content : null
             }
-            </View>
+
+
+            {
+                Object.keys(details).length === 0 ?
+                <View style={{alignItems: 'center', width: "100%",}}>
+
+                {
+                    <View style={{height: '100%', width: '95%', alignItems: 'center',}}>
+                        <ContentLoader
+                            row={[1, 3, 1, 1, 1, 1, 1, 1, 1, 1]}
+                            size={[
+                                [{width: '35%'}],
+                                [{width: '30%'}, {width: '30%'}, {width: '30%'}],
+                                [{height: 160, marginTop: 50}],
+                                [null],
+                                [{marginTop: 0}],
+                                [{marginTop: 0}],
+                                [{marginTop: 0}],
+                                [{marginTop: 0}],
+                                [{marginTop: 0}],
+                                [{marginTop: 0}],
+                            ]
+                            }
+                        />
+                    </View>
+                }
+            </View> : <></>
+            }
 
         </Modal>
     );

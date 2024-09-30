@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 import PrimaryButton from "../ui/PrimaryButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useDispatch} from "react-redux";
-import {clearBusinessId, updateAuthStatus} from "../store/authSlice";
+import {clearBusinessId, clearInBusiness, updateAuthStatus} from "../store/authSlice";
 import { clearListOfBusiness } from '../store/listOfBusinessSlice';
+import { useLocationContext } from '../context/LocationContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 const SignOutPrompt = ({ navigation }) => {
+    const { getLocation,currentLocation } = useLocationContext();
+
+    useFocusEffect(useCallback(()=>{
+        getLocation("Sign Out")
+    },[]))
 
     const dispatch = useDispatch();
 
@@ -17,19 +24,18 @@ const SignOutPrompt = ({ navigation }) => {
             await AsyncStorage.removeItem('authKey');
             dispatch(updateAuthStatus(false));
         } catch (e) {
-                    }
+        }
         try {
             await AsyncStorage.removeItem('businessId');
             dispatch(updateAuthStatus(false));
         } catch (e) {}
-        console.log("12");
         
+        dispatch(clearInBusiness());
         dispatch(clearBusinessId());
         dispatch(clearListOfBusiness())
 
         Alert.alert("Signed out", "You have been signed out successfully.");
-        navigation.navigate("Checkout");
-
+        // navigation.navigate("Checkout");
     };
 
     const showSignOutAlert = () => {

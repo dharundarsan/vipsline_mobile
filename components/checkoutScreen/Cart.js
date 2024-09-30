@@ -102,9 +102,8 @@ const Cart = () => {
                     <Text style={styles.selectServiceText}>Select an service or item to checkout</Text>
                     <PrimaryButton label="Add items to cart" buttonStyle={styles.addItemButton}
                                    onPress={() => {
-
-                                       openAddItemModal()
-                                   }}/>
+                        openAddItemModal()
+                    }}/>
                 </View> :
                 <>
                     <View style={{flex: 1}}>
