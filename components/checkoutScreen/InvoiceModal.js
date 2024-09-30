@@ -29,7 +29,9 @@ import {
     modifyPrepaidDetails
 } from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
-import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
+import Toast from "../../ui/Toast";
+// import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
+
 
 
 const InvoiceModal = (props) => {
@@ -71,6 +73,8 @@ const InvoiceModal = (props) => {
 
     const walletBalance = useSelector(state => state.invoice.walletBalance);
 
+    const toastRef = useRef(null);
+
 
     let centralGST = (details.total * 0.09);
     let stateGST = (details.total * 0.09);
@@ -101,14 +105,14 @@ const InvoiceModal = (props) => {
     const businessAddress = selectedBusinessDetails.address;
     const businessEmail = selectedBusinessDetails.email;
 
-    useEffect(() => {
-        Toast.show({
-            type: ALERT_TYPE.SUCCESS,
-            title: "Updated successfully",
-            // textBody: "Invoice generated",
-            autoClose: 1500,
-        });
-    }, []);
+    // useEffect(() => {
+    //     Toast.show({
+    //         type: ALERT_TYPE.SUCCESS,
+    //         title: "Updated successfully",
+    //         // textBody: "Invoice generated",
+    //         autoClose: 1500,
+    //     });
+    // }, []);
 
     useEffect(() => {
         async function api() {
@@ -154,14 +158,17 @@ const InvoiceModal = (props) => {
         //     dispatch(modifyPrepaidDetails({type: "clear"}))
         // }}
     >
-        <AlertNotificationRoot theme={"light"}
-                               toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
-                               colors={[{
-                                   // label: Colors.white,
-                                   card: Colors.grey200,
-                                   // card: "#ff7171",
-                                   // card: "#b73737",
-                               }]}>
+        {/*<AlertNotificationRoot theme={"light"}*/}
+        {/*                       toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}*/}
+        {/*                       colors={[{*/}
+        {/*                           // label: Colors.white,*/}
+        {/*                           card: Colors.grey200,*/}
+        {/*                           // card: "#ff7171",*/}
+        {/*                           // card: "#b73737",*/}
+        {/*                       }]}>*/}
+
+        <Toast ref={toastRef}/>
+
             <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
 
@@ -241,7 +248,7 @@ const InvoiceModal = (props) => {
                             let msg = await sendEmailAPI(email, bookingId);
                             setEmailModalVisibility(false);
                             if (msg === "success") {
-
+                                toastRef.current.show("email send successfully", 1000);
                             }
                         }
                     }}
@@ -606,7 +613,7 @@ styles.heading]}>Invoice</Text>*/}
                 }
                 {/*<Toast ref={toastRef} />*/}
             </ScrollView>
-        </AlertNotificationRoot>
+        {/*</AlertNotificationRoot>*/}
 
         {/*<Toast ref={toastRef} />*/}
     </Modal>

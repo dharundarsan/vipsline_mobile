@@ -39,22 +39,31 @@ import clearCartAPI from "../util/apis/clearCartAPI";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 
-const CheckoutScreen = () => {
+const CheckoutScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
-    const navigation = useNavigation();
+    // const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [searchClientQuery, setSearchClientQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false)
+    const [showDrawerIcon, setShowDrawerIcon] = useState(true);
 
     const businessId = useSelector(state => state.authDetails.businessId);
+
+    // console.log(route.params.showDrawerIcon());
+
+    useEffect(() => {
+        route.params.showDrawerIcon(showDrawerIcon)
+    }, [showDrawerIcon]);
 
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true)
+            setShowDrawerIcon(false);
             if (businessId !== "") {
+
                 await clearCartAPI();
                 dispatch(clearCustomItems());
                 dispatch(clearLocalCart());
@@ -76,7 +85,8 @@ const CheckoutScreen = () => {
                 // dispatch(loadCartFromDB());
                 // dispatch(loadBookingDetailsFromDb());
             }
-            setIsLoading(false)
+            setIsLoading(false);
+            setShowDrawerIcon(true);
         }
         loadData();
 

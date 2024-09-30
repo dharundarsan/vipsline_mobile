@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.grey250,
         justifyContent: 'center',
         alignItems: 'center',
+
     },
     label: {
         color: Colors.grey650
