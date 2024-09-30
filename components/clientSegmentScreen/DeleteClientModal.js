@@ -82,7 +82,7 @@ export default function DeleteClient(props) {
                             onPress={props.onCloseModal}
                         />
                         <PrimaryButton
-                            label={"Delete"}
+                            label={props.ActionOptionName !== undefined ? props.ActionOptionName : "Delete"}
                             buttonStyle={styles.deleteButton}
                             textStyle={[textTheme.titleMedium]}
                             onPress={() => {
@@ -105,13 +105,9 @@ export default function DeleteClient(props) {
                                 dispatch(loadClientFiltersFromDb(10, "All"));
                                 dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
                             }}
-
                         />
                     </View>
-
                 </View>
-
-
             </TouchableOpacity>
         </Modal>
     );

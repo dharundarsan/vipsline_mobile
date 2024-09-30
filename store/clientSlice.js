@@ -23,7 +23,6 @@ async function getBusinessId() {
 }
 
 export const loadClientsFromDb = () => async (dispatch, getState) => {
-    count++;
 
     let authToken = ""
     try {

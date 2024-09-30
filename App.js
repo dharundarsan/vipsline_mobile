@@ -275,8 +275,9 @@ const MainDrawerNavigator = () => {
                             // console.log(navigationRef.current.getRootState());
                             // navigate("Checkout")
                         }}
+                        ActionOptionName={"Cancel Sale"}
                         header={"Cancel Sale"}
-                        content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
+                        content={"If you cancel this sale transaction will not be processed."}
                         onCloseClientInfoAfterDeleted={async () => {
                             console.log("Clearing data and navigating");
                             await clearCartAPI();

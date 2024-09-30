@@ -414,8 +414,9 @@ const PaymentModal = (props) => {
                     // setModalVisibility(false);
                     // dispatch(loadClientInfoFromDb(props.id))
                 }}
+                ActionOptionName={"Cancel Sale"}
                 header={"Cancel Sale"}
-                content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
+                content={"If you cancel this sale transaction will not be processed."}
                 onCloseClientInfoAfterDeleted={async () => {
                     console.log("PaymentModal");
                     
