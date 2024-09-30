@@ -33,13 +33,16 @@ import {checkNullUndefined} from "../../util/Helpers";
 import {loadBusinessesListFromDb} from "../../store/listOfBusinessSlice";
 import {updateTotalClientCount} from "../../store/clientFilterSlice";
 import {clearClientInfo} from "../../store/clientInfoSlice";
-import Toast from "react-native-root-toast";
+// import Toast from "react-native-root-toast";
 import InvoiceModal from "./InvoiceModal";
 import * as Haptics from 'expo-haptics';
+import Toast from "../../ui/Toast";
 
 
 const CheckoutSection = (props) => {
     const tot = useSelector(state => state.cart.calculatedPrice);
+
+    const toastRef = useRef(null);
 
     // const totalChargeAmount = useSelector(state => state.cart.calculatedPrice[0]?.extra_charges_value);
     const totalChargeAmount = checkNullUndefined(tot) ?
@@ -473,24 +476,27 @@ const CheckoutSection = (props) => {
 
                                if (!clientInfo.isClientSelected) {
                                    // ToastAndroid.show("Please select client", ToastAndroid.LONG);
-                                   Toast.show("Please select client", {
-                                       duration: Toast.durations.LONG,
-                                       position: Toast.positions.BOTTOM,
-                                       shadow: false,
-                                       backgroundColor: "black",
-                                       opacity: 1
-                                   })
+                                   // Toast.show("Please select client", {
+                                   //     duration: Toast.durations.LONG,
+                                   //     position: Toast.positions.BOTTOM,
+                                   //     shadow: false,
+                                   //     backgroundColor: "black",
+                                   //     opacity: 1
+                                   // })
+                                   toastRef.current.show("please select client", 1000);
+
+
                                    return;
                                }
                                if (!dispatch(checkStaffOnCartItems())) {
                                    // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
-                                   Toast.show("Please select staff", {
-                                       duration: Toast.durations.LONG,
-                                       position: Toast.positions.BOTTOM,
-                                       shadow: false,
-                                       backgroundColor: "black",
-                                       opacity: 1
-                                   })
+                                   // Toast.show("Please select staff", {
+                                   //     duration: Toast.durations.LONG,
+                                   //     position: Toast.positions.BOTTOM,
+                                   //     shadow: false,
+                                   //     backgroundColor: "black",
+                                   //     opacity: 1
+                                   // })
                                    return;
                                }
                                setIsPaymentModalVisible(true)
@@ -500,9 +506,12 @@ const CheckoutSection = (props) => {
                     <Text
                         style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}</Text>
                     <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
+
                 </View>
+
             </PrimaryButton>
         </View>
+        <Toast  ref={toastRef} />
 
     </View>
 }

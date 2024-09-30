@@ -1,22 +1,22 @@
-import { View, Text, StyleSheet, Animated, Dimensions, SafeAreaView, Platform, ToastAndroid } from 'react-native';
+import { Text, StyleSheet, Animated, Dimensions, Platform, View } from 'react-native';
 import React, { useRef, useImperativeHandle, forwardRef, useState } from 'react';
 
 const { width } = Dimensions.get('window');
 
 const Toast = forwardRef((_, ref) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
-    const translateY = useRef(new Animated.Value(100)).current; // Start from below the screen
+    const translateY = useRef(new Animated.Value(-100)).current; // Start from above the screen
     const [message, setMessage] = useState(''); // Use state for message
-    const [toastHeight, setToastHeight] = useState(0); // State to hold dynamic height
 
     useImperativeHandle(ref, () => ({
         show: (msg, duration = 2000) => {
             if (Platform.OS === 'android') {
+                // Use Android Toast
                 ToastAndroid.show(msg, ToastAndroid.SHORT);
             } else {
                 setMessage(msg);
                 fadeAnim.setValue(0); // Reset fade to 0
-                translateY.setValue(100); // Reset position below the visible area
+                translateY.setValue(-100); // Reset position above the visible area
 
                 // Animate to visible position
                 Animated.parallel([
@@ -41,7 +41,7 @@ const Toast = forwardRef((_, ref) => {
                             useNativeDriver: true,
                         }),
                         Animated.timing(translateY, {
-                            toValue: 100, // Move back down below the visible area
+                            toValue: -100, // Move back up above the visible area
                             duration: 500,
                             useNativeDriver: true,
                         }),
@@ -52,37 +52,27 @@ const Toast = forwardRef((_, ref) => {
     }));
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <Animated.View
-                onLayout={(event) => {
-                    const { height } = event.nativeEvent.layout;
-                    setToastHeight(height); // Update the toast height
-                }}
-                style={[
-                    styles.toastContainer,
-                    {
-                        opacity: fadeAnim,
-                        transform: [{ translateY }],
-                        height: toastHeight, // Dynamic height based on content
-                    },
-                ]}
-            >
-                <Text style={styles.toastMessage}>
-                    {message}
-                </Text>
-            </Animated.View>
-        </SafeAreaView>
+        <Animated.View
+            style={[
+                styles.toastContainer,
+                {
+                    opacity: fadeAnim,
+                    transform: [{ translateY }],
+                    position: 'absolute', // Use absolute positioning
+                    top: 50, // Fixed position from the top
+                    alignSelf: 'center',
+                },
+            ]}
+        >
+            <Text style={styles.toastMessage}>
+                {message}
+            </Text>
+        </Animated.View>
     );
 });
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        justifyContent: 'flex-end', // Align to the bottom of the screen
-        paddingBottom: 50, // Add padding for the toast
-    },
     toastContainer: {
-        alignSelf: 'center',
         backgroundColor: 'black',
         paddingVertical: 10,
         paddingHorizontal: 20,

@@ -15,8 +15,9 @@ export default async function createNewClientAPI(data) {
     }
 
     const api = process.env.EXPO_PUBLIC_API_URI + "/user/addWalkInUser";
+    let response;
     try{
-        const response = await axios.post(api,
+        response = await axios.post(api,
             data,
             {
                 headers: {
@@ -24,6 +25,13 @@ export default async function createNewClientAPI(data) {
                 }
             })
     } catch (e) {
-        throw e.response.data.other_message;
+        console.log("already exists from api")
+        return false
+    }
+    if(response.data.message === "User added Successfully") {
+        return response.data.other_message;
+    }
+    else {
+        return false;
     }
 }

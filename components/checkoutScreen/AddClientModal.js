@@ -97,7 +97,8 @@ const AddClientModal = (props) => {
         presentationStyle="pageSheet" onRequestClose={props.closeModal}>
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 setIsCreateClientModalVisible(false);
-            }}/>
+            }} closeAddClientModal={props.closeModal}
+            />
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
                 <PrimaryButton
