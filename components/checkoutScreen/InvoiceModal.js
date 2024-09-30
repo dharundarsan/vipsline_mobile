@@ -314,6 +314,8 @@ styles.heading]}>Invoice</Text>*/}
                     buttonStyle={styles.closeButton}
                     onPress={() => {
                         // setCancelInvoiceModalVisibility(true)
+                        console.log("Invoivce Modal 1");
+                        
                         clearCartAPI();
                         dispatch(clearSalesNotes());
                         dispatch(modifyClientMembershipId({type: "clear"}))
@@ -351,6 +353,8 @@ styles.heading]}>Invoice</Text>*/}
                                 buttonStyle={styles.backToCheckoutButton}
                                 label={"Back to checkout"}
                                 onPress={() => {
+                                    console.log("Invoice Modal");
+                                    
                                     clearCartAPI();
                                     dispatch(modifyClientMembershipId({type: "clear"}))
                                     dispatch(clearSalesNotes());

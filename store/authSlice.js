@@ -6,6 +6,7 @@ const initialClientState = {
     isFetching: false,
     authToken: "",
     businessId: "",
+    inBusiness:false,
 };
 
 export const authSlice = createSlice({
@@ -29,7 +30,13 @@ export const authSlice = createSlice({
         },
         clearBusinessId(state, action) {
             state.businessId = "";
-        }
+        },
+        updateInBusiness(state, action){
+            state.inBusiness = action.payload;
+        },
+        clearInBusiness(state){
+            state.inBusiness = false;
+        },
     }
 });
 
@@ -39,7 +46,9 @@ export const {
     updateAuthToken,
     updateBusinessId,
     updateBusinessName,
-    clearBusinessId
+    clearBusinessId,
+    updateInBusiness,
+    clearInBusiness
 } = authSlice.actions;
 
 export default authSlice.reducer;

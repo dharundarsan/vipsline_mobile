@@ -91,10 +91,10 @@ export default function ClientSegmentScreen(props) {
     const [isLoading, setIsLoading] = useState(false);
     const [isSearchLoading, setIsSearchLoading] = useState(false);
 
-    const { getLocation } = useLocationContext();
-    useFocusEffect(()=>{
+    const { getLocation,currentLocation } = useLocationContext();
+    useFocusEffect(useCallback(()=>{
         getLocation("Clients")
-    })
+    },[currentLocation]))
 
     useEffect(() => {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));

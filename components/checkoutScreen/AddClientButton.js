@@ -90,7 +90,6 @@ const AddClientButton = (props) => {
             setEditClientModalVisibility(true);
         }
     }
-    console.log(JSON.stringify(clientInfo,null,3));
     
     return (
         <>
@@ -154,8 +153,7 @@ const AddClientButton = (props) => {
                             />
                             <View style={styles.actionMenu}>
                                 {
-                                    clientInfo.details
-                                    || clientInfo.membershipDetails.length !== 0
+                                    clientInfo.membershipDetails.length !== 0
                                     || clientInfo.packageDetails.length !== 0
                                     || clientInfo.details.wallet_balance !== undefined
                                         ? (

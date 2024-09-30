@@ -203,12 +203,18 @@ const AddItemModal = (props) => {
                                 const formattedCurrentDate = formatForComparison(now);
                                 const formattedSelectedDate = formatForComparison(date);
                                 if (formattedCurrentDate !== formattedSelectedDate) {
-                                    showToast();
+                                    const selectedDateLocal = new Date(date);
+                                    const isSameDay = 
+                                        now.getDate() === selectedDateLocal.getDate() && 
+                                        now.getMonth() === selectedDateLocal.getMonth() && 
+                                        now.getFullYear() === selectedDateLocal.getFullYear();
+                        
+                                    if (!isSameDay) {
+                                        showToast();
+                                    }
                                 }
                                 setIsDatePickerVisible(false);
-                                setSelectedDate(
-                                    new Date(date).getTime()
-                                );
+                                setSelectedDate(new Date(date).getTime());
                                 dispatch(updateAppointmentDate(new Date(date).getTime()));
                             }}
                             onCancel={() => setIsDatePickerVisible(false)}

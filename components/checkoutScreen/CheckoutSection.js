@@ -296,6 +296,8 @@ const CheckoutSection = (props) => {
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
                 await clearCartAPI();
+                console.log("123");
+                
                 dispatch(modifyClientMembershipId({ type: "clear" }))
                 clearSaleNotes();
                 dispatch(clearLocalCart());
