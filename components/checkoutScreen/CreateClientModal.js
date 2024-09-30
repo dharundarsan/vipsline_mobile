@@ -1,6 +1,6 @@
-import {Modal, ScrollView, StyleSheet, Text, View, ToastAndroid, Platform} from "react-native";
+import { Modal, ScrollView, StyleSheet, Text, View, ToastAndroid, Platform } from "react-native";
 import CustomTextInput from "../../ui/CustomTextInput";
-import React, {useState, useRef, useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import DropdownModal from "../../ui/DropdownModal";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
@@ -12,8 +12,8 @@ import {formatDate, showToast} from "../../util/Helpers";
 import {useDispatch} from "react-redux";
 import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {shadowStyling} from "../../util/Helpers";
-import Toast from "react-native-toast-message";
+import { shadowStyling } from "../../util/Helpers";
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -78,7 +78,7 @@ const CreateClientModal = (props) => {
 
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
-            await createNewClientAPI({
+            const response = await createNewClientAPI({
                 address: clientAddress,
                 anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
                 businessId: businessId,
@@ -98,23 +98,50 @@ const CreateClientModal = (props) => {
                 pinCode: "",
                 state: "Tamilnadu",
             });
-            showToast({
-                type: "success",
-                text1: "Client added Successfully"
-            })
-            clearForm();
-            dispatch(loadClientCountFromDb());
-            props.onCloseModal();
+            // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
+            if(response.toString() === "false") {
+                // TODO
+                // Toast.show({
+                //     type: ALERT_TYPE.WARNING,
+                //     title: "User already exists",
+                //     textBody: "Membership already exists in cart",
+                //     autoClose: 1500,
+                // })
+            }
+            else {
+                // TODO
+
+                // Toast.show({
+                //     type: ALERT_TYPE.SUCCESS,
+                //     title: "User added successfully",
+                //     textBody: "Membership already exists in cart",
+                //     autoClose: 1500,
+                //
+                // })
+                await dispatch(loadClientInfoFromDb(response))
+                clearForm();
+                await dispatch(loadClientCountFromDb());
+                props.onCloseModal();
+                props.closeAddClientModal();
+            }
+
         } catch (e) {
-            showToast({
-                type: "error",
-                text1: e
-            })
+            // ToastAndroid.show(e, ToastAndroid.LONG),
+            // TODO
+
+            // Toast.show(e, {
+            //     duration: Toast.durations.LONG,
+            //     position: Toast.positions.BOTTOM,
+            //     shadow: false,
+            //     backgroundColor: "black",
+            //     opacity: 1
+            // })
         }
 
     };
 
     return (
+
         <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}
                presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
@@ -267,7 +294,6 @@ const CreateClientModal = (props) => {
             <View style={styles.saveButtonContainer}>
                 <PrimaryButton label={"Save"} onPress={handleSave}/>
             </View>
-            <Toast/>
         </Modal>
     );
 };

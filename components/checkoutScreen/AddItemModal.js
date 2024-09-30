@@ -184,16 +184,18 @@ const AddItemModal = (props) => {
                                 const formattedCurrentDate = formatForComparison(now);
                                 const formattedSelectedDate = formatForComparison(date);
                                 if (formattedCurrentDate !== formattedSelectedDate) {
-                                    showToast({
-                                        type: "error",
-                                        text1: "Invoice on previous date",
-                                        text2: 'You are trying to raise this invoice on a previous date'
-                                    });
+                                    const selectedDateLocal = new Date(date);
+                                    const isSameDay =
+                                        now.getDate() === selectedDateLocal.getDate() &&
+                                        now.getMonth() === selectedDateLocal.getMonth() &&
+                                        now.getFullYear() === selectedDateLocal.getFullYear();
+
+                                    if (!isSameDay) {
+                                        // TODO
+                                    }
                                 }
                                 setIsDatePickerVisible(false);
-                                setSelectedDate(
-                                    new Date(date).getTime()
-                                );
+                                setSelectedDate(new Date(date).getTime());
                                 dispatch(updateAppointmentDate(new Date(date).getTime()));
                             }}
                             onCancel={() => setIsDatePickerVisible(false)}

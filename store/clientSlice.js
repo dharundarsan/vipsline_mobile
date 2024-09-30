@@ -22,7 +22,6 @@ async function getBusinessId() {
     }
 }
 
-var count = 0;
 export const loadClientsFromDb = () => async (dispatch, getState) => {
     count++;
 

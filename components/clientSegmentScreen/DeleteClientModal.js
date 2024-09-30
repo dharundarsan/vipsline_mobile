@@ -14,6 +14,8 @@ import {
     updateSearchClientMaxEntry
 } from "../../store/clientFilterSlice";
 import {clientFilterNames} from "../../util/chooseFilter";
+import { useNavigation } from "@react-navigation/native";
+import { useLocationContext } from "../../context/LocationContext";
 
 /**
  * DeleteClient Component
@@ -32,7 +34,8 @@ import {clientFilterNames} from "../../util/chooseFilter";
 export default function DeleteClient(props) {
     const dispatch = useDispatch();
     const currentClientId = useSelector(state => state.clientInfo.clientId);
-
+    const navigation = useNavigation();
+    const {reload} = useLocationContext();
     return (
         <Modal
             transparent={true}
@@ -51,7 +54,18 @@ export default function DeleteClient(props) {
                         buttonStyle={styles.closeButton}
                         pressableStyle={styles.closeButtonPressable}
                         onPress={() => {
-                            props.onCloseModal();
+                            if(props.setVisible !== undefined){
+                                // props.setVisible(false);
+                                // console.log("reload "+reload);
+
+                                // setTimeout(()=>{
+                                //     navigation.navigate("Checkout", { screen: "CheckoutScreen" });
+                                // },100)
+                                props.onCloseModal();
+                            }
+                            else{
+                                props.onCloseModal();
+                            }
                         }}
                     >
                         <Ionicons name="close" size={25} color="black"/>
@@ -72,16 +86,20 @@ export default function DeleteClient(props) {
                             buttonStyle={styles.deleteButton}
                             textStyle={[textTheme.titleMedium]}
                             onPress={() => {
-                                if (props.deleteClient) deleteClientAPI(currentClientId);
+                                if(props.deleteClient) deleteClientAPI(currentClientId);
                                 // TODO
-
                                 // else Toast.show({
                                 //     type: ALERT_TYPE.SUCCESS,
                                 //     title: "Sale cancelled",
                                 //     // textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                 //     autoClose: 1500,
                                 // });
-                                props.onCloseModal();
+                                if(props.setVisible !== undefined){
+                                    props.setVisible(false);
+                                }
+                                else{
+                                    props.onCloseModal();
+                                }
                                 props.onCloseClientInfoAfterDeleted();
                                 dispatch(loadClientCountFromDb());
                                 dispatch(loadClientFiltersFromDb(10, "All"));

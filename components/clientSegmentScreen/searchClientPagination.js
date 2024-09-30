@@ -66,6 +66,8 @@ export default function SearchClientPagination(props) {
 
     }, [props.filterPressed]);
 
+    console.log(props.filterPressed);
+
     useEffect(() => {
                 dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
         if(lowerCount === 1) {

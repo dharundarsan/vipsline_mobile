@@ -99,7 +99,8 @@ const AddClientModal = (props) => {
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 dispatch(loadClientsFromDb());
                 setIsCreateClientModalVisible(false);
-            }}/>
+            }} closeAddClientModal={props.closeModal}
+            />
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
                 <PrimaryButton

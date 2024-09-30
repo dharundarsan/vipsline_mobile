@@ -132,7 +132,7 @@ export default function clientInfoModal(props) {
     let content;
 
     if (clientMoreDetails === null) {
-        content = <ScrollView style={{width: "100%", height: '100%'}}>
+        content = <ScrollView style={{flex: 1, width: '100%'}} showsVerticalScrollIndicator={false}>
             <MoreOptionDropDownModal
                 isVisible={props.modalVisibility}
                 onCloseModal={() => props.setModalVisibility(false)}
@@ -262,6 +262,7 @@ export default function clientInfoModal(props) {
         <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet" onRequestClose={props.onClose} >
 
 
+
             <View style={styles.closeAndHeadingContainer}>
                 {
                     clientMoreDetails === null ?
@@ -307,10 +308,11 @@ export default function clientInfoModal(props) {
                         <Divider />
                     </>
             }
-            {
-                Object.keys(details).length !== 0 ?
-                    content : null
-            }
+            {/*{*/}
+            {/*    Object.keys(details).length !== 0 ?*/}
+            {/*        content : null*/}
+            {/*}*/}
+            <View style={{flex: 1, paddingHorizontal: 15, alignItems: 'center', width: '100%'}}>
 
 
             {
@@ -337,8 +339,9 @@ export default function clientInfoModal(props) {
                         />
                     </View>
                 }
-            </View> : <></>
+            </View> : content
             }
+            </View>
 
         </Modal>
     );
@@ -348,6 +351,7 @@ const styles = StyleSheet.create({
     modalContent: {
         flex: 1,
         alignItems: 'center',
+        width: '100%',
     },
     closeAndHeadingContainer: {
         justifyContent: "center",
@@ -389,8 +393,8 @@ const styles = StyleSheet.create({
     },
     optionsContainer: {
         flexDirection: "row",
-        width: "85%",
-        justifyContent: "space-around"
+        width: "95%",
+        justifyContent: "space-around",
     },
     updateOrDeleteOption: {
         backgroundColor: Colors.white,
@@ -410,13 +414,14 @@ const styles = StyleSheet.create({
         flex: 1
     },
     salesCard: {
-        marginTop: 64
+        marginTop: 64,
+        width: '100%'
     },
     clientInfoCategoryContainer: {
         borderWidth: 1,
         borderColor: Colors.grey250,
         borderRadius: 12,
-        width: '90%',
+        width: '100%',
         marginTop: 16,
         overflow: 'hidden',
         marginBottom: 100,

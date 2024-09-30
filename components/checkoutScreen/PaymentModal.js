@@ -417,6 +417,8 @@ const PaymentModal = (props) => {
                 header={"Cancel Sale"}
                 content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
                 onCloseClientInfoAfterDeleted={async () => {
+                    console.log("PaymentModal");
+                    
                     await clearCartAPI();
                     dispatch(modifyClientMembershipId({type: "clear"}))
                     dispatch(clearSalesNotes());

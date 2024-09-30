@@ -27,14 +27,14 @@ import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../sto
 import textTheme from "../constants/TextTheme";
 import {clientFilterAPI} from "../util/apis/clientFilterAPI";
 import axios from "axios";
-import {checkNullUndefined} from "../util/Helpers";
-import {useFocusEffect} from "@react-navigation/native";
+import { checkNullUndefined } from "../util/Helpers";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientModal";
 import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
-import Toast from "react-native-toast-message";
+import { useLocationContext } from "../context/LocationContext";
 
 
-export default function ClientSegmentScreen() {
+export default function ClientSegmentScreen(props) {
 
     const dispatch = useDispatch();
     const [filterPressed, setFilterPressed] = useState("all_clients_count");
@@ -90,6 +90,11 @@ export default function ClientSegmentScreen() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isSearchLoading, setIsSearchLoading] = useState(false);
+
+    const { getLocation,currentLocation } = useLocationContext();
+    useFocusEffect(useCallback(()=>{
+        getLocation("Clients")
+    },[currentLocation]))
 
     useEffect(() => {
         setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
@@ -358,20 +363,21 @@ export default function ClientSegmentScreen() {
 
 
                 {
-                    clientCount === 0 ?
-                        <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
-                            <Text style={[textTheme.titleSmall]}>
-                                No clients to display
-                            </Text>
-                        </View> :
-                        searchQuery === "" ?
-                            <>
-                                {
-                                    !isFetching ?
-                                        <FlatList
-                                            data={filterClientsList}
-                                            renderItem={renderItem}
-                                            scrollEnabled={false}
+
+                    searchQuery === "" ?
+                        <>
+                            {
+                                clientCount === 0 ?
+                                    <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                                        <Text style={[textTheme.titleSmall]}>
+                                            No clients to display
+                                        </Text>
+                                    </View> :
+                                !isFetching ?
+                                    <FlatList
+                                        data={filterClientsList}
+                                        renderItem={renderItem}
+                                        scrollEnabled={false}
 
                                         /> :
                                         <Bullets
@@ -398,27 +404,33 @@ export default function ClientSegmentScreen() {
                                 }
                             </> :
 
-                            <>
-                                {
-                                    !isSearchClientFetching ?
-                                        <FlatList
-                                            data={searchClientList}
-                                            scrollEnabled={false}
-                                            renderItem={renderItem}
-                                        /> :
-                                        <Bullets
-                                            tHeight={35}
-                                            tWidth={"75%"}
-                                            listSize={maxEntry}
-                                            aSize={35}
-                                            animationDuration={500}
-                                            containerStyles={{
-                                                paddingVertical: 16,
-                                                borderBottomWidth: 1,
-                                                borderBottomColor: Colors.grey250
-                                            }}
-                                            avatarStyles={{marginLeft: 16}}
-                                        />
+                        <>
+                            {
+                                searchClientTotalCount === 0 ?
+                                    <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                                        <Text style={[textTheme.titleSmall]}>
+                                            No clients to display
+                                        </Text>
+                                    </View> :
+                                !isSearchClientFetching ?
+                                    <FlatList
+                                        data={searchClientList}
+                                        scrollEnabled={false}
+                                        renderItem={renderItem}
+                                    /> :
+                                    <Bullets
+                                        tHeight={35}
+                                        tWidth={"75%"}
+                                        listSize={maxEntry}
+                                        aSize={35}
+                                        animationDuration={500}
+                                        containerStyles={{
+                                            paddingVertical: 16,
+                                            borderBottomWidth: 1,
+                                            borderBottomColor: Colors.grey250
+                                        }}
+                                        avatarStyles={{ marginLeft: 16 }}
+                                    />
 
                                 }
 
@@ -435,7 +447,6 @@ export default function ClientSegmentScreen() {
                             </>
                 }
             </View>
-            <Toast/>
         </ScrollView>
     );
 }

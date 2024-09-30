@@ -35,10 +35,14 @@ import {updateTotalClientCount} from "../../store/clientFilterSlice";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import InvoiceModal from "./InvoiceModal";
 import * as Haptics from 'expo-haptics';
+import Toast from "../../ui/Toast";
+// import Toast from 'react-native-root-toast';
 
 
 const CheckoutSection = (props) => {
     const tot = useSelector(state => state.cart.calculatedPrice);
+
+    const toastRef = useRef(null);
 
     // const totalChargeAmount = useSelector(state => state.cart.calculatedPrice[0]?.extra_charges_value);
     const totalChargeAmount = checkNullUndefined(tot) ?
@@ -171,28 +175,16 @@ const CheckoutSection = (props) => {
             if (selectedDiscountMode === "AMOUNT") {
                 if ((calculatedPrice[0].total_price_after_discount - discountValue) <= 0) {
                     setDiscountValue(discountValue)
-
-                    showToast({
-                        type: "error",
-                        text1: "Discount should be less than subtotal",
-                    })
-                    // Toast.show("Discount should be less than subtotal", {
-                    //     duration: Toast.durations.LONG,
-                    //     position: Toast.positions.TOP,
-                    //     shadow: false,
-                    //     backgroundColor: "black",
-                    //     opacity: 1
-                    // })
+                    // showToast()
+                    // TODO
                     setActionModal(false);
                     return;
                 }
             } else if (selectedDiscountMode === "PERCENTAGE") {
                 if (discountValue >= 100) {
                     setDiscountValue(amount);
-                    showToast({
-                        type: "error",
-                        text1: "Discount should be less than subtotal",
-                    })
+                    // showToast();
+                    // TODO
                     setActionModal(false);
                     return;
                 }
@@ -260,6 +252,7 @@ const CheckoutSection = (props) => {
 
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     return <View style={styles.checkoutSection}>
+
 
         {ActionModal && <MiniActionTextModal isVisible={ActionModal}
                                              onCloseModal={() => {
@@ -362,7 +355,7 @@ const CheckoutSection = (props) => {
                 }}/> :
                 null
         }
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
+        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
             {/*<Text*/}
             {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { calculatedPrice.length !== 0 ? calculatedPrice[0].total_discount_in_price : 0}</Text>*/}
@@ -405,12 +398,12 @@ const CheckoutSection = (props) => {
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
         </View>
 
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? { borderStyle: "dashed" } : null]}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length !== 0 ? calculatedPrice[0].total_price_after_discount : 0}</Text>
         </View>
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? { borderStyle: "dashed" } : null]}>
             <View>
                 {
                     checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
@@ -499,17 +492,28 @@ const CheckoutSection = (props) => {
 
 
                                if (!clientInfo.isClientSelected) {
-                                   showToast({
-                                       type: "error",
-                                       text1: "Please select client",
-                                   })
+                                   // ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                                   // Toast.show("Please select client", {
+                                   //     duration: Toast.durations.LONG,
+                                   //     position: Toast.positions.BOTTOM,
+                                   //     shadow: false,
+                                   //     backgroundColor: "black",
+                                   //     opacity: 1
+                                   // })
+                                   toastRef.current.show("please select client", 1000);
+
+
                                    return;
                                }
                                if (!dispatch(checkStaffOnCartItems())) {
-                                   showToast({
-                                       type: "error",
-                                       text1: "Please select staff",
-                                   })
+                                   // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                                   // Toast.show("Please select staff", {
+                                   //     duration: Toast.durations.LONG,
+                                   //     position: Toast.positions.BOTTOM,
+                                   //     shadow: false,
+                                   //     backgroundColor: "black",
+                                   //     opacity: 1
+                                   // })
                                    return;
                                }
                                setIsPaymentModalVisible(true)
@@ -522,6 +526,8 @@ const CheckoutSection = (props) => {
                 </View>
             </PrimaryButton>
         </View>
+        <Toast  ref={toastRef} />
+
     </View>
 }
 

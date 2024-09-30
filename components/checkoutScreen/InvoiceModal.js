@@ -29,6 +29,9 @@ import {
     modifyPrepaidDetails
 } from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
+import Toast from "../../ui/Toast";
+// import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
+
 
 
 const InvoiceModal = (props) => {
@@ -69,6 +72,8 @@ const InvoiceModal = (props) => {
     const businessId = useSelector(state => state.authDetails.businessId);
 
     const walletBalance = useSelector(state => state.invoice.walletBalance);
+
+    const toastRef = useRef(null);
 
 
     let centralGST = (details.total * 0.09);
@@ -163,6 +168,9 @@ const InvoiceModal = (props) => {
         {/*                           // card: "#ff7171",*/}
         {/*                           // card: "#b73737",*/}
         {/*                       }]}>*/}
+
+        <Toast ref={toastRef}/>
+
             <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
 
@@ -242,7 +250,7 @@ const InvoiceModal = (props) => {
                             let msg = await sendEmailAPI(email, bookingId);
                             setEmailModalVisibility(false);
                             if (msg === "success") {
-
+                                toastRef.current.show("email send successfully", 1000);
                             }
                         }
                     }}
