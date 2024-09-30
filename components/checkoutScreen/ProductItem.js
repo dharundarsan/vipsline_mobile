@@ -3,14 +3,13 @@ import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart} from "../../store/cartSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import * as Haptics from "expo-haptics";
-import {ALERT_TYPE, Toast} from "react-native-alert-notification";
 
 
 const ProductItem = (props) => {
     const dispatch = useDispatch();
-
+    const cartItems = useSelector(state => state.cart.items);
 
     const styles = StyleSheet.create({
         selectProductItemButton: {
@@ -60,20 +59,23 @@ const ProductItem = (props) => {
                           pressableStyle={styles.selectProductItemPressable}
                           onPress={() => {
                               if (props.data.available_quantity === 0) {
-                                  // ToastAndroid.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", ToastAndroid.LONG)
-                                  // Toast.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", Toast.LONG, {
-                                  //     tapToDismissEnabled: true,
-                                  // })
-                                  Toast.show({
-                                      type: ALERT_TYPE.WARNING,
-                                      title: "Zero stock warning",
-                                      textBody: "Adjust the stock quantity on the products page to make it available for sale",
-                                      autoClose: 1500,
-                                  });
+                                  // TODO: Implement Toast
+                                  // Toast.show({
+                                  //     type: ALERT_TYPE.WARNING,
+                                  //     title: "Zero stock warning",
+                                  //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                  //     autoClose: 1500,
+                                  // });
                                   return;
                               }
+                              const currentProductCountInCart = cartItems.reduce((acc, item) => {
+                                  if (item.product_id === props.data.id) {
+                                      return acc + 1;
+                                  }
+                                  return acc
+                              }, 0)
                               dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
-                              props.closeOverallModal()
+                              // props.closeOverallModal()
                           }}
     >
         <View style={styles.nameAndPriceContainer}>

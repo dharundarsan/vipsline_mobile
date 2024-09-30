@@ -72,7 +72,15 @@ export default function DeleteClient(props) {
                             buttonStyle={styles.deleteButton}
                             textStyle={[textTheme.titleMedium]}
                             onPress={() => {
-                                if(props.deleteClient) deleteClientAPI(currentClientId);
+                                if (props.deleteClient) deleteClientAPI(currentClientId);
+                                // TODO
+
+                                // else Toast.show({
+                                //     type: ALERT_TYPE.SUCCESS,
+                                //     title: "Sale cancelled",
+                                //     // textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                //     autoClose: 1500,
+                                // });
                                 props.onCloseModal();
                                 props.onCloseClientInfoAfterDeleted();
                                 dispatch(loadClientCountFromDb());
@@ -99,7 +107,7 @@ const styles = StyleSheet.create({
     closeButton: {
         position: "absolute",
         right: 10,
-        top:5,
+        top: 5,
         backgroundColor: Colors.white,
     },
     closeButtonPressable: {
@@ -120,7 +128,7 @@ const styles = StyleSheet.create({
     },
     label: {
         width: "100%",
-        paddingVertical:5,
+        paddingVertical: 5,
         backgroundColor: Colors.background,
         alignItems: "center",
         elevation: 0.5,

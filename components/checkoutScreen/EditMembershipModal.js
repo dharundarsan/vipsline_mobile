@@ -23,7 +23,6 @@ import {addItemToCart, addItemToEditedCart} from "../../store/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
 import * as Haptics from "expo-haptics";
-import {ALERT_TYPE, Dialog, AlertNotificationRoot, Toast} from 'react-native-alert-notification';
 
 
 const EditMembershipModal = (props) => {
@@ -39,12 +38,13 @@ const EditMembershipModal = (props) => {
     const handleSave = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (cartItems.some(item => item.membership_id === props.data.id || editedCart.some(item => item.membership_id === props.data.id))) {
-            Toast.show({
-                type: ALERT_TYPE.WARNING,
-                title: "Already exists",
-                textBody: "Membership already exists in cart",
-                autoClose: 1500,
-            });
+            //TODO: Implement toast
+            // Toast.show({
+            //     type: ALERT_TYPE.WARNING,
+            //     title: "Already exists",
+            //     textBody: "Membership already exists in cart",
+            //     autoClose: 1500,
+            // });
             return;
         }
 

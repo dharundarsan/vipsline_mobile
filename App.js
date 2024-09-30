@@ -20,7 +20,6 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Font from 'expo-font';
-import {RootSiblingParent} from 'react-native-root-siblings';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -50,6 +49,7 @@ import {updateAuthStatus} from "./store/authSlice";
 import clearCartAPI from "./util/apis/clearCartAPI";
 import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "./store/cartSlice";
 import {clearClientInfo} from "./store/clientInfoSlice";
+import Toast from "react-native-toast-message";
 
 enableScreens();
 
@@ -81,6 +81,7 @@ export default function App() {
 
             <AppNavigator/>
             {/*</SafeAreaView>*/}
+            <Toast/>
         </Provider>
     );
 }
@@ -101,7 +102,9 @@ const CheckoutStack = () => (
                 ),
                 presentation: 'modal'
             })}
-        />
+        >
+            {/*<Toast/>*/}
+        </Stack.Screen>
     </Stack.Navigator>
 );
 
@@ -221,9 +224,17 @@ const AppNavigator = () => {
 
 const AuthNavigator = () => (
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
-        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
-        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
-        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+        <AuthStack.Screen name="AuthScreen" component={AuthScreen}>
+            {/*<Toast/>*/}
+        </AuthStack.Screen>
+        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}>
+            {/*<Toast/>*/}
+
+        </AuthStack.Screen>
+        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}>
+            {/*<Toast/>*/}
+
+        </AuthStack.Screen>
     </AuthStack.Navigator>
 );
 
@@ -232,7 +243,9 @@ const LandingScreen = () => (
         <LandingStack.Screen
             name="ListOfBusinessesScreen"
             component={ListOfBusinessesScreen}
-        />
+        >
+            {/*<Toast/>*/}
+        </LandingStack.Screen>
     </LandingStack.Navigator>
 );
 

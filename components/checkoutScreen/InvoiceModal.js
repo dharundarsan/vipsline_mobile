@@ -29,7 +29,6 @@ import {
     modifyPrepaidDetails
 } from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
-import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
 
 
 const InvoiceModal = (props) => {
@@ -102,12 +101,14 @@ const InvoiceModal = (props) => {
     const businessEmail = selectedBusinessDetails.email;
 
     useEffect(() => {
-        Toast.show({
-            type: ALERT_TYPE.SUCCESS,
-            title: "Updated successfully",
-            // textBody: "Invoice generated",
-            autoClose: 1500,
-        });
+        // TODO
+
+        // Toast.show({
+        //     type: ALERT_TYPE.SUCCESS,
+        //     title: "Updated successfully",
+        //     textBody: "Invoice generated",
+        //     autoClose: 1500,
+        // });
     }, []);
 
     useEffect(() => {
@@ -154,14 +155,14 @@ const InvoiceModal = (props) => {
         //     dispatch(modifyPrepaidDetails({type: "clear"}))
         // }}
     >
-        <AlertNotificationRoot theme={"light"}
-                               toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
-                               colors={[{
-                                   // label: Colors.white,
-                                   card: Colors.grey200,
-                                   // card: "#ff7171",
-                                   // card: "#b73737",
-                               }]}>
+        {/*<AlertNotificationRoot theme={"light"}*/}
+        {/*                       toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}*/}
+        {/*                       colors={[{*/}
+        {/*                           // label: Colors.white,*/}
+        {/*                           card: Colors.grey200,*/}
+        {/*                           // card: "#ff7171",*/}
+        {/*                           // card: "#b73737",*/}
+        {/*                       }]}>*/}
             <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
 
@@ -606,7 +607,7 @@ styles.heading]}>Invoice</Text>*/}
                 }
                 {/*<Toast ref={toastRef} />*/}
             </ScrollView>
-        </AlertNotificationRoot>
+        {/*</AlertNotificationRoot>*/}
 
         {/*<Toast ref={toastRef} />*/}
     </Modal>

@@ -27,14 +27,14 @@ import ServicesList from "./ServicesList";
 import ProductsList from "./ProductsList";
 import MembershipsAndPackagesList from "./MembershipsAndPackagesList";
 import textTheme from "../../constants/TextTheme";
-import {capitalizeFirstLetter, formatDate, shadowStyling} from "../../util/Helpers";
+import {capitalizeFirstLetter, formatDate, shadowStyling, showToast} from "../../util/Helpers";
 import AddCustomItemModal from "./AddCustomItemModal";
 import PrepaidModal from "./PrepaidModal";
 import {updateAppointmentDate} from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
+import Toast from "react-native-toast-message";
 
 const modalCategoryListData = [
     {id: "services", title: "SERVICES"},
@@ -79,14 +79,7 @@ const AddItemModal = (props) => {
     const openDatePicker = () => {
         setIsDatePickerVisible(true);
     };
-    function showToast(){
-        Toast.show({
-            type: ALERT_TYPE.WARNING,
-            title: "You are trying to raise this invoice on a previous date",
-            // textBody: "Invoice generated",
-            autoClose: 3000,
-        });
-    }
+
     const styles = StyleSheet.create({
         modalOverlay: {
             flex: 1,
@@ -176,18 +169,6 @@ const AddItemModal = (props) => {
                         />
                     </Pressable>
                     {isDatePickerVisible && (
-                        // <RNDateTimePicker
-                        //     value={new Date(selectedDate)}
-                        //     maximumDate={new Date(Date.now())}
-                        //     mode="date"
-                        //     display="default"
-                        //     onChange={(date) => {
-                        //         setIsDatePickerVisible(false);
-                        //         setSelectedDate(
-                        //             date.nativeEvent.timestamp
-                        //         );
-                        //     }}
-                        // />
                         <DateTimePickerModal
                             isVisible={isDatePickerVisible}
                             mode="date"
@@ -203,7 +184,11 @@ const AddItemModal = (props) => {
                                 const formattedCurrentDate = formatForComparison(now);
                                 const formattedSelectedDate = formatForComparison(date);
                                 if (formattedCurrentDate !== formattedSelectedDate) {
-                                    showToast();
+                                    showToast({
+                                        type: "error",
+                                        text1: "Invoice on previous date",
+                                        text2: 'You are trying to raise this invoice on a previous date'
+                                    });
                                 }
                                 setIsDatePickerVisible(false);
                                 setSelectedDate(
@@ -297,41 +282,33 @@ const AddItemModal = (props) => {
                 }
             }
         >
-            <AlertNotificationRoot theme={"light"}
-                                   toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
-                                   colors={[{
-                                       // label: Colors.white,
-                                       card: Colors.grey200,
-                                       // card: "#ff7171",
-                                       // card: "#b73737",
-                                   }]}>
-                <View style={[styles.backAndCloseContainer, shadowStyling]}>
-                    {
-                        selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
-                            buttonStyle={styles.backButton}
-                            onPress={() => {
-                                setSelectedCategory(null);
-                            }}
-                        >
-                            <AntDesign name="arrowleft" size={24} color="black"/>
-                        </PrimaryButton>
-                    }
-                    <View style={styles.newSaleTextContainer}>
-                        <Text
-                            style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
-                    </View>
-                    <PrimaryButton
-                        buttonStyle={styles.closeButton}
+            <View style={[styles.backAndCloseContainer, shadowStyling]}>
+                {
+                    selectedCategory == null || selectedCategory === "customItem" ? null : <PrimaryButton
+                        buttonStyle={styles.backButton}
                         onPress={() => {
                             setSelectedCategory(null);
-                            props.closeModal();
                         }}
                     >
-                        <Ionicons name="close" size={25} color="black"/>
+                        <AntDesign name="arrowleft" size={24} color="black"/>
                     </PrimaryButton>
+                }
+                <View style={styles.newSaleTextContainer}>
+                    <Text
+                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
                 </View>
-                {content}
-            </AlertNotificationRoot>
+                <PrimaryButton
+                    buttonStyle={styles.closeButton}
+                    onPress={() => {
+                        setSelectedCategory(null);
+                        props.closeModal();
+                    }}
+                >
+                    <Ionicons name="close" size={25} color="black"/>
+                </PrimaryButton>
+            </View>
+            {content}
+            <Toast/>
         </Modal>
     );
 }

@@ -149,8 +149,8 @@ const EditCartModal = (props) => {
         <View style={styles.addToCartButtonContainer}>
             <PrimaryButton onPress={async () => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                if (discountAmount > price) {
-                    ToastAndroid.show("Discount should not be greater than price", ToastAndroid.SHORT);
+                if (discountAmount => price) {
+                    ToastAndroid.show("Discount should not be equal or greater than price", ToastAndroid.SHORT);
                     return;
                 }
                 if (price !== parseFloat(props.data.price) || discountAmount !== props.data.dicounted_amount) {

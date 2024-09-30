@@ -16,6 +16,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {shadowStyling} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
+import Toast from "react-native-toast-message";
 
 const AddClientModal = (props) => {
     // const pageNo = useSelector(state => state.client.pageNo);
@@ -94,7 +95,7 @@ const AddClientModal = (props) => {
 
     return (
         <Modal visible={props.isVisible} animationType={"slide"}
-        presentationStyle="pageSheet" onRequestClose={props.closeModal}>
+               presentationStyle="pageSheet" onRequestClose={props.closeModal}>
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 dispatch(loadClientsFromDb());
                 setIsCreateClientModalVisible(false);
@@ -175,6 +176,7 @@ const AddClientModal = (props) => {
                     />
                 )}
             </View>
+            <Toast/>
         </Modal>
     );
 };

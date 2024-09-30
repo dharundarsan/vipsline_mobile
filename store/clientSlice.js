@@ -25,8 +25,7 @@ async function getBusinessId() {
 var count = 0;
 export const loadClientsFromDb = () => async (dispatch, getState) => {
     count++;
-    console.log(count);
-    
+
     let authToken = ""
     try {
         const value = await AsyncStorage.getItem('authKey');
