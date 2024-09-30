@@ -38,14 +38,14 @@ export default function ClientStatistics(props) {
 
     function renderItem(itemData) {
         return (
-             <>
-            <ClientStatisticsCard
-                label={itemData.item.label}
-                value={itemData.item.value}
-                containerStyle={styles.cardStyle}
-            />
-            <View style={{width: 20}}/>
-             </>
+            <>
+                <ClientStatisticsCard
+                    label={itemData.item.label}
+                    value={itemData.item.value}
+                    containerStyle={styles.cardStyle}
+                />
+                {/*<View style={{width: 20}}/>*/}
+            </>
         );
     }
 
@@ -67,6 +67,7 @@ export default function ClientStatistics(props) {
                     data={StatisticsItems}
                     renderItem={renderItem}
                     numColumns={2}
+                    columnWrapperStyle={{gap: 20}}
                     contentContainerStyle={styles.listStyle}
                     style={{width: '100%'}}
                 />
@@ -79,29 +80,31 @@ const styles = StyleSheet.create({
     statistics: {
         flex: 1,
         alignItems: "center",
+        width: "100%",
+
 
     },
     salesStatisticsCard: {
-        width: "95%",
+        width: "100%",
         flexDirection: 'row',
         marginTop: 32,
         height: 95
     },
     statisticsCardOuterContainer: {
         marginTop: 16,
-        width: '95%',
+        width: '100%',
     },
     listStyle: {
         gap: 20,
         width: '100%',
     },
     cardStyle: {
+        flex: 1,
         height: 72,
-        width: '47.4%',
     },
     titleContainer: {
         marginTop: 16,
-        width: '95%',
+        width: '100%',
     },
     title: {
         marginLeft: 16

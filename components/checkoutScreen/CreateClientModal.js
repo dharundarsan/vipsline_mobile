@@ -13,7 +13,8 @@ import { useDispatch } from "react-redux";
 import { loadClientCountFromDb, loadClientsFromDb } from "../../store/clientSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { shadowStyling } from "../../util/Helpers";
-import Toast from "react-native-root-toast";
+import {Toast, AlertNotificationRoot, ALERT_TYPE} from "react-native-alert-notification"
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -78,7 +79,7 @@ const CreateClientModal = (props) => {
 
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
-            await createNewClientAPI({
+            const response = await createNewClientAPI({
                 address: clientAddress,
                 anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
                 businessId: businessId,
@@ -99,32 +100,49 @@ const CreateClientModal = (props) => {
                 state: "Tamilnadu",
             });
             // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
-            Toast.show("User added Successfully", {
-                duration: Toast.durations.LONG,
-                position: Toast.positions.BOTTOM,
-                shadow: false,
-                backgroundColor: "black",
-                opacity: 1
-            })
-            clearForm();
-            dispatch(loadClientCountFromDb());
-            props.onCloseModal();
+            if(response.toString() === "false") {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: "User already exists",
+                    textBody: "Membership already exists in cart",
+                    autoClose: 1500,
+                })
+                console.log("already exists999");
+            }
+            else {
+                Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: "User added successfully",
+                    textBody: "Membership already exists in cart",
+                    autoClose: 1500,
+
+                })
+                console.log(response)
+                await dispatch(loadClientInfoFromDb(response))
+                clearForm();
+                await dispatch(loadClientCountFromDb());
+                props.onCloseModal();
+                props.closeAddClientModal();
+            }
+
         } catch (e) {
             // ToastAndroid.show(e, ToastAndroid.LONG),
-            Toast.show(e, {
-                duration: Toast.durations.LONG,
-                position: Toast.positions.BOTTOM,
-                shadow: false,
-                backgroundColor: "black",
-                opacity: 1
-            })
+
         }
 
     };
 
     return (
+
         <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}
             presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+            <AlertNotificationRoot
+                theme={"light"}
+                toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
+                colors={[{
+                    label:Colors.black,
+                    card: Colors.grey200}]}
+            >
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Add a new client</Text>
                 <PrimaryButton
@@ -276,6 +294,7 @@ const CreateClientModal = (props) => {
             <View style={styles.saveButtonContainer}>
                 <PrimaryButton label={"Save"} onPress={handleSave} />
             </View>
+        </AlertNotificationRoot>
         </Modal>
     );
 };

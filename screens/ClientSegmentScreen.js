@@ -362,15 +362,16 @@ export default function ClientSegmentScreen(props) {
 
 
                 {
-                    clientCount === 0 ?
-                        <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
-                            <Text style={[textTheme.titleSmall]}>
-                                No clients to display
-                            </Text>
-                        </View> :
+
                     searchQuery === "" ?
                         <>
                             {
+                                clientCount === 0 ?
+                                    <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                                        <Text style={[textTheme.titleSmall]}>
+                                            No clients to display
+                                        </Text>
+                                    </View> :
                                 !isFetching ?
                                     <FlatList
                                         data={filterClientsList}
@@ -404,6 +405,12 @@ export default function ClientSegmentScreen(props) {
 
                         <>
                             {
+                                searchClientTotalCount === 0 ?
+                                    <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                                        <Text style={[textTheme.titleSmall]}>
+                                            No clients to display
+                                        </Text>
+                                    </View> :
                                 !isSearchClientFetching ?
                                     <FlatList
                                         data={searchClientList}

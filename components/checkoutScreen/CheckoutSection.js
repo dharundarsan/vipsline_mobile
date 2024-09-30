@@ -1,19 +1,19 @@
 import {
     KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View
 } from "react-native";
-import { DataTable } from "react-native-paper";
+import {DataTable} from "react-native-paper";
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
-import { Keyboard } from "react-native";
-import { useState, useEffect, useRef } from "react";
+import {Entypo, MaterialCommunityIcons} from '@expo/vector-icons';
+import {Feather} from '@expo/vector-icons';
+import {Keyboard} from "react-native";
+import {useState, useEffect, useRef} from "react";
 import PaymentModal from "./PaymentModal";
 import Popover from "react-native-popover-view";
-import { loadWalletPriceFromDb } from "../../store/invoiceSlice";
-import { useDispatch, useSelector } from "react-redux";
+import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
+import {useDispatch, useSelector} from "react-redux";
 import {
     checkStaffOnCartItems, clearCalculatedPrice,
     clearLocalCart,
@@ -35,11 +35,14 @@ import { updateTotalClientCount } from "../../store/clientFilterSlice";
 import { clearClientInfo } from "../../store/clientInfoSlice";
 import InvoiceModal from "./InvoiceModal";
 import * as Haptics from 'expo-haptics';
-import Toast from 'react-native-root-toast';
+import Toast from "../../ui/Toast";
+// import Toast from 'react-native-root-toast';
 
 
 const CheckoutSection = (props) => {
     const tot = useSelector(state => state.cart.calculatedPrice);
+
+    const toastRef = useRef(null);
 
     // const totalChargeAmount = useSelector(state => state.cart.calculatedPrice[0]?.extra_charges_value);
     const totalChargeAmount = checkNullUndefined(tot) ?
@@ -78,7 +81,7 @@ const CheckoutSection = (props) => {
     const cartDetails = useSelector(state => state.cart.items);
 
     useEffect(() => {
-        const updatedCategory = { service: 0, product: 0, package: 0 };
+        const updatedCategory = {service: 0, product: 0, package: 0};
 
         cartDetails.forEach(item => {
             if (["Women", "Men", "General"].includes(item.gender)) {
@@ -144,7 +147,7 @@ const CheckoutSection = (props) => {
     const cartItems = useSelector((state) => state.cart.items);
     const editedCart = useSelector((state) => state.cart.editedCart);
     const [salesnote, setSalesnote] = useState("");
-    const [chargesInputData, setChargesInputData] = useState([{ index: 0 }]);
+    const [chargesInputData, setChargesInputData] = useState([{index: 0}]);
     const [data, setData] = useState([{}])
 
     useEffect(() => {
@@ -182,7 +185,7 @@ const CheckoutSection = (props) => {
             if (selectedDiscountMode === "AMOUNT") {
                 if ((calculatedPrice[0].total_price_after_discount - discountValue) <= 0) {
                     setDiscountValue(discountValue)
-                    showToast()
+                    // showToast()
                     setActionModal(false);
                     return;
                 }
@@ -190,7 +193,7 @@ const CheckoutSection = (props) => {
             else if (selectedDiscountMode === "PERCENTAGE") {
                 if (discountValue >= 100) {
                     setDiscountValue(amount);
-                    showToast();
+                    // showToast();
                     setActionModal(false);
                     return;
                 }
@@ -243,8 +246,8 @@ const CheckoutSection = (props) => {
 
     function clearCharges() {
 
-        setChargesInputData([{ index: 0 }])
-        dispatch(updateChargeData([{ index: 0, name: "", amount: 0, }]));
+        setChargesInputData([{index: 0}])
+        dispatch(updateChargeData([{index: 0, name: "", amount: 0,}]));
         dispatch(updateCalculatedPrice());
 
         setActionModal(false);
@@ -259,28 +262,29 @@ const CheckoutSection = (props) => {
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     return <View style={styles.checkoutSection}>
 
+
         {ActionModal && <MiniActionTextModal isVisible={ActionModal}
-            onCloseModal={() => {
-                setActionModal(false)
-            }}
-            total_price_after_discount={calculatedPrice[0].total_price_after_discount}
-            selectedDiscountMode={selectedDiscountMode}
-            setSelectedDiscountMode={setSelectedDiscountMode}
-            clearSalesNotes={clearSaleNotes}
-            chargesInputData={chargesInputData}
-            setChargesInputData={setChargesInputData}
-            title={title}
-            clickedValue={clickedValue}
-            data={data}
-            setDiscountValue={setDiscountValue}
-            discountValue={discountValue}
-            onChangeValue={setSalesnote}
-            salesNote={salesnote}
-            addDiscount={addDiscount}
-            addCharges={addCharges}
-            updateCharges={updateCharges}
-            UpdateSalesNotes={UpdateSalesNotes}
-            clearCharges={clearCharges}
+                                             onCloseModal={() => {
+                                                 setActionModal(false)
+                                             }}
+                                             total_price_after_discount={calculatedPrice[0].total_price_after_discount}
+                                             selectedDiscountMode={selectedDiscountMode}
+                                             setSelectedDiscountMode={setSelectedDiscountMode}
+                                             clearSalesNotes={clearSaleNotes}
+                                             chargesInputData={chargesInputData}
+                                             setChargesInputData={setChargesInputData}
+                                             title={title}
+                                             clickedValue={clickedValue}
+                                             data={data}
+                                             setDiscountValue={setDiscountValue}
+                                             discountValue={discountValue}
+                                             onChangeValue={setSalesnote}
+                                             salesNote={salesnote}
+                                             addDiscount={addDiscount}
+                                             addCharges={addCharges}
+                                             updateCharges={updateCharges}
+                                             UpdateSalesNotes={UpdateSalesNotes}
+                                             clearCharges={clearCharges}
         />}
         {isDelete && <DeleteClient
             isVisible={isDelete}
@@ -296,9 +300,7 @@ const CheckoutSection = (props) => {
                 // props.setSearchQuery("");
                 // props.setFilterPressed("all_clients_count");
                 await clearCartAPI();
-                console.log("123");
-                
-                dispatch(modifyClientMembershipId({ type: "clear" }))
+                dispatch(modifyClientMembershipId({type: "clear"}))
                 clearSaleNotes();
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
@@ -348,55 +350,55 @@ const CheckoutSection = (props) => {
         />}
         {isPaymentModalVisible &&
             <PaymentModal isVisible={isPaymentModalVisible}
-                onCloseModal={() => {
-                    setIsPaymentModalVisible(false)
-                }}
-                setIsInvoiceModalVisible={setIsInvoiceModalVisible}
-                price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} />
+                          onCloseModal={() => {
+                              setIsPaymentModalVisible(false)
+                          }}
+                          setIsInvoiceModalVisible={setIsInvoiceModalVisible}
+                          price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
         }
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
                 <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
                     setIsInvoiceModalVisible(false);
                     // props.onCloseModal();
-                }} /> :
+                }}/> :
                 null
         }
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? { borderStyle: "dashed" } : null]}>
+        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
             {/*<Text*/}
             {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { calculatedPrice.length !== 0 ? calculatedPrice[0].total_discount_in_price : 0}</Text>*/}
             <View>
                 {
                     checkNullUndefined(calculatedPrice[0]) ? calculatedPrice[0].total_discount_in_price === 0 ?
-                        <Pressable style={styles.checkoutDetailInnerContainer}>
-                            <Text
-                                style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
-                            <MaterialCommunityIcons name="information-outline" size={24}
-                                color="black" />
-                        </Pressable> :
-
-                        <Popover popoverStyle={styles.popoverStyle}
-                            from={<Pressable style={styles.checkoutDetailInnerContainer}>
+                            <Pressable style={styles.checkoutDetailInnerContainer}>
                                 <Text
                                     style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
                                 <MaterialCommunityIcons name="information-outline" size={24}
-                                    color="black" />
-                            </Pressable>}
-                            offset={Platform.OS === "ios" ? 0 : 32}
-                        >
-                            {discountCategory.service !== "0" ?
-                                <Text>Service Discount: ₹{discountCategory.service}</Text> : null}
-                            {discountCategory.product !== "0" ?
-                                <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
-                            {discountCategory.package !== "0" ?
-                                <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
-                            {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount) ?
-                                <Text>Custom
-                                    Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text> : null}
-                            {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" && customDiscount !== undefined && customDiscount.length === 0 ?
-                                <Text>No discounts applied</Text> : null}
-                        </Popover> :
+                                                        color="black"/>
+                            </Pressable> :
+
+                            <Popover popoverStyle={styles.popoverStyle}
+                                     from={<Pressable style={styles.checkoutDetailInnerContainer}>
+                                         <Text
+                                             style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>
+                                         <MaterialCommunityIcons name="information-outline" size={24}
+                                                                 color="black"/>
+                                     </Pressable>}
+                                     offset={Platform.OS === "ios" ? 0 : 32}
+                            >
+                                {discountCategory.service !== "0" ?
+                                    <Text>Service Discount: ₹{discountCategory.service}</Text> : null}
+                                {discountCategory.product !== "0" ?
+                                    <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
+                                {discountCategory.package !== "0" ?
+                                    <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
+                                {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount) ?
+                                    <Text>Custom
+                                        Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text> : null}
+                                {discountCategory.service === "0" && discountCategory.product === "0" && discountCategory.package === "0" && customDiscount !== undefined && customDiscount.length === 0 ?
+                                    <Text>No discounts applied</Text> : null}
+                            </Popover> :
                         <></>
                 }
             </View>
@@ -405,19 +407,19 @@ const CheckoutSection = (props) => {
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
         </View>
 
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? { borderStyle: "dashed" } : null]}>
+        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length !== 0 ? calculatedPrice[0].total_price_after_discount : 0}</Text>
         </View>
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? { borderStyle: "dashed" } : null]}>
+        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
             <View>
                 {
                     checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
                         <Pressable style={styles.checkoutDetailInnerContainer}>
                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
                                 (18%)</Text>
-                            <MaterialCommunityIcons name="information-outline" size={24} color="black" />
+                            <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
                         </Pressable> :
                         <Popover popoverStyle={styles.popoverStyle}
                             from={<Pressable style={styles.checkoutDetailInnerContainer}>
@@ -497,38 +499,44 @@ const CheckoutSection = (props) => {
                 onPress={() => {
 
 
-                    if (!clientInfo.isClientSelected) {
-                        // ToastAndroid.show("Please select client", ToastAndroid.LONG);
-                        Toast.show("Please select client", {
-                            duration: Toast.durations.LONG,
-                            position: Toast.positions.BOTTOM,
-                            shadow: false,
-                            backgroundColor: "black",
-                            opacity: 1
-                        })
-                        return;
-                    }
-                    if (!dispatch(checkStaffOnCartItems())) {
-                        // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
-                        Toast.show("Please select staff", {
-                            duration: Toast.durations.LONG,
-                            position: Toast.positions.BOTTOM,
-                            shadow: false,
-                            backgroundColor: "black",
-                            opacity: 1
-                        })
-                        return;
-                    }
-                    setIsPaymentModalVisible(true)
-                }}>
+                               if (!clientInfo.isClientSelected) {
+                                   // ToastAndroid.show("Please select client", ToastAndroid.LONG);
+                                   // Toast.show("Please select client", {
+                                   //     duration: Toast.durations.LONG,
+                                   //     position: Toast.positions.BOTTOM,
+                                   //     shadow: false,
+                                   //     backgroundColor: "black",
+                                   //     opacity: 1
+                                   // })
+                                   toastRef.current.show("please select client", 1000);
+
+
+                                   return;
+                               }
+                               if (!dispatch(checkStaffOnCartItems())) {
+                                   // ToastAndroid.show("Please select staff", ToastAndroid.LONG);
+                                   // Toast.show("Please select staff", {
+                                   //     duration: Toast.durations.LONG,
+                                   //     position: Toast.positions.BOTTOM,
+                                   //     shadow: false,
+                                   //     backgroundColor: "black",
+                                   //     opacity: 1
+                                   // })
+                                   return;
+                               }
+                               setIsPaymentModalVisible(true)
+                           }}>
                 <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
                 <View style={styles.checkoutButtonAmountAndArrowContainer}>
                     <Text
                         style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}</Text>
-                    <Feather name="arrow-right-circle" size={24} color={Colors.white} />
+                    <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
+
                 </View>
             </PrimaryButton>
         </View>
+        <Toast  ref={toastRef} />
+
     </View>
 }
 
