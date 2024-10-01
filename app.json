@@ -22,7 +22,8 @@
             "./assets/fonts/Inter/static/Inter_18pt-Medium.ttf"
           ]
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "splash": {
       "image": "./assets/images/adaptive-icon.png",

@@ -13,9 +13,9 @@ import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
 import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {shadowStyling} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
+import * as SecureStore from 'expo-secure-store';
 import Toast from "react-native-toast-message";
 
 const AddClientModal = (props) => {
@@ -35,7 +35,9 @@ const AddClientModal = (props) => {
 
         let authToken = ""
         try {
-            const value = await AsyncStorage.getItem('authKey');
+            // const value = await AsyncStorage.getItem('authKey');
+            const value = await SecureStore.getItemAsync('authKey');
+
             if (value !== null) {
                 authToken = value;
             }
@@ -45,7 +47,8 @@ const AddClientModal = (props) => {
 
         let businessId = ""
         try {
-            const value = await AsyncStorage.getItem('businessId');
+            // const value = await AsyncStorage.getItem('businessId');
+            const value = await SecureStore.getItemAsync('businessId');
             if (value !== null) {
                 businessId = value;
             }

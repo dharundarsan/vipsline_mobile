@@ -22,7 +22,7 @@ import {
 import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
 import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 import {useFocusEffect} from "@react-navigation/native";
 import {clearClientInfo} from "../store/clientInfoSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
@@ -79,7 +79,8 @@ export default function ListOfBusinessesScreen({navigation}) {
 
         let businessId = ""
         try {
-            const value = await AsyncStorage.getItem('businessId');
+            // const value = await AsyncStorage.getItem('businessId');
+            const value = await SecureStore.getItemAsync('businessId');
             if (value !== null) {
                 businessId = value;
             }
@@ -90,7 +91,8 @@ export default function ListOfBusinessesScreen({navigation}) {
 
     const storeData = async (value) => {
         try {
-            await AsyncStorage.setItem('businessId', value);
+            // await AsyncStorage.setItem('businessId', value);
+            await SecureStore.setItemAsync('businessId', value);
         } catch (e) {
         }
     };
@@ -147,7 +149,6 @@ export default function ListOfBusinessesScreen({navigation}) {
             isVisible={isDelete}
             setVisible={setIsDelete}
             onCloseModal={async () => {
-                console.log("Navigating to CheckoutScreen");
                 // Navigate directly to CheckoutScreen
                 setTimeout(() => {
                     setIsDelete(false);
@@ -156,12 +157,10 @@ export default function ListOfBusinessesScreen({navigation}) {
                 setReload(true)
                 // console.log(navigationRef.current.getRootState());
                 // navigate("Checkout")
-                console.log("Navigation to CheckoutScreen complete.");
             }}
             header={"Cancel Sale"}
             content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
             onCloseClientInfoAfterDeleted={async () => {
-                console.log("Clearing data and navigating");
                 await clearCartAPI();
                 dispatch(modifyClientMembershipId({ type: "clear" }));
                 clearSalesNotes();

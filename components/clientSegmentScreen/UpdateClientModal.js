@@ -265,6 +265,14 @@ const UpdateClientModal = React.memo((props) => {
                         placeholder="Enter client's GSTIN"
                         value={clientData.gstNo}
                         onChangeText={(value) => handleChange("gstNo", value)}
+                        validator={(text) => {
+                            if (text.length !== 0){
+                                let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
+                                if(regex.test(text) === true) return true;
+                                else return "Please enter valid GST number"
+                            }
+                            else return true;
+                        }}
                     />
                     <CustomTextInput
                         type="phoneNo"

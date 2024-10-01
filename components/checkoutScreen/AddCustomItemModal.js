@@ -21,7 +21,7 @@ const AddCustomItemModal = (props) => {
     return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}
                   presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
-            <Text style={[textTheme.titleLarge, styles.heading]}>Add Custom Item</Text>
+            <Text style={[textTheme.titleLarge, styles.heading]}>Edit Custom Item</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}

@@ -18,7 +18,6 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 // import ClientSegmentScreen from "./screens/ClientSegmentScreen";
 //Font And SplashScreen Imports
 import * as SplashScreen from 'expo-splash-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Font from 'expo-font';
 
 
@@ -55,6 +54,7 @@ import { LocationProvider, useLocationContext } from './context/LocationContext'
 import { loadBusinessesListFromDb } from './store/listOfBusinessSlice';
 import { loadLoginUserDetailsFromDb } from './store/loginUserSlice';
 import drawerItem from "react-native-paper/src/components/Drawer/DrawerItem";
+import * as SecureStore from 'expo-secure-store';
 
 enableScreens();
 
@@ -174,7 +174,9 @@ const AppNavigator = () => {
 
     const checkAuthentication = async () => {
         try {
-            const authKey = await AsyncStorage.getItem('authKey');
+            // const authKey = await AsyncStorage.getItem('authKey');
+            const authKey = await SecureStore.getItemAsync('authKey');
+            
             if (authKey !== null) {
                 // setIsAuthenticated(true);
                 dispatch(updateAuthStatus(true));
@@ -279,7 +281,6 @@ const MainDrawerNavigator = () => {
                         header={"Cancel Sale"}
                         content={"If you cancel this sale transaction will not be processed."}
                         onCloseClientInfoAfterDeleted={async () => {
-                            console.log("Clearing data and navigating");
                             await clearCartAPI();
                             dispatch(modifyClientMembershipId({ type: "clear" }));
                             clearSalesNotes();
