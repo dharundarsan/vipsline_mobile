@@ -7,7 +7,7 @@ import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import Divider from "../../ui/Divider";
 import ClientStatistics from "./ClientStatistics";
 import ClientDetails from "./ClientDetails";
@@ -19,6 +19,8 @@ import { checkNullUndefined, dateFormatter } from "../../util/Helpers";
 import { clearClientInfo, loadClientInfoFromDb } from "../../store/clientInfoSlice";
 import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
+import { loadClientsFromDb } from "../../store/clientSlice";
+import Toast from "../../ui/Toast";
 
 /**
  * ClientInfoModal Component
@@ -51,7 +53,9 @@ const getCategoryTitle =
     "review": "Review",
     "giftVoucher": "Gift Voucher",
     "seeMoreStats": "Statistics"
+
 }
+
 
 
 export default function clientInfoModal(props) {
@@ -60,6 +64,7 @@ export default function clientInfoModal(props) {
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
     const details = useSelector(state => state.clientInfo.details);
+
 
 
     const [totalSales, setTotalSales] = useState("");
@@ -71,6 +76,8 @@ export default function clientInfoModal(props) {
     const [totalVisits, setTotalVisits] = useState(0);
     const [phone, setPhone] = useState("");
     const [name, setName] = useState("");
+
+    const toastRef = useRef(null)
 
 
     useEffect(() => {
@@ -154,17 +161,19 @@ export default function clientInfoModal(props) {
 
                 }}
                 details={details}
+                updateClientToast={(message, duration) => {
+                    toastRef.current.show(message, duration);
+                }}
 
             />
 
             <DeleteClient
                 isVisible={deleteClientModalVisibility}
+                deleteClient={true}
                 onCloseModal={() => {
                     setDeleteClientModalVisibility(false)
                     props.setModalVisibility(false);
-                    // dispatch(loadClientInfoFromDb(props.id))
-                    dispatch(clearClientInfo());
-
+                    dispatch(loadClientsFromDb())
                 }}
                 header={"Delete Client"}
                 content={"Are you sure? This action cannot be undone."}
@@ -172,19 +181,21 @@ export default function clientInfoModal(props) {
                     props.setVisible(false);
                     props.setSearchQuery("");
                     props.setFilterPressed("all_clients_count");
+                    dispatch(clearClientInfo());
                 }}
+                deleteClientToast={props.deleteClientToast}
 
             />
             <View style={styles.modalContent}>
+
                 <ClientCard
-                    name={name === undefined ? " " : name}
-                    phone={phone === undefined ? " " : phone}
+                    name={details.name}
+                    phone={details.mobile_1}
                     card={styles.clientDetailsContainer}
                     nameText={[textTheme.titleSmall, styles.name]}
                     phoneText={[textTheme.titleSmall, styles.phone]}
                     onPress={() => null}
                     rippleColor={Colors.transparent}
-
                 />
                 <View style={styles.optionsContainer}>
                     <PrimaryButton
@@ -258,7 +269,7 @@ export default function clientInfoModal(props) {
 
     return (
         <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet" onRequestClose={props.onClose} >
-
+            <Toast ref={toastRef}/>
 
 
             <View style={styles.closeAndHeadingContainer}>
@@ -289,7 +300,7 @@ export default function clientInfoModal(props) {
                     clientMoreDetails === null ?
                         null :
                         <ClientCard
-                            name={props.name}
+                            name={details.name}
                             card={styles.clientProfileCard}
                             cardInnerContainer={styles.cardInnerContainer}
                             rippleColor={Colors.white}
@@ -381,13 +392,13 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     clientDetailsContainer: {
-        width: "auto",
+        alignItems: 'center',
     },
     name: {
         fontWeight: '600',
     },
     phone: {
-        width: "150%"
+        // width: "150%"
     },
     optionsContainer: {
         flexDirection: "row",

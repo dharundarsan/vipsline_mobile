@@ -17,8 +17,9 @@ import {useDispatch, useSelector} from "react-redux";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import {updateDiscount} from '../../store/cartSlice';
 import * as Haptics from "expo-haptics";
+import Toast from "react-native-toast-message";
 
-const Cart = () => {
+const Cart = (props) => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const cartItems = useSelector((state) => state.cart.items);
@@ -91,8 +92,6 @@ const Cart = () => {
         <View style={styles.cart}>
             {isModalVisible &&
                 <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={() => {
-
-
                     openAddItemModal()
                 }}/>}
             {cartItems.length === 0 && customItems.length === 0 ?
@@ -102,9 +101,8 @@ const Cart = () => {
                     <Text style={styles.selectServiceText}>Select an service or item to checkout</Text>
                     <PrimaryButton label="Add items to cart" buttonStyle={styles.addItemButton}
                                    onPress={() => {
-
-                                       openAddItemModal()
-                                   }}/>
+                        openAddItemModal()
+                    }}/>
                 </View> :
                 <>
                     <View style={{flex: 1}}>
@@ -124,7 +122,9 @@ const Cart = () => {
                             </View>
                         </PrimaryButton>
                     </View>
-                    <CheckoutSection/>
+                    <CheckoutSection
+                        checkoutScreenToast={props.showToast}
+                    />
                 </>
             }
         </View>

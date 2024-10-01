@@ -3,13 +3,17 @@ import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart} from "../../store/cartSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import * as Haptics from "expo-haptics";
+import {useRef} from "react";
+import Toast from "../../ui/Toast";
+import {checkNullUndefined} from "../../util/Helpers";
 
 
 const ProductItem = (props) => {
     const dispatch = useDispatch();
-
+    const cartItems = useSelector(state => state.cart.items);
+    const toastRef = useRef(null);
 
     const styles = StyleSheet.create({
         selectProductItemButton: {
@@ -57,15 +61,28 @@ const ProductItem = (props) => {
 
     return <PrimaryButton buttonStyle={styles.selectProductItemButton}
                           pressableStyle={styles.selectProductItemPressable}
-                          onPress={() => {
+                          onPress={async () => {
                               if (props.data.available_quantity === 0) {
-                                  // ToastAndroid.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", ToastAndroid.LONG)
-                                  Toast.show("Zero stock warning. Adjust the stock quantity on the products page to make it available for sale.", Toast.LONG, {
-                                      tapToDismissEnabled: true,
-                                  })
+                                  // TODO: Implement Toast
+                                  // Toast.show({
+                                  //     type: ALERT_TYPE.WARNING,
+                                  //     title: "Zero stock warning",
+                                  //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                  //     autoClose: 1500,
+                                  // });
+                                  props.addItemModalToast("Adjust the stock quantity on the products page to make it available for sale.", 2000);
                                   return;
                               }
-                              dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
+                              try {
+                                  const response = await dispatch(addItemToCart({
+                                      product_id: props.data.id,
+                                      quantity: 1
+                                  }));
+                              } catch (err) {
+                                  props.addItemModalToast(err, 2000);
+
+                                  return;
+                              }
                               props.closeOverallModal()
                           }}
     >

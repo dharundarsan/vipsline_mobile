@@ -4,17 +4,17 @@ import React, { useState, useRef, useEffect } from "react";
 import DropdownModal from "../../ui/DropdownModal";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
-import { formatDate } from "../../util/Helpers";
-import { useDispatch } from "react-redux";
-import { loadClientCountFromDb } from "../../store/clientSlice";
+import {formatDate, showToast} from "../../util/Helpers";
+import {useDispatch} from "react-redux";
+import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { shadowStyling } from "../../util/Helpers";
-import {Toast, AlertNotificationRoot, ALERT_TYPE} from "react-native-alert-notification"
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import Toast from "../../ui/Toast";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -33,6 +33,7 @@ const CreateClientModal = (props) => {
     const [isAnniversarySelected, setIsAnniversarySelected] = useState(false);
 
     const dispatch = useDispatch();
+    const toastRef = useRef(null);
 
     const firstNameRef = useRef(null);
     const lastNameRef = useRef(null);
@@ -99,25 +100,27 @@ const CreateClientModal = (props) => {
                 pinCode: "",
                 state: "Tamilnadu",
             });
-            // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
+
             if(response.toString() === "false") {
-                Toast.show({
-                    type: ALERT_TYPE.WARNING,
-                    title: "User already exists",
-                    textBody: "Membership already exists in cart",
-                    autoClose: 1500,
-                })
-                console.log("already exists999");
+                // TODO
+                toastRef.current.show("User already exists", 1000);
+                // Toast.show({
+                //     type: ALERT_TYPE.WARNING,
+                //     title: "User already exists",
+                //     textBody: "Membership already exists in cart",
+                //     autoClose: 1500,
+                // })
             }
             else {
-                Toast.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    title: "User added successfully",
-                    textBody: "Membership already exists in cart",
-                    autoClose: 1500,
-
-                })
-                console.log(response)
+                // TODO
+                toastRef.current.show("User added Successfully", 1000);
+                // Toast.show({
+                //     type: ALERT_TYPE.SUCCESS,
+                //     title: "User added successfully",
+                //     textBody: "Membership already exists in cart",
+                //     autoClose: 1500,
+                //
+                // })
                 await dispatch(loadClientInfoFromDb(response))
                 clearForm();
                 await dispatch(loadClientCountFromDb());
@@ -127,7 +130,15 @@ const CreateClientModal = (props) => {
 
         } catch (e) {
             // ToastAndroid.show(e, ToastAndroid.LONG),
-
+            // TODO
+            toastRef.current.show("Something went wrong", 1000);
+            // Toast.show(e, {
+            //     duration: Toast.durations.LONG,
+            //     position: Toast.positions.BOTTOM,
+            //     shadow: false,
+            //     backgroundColor: "black",
+            //     opacity: 1
+            // })
         }
 
     };
@@ -135,14 +146,7 @@ const CreateClientModal = (props) => {
     return (
 
         <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}
-            presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
-            <AlertNotificationRoot
-                theme={"light"}
-                toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
-                colors={[{
-                    label:Colors.black,
-                    card: Colors.grey200}]}
-            >
+               presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Add a new client</Text>
                 <PrimaryButton
@@ -150,7 +154,7 @@ const CreateClientModal = (props) => {
                     pressableStyle={styles.closeButtonPressable}
                     onPress={props.onCloseModal}
                 >
-                    <Ionicons name="close" size={25} color="black" />
+                    <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
             <ScrollView>
@@ -164,7 +168,10 @@ const CreateClientModal = (props) => {
                         value={firstName}
                         onChangeText={setFirstName}
                         validator={(text) => {
-                            if (text.length === 0) return "First name is required";
+                            if (text.trim().length === 0) {
+                                setFirstName("");
+                                return "First name is required"
+                            }
                             else return true;
                         }}
                         onSave={(callback) => {
@@ -211,8 +218,7 @@ const CreateClientModal = (props) => {
                         validator={(text) => {
                             if (text.trim().length === 0) {
                                 return true;
-                            }
-                            else {
+                            } else {
                                 if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "") return "Email is invalid";
                                 else return true;
                             }
@@ -292,9 +298,9 @@ const CreateClientModal = (props) => {
                 </View>
             </ScrollView>
             <View style={styles.saveButtonContainer}>
-                <PrimaryButton label={"Save"} onPress={handleSave} />
+                <PrimaryButton label={"Save"} onPress={handleSave}/>
             </View>
-        </AlertNotificationRoot>
+            <Toast ref={toastRef}/>
         </Modal>
     );
 };

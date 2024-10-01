@@ -1,7 +1,5 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {ToastAndroid} from "react-native";
-import Toast from "react-native-root-toast";
 
 export default async function updateAPI(response, mode_of_payment, splitUpState, clientInfo) {
     let authToken = "";
@@ -72,23 +70,27 @@ export default async function updateAPI(response, mode_of_payment, splitUpState,
             }
         );
         // ToastAndroid.show("updated successfully!", ToastAndroid.LONG);
-        Toast.show("Updated Successfully", {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow: false,
-            backgroundColor: "black",
-            opacity: 1
-        })
+        // TODO
+
+        // Toast.show("Updated Successfully", {
+        //     duration: Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow: false,
+        //     backgroundColor: "black",
+        //     opacity: 1
+        // })
     } catch (error) {
         console.error("Error during updateAPI call:", error);
         // ToastAndroid.show("not updated successfully!", ToastAndroid.LONG);
-        Toast.show("Not Updated Successfully", {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow: false,
-            backgroundColor: "black",
-            opacity: 1
-        })
+        // TODO
+
+        // Toast.show("Not Updated Successfully", {
+        //     duration: Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow: false,
+        //     backgroundColor: "black",
+        //     opacity: 1
+        // })
         throw error; // Ensure that the error is propagated
     }
 }

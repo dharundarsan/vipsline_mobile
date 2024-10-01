@@ -27,13 +27,15 @@ import ServicesList from "./ServicesList";
 import ProductsList from "./ProductsList";
 import MembershipsAndPackagesList from "./MembershipsAndPackagesList";
 import textTheme from "../../constants/TextTheme";
-import {capitalizeFirstLetter, formatDate, shadowStyling} from "../../util/Helpers";
+import {capitalizeFirstLetter, formatDate, shadowStyling, showToast} from "../../util/Helpers";
 import AddCustomItemModal from "./AddCustomItemModal";
 import PrepaidModal from "./PrepaidModal";
 import {updateAppointmentDate} from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+// import Toast from "react-native-toast-message";
+import Toast from "../../ui/Toast";
 
 const modalCategoryListData = [
     {id: "services", title: "SERVICES"},
@@ -52,6 +54,13 @@ const AddItemModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(appointmentDate);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
+
+    const toastRef = useRef(null);
+
+    function addItemModalToast(message, duration) {
+        toastRef.current.show(message, duration);
+    }
+
 
     const businessDetails = useSelector(state => state.businesses);
 
@@ -168,30 +177,35 @@ const AddItemModal = (props) => {
                         />
                     </Pressable>
                     {isDatePickerVisible && (
-                        // <RNDateTimePicker
-                        //     value={new Date(selectedDate)}
-                        //     maximumDate={new Date(Date.now())}
-                        //     mode="date"
-                        //     display="default"
-                        //     onChange={(date) => {
-                        //         setIsDatePickerVisible(false);
-                        //         setSelectedDate(
-                        //             date.nativeEvent.timestamp
-                        //         );
-                        //     }}
-                        // />
                         <DateTimePickerModal
                             isVisible={isDatePickerVisible}
                             mode="date"
-                            minimumDate={businessDetails.businessNotificationDetails.data[0].back_date_invoice_allowed === false 
-                            ? new Date(Date.now()) : undefined }
+                            minimumDate={businessDetails.businessNotificationDetails.data[0].back_date_invoice_allowed === false
+                                ? new Date(Date.now()) : undefined}
                             maximumDate={new Date(Date.now())}
-                            date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)}
+                            date={new Date(selectedDate)}
                             onConfirm={(date) => {
+                                const now = new Date();
+                                const formatForComparison = (date) => {
+                                    return new Date(date).toISOString().split(':').slice(0, 2).join(':') + ':00.000Z';
+                                };
+                                const formattedCurrentDate = formatForComparison(now);
+                                const formattedSelectedDate = formatForComparison(date);
+                                if (formattedCurrentDate !== formattedSelectedDate) {
+                                    const selectedDateLocal = new Date(date);
+                                    const isSameDay =
+                                        now.getDate() === selectedDateLocal.getDate() &&
+                                        now.getMonth() === selectedDateLocal.getMonth() &&
+                                        now.getFullYear() === selectedDateLocal.getFullYear();
+
+                                    if (!isSameDay) {
+
+                                        toastRef.current.show("you're trying to raise the invoice on a previous date", 1000);
+
+                                    }
+                                }
                                 setIsDatePickerVisible(false);
-                                setSelectedDate(
-                                    new Date(date).getTime()
-                                );
+                                setSelectedDate(new Date(date).getTime());
                                 dispatch(updateAppointmentDate(new Date(date).getTime()));
                             }}
                             onCancel={() => setIsDatePickerVisible(false)}
@@ -245,7 +259,9 @@ const AddItemModal = (props) => {
                                 closeOverallModal={() => {
                                     setSelectedCategory(null)
                                     props.closeModal()
-                                }}/>
+                                }}
+                                addItemModalToast={addItemModalToast}
+        />
     } else if (selectedCategory === "memberships") {
         content =
             <MembershipsAndPackagesList category={"memberships"} closeOverallModal={() => {
@@ -306,6 +322,7 @@ const AddItemModal = (props) => {
                 </PrimaryButton>
             </View>
             {content}
+            <Toast ref={toastRef}/>
         </Modal>
     );
 }

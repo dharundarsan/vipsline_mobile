@@ -38,6 +38,7 @@ const AddClientButton = (props) => {
     const [isAvailablePackagesModalVisible, setIsAvailablePackageModalVisible] = useState(false);
     const [modalVisibility, setModalVisibility] = useState(false)
     const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
+    const [selectedOption, setSelectedOption] = useState("");
 
     const details = useSelector(state => state.clientInfo.details);
 
@@ -49,7 +50,7 @@ const AddClientButton = (props) => {
         dispatch(loadCartFromDB(clientInfo.client_id))
         // console.log(JSON.stringify(clientInfo.membershipDetails[0].client_id,null,3));
 
-        if (clientInfo.membershipDetails[0].client_id !== undefined) {
+        if (clientInfo.membershipDetails[0]?.client_id !== undefined) {
             dispatch(modifyClientId({type: "update", payload: clientInfo.membershipDetails[0].client_id}))
         } else {
             dispatch(modifyClientId({type: "clear"}))
@@ -89,7 +90,7 @@ const AddClientButton = (props) => {
             setEditClientModalVisibility(true);
         }
     }
-
+    
     return (
         <>
             {
@@ -97,6 +98,8 @@ const AddClientButton = (props) => {
                     <View style={{borderBottomWidth: 1, borderColor: Colors.highlight}}>
                         {isVisibileModal && (
                             <ClientInfoModal
+                                selectedOption={selectedOption}
+                                setSelectedOption={setSelectedOption}
                                 setFilterPressed={setFilterPressed}
                                 searchClientQuery={props.searchClientQuery}
                                 setSearchQuery={props.setSearchClientQuery}
@@ -114,9 +117,10 @@ const AddClientButton = (props) => {
                                 onClose={() => {
                                     setIsVisibleModal(false);
                                 }}
-                                phone={clientInfo.details?.mobile_1}
-                                name={clientInfo.details?.firstName}
-                                id={clientInfo.details?.id}
+                                phone={clientInfo.details.mobile_1}
+                                name={clientInfo.details.firstName}
+                                id={clientInfo.details.id}
+                                deleteClientToast={props.deleteClientToast}
                             />
                         )}
                         {/* <UpdateClientModal
@@ -150,8 +154,7 @@ const AddClientButton = (props) => {
                             />
                             <View style={styles.actionMenu}>
                                 {
-                                    clientInfo.details
-                                    || clientInfo.membershipDetails.length !== 0
+                                    clientInfo.membershipDetails.length !== 0
                                     || clientInfo.packageDetails.length !== 0
                                     || clientInfo.details.wallet_balance !== undefined
                                         ? (

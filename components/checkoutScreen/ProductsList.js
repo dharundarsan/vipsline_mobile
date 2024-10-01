@@ -5,12 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 import PrimaryButton from "../../ui/PrimaryButton";
 import Divider from "../../ui/Divider";
 import TextTheme from "../../constants/TextTheme";
-import React, { useEffect, useState, useLayoutEffect } from "react";
+import React, {useEffect, useState, useLayoutEffect, useRef} from "react";
 import ServiceItem from "./ServiceItem";
 import ProductItem from "./ProductItem";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import SearchBar from "../../ui/SearchBar";
+import { checkNullUndefined } from "../../util/Helpers";
+import Toast from "../../ui/Toast";
 
 const ProductsList = (props) => {
     const productsData = useSelector(state => state.catalogue.products.items);
@@ -60,12 +62,14 @@ const ProductsList = (props) => {
     //         backHandler.remove();  // Ensure that the event listener is removed properly.
     //     };
     // }, [props.selectedCategory]);
+
+
     
     return (
         <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>
                 {
-                    productsData[0] !== null ?
+                    checkNullUndefined(productsData[0]) ?
                         <>
                             <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
                             <SearchBar filter={false}
@@ -78,7 +82,7 @@ const ProductsList = (props) => {
                 }
             </View>
             {
-                productsData[0] === null ? <View style={styles.noDataMessage}>
+                productsData[0] === null || productsData[0] === undefined ? <View style={styles.noDataMessage}>
                     <Text style={TextTheme.titleMedium}>No Products Available</Text>
                 </View>
                     :
@@ -96,9 +100,12 @@ const ProductsList = (props) => {
                                 </View>
                                 <FlatList
                                     data={item.products}
-                                    renderItem={({ item }) => <ProductItem data={item}
-                                        closeOverallModal={props.closeOverallModal}
-                                    />}
+                                    renderItem={({ item }) =>
+                                        <ProductItem
+                                            data={item}
+                                            closeOverallModal={props.closeOverallModal}
+                                            addItemModalToast={props.addItemModalToast}
+                                        />}
                                     // renderItem={({item}) => <ProductItem data={item}
                                     //                                      addToTempSelectedItems={addToTempSelectedItems}
                                     //                                      selected={tempSelectedItems.includes(item)}/>}
@@ -110,6 +117,7 @@ const ProductsList = (props) => {
                     </ScrollView>
 
             }
+
         </View>
 
     );
@@ -148,7 +156,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: "-50%"
+        marginTop: "-8%"
     }
 });
 

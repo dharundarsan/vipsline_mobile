@@ -85,8 +85,11 @@ export default function EmailLogin() {
                 } catch (e) {
                 }
             } catch (error) {
+                console.log("sdgsdg")
+                setPasswordPrompt("Incorrect password");
                 setIsLoading(false);
                 setIsPasswordValid(false);
+                setIsPasswordTyping(false);
             }
             isAuthenticationSuccessful = response.data.message === undefined ?
                 "" :
@@ -100,6 +103,7 @@ export default function EmailLogin() {
 
 
         if (isAuthenticationSuccessful) {
+            console.log("succ")
             setPasswordPrompt("");
             setIsPasswordValid(true);
             dispatch(updateAuthStatus(true));
@@ -266,6 +270,7 @@ export default function EmailLogin() {
                     }
                     if(email.trim().length === 0 && password.trim().length > 0) {
                         setEmailPrompt("Email is required");
+                        console.log("3")
                         setPasswordPrompt("");
                         // console.log("2")
 
@@ -286,21 +291,6 @@ export default function EmailLogin() {
                         await signInHandler();
                         setIsEmailTyping(false);
                         setIsPasswordTyping(false)
-                        // console.log(isUserFound);
-                        // console.log(isPasswordValid);
-                        // if(isUserFound) {
-                        //     setEmailPrompt("");
-                        // }
-                        // else {
-                        //     setEmailPrompt("Incorrect email");
-                        // }
-                        // if(isPasswordValid) {
-                        //     setPasswordPrompt("");
-                        // }
-                        // else {
-                        //     setPasswordPrompt("Incorrect password")
-                        // }
-                        // console.log("5")
                     }
 
 

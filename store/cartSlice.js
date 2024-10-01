@@ -71,8 +71,13 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
                 }
             }
         );
+        if (response.data.status_code === 404) {
+            throw response;
+        }
         dispatch(await loadCartFromDB())
     } catch (error) {
+        //TODO
+        throw error.data.other_message;
     }
 }
 
@@ -440,14 +445,13 @@ export const cartSlice = createSlice({
                     // if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
                     console.log(state.editedCart.filter(item => item.gender === "prepaid"))
                     if (state.prepaid_wallet.length > 0) {
-                        console.log(payload)
                         // state.prepaid_wallet[0].source = "add_prepaid";
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
                             source: "add_prepaid"
                         }]
                     }
-                    if (state.prepaid_wallet.length > 0  || state.editedCart.filter(item => item.gender === "prepaid").length > 0) {
+                    if (state.prepaid_wallet.length > 0 || state.editedCart.filter(item => item.gender === "prepaid").length > 0) {
                         // state.prepaid_wallet[0].resource_id = payload;
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],

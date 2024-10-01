@@ -3,7 +3,6 @@ import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useState} from "react";
-import Toast from 'react-native-root-toast';
 
 export default function BusinessCard(props) {
     const [status, setStatus] = useState("");
@@ -69,13 +68,15 @@ export default function BusinessCard(props) {
             onPress={() => {
                 if (props.status === "unverified") {
                     // ToastAndroid.show("Business yet to be verified", ToastAndroid.SHORT);
-                    Toast.show("Business yet to be verified",{
-                        duration:Toast.durations.SHORT,
-                        position: Toast.positions.BOTTOM,
-                        shadow:false,
-                        backgroundColor:"black",
-                        opacity:1
-                    })
+                    //TODO
+                    props.listOfBusinessToast("Business yet to be verified", 2000);
+                    // Toast.show("Business yet to be verified",{
+                    //     duration:Toast.durations.SHORT,
+                    //     position: Toast.positions.BOTTOM,
+                    //     shadow:false,
+                    //     backgroundColor:"black",
+                    //     opacity:1
+                    // })
                     return
                 }
                 props.onPress();

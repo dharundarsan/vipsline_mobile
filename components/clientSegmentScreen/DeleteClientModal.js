@@ -14,6 +14,8 @@ import {
     updateSearchClientMaxEntry
 } from "../../store/clientFilterSlice";
 import {clientFilterNames} from "../../util/chooseFilter";
+import { useNavigation } from "@react-navigation/native";
+import { useLocationContext } from "../../context/LocationContext";
 
 /**
  * DeleteClient Component
@@ -32,7 +34,8 @@ import {clientFilterNames} from "../../util/chooseFilter";
 export default function DeleteClient(props) {
     const dispatch = useDispatch();
     const currentClientId = useSelector(state => state.clientInfo.clientId);
-
+    const navigation = useNavigation();
+    const {reload} = useLocationContext();
     return (
         <Modal
             transparent={true}
@@ -51,7 +54,18 @@ export default function DeleteClient(props) {
                         buttonStyle={styles.closeButton}
                         pressableStyle={styles.closeButtonPressable}
                         onPress={() => {
-                            props.onCloseModal();
+                            if(props.setVisible !== undefined){
+                                // props.setVisible(false);
+                                // console.log("reload "+reload);
+
+                                // setTimeout(()=>{
+                                //     navigation.navigate("Checkout", { screen: "CheckoutScreen" });
+                                // },100)
+                                props.onCloseModal();
+                            }
+                            else{
+                                props.onCloseModal();
+                            }
                         }}
                     >
                         <Ionicons name="close" size={25} color="black"/>
@@ -68,24 +82,33 @@ export default function DeleteClient(props) {
                             onPress={props.onCloseModal}
                         />
                         <PrimaryButton
-                            label={"Delete"}
+                            label={props.ActionOptionName !== undefined ? props.ActionOptionName : "Delete"}
                             buttonStyle={styles.deleteButton}
                             textStyle={[textTheme.titleMedium]}
                             onPress={() => {
-                                deleteClientAPI(currentClientId);
-                                props.onCloseModal();
+                                if(props.deleteClient) {
+                                    deleteClientAPI(currentClientId);
+                                    props.deleteClientToast();
+                                }
+                                else {
+                                    props.checkoutScreenToast();
+                                }
+                                // TODO
+
+                                if(props.setVisible !== undefined){
+                                    props.setVisible(false);
+                                }
+                                else{
+                                    props.onCloseModal();
+                                }
                                 props.onCloseClientInfoAfterDeleted();
                                 dispatch(loadClientCountFromDb());
                                 dispatch(loadClientFiltersFromDb(10, "All"));
                                 dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
                             }}
-
                         />
                     </View>
-
                 </View>
-
-
             </TouchableOpacity>
         </Modal>
     );
@@ -99,7 +122,7 @@ const styles = StyleSheet.create({
     closeButton: {
         position: "absolute",
         right: 10,
-        top:5,
+        top: 5,
         backgroundColor: Colors.white,
     },
     closeButtonPressable: {
@@ -120,7 +143,7 @@ const styles = StyleSheet.create({
     },
     label: {
         width: "100%",
-        paddingVertical:5,
+        paddingVertical: 5,
         backgroundColor: Colors.background,
         alignItems: "center",
         elevation: 0.5,

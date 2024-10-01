@@ -29,20 +29,21 @@ import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {updateChargeData, updateDiscount, updateSalesNotes} from "../../store/cartSlice";
-import {checkNullUndefined} from "../../util/Helpers";
+import {checkNullUndefined, showToast} from "../../util/Helpers";
 import {loadBusinessesListFromDb} from "../../store/listOfBusinessSlice";
 import {updateTotalClientCount} from "../../store/clientFilterSlice";
 import {clearClientInfo} from "../../store/clientInfoSlice";
-// import Toast from "react-native-root-toast";
 import InvoiceModal from "./InvoiceModal";
 import * as Haptics from 'expo-haptics';
 import Toast from "../../ui/Toast";
+import {updateToastRef} from "../../store/toastSlice";
+import {checkoutScreenToast} from "../../screens/CheckoutScreen";
+// import Toast from 'react-native-root-toast';
 
 
 const CheckoutSection = (props) => {
     const tot = useSelector(state => state.cart.calculatedPrice);
 
-    const toastRef = useRef(null);
 
     // const totalChargeAmount = useSelector(state => state.cart.calculatedPrice[0]?.extra_charges_value);
     const totalChargeAmount = checkNullUndefined(tot) ?
@@ -166,13 +167,33 @@ const CheckoutSection = (props) => {
     const moreInvoiceDetails = useSelector(state => state.invoice.invoiceDetails);
     const customDiscount = useSelector(state => state.cart.additionalDiscounts);
 
-
-    async function addDiscount(discountMode, type) {
+    async function addDiscount(discountMode, type, amount) {
         if (type === "clear") {
             setDiscountValue("")
             dispatch(updateDiscount([]));
             setSelectedDiscountMode("PERCENTAGE")
         } else {
+            if (selectedDiscountMode === "AMOUNT") {
+                if ((calculatedPrice[0].total_price_after_discount - discountValue) <= 0) {
+                    setDiscountValue(discountValue)
+                    // showToast()
+                    // TODO
+                    props.checkoutScreenToast("Discount should be less than subtotal", 2000);
+
+                    // toastRef.current.show("discount should be less than the amount", 2000);
+                    setActionModal(false);
+                    return;
+                }
+            } else if (selectedDiscountMode === "PERCENTAGE") {
+                if (discountValue >= 100) {
+                    setDiscountValue(amount);
+                    // showToast();
+                    // TODO
+                    props.checkoutScreenToast("Discount should be less than subtotal", 2000);
+                    setActionModal(false);
+                    return;
+                }
+            }
             const addDiscount = {
                 name: "Custom Discount", type: discountMode, amount: discountValue
             }
@@ -235,6 +256,12 @@ const CheckoutSection = (props) => {
     }
 
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+
+
+
+
+
+
     return <View style={styles.checkoutSection}>
 
 
@@ -263,13 +290,14 @@ const CheckoutSection = (props) => {
         />}
         {isDelete && <DeleteClient
             isVisible={isDelete}
+            ActionOptionName={"Cancel Sale"}
             onCloseModal={() => {
                 setIsDelete(false)
                 // setModalVisibility(false);
                 // dispatch(loadClientInfoFromDb(props.id))
             }}
             header={"Cancel Sale"}
-            content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
+            content={"If you cancel this sale transaction will not be processed."}
             onCloseClientInfoAfterDeleted={async () => {
                 // props.setVisible(false);
                 // props.setSearchQuery("");
@@ -280,6 +308,9 @@ const CheckoutSection = (props) => {
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
                 dispatch(clearCalculatedPrice())
+            }}
+            checkoutScreenToast={() => {
+                props.checkoutScreenToast("sale cancelled", 2000);
             }}
         />}
         {isModalOpen && <DropdownModal
@@ -339,7 +370,7 @@ const CheckoutSection = (props) => {
                 }}/> :
                 null
         }
-        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
             {/*<Text*/}
             {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { calculatedPrice.length !== 0 ? calculatedPrice[0].total_discount_in_price : 0}</Text>*/}
@@ -382,12 +413,12 @@ const CheckoutSection = (props) => {
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
         </View>
 
-        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length !== 0 ? calculatedPrice[0].total_price_after_discount : 0}</Text>
         </View>
-        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
             <View>
                 {
                     checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
@@ -420,26 +451,27 @@ const CheckoutSection = (props) => {
         </View>
         {
             totalChargeAmount !== 0 ?
-            <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
-            <View>
-                {
-                    chargesAmount[0].amount === 0 ?
-                        <Pressable style={styles.checkoutDetailInnerContainer}>
-                            <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
-                            <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
-                        </Pressable> :
-                        <Popover popoverStyle={styles.popoverStyle}
-                                 from={
-                                     (<Pressable style={styles.checkoutDetailInnerContainer}>
-                                         <Text
-                                             style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
-                                         <MaterialCommunityIcons name="information-outline" size={24}
-                                                                 color="black"/>
-                                     </Pressable>)
-                                 }
-                                 offset={Platform.OS === "ios" ? 0 : 32}
-                        >
-                            {
+                <View
+                    style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
+                    <View>
+                        {
+                            chargesAmount[0].amount === 0 ?
+                                <Pressable style={styles.checkoutDetailInnerContainer}>
+                                    <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                    <MaterialCommunityIcons name="information-outline" size={24} color="black"/>
+                                </Pressable> :
+                                <Popover popoverStyle={styles.popoverStyle}
+                                         from={
+                                             (<Pressable style={styles.checkoutDetailInnerContainer}>
+                                                 <Text
+                                                     style={[textTheme.titleMedium, styles.checkoutDetailText]}>Charges</Text>
+                                                 <MaterialCommunityIcons name="information-outline" size={24}
+                                                                         color="black"/>
+                                             </Pressable>)
+                                         }
+                                         offset={Platform.OS === "ios" ? 0 : 32}
+                                >
+                                    {
 
                                         chargesAmount.map((item, index) => {
                                             return (
@@ -483,7 +515,7 @@ const CheckoutSection = (props) => {
                                    //     backgroundColor: "black",
                                    //     opacity: 1
                                    // })
-                                   toastRef.current.show("please select client", 1000);
+                                   props.checkoutScreenToast("Please select client", 2000);
 
 
                                    return;
@@ -497,6 +529,7 @@ const CheckoutSection = (props) => {
                                    //     backgroundColor: "black",
                                    //     opacity: 1
                                    // })
+                                   props.checkoutScreenToast("Please select staff", 2000);
                                    return;
                                }
                                setIsPaymentModalVisible(true)
@@ -506,12 +539,9 @@ const CheckoutSection = (props) => {
                     <Text
                         style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}</Text>
                     <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
-
                 </View>
-
             </PrimaryButton>
         </View>
-        <Toast  ref={toastRef} />
 
     </View>
 }

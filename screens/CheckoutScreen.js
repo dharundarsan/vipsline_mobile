@@ -6,7 +6,7 @@ import Cart from "../components/checkoutScreen/Cart";
 import AddClientButton from "../components/checkoutScreen/AddClientButton";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import title from "react-native-paper/src/components/Typography/v2/Title";
-import {useCallback, useEffect, useLayoutEffect, useState} from "react";
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {
     loadMembershipsDataFromDb,
@@ -23,7 +23,7 @@ import {
     loadClientFiltersFromDb,
 } from "../store/clientFilterSlice";
 import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
-import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
+import {loadBusinessesListFromDb, loadBusinessNotificationDetails} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {loadStaffsFromDB} from "../store/staffSlice";
 import {
@@ -36,8 +36,10 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
-import {useSafeAreaInsets} from "react-native-safe-area-context";
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useLocationContext } from "../context/LocationContext";
+import Toast from "../ui/Toast";
+import {updateToastRef} from "../store/toastSlice";
 
 const CheckoutScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -50,7 +52,14 @@ const CheckoutScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [showDrawerIcon, setShowDrawerIcon] = useState(true);
 
+    const cartItems = useSelector(state => state.cart.items)
     const businessId = useSelector(state => state.authDetails.businessId);
+
+    const { getLocation, reload, setReload } = useLocationContext();
+
+    useFocusEffect(useCallback(() => {
+        getLocation("CheckoutScreen");
+    }, []))
 
     // console.log(route.params.showDrawerIcon());
 
@@ -58,34 +67,39 @@ const CheckoutScreen = ({ navigation, route }) => {
         route.params.showDrawerIcon(showDrawerIcon)
     }, [showDrawerIcon]);
 
+    const toastRef = useRef(null);
     useEffect(() => {
         const loadData = async () => {
-            setIsLoading(true)
-            setShowDrawerIcon(false);
-            if (businessId !== "") {
+            if (!reload) {
+                setIsLoading(true)
+                setShowDrawerIcon(false);
+                if (businessId !== "") {
 
-                await clearCartAPI();
-                dispatch(clearCustomItems());
-                dispatch(clearLocalCart());
-                dispatch(clearSalesNotes());
-                dispatch(modifyClientMembershipId({type: "clear"}))
-                await dispatch(loadServicesDataFromDb("women"));
-                await dispatch(loadServicesDataFromDb("men"));
-                await dispatch(loadServicesDataFromDb("kids"));
-                await dispatch(loadServicesDataFromDb("general"));
-                await dispatch(loadProductsDataFromDb());
-                await dispatch(loadPackagesDataFromDb());
-                await dispatch(loadMembershipsDataFromDb());
-                // await dispatch(loadClientsFromDb());
-                await dispatch(loadClientCountFromDb());
-                await dispatch(loadClientFiltersFromDb(10, "All"));
-                await dispatch(loadBusinessesListFromDb());
-                await dispatch(loadLoginUserDetailsFromDb());
-                await dispatch(loadStaffsFromDB());
-                // dispatch(loadCartFromDB());
-                // dispatch(loadBookingDetailsFromDb());
+
+                    await clearCartAPI();
+                    dispatch(clearCustomItems());
+                    dispatch(clearLocalCart());
+                    dispatch(clearSalesNotes());
+                    dispatch(modifyClientMembershipId({type: "clear"}))
+                    await dispatch(loadServicesDataFromDb("women"));
+                    await dispatch(loadServicesDataFromDb("men"));
+                    await dispatch(loadServicesDataFromDb("kids"));
+                    await dispatch(loadServicesDataFromDb("general"));
+                    await dispatch(loadProductsDataFromDb());
+                    await dispatch(loadPackagesDataFromDb());
+                    await dispatch(loadMembershipsDataFromDb());
+                    // await dispatch(loadClientsFromDb());
+                    await dispatch(loadClientFiltersFromDb(10, "All"));
+                    await dispatch(loadBusinessesListFromDb());
+                    await dispatch(loadLoginUserDetailsFromDb());
+                    await dispatch(loadStaffsFromDB());
+                    await dispatch(loadBusinessNotificationDetails());
+                    await dispatch(loadClientCountFromDb());
+                    // dispatch(loadCartFromDB());
+                    // dispatch(loadBookingDetailsFromDb());
+                }
+                setIsLoading(false);
             }
-            setIsLoading(false);
             setShowDrawerIcon(true);
         }
         loadData();
@@ -94,7 +108,6 @@ const CheckoutScreen = ({ navigation, route }) => {
 
 
     useFocusEffect(
-
         useCallback(() => {
             // Function to execute whenever the drawer screen is opened
             if (businessId !== "") {
@@ -107,22 +120,35 @@ const CheckoutScreen = ({ navigation, route }) => {
         }, [businessId])
     );
 
+    function checkoutScreenToast(message, duration) {
+        toastRef.current.show(message, duration);
+    }
+
+
+
     return (
         isLoading ? <ActivityIndicator size={"large"} style={{flex: 1, backgroundColor: Colors.white}}/> :
             <View style={[styles.checkoutScreen, {
                 paddingBottom: insets.bottom
             }]}>
+                <Toast ref={toastRef}/>
                 <AddClientModal setSearchClientQuery={setSearchClientQuery}
                                 searchClientQuery={searchClientQuery}
                                 closeModal={() => {
                                     setIsAddClientModalVisible(false)
                                 }} isVisible={isAddClientModalVisible}/>
                 <AddClientButton setSearchClientQuery={setSearchClientQuery}
-                                 searchClientQuery={searchClientQuery}
-                                 onPress={() => {
-                                     setIsAddClientModalVisible(true)
-                                 }}/>
-                <Cart/>
+                    searchClientQuery={searchClientQuery}
+                    onPress={() => {
+                        setIsAddClientModalVisible(true)
+                    }}
+                                 deleteClientToast={() => {
+                                     toastRef.current.show("Client deleted successfully.");
+                                 }}
+                />
+                <Cart
+                    showToast={checkoutScreenToast}
+                />
             </View>
     );
 }

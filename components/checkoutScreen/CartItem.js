@@ -59,8 +59,6 @@ const CartItem = (props) => {
     // useEffect(() => {
     //     setSelectedStaff(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
     // }, [props.data]);
-
-
     return <>
         <View style={styles.cartItem}>
             {isEditPrepaidModalVisible && <PrepaidModal edited={true}
@@ -128,7 +126,6 @@ const CartItem = (props) => {
                             style={[TextTheme.bodyLarge, styles.amountText]}>{editedData ? editedData.price : props.data.price}</Text>
                         {(props.data.gender === "packages" && props.data.package_name !== "") ? null :
                             <PrimaryButton onPress={() => {
-
                                 if (props.data.gender === "prepaid") {
                                     setIsEditPrepaidModalVisible(true)
                                 } else if (props.data.gender === "custom_item") {
@@ -179,11 +176,19 @@ const CartItem = (props) => {
                         <MaterialIcons name="keyboard-arrow-down" size={24} color="black"/>
                     </View>
                 </PrimaryButton>
+                <Text style={[textTheme.labelLarge, styles.discountText]}>
+                    {editedData
+                        ? (editedData.disc_value !== 0 ? `Discount ₹${editedData.disc_value.toFixed(2)}` : "")
+                        : (props.data.price - props.data.discounted_price !== 0 &&
+                            props.data.gender !== "custom_item" &&
+                            props.data.gender !== "prepaid" &&
+                            props.data.gender === "packages")
+                            ? `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}`
+                            : props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" || props.data.gender === "Products" ? `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}` : null
+                    }
+                </Text>
 
-                {props.data.price - props.data.discounted_price === 0 || props.data.gender === "custom_item" || props.data.price - props.data.discounted_price === props.data.price || props.data.gender === "prepaid" ? null :
-                    <Text
-                        style={[textTheme.labelLarge, styles.discountText]}>{`Discount ₹${(props.data.price - props.data.discounted_price).toFixed(2)}`}</Text>
-                }
+
             </View>
         </View>
         <Divider/>

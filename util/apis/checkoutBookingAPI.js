@@ -41,7 +41,6 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useSelector} from "react-redux";
 import {formatDate} from "../Helpers";
-import {ALERT_TYPE, Toast} from "react-native-alert-notification";
 
 export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {
     let authToken = "";
