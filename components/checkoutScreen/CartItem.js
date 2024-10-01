@@ -59,6 +59,119 @@ const CartItem = (props) => {
     // useEffect(() => {
     //     setSelectedStaff(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
     // }, [props.data]);
+
+    const styles = StyleSheet.create({
+        scrollView: {
+            flex: 1,
+        },
+        cartItem: {
+            // flex: 1,
+            marginVertical: 10,
+            marginHorizontal: 20,
+        },
+        itemNameAndDetailsContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center"
+        },
+        itemNameText: {
+            maxWidth: "50%",
+        },
+        itemDetailsContainer: {
+            alignItems: "center",
+            flexDirection: "row",
+        },
+        itemQuantityText: {
+            fontWeight: "900",
+            marginRight: 10,
+        },
+        amountContainer: {
+            flexDirection: "row",
+            borderWidth: 1,
+            borderColor: Colors.grey400,
+            borderRadius: 8,
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        currencySymbol: {
+            paddingRight: 5,
+            paddingLeft: 10,
+            paddingVertical: 5,
+            borderLeftColor: Colors.transparent,
+            borderTopColor: Colors.transparent,
+            borderBottomColor: Colors.transparent,
+            borderRightColor: Colors.grey400,
+            borderWidth: 1,
+            fontWeight: "500",
+        },
+        iosCurrencySymbol: {
+            borderColor: Colors.transparent,
+            paddingRight: 5,
+            paddingLeft: 10,
+            paddingVertical: 5,
+            borderWidth: 1,
+            fontWeight: "500",
+        },
+        amountText: {
+            maxWidth: 80,
+            fontWeight: "500",
+            color: Colors.black,
+            marginRight: 6,
+            marginLeft: 10,
+            marginVertical: 0,
+        },
+        editAmountButton: {
+            backgroundColor: Colors.transparent,
+        },
+        editAmountPressable: {
+            paddingHorizontal: 5,
+            paddingVertical: 10,
+        },
+        editAmountIcon: {
+            paddingHorizontal: 5,
+            color: Colors.grey600
+        },
+        closeIconButton: {
+            backgroundColor: Colors.transparent,
+            marginRight: -15,
+            marginLeft: 5,
+        },
+        closeIconPressable: {
+            paddingHorizontal: 5,
+            paddingVertical: 5,
+        },
+        staffAndDiscountContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center"
+        },
+        discountText: {
+            color: Colors.button,
+            fontWeight: "bold",
+            // alignSelf: "flex-end",
+            // marginHorizontal: 55,
+            // marginTop: 3,
+        },
+        staffButton: {
+            // alignSelf: "flex-start",
+            borderBottomWidth: 1,
+            borderBottomColor: Colors.grey600,
+            backgroundColor: Colors.transparent,
+            padding: 0,
+        },
+        staffPressable: {
+            padding: 0,
+            margin: 0,
+        },
+        staffText: {
+            color: selectedStaff === null ? Colors.error : Colors.highlight,
+        },
+        staffContainer: {
+            flexDirection: "row",
+            alignItems: "center",
+        }
+    });
+
     return <>
         <View style={styles.cartItem}>
             {isEditPrepaidModalVisible && <PrepaidModal edited={true}
@@ -184,7 +297,7 @@ const CartItem = (props) => {
                             props.data.gender !== "prepaid" &&
                             props.data.gender === "packages")
                             ? `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}`
-                            : props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" || props.data.gender === "Products" ? `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}` : null
+                            : props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" || props.data.gender === "Products" ? (props.data.discounted_price === 0 || props.data.discounted_price === props.data.price) ? null : `Discount ₹${(props.data.price - props.data.discounted_price).toFixed(2)}` : null
                     }
                 </Text>
 
@@ -196,118 +309,5 @@ const CartItem = (props) => {
     </>
 }
 
-const styles = StyleSheet.create({
-    scrollView: {
-        flex: 1,
-    },
-    cartItem: {
-        // flex: 1,
-        marginVertical: 10,
-        marginHorizontal: 20,
-    },
-    itemNameAndDetailsContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
-    itemNameText: {
-        maxWidth: "50%",
-    },
-    itemDetailsContainer: {
-        alignItems: "center",
-        flexDirection: "row",
-    },
-    itemQuantityText: {
-        fontWeight: "900",
-        marginRight: 10,
-    },
-    amountContainer: {
-        flexDirection: "row",
-        borderWidth: 1,
-        borderColor: Colors.grey400,
-        borderRadius: 8,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    currencySymbol: {
-        paddingRight: 5,
-        paddingLeft: 10,
-        paddingVertical: 5,
-        borderLeftColor: Colors.transparent,
-        borderTopColor: Colors.transparent,
-        borderBottomColor: Colors.transparent,
-        borderRightColor: Colors.grey400,
-        borderWidth: 1,
-        fontWeight: "500",
-    },
-    iosCurrencySymbol: {
-        borderColor: Colors.transparent,
-        paddingRight: 5,
-        paddingLeft: 10,
-        paddingVertical: 5,
-        borderWidth: 1,
-        fontWeight: "500",
-    },
-    amountText: {
-        maxWidth: 80,
-        fontWeight: "500",
-        color: Colors.black,
-        marginRight: 6,
-        marginLeft: 10,
-        marginVertical: 0,
-    },
-    editAmountButton: {
-        backgroundColor: Colors.transparent,
-    },
-    editAmountPressable: {
-        paddingHorizontal: 5,
-        paddingVertical: 10,
-    },
-    editAmountIcon: {
-        paddingHorizontal: 5,
-        color: Colors.grey600
-    },
-    closeIconButton: {
-        backgroundColor: Colors.transparent,
-        marginRight: -15,
-        marginLeft: 5,
-    },
-    closeIconPressable: {
-        paddingHorizontal: 5,
-        paddingVertical: 5,
-    },
-    staffAndDiscountContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
-    discountText: {
-        color: Colors.button,
-        fontWeight: "bold",
-        // alignSelf: "flex-end",
-        // marginHorizontal: 55,
-        // marginTop: 3,
-    },
-    staffButton: {
-        // alignSelf: "flex-start",
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.grey600,
-        backgroundColor: Colors.transparent,
-        padding: 0,
-    },
-    staffPressable: {
-        padding: 0,
-        margin: 0,
-    },
-    staffText: {
-        color: Colors.error
-    },
-    staffContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-    }
-
-
-});
 
 export default CartItem;
