@@ -14,6 +14,7 @@ import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice"
 import { shadowStyling } from "../../util/Helpers";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import * as SecureStore from 'expo-secure-store';
+import Toast from "../../ui/Toast";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -32,6 +33,7 @@ const CreateClientModal = (props) => {
     const [isAnniversarySelected, setIsAnniversarySelected] = useState(false);
 
     const dispatch = useDispatch();
+    const toastRef = useRef(null);
 
     const firstNameRef = useRef(null);
     const lastNameRef = useRef(null);
@@ -65,8 +67,8 @@ const CreateClientModal = (props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
-        
-        
+
+
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
             let businessId = ""
@@ -100,9 +102,10 @@ const CreateClientModal = (props) => {
                 pinCode: "",
                 state: "Tamilnadu",
             });
-            // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
+
             if(response.toString() === "false") {
                 // TODO
+                toastRef.current.show("User already exists", 1000);
                 // Toast.show({
                 //     type: ALERT_TYPE.WARNING,
                 //     title: "User already exists",
@@ -112,7 +115,7 @@ const CreateClientModal = (props) => {
             }
             else {
                 // TODO
-
+                toastRef.current.show("User added Successfully", 1000);
                 // Toast.show({
                 //     type: ALERT_TYPE.SUCCESS,
                 //     title: "User added successfully",
@@ -130,7 +133,7 @@ const CreateClientModal = (props) => {
         } catch (e) {
             // ToastAndroid.show(e, ToastAndroid.LONG),
             // TODO
-
+            toastRef.current.show("Something went wrong", 1000);
             // Toast.show(e, {
             //     duration: Toast.durations.LONG,
             //     position: Toast.positions.BOTTOM,
@@ -167,7 +170,10 @@ const CreateClientModal = (props) => {
                         value={firstName}
                         onChangeText={setFirstName}
                         validator={(text) => {
-                            if (text.length === 0) return "First name is required";
+                            if (text.trim().length === 0) {
+                                setFirstName("");
+                                return "First name is required"
+                            }
                             else return true;
                         }}
                         onSave={(callback) => {
@@ -304,6 +310,7 @@ const CreateClientModal = (props) => {
             <View style={styles.saveButtonContainer}>
                 <PrimaryButton label={"Save"} onPress={handleSave}/>
             </View>
+            <Toast ref={toastRef}/>
         </Modal>
     );
 };

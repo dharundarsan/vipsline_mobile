@@ -36,13 +36,14 @@ import {clearClientInfo} from "../../store/clientInfoSlice";
 import InvoiceModal from "./InvoiceModal";
 import * as Haptics from 'expo-haptics';
 import Toast from "../../ui/Toast";
+import {updateToastRef} from "../../store/toastSlice";
+import {checkoutScreenToast} from "../../screens/CheckoutScreen";
 // import Toast from 'react-native-root-toast';
 
 
 const CheckoutSection = (props) => {
     const tot = useSelector(state => state.cart.calculatedPrice);
 
-    const toastRef = useRef(null);
 
     // const totalChargeAmount = useSelector(state => state.cart.calculatedPrice[0]?.extra_charges_value);
     const totalChargeAmount = checkNullUndefined(tot) ?
@@ -177,6 +178,9 @@ const CheckoutSection = (props) => {
                     setDiscountValue(discountValue)
                     // showToast()
                     // TODO
+                    props.checkoutScreenToast("Discount should be less than subtotal", 2000);
+
+                    // toastRef.current.show("discount should be less than the amount", 2000);
                     setActionModal(false);
                     return;
                 }
@@ -185,6 +189,7 @@ const CheckoutSection = (props) => {
                     setDiscountValue(amount);
                     // showToast();
                     // TODO
+                    props.checkoutScreenToast("Discount should be less than subtotal", 2000);
                     setActionModal(false);
                     return;
                 }
@@ -251,6 +256,12 @@ const CheckoutSection = (props) => {
     }
 
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+
+
+
+
+
+
     return <View style={styles.checkoutSection}>
 
 
@@ -297,6 +308,9 @@ const CheckoutSection = (props) => {
                 dispatch(clearLocalCart());
                 dispatch(clearClientInfo());
                 dispatch(clearCalculatedPrice())
+            }}
+            checkoutScreenToast={() => {
+                props.checkoutScreenToast("sale cancelled", 2000);
             }}
         />}
         {isModalOpen && <DropdownModal
@@ -356,7 +370,7 @@ const CheckoutSection = (props) => {
                 }}/> :
                 null
         }
-        <View style={[styles.checkoutDetailRow,Platform.OS === "android" ? {borderStyle: "dashed"} : null ]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
             {/*<Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Discount</Text>*/}
             {/*<Text*/}
             {/*    style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ { calculatedPrice.length !== 0 ? calculatedPrice[0].total_discount_in_price : 0}</Text>*/}
@@ -399,12 +413,12 @@ const CheckoutSection = (props) => {
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_discount_in_price}</Text>
         </View>
 
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? { borderStyle: "dashed" } : null]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>Sub Total</Text>
             <Text
                 style={[textTheme.titleMedium, styles.checkoutDetailText]}>₹ {calculatedPrice.length !== 0 ? calculatedPrice[0].total_price_after_discount : 0}</Text>
         </View>
-        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? { borderStyle: "dashed" } : null]}>
+        <View style={[styles.checkoutDetailRow, Platform.OS === "android" ? {borderStyle: "dashed"} : null]}>
             <View>
                 {
                     checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
@@ -501,7 +515,7 @@ const CheckoutSection = (props) => {
                                    //     backgroundColor: "black",
                                    //     opacity: 1
                                    // })
-                                   toastRef.current.show("please select client", 1000);
+                                   props.checkoutScreenToast("Please select client", 2000);
 
 
                                    return;
@@ -515,6 +529,7 @@ const CheckoutSection = (props) => {
                                    //     backgroundColor: "black",
                                    //     opacity: 1
                                    // })
+                                   props.checkoutScreenToast("Please select staff", 2000);
                                    return;
                                }
                                setIsPaymentModalVisible(true)
@@ -527,7 +542,6 @@ const CheckoutSection = (props) => {
                 </View>
             </PrimaryButton>
         </View>
-        <Toast  ref={toastRef} />
 
     </View>
 }

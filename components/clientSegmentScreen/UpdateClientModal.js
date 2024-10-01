@@ -41,6 +41,8 @@ import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
  */
 
 
+
+
 const UpdateClientModal = React.memo((props) => {
     // const details = useSelector(state => state.clientInfo.details);
     const details = props.details;
@@ -127,6 +129,7 @@ const UpdateClientModal = React.memo((props) => {
                 state: "Tamilnadu",
             });
             // dispatch(loadClientCountFromDb());
+            props.updateClientToast("User updated Successfully", 2000);
             dispatch(loadClientInfoFromDb(clientDetails.id));
             props.onCloseModal();
             // ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
@@ -143,7 +146,8 @@ const UpdateClientModal = React.memo((props) => {
         } catch (e) {
             // ToastAndroid.show(e + "error", ToastAndroid.LONG);
             // TODO
-
+            props.updateClientToast("failed to update client", 2000);
+            console.log("updated")
             // Toast.show(e+" error",{
             //     duration:Toast.durations.LONG,
             //     position: Toast.positions.BOTTOM,

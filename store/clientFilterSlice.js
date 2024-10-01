@@ -176,6 +176,10 @@ export const clientFilterSlice = createSlice({
         updateSearchClientMaxEntry(state, action) {
             state.searchMaxEntry = action.payload;
         },
+        resetMaxEntry(state, action) {
+            state.maxEntry = 10;
+            state.searchClientMaxEntry = 10;
+        }
 
     }
 });
@@ -195,7 +199,8 @@ export const {
     decrementSearchPageNumber,
     updateTotalSearchClientCount,
     updateSearchClientMaxEntry,
-    updateAnalyticDetails
+    updateAnalyticDetails,
+    resetMaxEntry,
 } = clientFilterSlice.actions;
 
 export default clientFilterSlice.reducer;

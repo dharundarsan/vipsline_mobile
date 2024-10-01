@@ -16,6 +16,7 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {shadowStyling} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
+import Toast from "../../ui/Toast";
 
 const PrepaidModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
@@ -27,9 +28,12 @@ const PrepaidModal = (props) => {
     const prepaidAmountRef = useRef(null);
     const prepaid_wallet = useSelector(state => state.cart.prepaid_wallet)
 
+    const toastRef = useRef(null);
+
 
     return <Modal style={styles.prepaidModal} visible={props.isVisible} animationType={"slide"}
                   presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+        <Toast ref={toastRef}/>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text style={[textTheme.titleLarge, styles.heading]}>{props.edited ? "Edit Prepaid" : "Add Prepaid"}</Text>
             <PrimaryButton
@@ -83,7 +87,7 @@ const PrepaidModal = (props) => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                 if (!prepaidAmountRef.current()) return;
                 if (prepaidBonus > prepaidAmount) {
-                    ToastAndroid.show("Prepaid bonus should be lesser or equal to actual amount", ToastAndroid.LONG)
+                    toastRef.current.show("Prepaid bonus should be lesser or equal to actual amount", 2000);
                     return;
                 }
                 if (props.edited) {
@@ -110,7 +114,7 @@ const PrepaidModal = (props) => {
                     props.onCloseModal();
                 } else {
                     if (prepaid_wallet[0].wallet_amount !== "") {
-                        ToastAndroid.show("Prepaid already in the cart", ToastAndroid.SHORT)
+                        toastRef.current.show("Prepaid already in the cart", 2000);
                         return;
                     }
                     dispatch(addItemToCart({

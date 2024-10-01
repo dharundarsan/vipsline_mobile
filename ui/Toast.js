@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Animated, Dimensions, Platform, View } from 'react-native';
+import {Text, StyleSheet, Animated, Dimensions, Platform, View, ToastAndroid} from 'react-native';
 import React, { useRef, useImperativeHandle, forwardRef, useState } from 'react';
 
 const { width } = Dimensions.get('window');
@@ -10,10 +10,17 @@ const Toast = forwardRef((_, ref) => {
 
     useImperativeHandle(ref, () => ({
         show: (msg, duration = 2000) => {
-            if (Platform.OS === 'android') {
-                // Use Android Toast
-                ToastAndroid.show(msg, ToastAndroid.SHORT);
-            } else {
+            // if (Platform.OS === 'android') {
+            //     // Use Android Toast
+            //     ToastAndroid.showWithGravityAndOffset(
+            //         msg,
+            //         ToastAndroid.SHORT,
+            //         ToastAndroid.TOP,
+            //         0,    // X offset
+            //         100   // Y offset (change this value to adjust the top position)
+            //     );
+            //
+            // } else {
                 setMessage(msg);
                 fadeAnim.setValue(0); // Reset fade to 0
                 translateY.setValue(-100); // Reset position above the visible area
@@ -47,7 +54,7 @@ const Toast = forwardRef((_, ref) => {
                         }),
                     ]).start();
                 }, duration);
-            }
+            // }
         },
     }));
 

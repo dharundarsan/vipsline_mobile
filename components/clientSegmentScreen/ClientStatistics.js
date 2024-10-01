@@ -41,7 +41,7 @@ export default function ClientStatistics(props) {
             <>
                 <ClientStatisticsCard
                     label={itemData.item.label}
-                    value={itemData.item.value}
+                    value={itemData.item.value === "" ? "0" : itemData.item.value}
                     containerStyle={styles.cardStyle}
                 />
                 {/*<View style={{width: 20}}/>*/}

@@ -3,7 +3,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Feather, Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Colors from "../../constants/Colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CustomTextInput from "../../ui/CustomTextInput";
@@ -39,6 +39,7 @@ import clearCartAPI from "../../util/apis/clearCartAPI";
 import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import * as Haptics from "expo-haptics";
+import Toast from "../../ui/Toast";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -93,6 +94,8 @@ const PaymentModal = (props) => {
     const cartSliceState = useSelector((state) => state.cart);
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
+
+    const toastRef = useRef(null)
 
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
@@ -393,16 +396,17 @@ const PaymentModal = (props) => {
         {/*                           // card: "#ff7171",*/}
         {/*                           // card: "#b73737",*/}
         {/*                       }]}>*/}
+        <Toast ref={toastRef}/>
 
-        {
-            isSplitPaymentDropdownVisible &&
-            <DropdownModal isVisible={isSplitPaymentDropdownVisible}
-                           onCloseModal={() => {
+            {
+                isSplitPaymentDropdownVisible &&
+                <DropdownModal isVisible={isSplitPaymentDropdownVisible}
+                               onCloseModal={() => {
 
-                               setIsSplitPaymentDropdownVisible(false)
-                           }}
-                           dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
-                           onChangeValue={(value) => {
+                                   setIsSplitPaymentDropdownVisible(false)
+                               }}
+                               dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
+                               onChangeValue={(value) => {
 
                                setAddedSplitPayment(value)
                            }}/>
@@ -418,8 +422,6 @@ const PaymentModal = (props) => {
             header={"Cancel Sale"}
             content={"If you cancel this sale transaction will not be processed."}
             onCloseClientInfoAfterDeleted={async () => {
-                console.log("PaymentModal");
-
                 await clearCartAPI();
                 dispatch(modifyClientMembershipId({type: "clear"}))
                 dispatch(clearSalesNotes());
@@ -621,40 +623,42 @@ const PaymentModal = (props) => {
                                                 // ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
                                                 // TODO
 
-                                                // Toast.show("Prepaid split amount is greater than the prepaid balance", {
-                                                //     duration: Toast.durations.LONG,
-                                                //     position: Toast.positions.BOTTOM,
-                                                //     shadow: false,
-                                                //     backgroundColor: "black",
-                                                //     opacity: 1
-                                                // })
-                                                return;
+                                                    // Toast.show("Prepaid split amount is greater than the prepaid balance", {
+                                                    //     duration: Toast.durations.LONG,
+                                                    //     position: Toast.positions.BOTTOM,
+                                                    //     shadow: false,
+                                                    //     backgroundColor: "black",
+                                                    //     opacity: 1
+                                                    // })
+                                                    toastRef.current.show("Prepaid split amount is greater than the prepaid balance", 2000);
+                                                    return;
+                                                }
                                             }
-                                        }
-                                        const totalValue = splitUpState.reduce((acc, ele) => {
-                                            if (ele.shown) {
-                                                if (ele.mode === item.mode) return acc + parseFloat(text)
-                                                return acc + ele.amount;
-                                            }
-                                            return acc;
-                                        }, 0)
+                                            const totalValue = splitUpState.reduce((acc, ele) => {
+                                                if (ele.shown) {
+                                                    if (ele.mode === item.mode) return acc + parseFloat(text)
+                                                    return acc + ele.amount;
+                                                }
+                                                return acc;
+                                            }, 0)
 
                                         if (totalValue > props.price) {
                                             setIsError(true);
                                             // ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
                                             // TODO
 
-                                            // Toast.show("Split Payments are not summing upto transaction total. Please check.", {
-                                            //     duration: Toast.durations.SHORT,
-                                            //     position: Toast.positions.BOTTOM,
-                                            //     shadow: false,
-                                            //     backgroundColor: "black",
-                                            //     opacity: 1
-                                            // })
-                                            return;
-                                        } else if (totalValue === props.price) {
-                                            setIsError(false);
-                                        }
+                                                // Toast.show("Split Payments are not summing upto transaction total. Please check.", {
+                                                //     duration: Toast.durations.SHORT,
+                                                //     position: Toast.positions.BOTTOM,
+                                                //     shadow: false,
+                                                //     backgroundColor: "black",
+                                                //     opacity: 1
+                                                // })
+                                                toastRef.current.show("Split Payments are not summing upto transaction total. Please check.", 2000);
+                                                return;
+                                            } else if (totalValue === props.price) {
+                                                setIsError(false);
+                                            }
 
                                         callSplitAPI();
                                     }}
@@ -762,19 +766,20 @@ const PaymentModal = (props) => {
                                                if (response.data === null || response.message === "Something went wrong") {
                                                    // TODO
 
-                                                   // Toast.show({
-                                                   //     type: ALERT_TYPE.DANGER,
-                                                   //     title: "Something went wrong",
-                                                   //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
-                                                   // autoClose: 1500,
-                                                   // });
-                                                   return;
-                                               } else {
-                                                   props.setIsInvoiceModalVisible(true);
-                                                   setTimeout(() => {
-                                                       props.onCloseModal();
-                                                   }, 100)
-                                               }
+                                                       // Toast.show({
+                                                       //     type: ALERT_TYPE.DANGER,
+                                                       //     title: "Something went wrong",
+                                                       //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                                           // autoClose: 1500,
+                                                       // });
+                                                       toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
+                                                       return;
+                                                   } else {
+                                                       props.setIsInvoiceModalVisible(true);
+                                                       setTimeout(() => {
+                                                           props.onCloseModal();
+                                                       }, 100)
+                                                   }
 
                                                updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
                                                setTimeout(() => {
@@ -796,7 +801,7 @@ const PaymentModal = (props) => {
                                            return false;
                                        })) {
                                            //TODO
-                                           console.log("Entered prepaid value is greater than prepaid balance")
+                                           toastRef.current.show("Entered prepaid value is greater than prepaid balance", 2000);
                                            setIsLoading(false);
                                            return;
                                        }
@@ -808,7 +813,7 @@ const PaymentModal = (props) => {
                                        }, 0)
                                        if (totalPrice < props.price || totalPrice > props.price) {
                                            //TODO
-                                           console.log("Split up not summing to the price")
+                                           toastRef.current.show("Split up not summing to the price", 2000);
                                            return;
                                        }
                                        dispatch(updateCalculatedPrice(details.id, true, splitUpState.filter(item => {
@@ -821,6 +826,7 @@ const PaymentModal = (props) => {
                                            })[0].amount).then(response => {
                                                if (response.data === null || response.message === "Something went wrong") {
                                                    // TODO
+                                                   toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
 
                                                    // Toast.show({
                                                    //     type: ALERT_TYPE.DANGER,
@@ -860,7 +866,7 @@ const PaymentModal = (props) => {
                                        }, 0)
                                        if (totalPrice < props.price || totalPrice > props.price) {
                                            //TODO
-                                           console.log("Split up not summing to the price")
+                                           toastRef.current.show("Split up not summing to the price", 2000);
                                            // Toast.show({
                                            //     type: ALERT_TYPE.WARNING,
                                            //     title: "The split amounts do not add up to the total price",
@@ -880,6 +886,8 @@ const PaymentModal = (props) => {
                                            //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                            // autoClose: 1500,
                                            // });
+                                           toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
+
                                            return;
                                        } else {
                                            props.setIsInvoiceModalVisible(true);

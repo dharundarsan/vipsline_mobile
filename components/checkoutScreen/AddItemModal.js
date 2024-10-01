@@ -34,7 +34,8 @@ import {updateAppointmentDate} from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import Toast from "react-native-toast-message";
+// import Toast from "react-native-toast-message";
+import Toast from "../../ui/Toast";
 
 const modalCategoryListData = [
     {id: "services", title: "SERVICES"},
@@ -53,6 +54,13 @@ const AddItemModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(appointmentDate);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
+
+    const toastRef = useRef(null);
+
+    function addItemModalToast(message, duration) {
+        toastRef.current.show(message, duration);
+    }
+
 
     const businessDetails = useSelector(state => state.businesses);
 
@@ -191,7 +199,9 @@ const AddItemModal = (props) => {
                                         now.getFullYear() === selectedDateLocal.getFullYear();
 
                                     if (!isSameDay) {
-                                        // TODO
+
+                                        toastRef.current.show("you're trying to raise the invoice on a previous date", 1000);
+
                                     }
                                 }
                                 setIsDatePickerVisible(false);
@@ -249,7 +259,9 @@ const AddItemModal = (props) => {
                                 closeOverallModal={() => {
                                     setSelectedCategory(null)
                                     props.closeModal()
-                                }}/>
+                                }}
+                                addItemModalToast={addItemModalToast}
+        />
     } else if (selectedCategory === "memberships") {
         content =
             <MembershipsAndPackagesList category={"memberships"} closeOverallModal={() => {
@@ -310,7 +322,7 @@ const AddItemModal = (props) => {
                 </PrimaryButton>
             </View>
             {content}
-            <Toast/>
+            <Toast ref={toastRef}/>
         </Modal>
     );
 }
