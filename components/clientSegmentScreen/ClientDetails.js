@@ -80,11 +80,11 @@ export default function ClientDetails(props) {
     return (
         <ScrollView style={styles.clientDetails} contentContainerStyle={{alignItems: "center",}} showsVerticalScrollIndicator={false}>
             <View style={styles.titleContainer}>
-                <UpdateClientModal
+                { updateModalVisibility && <UpdateClientModal
                     isVisible={updateModalVisibility}
                     details={details}
                     onCloseModal={() => setUpdateModalVisibility(false)}
-                />
+                />}
                 <Text style={[textTheme.titleMedium, styles.title]}>
                     {props.title}
                 </Text>

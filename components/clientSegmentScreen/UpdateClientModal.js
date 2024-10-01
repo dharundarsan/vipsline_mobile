@@ -67,10 +67,12 @@ const UpdateClientModal = React.memo((props) => {
     const firstNameRef = useRef(null);
     const lastNameRef = useRef(null);
     const phoneNoRef = useRef(null);
-    const emailRef = useRef(null);
+    // const emailRef = useRef(null);
 
 
     const existingValues = () => {
+        console.log("DOB")
+        console.log(details.dob)
         setClientData({
             firstName: details.firstName,
             lastName: details.lastName,
@@ -100,9 +102,9 @@ const UpdateClientModal = React.memo((props) => {
         const firstNameValid = firstNameRef.current();
         const lastNameValid = lastNameRef.current();
         const phoneNoValid = phoneNoRef.current();
-        const emailValid = emailRef.current();
+        // const emailValid = emailRef.current();
 
-        if (!firstNameValid || !lastNameValid || !phoneNoValid || !emailValid) return;
+        if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
             await updateClientAPI(clientDetails.id, {
                 address: clientData.clientAddress,
@@ -114,7 +116,7 @@ const UpdateClientModal = React.memo((props) => {
                 country: "India",
                 countryCode: clientData.phoneNo[0],
                 custGst: clientData.gstNo,
-                dob: clientData.isDobSelected ? formatDate(clientData.dateOfBirth, "yyyy-mm-dd") : "",
+                dob: clientData.isDobSelected ? formatDate(clientData.dateOfBirth, "yyyy-mm-dd") : undefined,
                 username: clientData.email,
                 firstName: clientData.firstName,
                 gender: clientData.gender,
@@ -219,10 +221,10 @@ const UpdateClientModal = React.memo((props) => {
                         placeholder="Enter email address"
                         value={clientData.email}
                         onChangeText={(value) => handleChange("email", value)}
-                        validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
-                        onSave={(callback) => {
-                            emailRef.current = callback;
-                        }}
+                        validator={(text) => !checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
+                        // onSave={(callback) => {
+                            // emailRef.current = callback;
+                        // }}
                     />
                     <CustomTextInput
                         type="dropdown"
@@ -242,7 +244,7 @@ const UpdateClientModal = React.memo((props) => {
                         maximumDate={new Date()}
                         type="date"
                         label="Date of birth"
-                        value={clientData.dateOfBirth === undefined || clientData.dateOfBirth === null ? null : new Date(clientData.dateOfBirth)}
+                        value={clientData.dateOfBirth === null || clientData.dateOfBirth === undefined ? null : new Date(clientData.dateOfBirth)}
                         onChangeValue={(value) => {
                             handleChange("isDobSelected", true);
                             handleChange("dateOfBirth", value);
@@ -266,7 +268,7 @@ const UpdateClientModal = React.memo((props) => {
                         value={clientData.gstNo}
                         onChangeText={(value) => handleChange("gstNo", value)}
                         validator={(text) => {
-                            if (text.length !== 0){
+                            if ( checkNullUndefined(text) && text.trim().length !== 0){
                                 let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
                                 if(regex.test(text) === true) return true;
                                 else return "Please enter valid GST number"

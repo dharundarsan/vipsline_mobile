@@ -144,7 +144,7 @@ export default function clientInfoModal(props) {
 
             />
 
-            <UpdateClientModal
+            { editClientModalVisibility && <UpdateClientModal
                 isVisible={editClientModalVisibility}
                 onCloseModal={() => {
                     dispatch(loadClientInfoFromDb(props.id))
@@ -155,8 +155,7 @@ export default function clientInfoModal(props) {
 
                 }}
                 details={details}
-
-            />
+            />}
 
             <DeleteClient
                 isVisible={deleteClientModalVisibility}
