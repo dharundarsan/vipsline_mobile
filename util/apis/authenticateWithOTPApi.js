@@ -1,7 +1,6 @@
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI} from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import * as SecureStore from 'expo-secure-store';
 export default async function authenticateWithOTPApi(mobileNumber, otp, platform) {
     let isAuthenticated;
 
@@ -16,7 +15,8 @@ export default async function authenticateWithOTPApi(mobileNumber, otp, platform
         message = response.data.message;
 
         try {
-            await AsyncStorage.setItem('authKey', response.data.other_message);
+            // await AsyncStorage.setItem('authKey', response.data.other_message);
+            await SecureStore.setItemAsync('authKey',response.data.other_message)
         } catch (e) {
         }
 

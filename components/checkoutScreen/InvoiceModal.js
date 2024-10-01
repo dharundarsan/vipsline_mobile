@@ -17,7 +17,7 @@ import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import {
@@ -81,7 +81,8 @@ const InvoiceModal = (props) => {
 
     async function getBusinessId() {
         try {
-            const value = await AsyncStorage.getItem('businessId');
+            // const value = await AsyncStorage.getItem('businessId');
+            const value = await SecureStore.getItemAsync('businessId');
             if (value !== null) {
                 return value;
             }

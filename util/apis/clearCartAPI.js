@@ -1,12 +1,13 @@
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_AUTH_KEY, EXPO_PUBLIC_BUSINESS_ID} from "@env";
 import {clearSalesNotes, loadCartFromDB} from "../../store/cartSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 export default async function clearCartAPI() {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -16,7 +17,8 @@ export default async function clearCartAPI() {
 
     let businessId = ""
     try {
-        const value = await AsyncStorage.getItem('businessId');
+        // const value = await AsyncStorage.getItem('businessId');
+        const value = await SecureStore.getItemAsync('businessId');
         if (value !== null) {
             businessId = value;
         }

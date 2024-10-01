@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 import PrimaryButton from "../ui/PrimaryButton";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useDispatch} from "react-redux";
 import {clearBusinessId, clearInBusiness, updateAuthStatus} from "../store/authSlice";
 import { clearListOfBusiness } from '../store/listOfBusinessSlice';
@@ -21,12 +20,14 @@ const SignOutPrompt = ({ navigation }) => {
         // Perform the sign-out action (e.g., clear storage, navigate to login screen)
 
         try {
-            await AsyncStorage.removeItem('authKey');
+            // await AsyncStorage.removeItem('authKey');
+            await SecureStore.deleteItemAsync('authKey');
             dispatch(updateAuthStatus(false));
         } catch (e) {
         }
         try {
-            await AsyncStorage.removeItem('businessId');
+            // await AsyncStorage.removeItem('businessId');
+            await SecureStore.deleteItemAsync('businessId');
             dispatch(updateAuthStatus(false));
         } catch (e) {}
         

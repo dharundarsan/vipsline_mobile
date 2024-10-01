@@ -33,7 +33,6 @@ import {
     loadCartFromDB,
     modifyClientMembershipId
 } from "../store/cartSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

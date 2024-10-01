@@ -1,13 +1,13 @@
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_AUTH_KEY} from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import * as SecureStore from 'expo-secure-store';
 
 export default async function getDiscountAPI(data) {
 
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }

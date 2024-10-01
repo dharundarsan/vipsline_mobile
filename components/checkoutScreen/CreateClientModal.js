@@ -11,9 +11,9 @@ import createNewClientAPI from "../../util/apis/createNewClientAPI";
 import {formatDate, showToast} from "../../util/Helpers";
 import {useDispatch} from "react-redux";
 import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { shadowStyling } from "../../util/Helpers";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import * as SecureStore from 'expo-secure-store';
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -65,19 +65,21 @@ const CreateClientModal = (props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
-        let businessId = ""
-        try {
-            const value = await AsyncStorage.getItem('businessId');
-            if (value !== null) {
-                businessId = value;
-            }
-        } catch (e) {
-            console.log("businessId fetching error. (inside createClientModal)" + e);
-        }
-
-
+        
+        
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
+            let businessId = ""
+            try {
+                // const value = await AsyncStorage.getItem('businessId');
+                const value = await SecureStore.getItemAsync('businessId');
+
+                if (value !== null) {
+                    businessId = value;
+                }
+            } catch (e) {
+                console.log("businessId fetching error. (inside createClientModal)" + e);
+            }
             const response = await createNewClientAPI({
                 address: clientAddress,
                 anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
@@ -262,6 +264,14 @@ const CreateClientModal = (props) => {
                         type="text"
                         label="GST number"
                         placeholder="Enter client's GSTIN"
+                        validator={(text) => {
+                            if (text.length !== 0){
+                                let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
+                                if(regex.test(text) === true) return true;
+                                else return "Please enter valid GST number"
+                            }
+                            else return true;
+                        }}
                         value={gstNo}
                         onChangeText={setGstNo}
                     />
