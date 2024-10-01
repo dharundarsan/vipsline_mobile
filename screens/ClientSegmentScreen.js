@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, Image, FlatList, ScrollView, Platform} from "rea
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
-import React, {useCallback, useEffect, useLayoutEffect, useState} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import appliedFilter, {chooseFilterCount, clientFilterNames} from "../util/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
@@ -32,6 +32,7 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientModal";
 import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
 import { useLocationContext } from "../context/LocationContext";
+import Toast from "../ui/Toast";
 
 
 export default function ClientSegmentScreen(props) {
@@ -90,10 +91,13 @@ export default function ClientSegmentScreen(props) {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isSearchLoading, setIsSearchLoading] = useState(false);
+    const toastRef = useRef(null);
 
     const { getLocation,currentLocation } = useLocationContext();
-    useFocusEffect(useCallback(()=>{
-        getLocation("Clients")
+    useFocusEffect(useCallback( ()=>{
+         dispatch(loadClientFiltersFromDb(10, "All"));
+        getLocation("Clients");
+
     },[]))
 
     useEffect(() => {
@@ -111,6 +115,7 @@ export default function ClientSegmentScreen(props) {
     useEffect(() => {
         const clientCount = chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         setClientCount(clientCount);
+        setSearchQuery("");
 
         async function func() {
             setIsLoading(true)
@@ -121,10 +126,10 @@ export default function ClientSegmentScreen(props) {
             setTimeout(() => {
                 setIsLoading(false);
             }, 400)
-
         }
 
-        func()
+        func();
+
 
     }, [filterPressed]);
 
@@ -223,6 +228,10 @@ export default function ClientSegmentScreen(props) {
         }
     }
 
+    function clientSegmentToast(message, duration) {
+        toastRef.current.show(message, duration);
+    }
+
     return (
         <ScrollView style={styles.scrollView}>
 
@@ -280,6 +289,9 @@ export default function ClientSegmentScreen(props) {
                             setIsClientInfoModalVisible(false)
                             dispatch(clearClientInfo())
                         }}
+                        deleteClientToast={() => {
+                            clientSegmentToast("client deleted successfully.", 2000);
+                        }}
                     />
                 }
 
@@ -302,6 +314,7 @@ export default function ClientSegmentScreen(props) {
                 <AddClient/>
 
                 <Divider color={Colors.grey250}/>
+                <Toast ref={toastRef}/>
 
                 <View style={styles.clientFilterContainer}>
                     <ClientFiltersCategories
@@ -309,6 +322,7 @@ export default function ClientSegmentScreen(props) {
                         filterPressed={filterPressed}
                         isLoading={isLoading}
                         searchLoading={isSearchLoading}
+                        clientSegmentToast={clientSegmentToast}
                     />
                 </View>
 
@@ -400,6 +414,7 @@ export default function ClientSegmentScreen(props) {
                                         <Pagination
                                             filterPressed={filterPressed}
                                             setIsModalVisible={setIsModalVisible}
+                                            totalCount={clientCount}
                                         /> : null
                                 }
                             </> :

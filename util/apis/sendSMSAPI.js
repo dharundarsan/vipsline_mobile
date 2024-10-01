@@ -49,6 +49,7 @@ export default async function sendSMSAPI(name, mobile) {
         //     backgroundColor:"black",
         //     opacity:1
         // })
+        return "SMS sent successfully!"
     } catch (error) {
         // ToastAndroid.show("Failed to send SMS.", ToastAndroid.LONG);
         // TODO
@@ -60,5 +61,6 @@ export default async function sendSMSAPI(name, mobile) {
         //     backgroundColor:"black",
         //     opacity:1
         // })
+        return "Failed to send SMS."
     }
 }

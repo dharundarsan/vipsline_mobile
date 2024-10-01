@@ -5,11 +5,15 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {addItemToCart} from "../../store/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import * as Haptics from "expo-haptics";
+import {useRef} from "react";
+import Toast from "../../ui/Toast";
+import {checkNullUndefined} from "../../util/Helpers";
 
 
 const ProductItem = (props) => {
     const dispatch = useDispatch();
     const cartItems = useSelector(state => state.cart.items);
+    const toastRef = useRef(null);
 
     const styles = StyleSheet.create({
         selectProductItemButton: {
@@ -57,7 +61,7 @@ const ProductItem = (props) => {
 
     return <PrimaryButton buttonStyle={styles.selectProductItemButton}
                           pressableStyle={styles.selectProductItemPressable}
-                          onPress={() => {
+                          onPress={async () => {
                               if (props.data.available_quantity === 0) {
                                   // TODO: Implement Toast
                                   // Toast.show({
@@ -66,16 +70,20 @@ const ProductItem = (props) => {
                                   //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                   //     autoClose: 1500,
                                   // });
+                                  props.addItemModalToast("Adjust the stock quantity on the products page to make it available for sale.", 2000);
                                   return;
                               }
-                              const currentProductCountInCart = cartItems.reduce((acc, item) => {
-                                  if (item.product_id === props.data.id) {
-                                      return acc + 1;
-                                  }
-                                  return acc
-                              }, 0)
-                              dispatch(addItemToCart({product_id: props.data.id, quantity: 1}));
-                              // props.closeOverallModal()
+                              try {
+                                  const response = await dispatch(addItemToCart({
+                                      product_id: props.data.id,
+                                      quantity: 1
+                                  }));
+                              } catch (err) {
+                                  props.addItemModalToast(err, 2000);
+
+                                  return;
+                              }
+                              props.closeOverallModal()
                           }}
     >
         <View style={styles.nameAndPriceContainer}>

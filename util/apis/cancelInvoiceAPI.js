@@ -28,6 +28,8 @@ export default async function cancelInvoiceAPI(status, bookingId) {
             }
         );
 
+        return "Invoice Cancelled successfully!";
+
         // ToastAndroid.show("Invoice Cancelled successfully!", ToastAndroid.LONG);
         // TODO
 
@@ -39,6 +41,7 @@ export default async function cancelInvoiceAPI(status, bookingId) {
         //     opacity: 1
         // })
     } catch (error) {
+        return "Failed to cancel Invoice";
         // ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
         // TODO
 

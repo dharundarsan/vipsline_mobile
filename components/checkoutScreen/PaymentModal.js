@@ -3,7 +3,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Feather, Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Colors from "../../constants/Colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CustomTextInput from "../../ui/CustomTextInput";
@@ -39,6 +39,7 @@ import clearCartAPI from "../../util/apis/clearCartAPI";
 import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import * as Haptics from "expo-haptics";
+import Toast from "../../ui/Toast";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -93,6 +94,8 @@ const PaymentModal = (props) => {
     const cartSliceState = useSelector((state) => state.cart);
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
+
+    const toastRef = useRef(null)
 
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
@@ -394,6 +397,8 @@ const PaymentModal = (props) => {
         {/*                           // card: "#b73737",*/}
         {/*                       }]}>*/}
 
+        <Toast ref={toastRef}/>
+
             {
                 isSplitPaymentDropdownVisible &&
                 <DropdownModal isVisible={isSplitPaymentDropdownVisible}
@@ -427,6 +432,7 @@ const PaymentModal = (props) => {
                     dispatch(clearClientInfo());
                     dispatch(clearCalculatedPrice())
                 }}
+
             />}
             {
                 isOptionsDropdownModalVisible && <DropdownModal isVisible={isOptionsDropdownModalVisible}
@@ -628,6 +634,7 @@ const PaymentModal = (props) => {
                                                     //     backgroundColor: "black",
                                                     //     opacity: 1
                                                     // })
+                                                    toastRef.current.show("Prepaid split amount is greater than the prepaid balance", 2000);
                                                     return;
                                                 }
                                             }
@@ -651,6 +658,7 @@ const PaymentModal = (props) => {
                                                 //     backgroundColor: "black",
                                                 //     opacity: 1
                                                 // })
+                                                toastRef.current.show("Split Payments are not summing upto transaction total. Please check.", 2000);
                                                 return;
                                             } else if (totalValue > props.price) {
                                                 setIsError(false);
@@ -763,6 +771,7 @@ const PaymentModal = (props) => {
                                                        //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                                            // autoClose: 1500,
                                                        // });
+                                                       toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
                                                        return;
                                                    } else {
                                                        props.setIsInvoiceModalVisible(true);
@@ -791,7 +800,7 @@ const PaymentModal = (props) => {
                                                return acc;
                                            }, 0) < props.price) {
                                                //TODO
-                                               console.log("Split up not summing to the price")
+                                               toastRef.current.show("Split up not summing to the price", 2000);
                                                return;
                                            }
                                            dispatch(updateCalculatedPrice(details.id, true, splitUpState.filter(item => {
@@ -804,7 +813,7 @@ const PaymentModal = (props) => {
                                                })[0].amount).then(response => {
                                                    if (response.data === null || response.message === "Something went wrong") {
                                                        // TODO
-
+                                                       toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
                                                        // Toast.show({
                                                        //     type: ALERT_TYPE.DANGER,
                                                        //     title: "Something went wrong",
@@ -842,7 +851,7 @@ const PaymentModal = (props) => {
                                                return acc;
                                            }, 0) < props.price) {
                                                // TODO
-                                               console.log("Split up not summing to the price")
+                                               toastRef.current.show("Split up not summing to the price", 2000);
 
                                                // Toast.show({
                                                //     type: ALERT_TYPE.WARNING,
@@ -863,6 +872,7 @@ const PaymentModal = (props) => {
                                                //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                                    // autoClose: 1500,
                                                // });
+                                               toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
                                                return;
                                            } else {
                                                props.setIsInvoiceModalVisible(true);

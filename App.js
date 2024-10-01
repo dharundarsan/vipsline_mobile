@@ -292,6 +292,7 @@ const MainDrawerNavigator = () => {
                                 navigation.navigate(currentLocation);
                             }, 10);
                         }}
+                        checkoutScreenToast={() => null}
                     />
                     :
                     wentToBusiness ?

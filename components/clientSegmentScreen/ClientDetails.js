@@ -5,8 +5,9 @@ import Colors from "../../constants/Colors";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useSelector} from "react-redux";
 import {dateFormatter} from "../../util/Helpers";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import UpdateClientModal from "./UpdateClientModal";
+import Toast from "../../ui/Toast";
 
 /**
  * ClientDetails Component
@@ -75,15 +76,20 @@ export default function ClientDetails(props) {
 
 
     const [updateModalVisibility, setUpdateModalVisibility] = useState(false);
+    const toastRef = useRef(null)
 
 
     return (
         <ScrollView style={styles.clientDetails} contentContainerStyle={{alignItems: "center",}} showsVerticalScrollIndicator={false}>
+            <Toast ref={toastRef}/>
             <View style={styles.titleContainer}>
                 <UpdateClientModal
                     isVisible={updateModalVisibility}
                     details={details}
                     onCloseModal={() => setUpdateModalVisibility(false)}
+                    updateClientToast={(message, duration) => {
+                        toastRef.current.show(message, duration);
+                    }}
                 />
                 <Text style={[textTheme.titleMedium, styles.title]}>
                     {props.title}

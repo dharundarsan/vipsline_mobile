@@ -3,6 +3,7 @@ import Colors from "../../constants/Colors"
 import Divider from "../../ui/Divider";
 import textTheme from "../../constants/TextTheme";
 import * as Haptics from "expo-haptics";
+import {checkNullUndefined} from "../../util/Helpers";
 
 
 /**
@@ -47,11 +48,7 @@ import * as Haptics from "expo-haptics";
 const radius = 38;
 
 export default function ClientCard(props) {
-    const name = props.name !== undefined && props.name.trim() !== "" ? props.name.toString() : "Z";
-    const phone = props.phone;
-    const email = props.email;
-
-
+    const name = props.name;
 
     const styles = StyleSheet.create({
         card: {
@@ -79,7 +76,6 @@ export default function ClientCard(props) {
         },
         clientDetailsContainer: {
             marginLeft: 16,
-            flex: 1,
             flexDirection: 'column',
         },
         name: {
@@ -97,12 +93,13 @@ export default function ClientCard(props) {
         }
     })
 
+
     return (<>
             <Pressable
                 style={({pressed}) => pressed ? [styles.card, props.card, styles.opacity] : [styles.card, props.card]}
                 android_ripple={{color: props.rippleColor ? props.rippleColor : Colors.ripple}}
                 onPress={() => {
-                    Haptics.selectionAsync()
+                    // Haptics.selectionAsync()
                     props.onPress(props.clientId)
                 }}
             >
@@ -110,26 +107,24 @@ export default function ClientCard(props) {
                     <View style={[styles.clientProfile, props.clientProfile]}>
                         <Text
                             style={[styles.text, props.avatarText]}>
-                            {name !== undefined ? name.at(0).toUpperCase() : "Z"}
+                            {checkNullUndefined(props.name) ? props.name.at(0).toUpperCase() : "Z"}
                         </Text>
                     </View>
 
                     <View style={[styles.clientDetailsContainer, props.clientDetailsContainer]}>
                         {
-                            props.name !== undefined ? <Text style={[textTheme.titleSmall, props.nameText]} ellipsizeMode="tail"
-                            numberOfLines={1}>{name}</Text> : null
+                            checkNullUndefined(props.name) ? <Text style={[textTheme.titleSmall, props.nameText]} ellipsizeMode="tail"
+                            numberOfLines={1}>{props.name}</Text> : <Text>hello</Text>
                         }
                         {
-                            props.phone !== undefined ?
-                                < Text style={[textTheme.bodyMedium, styles.phone, props.phoneText]}>{phone}</Text> : null
+                            checkNullUndefined(props.phone) ?
+                                <Text style={[textTheme.bodyMedium, styles.phone, props.phoneText]}>{props.phone}</Text> : null
                         }
                         {
-                            email !== undefined && email !== null && email.trim().length !== 0 ?
+                            props.email !== undefined && props.email !== null && props.email.trim().length !== 0 ?
                                 <Text style={[textTheme.bodyMedium, styles.email]} ellipsizeMode="tail"
-                                numberOfLines={1}>{email.trim()}</Text> : null
+                                numberOfLines={1}>{props.email.trim()}</Text> : null
                         }
-
-                        {/*<Text>{name}</Text>*/}
                     </View>
                 </View>
             </Pressable>

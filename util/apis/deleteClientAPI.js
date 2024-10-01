@@ -14,19 +14,6 @@ export default async function deleteClientAPI(clientId) {
         console.log("auth token fetching error.(inside deleteClientAPI)" + e);
     }
 
-    const showToast = () => {
-        // ToastAndroid.show('Client deleted successfully', ToastAndroid.SHORT);
-        // TODO
-
-        // Toast.show("Client Deleted Successfully",{
-        //     duration:Toast.durations.SHORT,
-        //     position: Toast.positions.BOTTOM,
-        //     shadow:false,
-        //     backgroundColor:"black",
-        //     opacity:1
-        // })
-    };
-
     try {
         const response = await axios.put(
             process.env.EXPO_PUBLIC_API_URI + "/client/deleteClient",
@@ -40,7 +27,6 @@ export default async function deleteClientAPI(clientId) {
             }
         )
         if (response.data.message === "Client deleted ") {
-            showToast();
         }
     } catch (error) {
     }

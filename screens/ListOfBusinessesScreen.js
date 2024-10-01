@@ -11,7 +11,7 @@ import {
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
-import {useCallback, useEffect, useLayoutEffect, useState} from "react";
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 
 import {
     loadMembershipsDataFromDb,
@@ -20,7 +20,7 @@ import {
     loadServicesDataFromDb
 } from "../store/catalogueSlice";
 import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
-import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
+import {loadClientFiltersFromDb, resetClientFilter, resetMaxEntry} from "../store/clientFilterSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useFocusEffect} from "@react-navigation/native";
@@ -30,6 +30,7 @@ import {clearCalculatedPrice, clearCustomItems, clearLocalCart, clearSalesNotes,
 import * as Haptics from "expo-haptics";
 import { useLocationContext } from '../context/LocationContext';
 import DeleteClient from '../components/clientSegmentScreen/DeleteClientModal';
+import Toast from "../ui/Toast";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -37,6 +38,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
     const { getLocation, currentLocation,reload,setReload } = useLocationContext();
+    const toastRef = useRef();
     
     useFocusEffect(useCallback(() => {
         getLocation("List of Business");
@@ -110,12 +112,18 @@ export default function ListOfBusinessesScreen({navigation}) {
                     dispatch(updateBusinessId(itemData.item.id));
                     dispatch(updateIsBusinessSelected(true));
                     dispatch(updateSelectedBusinessDetails(itemData.item));
+                    await dispatch(resetClientFilter());
+                    dispatch(resetMaxEntry());
                     navigation.navigate("Checkout");
                 }}
+                listOfBusinessToast={listOfBusinessToast}
             />
         );
     }
 
+    function listOfBusinessToast(message, duration) {
+        toastRef.current.show(message, duration);
+    }
     const token = useSelector(state => state.authDetails.authToken);
     const id = useSelector(state => state.authDetails.businessId);
     const cartItems = useSelector(state => state.cart.items);
@@ -123,6 +131,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     return (
         cartItems.length === 0 ?
             <ScrollView style={styles.listOfBusinesses} contentContainerStyle={{alignItems: "center"}}>
+                <Toast ref={toastRef}/>
     
                 <Divider/>
                 <View style={styles.body}>
@@ -174,6 +183,7 @@ export default function ListOfBusinessesScreen({navigation}) {
                     navigation.navigate(currentLocation);
                 }, 10);
             }}
+            checkoutScreenToast={() => null}
         />
     );
 }
