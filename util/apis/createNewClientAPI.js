@@ -1,12 +1,13 @@
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_AUTH_KEY, EXPO_PUBLIC_BUSINESS_ID} from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 export default async function createNewClientAPI(data) {
 
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -15,8 +16,9 @@ export default async function createNewClientAPI(data) {
     }
 
     const api = process.env.EXPO_PUBLIC_API_URI + "/user/addWalkInUser";
+    let response;
     try{
-        const response = await axios.post(api,
+        response = await axios.post(api,
             data,
             {
                 headers: {
@@ -24,6 +26,13 @@ export default async function createNewClientAPI(data) {
                 }
             })
     } catch (e) {
-        throw e.response.data.other_message;
+        console.log("already exists from api")
+        return false
+    }
+    if(response.data.message === "User added Successfully") {
+        return response.data.other_message;
+    }
+    else {
+        return false;
     }
 }

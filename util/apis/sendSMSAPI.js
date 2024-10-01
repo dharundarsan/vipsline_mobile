@@ -1,12 +1,12 @@
 import axios from "axios";
 import { ToastAndroid } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-root-toast";
+import * as SecureStore from 'expo-secure-store';
 
 export default async function sendSMSAPI(name, mobile) {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -16,7 +16,8 @@ export default async function sendSMSAPI(name, mobile) {
 
     let businessId = ""
     try {
-        const value = await AsyncStorage.getItem('businessId');
+        // const value = await AsyncStorage.getItem('businessId');
+        const value = await SecureStore.getItemAsync('businessId');
         if (value !== null) {
             businessId = value;
         }
@@ -41,21 +42,25 @@ export default async function sendSMSAPI(name, mobile) {
         );
 
         // ToastAndroid.show("SMS send successfully!", ToastAndroid.LONG);
-        Toast.show("SMS Send Successfully",{
-            duration:Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow:false,
-            backgroundColor:"black",
-            opacity:1
-        })
+        // TODO
+
+        // Toast.show("SMS Send Successfully",{
+        //     duration:Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow:false,
+        //     backgroundColor:"black",
+        //     opacity:1
+        // })
     } catch (error) {
         // ToastAndroid.show("Failed to send SMS.", ToastAndroid.LONG);
-        Toast.show("Failed To Send SMS",{
-            duration:Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow:false,
-            backgroundColor:"black",
-            opacity:1
-        })
+        // TODO
+
+        // Toast.show("Failed To Send SMS",{
+        //     duration:Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow:false,
+        //     backgroundColor:"black",
+        //     opacity:1
+        // })
     }
 }

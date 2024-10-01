@@ -4,16 +4,16 @@ import React, { useState, useRef, useEffect } from "react";
 import DropdownModal from "../../ui/DropdownModal";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
-import { formatDate } from "../../util/Helpers";
-import { useDispatch } from "react-redux";
-import { loadClientCountFromDb, loadClientsFromDb } from "../../store/clientSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {formatDate, showToast} from "../../util/Helpers";
+import {useDispatch} from "react-redux";
+import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import { shadowStyling } from "../../util/Helpers";
-import Toast from "react-native-root-toast";
+import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import * as SecureStore from 'expo-secure-store';
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -65,20 +65,22 @@ const CreateClientModal = (props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
-        let businessId = ""
-        try {
-            const value = await AsyncStorage.getItem('businessId');
-            if (value !== null) {
-                businessId = value;
-            }
-        } catch (e) {
-            console.log("businessId fetching error. (inside createClientModal)" + e);
-        }
-
-
+        
+        
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
-            await createNewClientAPI({
+            let businessId = ""
+            try {
+                // const value = await AsyncStorage.getItem('businessId');
+                const value = await SecureStore.getItemAsync('businessId');
+
+                if (value !== null) {
+                    businessId = value;
+                }
+            } catch (e) {
+                console.log("businessId fetching error. (inside createClientModal)" + e);
+            }
+            const response = await createNewClientAPI({
                 address: clientAddress,
                 anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
                 businessId: businessId,
@@ -99,32 +101,51 @@ const CreateClientModal = (props) => {
                 state: "Tamilnadu",
             });
             // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
-            Toast.show("User added Successfully", {
-                duration: Toast.durations.LONG,
-                position: Toast.positions.BOTTOM,
-                shadow: false,
-                backgroundColor: "black",
-                opacity: 1
-            })
-            clearForm();
-            dispatch(loadClientCountFromDb());
-            props.onCloseModal();
+            if(response.toString() === "false") {
+                // TODO
+                // Toast.show({
+                //     type: ALERT_TYPE.WARNING,
+                //     title: "User already exists",
+                //     textBody: "Membership already exists in cart",
+                //     autoClose: 1500,
+                // })
+            }
+            else {
+                // TODO
+
+                // Toast.show({
+                //     type: ALERT_TYPE.SUCCESS,
+                //     title: "User added successfully",
+                //     textBody: "Membership already exists in cart",
+                //     autoClose: 1500,
+                //
+                // })
+                await dispatch(loadClientInfoFromDb(response))
+                clearForm();
+                await dispatch(loadClientCountFromDb());
+                props.onCloseModal();
+                props.closeAddClientModal();
+            }
+
         } catch (e) {
             // ToastAndroid.show(e, ToastAndroid.LONG),
-            Toast.show(e, {
-                duration: Toast.durations.LONG,
-                position: Toast.positions.BOTTOM,
-                shadow: false,
-                backgroundColor: "black",
-                opacity: 1
-            })
+            // TODO
+
+            // Toast.show(e, {
+            //     duration: Toast.durations.LONG,
+            //     position: Toast.positions.BOTTOM,
+            //     shadow: false,
+            //     backgroundColor: "black",
+            //     opacity: 1
+            // })
         }
 
     };
 
     return (
+
         <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}
-            presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+               presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Add a new client</Text>
                 <PrimaryButton
@@ -132,7 +153,7 @@ const CreateClientModal = (props) => {
                     pressableStyle={styles.closeButtonPressable}
                     onPress={props.onCloseModal}
                 >
-                    <Ionicons name="close" size={25} color="black" />
+                    <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
             </View>
             <ScrollView>
@@ -193,8 +214,7 @@ const CreateClientModal = (props) => {
                         validator={(text) => {
                             if (text.trim().length === 0) {
                                 return true;
-                            }
-                            else {
+                            } else {
                                 if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "") return "Email is invalid";
                                 else return true;
                             }
@@ -244,6 +264,14 @@ const CreateClientModal = (props) => {
                         type="text"
                         label="GST number"
                         placeholder="Enter client's GSTIN"
+                        validator={(text) => {
+                            if (text.length !== 0){
+                                let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
+                                if(regex.test(text) === true) return true;
+                                else return "Please enter valid GST number"
+                            }
+                            else return true;
+                        }}
                         value={gstNo}
                         onChangeText={setGstNo}
                     />
@@ -274,7 +302,7 @@ const CreateClientModal = (props) => {
                 </View>
             </ScrollView>
             <View style={styles.saveButtonContainer}>
-                <PrimaryButton label={"Save"} onPress={handleSave} />
+                <PrimaryButton label={"Save"} onPress={handleSave}/>
             </View>
         </Modal>
     );

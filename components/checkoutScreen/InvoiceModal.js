@@ -17,7 +17,7 @@ import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import {
@@ -29,7 +29,9 @@ import {
     modifyPrepaidDetails
 } from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
-import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
+import Toast from "../../ui/Toast";
+// import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
+
 
 
 const InvoiceModal = (props) => {
@@ -71,13 +73,16 @@ const InvoiceModal = (props) => {
 
     const walletBalance = useSelector(state => state.invoice.walletBalance);
 
+    const toastRef = useRef(null);
+
 
     let centralGST = (details.total * 0.09);
     let stateGST = (details.total * 0.09);
 
     async function getBusinessId() {
         try {
-            const value = await AsyncStorage.getItem('businessId');
+            // const value = await AsyncStorage.getItem('businessId');
+            const value = await SecureStore.getItemAsync('businessId');
             if (value !== null) {
                 return value;
             }
@@ -102,12 +107,14 @@ const InvoiceModal = (props) => {
     const businessEmail = selectedBusinessDetails.email;
 
     useEffect(() => {
-        Toast.show({
-            type: ALERT_TYPE.SUCCESS,
-            title: "Updated successfully",
-            // textBody: "Invoice generated",
-            autoClose: 1500,
-        });
+        // TODO
+
+        // Toast.show({
+        //     type: ALERT_TYPE.SUCCESS,
+        //     title: "Updated successfully",
+        //     textBody: "Invoice generated",
+        //     autoClose: 1500,
+        // });
     }, []);
 
     useEffect(() => {
@@ -154,14 +161,17 @@ const InvoiceModal = (props) => {
         //     dispatch(modifyPrepaidDetails({type: "clear"}))
         // }}
     >
-        <AlertNotificationRoot theme={"light"}
-                               toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
-                               colors={[{
-                                   // label: Colors.white,
-                                   card: Colors.grey200,
-                                   // card: "#ff7171",
-                                   // card: "#b73737",
-                               }]}>
+        {/*<AlertNotificationRoot theme={"light"}*/}
+        {/*                       toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}*/}
+        {/*                       colors={[{*/}
+        {/*                           // label: Colors.white,*/}
+        {/*                           card: Colors.grey200,*/}
+        {/*                           // card: "#ff7171",*/}
+        {/*                           // card: "#b73737",*/}
+        {/*                       }]}>*/}
+
+        <Toast ref={toastRef}/>
+
             <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
 
@@ -241,7 +251,7 @@ const InvoiceModal = (props) => {
                             let msg = await sendEmailAPI(email, bookingId);
                             setEmailModalVisibility(false);
                             if (msg === "success") {
-
+                                toastRef.current.show("email send successfully", 1000);
                             }
                         }
                     }}
@@ -314,8 +324,6 @@ styles.heading]}>Invoice</Text>*/}
                     buttonStyle={styles.closeButton}
                     onPress={() => {
                         // setCancelInvoiceModalVisibility(true)
-                        console.log("Invoivce Modal 1");
-                        
                         clearCartAPI();
                         dispatch(clearSalesNotes());
                         dispatch(modifyClientMembershipId({type: "clear"}))
@@ -353,8 +361,6 @@ styles.heading]}>Invoice</Text>*/}
                                 buttonStyle={styles.backToCheckoutButton}
                                 label={"Back to checkout"}
                                 onPress={() => {
-                                    console.log("Invoice Modal");
-                                    
                                     clearCartAPI();
                                     dispatch(modifyClientMembershipId({type: "clear"}))
                                     dispatch(clearSalesNotes());
@@ -610,7 +616,7 @@ styles.heading]}>Invoice</Text>*/}
                 }
                 {/*<Toast ref={toastRef} />*/}
             </ScrollView>
-        </AlertNotificationRoot>
+        {/*</AlertNotificationRoot>*/}
 
         {/*<Toast ref={toastRef} />*/}
     </Modal>

@@ -5,13 +5,13 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import React, {useState} from "react";
 import Colors from "../../constants/Colors";
-import {formatDate, shadowStyling} from "../../util/Helpers";
+import {formatDate, shadowStyling, showToast} from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {addCustomItems, addItemToCart, updateCalculatedPrice, updateCustomItem} from "../../store/cartSlice";
 import {useDispatch} from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
-import Toast from "react-native-root-toast";
 import * as Haptics from "expo-haptics";
+import Toast from "react-native-toast-message";
 
 const AddCustomItemModal = (props) => {
     const [itemName, setItemName] = useState(props.edited ? props.data.name : "");
@@ -19,9 +19,9 @@ const AddCustomItemModal = (props) => {
     const dispatch = useDispatch();
 
     return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}
-    presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+                  presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
-            <Text style={[textTheme.titleLarge, styles.heading]}>Add Custom Item</Text>
+            <Text style={[textTheme.titleLarge, styles.heading]}>Edit Custom Item</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}
@@ -45,11 +45,17 @@ const AddCustomItemModal = (props) => {
             <PrimaryButton onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                 if (itemName.trim() === "") {
-                    ToastAndroid.show("Please enter item name", ToastAndroid.SHORT)
+                    showToast({
+                        type: "error",
+                        text1: "Please enter item name",
+                    });
                     return;
                 }
-                if (itemPrice === 0 || !parseFloat(itemPrice) ) {
-                    ToastAndroid.show("Invalid Amount", ToastAndroid.SHORT)
+                if (itemPrice === 0 || !parseFloat(itemPrice)) {
+                    showToast({
+                        type: "error",
+                        text1: "Invalid Amount",
+                    });
                     return;
                 }
                 let price;
@@ -82,6 +88,7 @@ const AddCustomItemModal = (props) => {
                 dispatch(updateCalculatedPrice());
             }} label={props.edited ? "Save" : "Add to cart"}/>
         </View>
+        <Toast/>
     </Modal>
 }
 

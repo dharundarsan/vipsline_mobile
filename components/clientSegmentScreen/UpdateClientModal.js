@@ -11,7 +11,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
 import updateClientAPI from "../../util/apis/updateClientAPI";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
-import Toast from "react-native-root-toast";
 
 /**
  * UpdateClientModal Component
@@ -85,8 +84,8 @@ const UpdateClientModal = React.memo((props) => {
             clientAddress: details.address,
             isDobSelected: false,
             isAnniversarySelected: false,
-            anniversaryDate: checkNullUndefined( details.anniversary) &&  details.anniversary.trim().length !== 0 ?
-                new Date( details.anniversary) : null,
+            anniversaryDate: checkNullUndefined(details.anniversary) && details.anniversary.trim().length !== 0 ?
+                new Date(details.anniversary) : null,
             dateOfBirth: checkNullUndefined(details.dob) && details.dob.trim().length !== 0 ?
                 new Date(details.dob) : null,
             clientSource: details.client_source,
@@ -96,11 +95,6 @@ const UpdateClientModal = React.memo((props) => {
     const clientDetails = useSelector(state => state.clientInfo.details);
     const businessId = useSelector(state => state.authDetails.businessId);
 
-
-
-
-
-    
 
     const handleUpdate = async () => {
         const firstNameValid = firstNameRef.current();
@@ -134,23 +128,27 @@ const UpdateClientModal = React.memo((props) => {
             dispatch(loadClientInfoFromDb(clientDetails.id));
             props.onCloseModal();
             // ToastAndroid.show("User updated Successfully", ToastAndroid.LONG);
-            Toast.show("User updated successfully",{
-                duration:Toast.durations.LONG,
-                position: Toast.positions.BOTTOM,
-                shadow:false,
-                backgroundColor:"black",
-                opacity:1
-            })
+            // TODO
+
+            // Toast.show("User updated successfully",{
+            //     duration:Toast.durations.LONG,
+            //     position: Toast.positions.BOTTOM,
+            //     shadow:false,
+            //     backgroundColor:"black",
+            //     opacity:1
+            // })
             // props.onUpdate();
         } catch (e) {
-                        // ToastAndroid.show(e + "error", ToastAndroid.LONG);
-                        Toast.show(e+" error",{
-                            duration:Toast.durations.LONG,
-                            position: Toast.positions.BOTTOM,
-                            shadow:false,
-                            backgroundColor:"black",
-                            opacity:1
-                        })
+            // ToastAndroid.show(e + "error", ToastAndroid.LONG);
+            // TODO
+
+            // Toast.show(e+" error",{
+            //     duration:Toast.durations.LONG,
+            //     position: Toast.positions.BOTTOM,
+            //     shadow:false,
+            //     backgroundColor:"black",
+            //     opacity:1
+            // })
         }
     };
 
@@ -166,8 +164,8 @@ const UpdateClientModal = React.memo((props) => {
     }, [props.isVisible, details]);
 
     return (
-        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"} 
-        presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+        <Modal visible={props.isVisible} style={styles.createClientModal} animationType={"slide"}
+               presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <View style={styles.closeAndHeadingContainer}>
                 <Text style={[textTheme.titleLarge, styles.titleText]}>Edit client</Text>
                 <PrimaryButton
@@ -189,7 +187,9 @@ const UpdateClientModal = React.memo((props) => {
                         value={clientData.firstName}
                         onChangeText={(value) => handleChange("firstName", value)}
                         validator={(text) => text.length === 0 ? "First name is required" : true}
-                        onSave={(callback) => { firstNameRef.current = callback; }}
+                        onSave={(callback) => {
+                            firstNameRef.current = callback;
+                        }}
                     />
                     <CustomTextInput
                         type="text"
@@ -198,7 +198,9 @@ const UpdateClientModal = React.memo((props) => {
                         value={clientData.lastName}
                         onChangeText={(value) => handleChange("lastName", value)}
                         // validator={(text) => text.length === 0 ? "Last name is required" : true}
-                        onSave={(callback) => { lastNameRef.current = callback; }}
+                        onSave={(callback) => {
+                            lastNameRef.current = callback;
+                        }}
                     />
                     <CustomTextInput
                         type="phoneNo"
@@ -207,7 +209,9 @@ const UpdateClientModal = React.memo((props) => {
                         value={clientData.phoneNo[1]}
                         onChangeText={(value) => handleChange("phoneNo", [value[0], value[1]])}
                         validator={(text) => text.length !== 10 ? "Phone number is invalid" : true}
-                        onSave={(callback) => { phoneNoRef.current = callback; }}
+                        onSave={(callback) => {
+                            phoneNoRef.current = callback;
+                        }}
                     />
                     <CustomTextInput
                         type="email"
@@ -216,7 +220,9 @@ const UpdateClientModal = React.memo((props) => {
                         value={clientData.email}
                         onChangeText={(value) => handleChange("email", value)}
                         validator={(text) => !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
-                        onSave={(callback) => { emailRef.current = callback; }}
+                        onSave={(callback) => {
+                            emailRef.current = callback;
+                        }}
                     />
                     <CustomTextInput
                         type="dropdown"
@@ -236,7 +242,7 @@ const UpdateClientModal = React.memo((props) => {
                         maximumDate={new Date()}
                         type="date"
                         label="Date of birth"
-                        value={ clientData.dateOfBirth === undefined || clientData.dateOfBirth === null ? null : new Date(clientData.dateOfBirth)}
+                        value={clientData.dateOfBirth === undefined || clientData.dateOfBirth === null ? null : new Date(clientData.dateOfBirth)}
                         onChangeValue={(value) => {
                             handleChange("isDobSelected", true);
                             handleChange("dateOfBirth", value);
@@ -259,6 +265,14 @@ const UpdateClientModal = React.memo((props) => {
                         placeholder="Enter client's GSTIN"
                         value={clientData.gstNo}
                         onChangeText={(value) => handleChange("gstNo", value)}
+                        validator={(text) => {
+                            if (text.length !== 0){
+                                let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
+                                if(regex.test(text) === true) return true;
+                                else return "Please enter valid GST number"
+                            }
+                            else return true;
+                        }}
                     />
                     <CustomTextInput
                         type="phoneNo"

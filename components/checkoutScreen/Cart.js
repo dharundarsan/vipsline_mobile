@@ -17,6 +17,7 @@ import {useDispatch, useSelector} from "react-redux";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import {updateDiscount} from '../../store/cartSlice';
 import * as Haptics from "expo-haptics";
+import Toast from "react-native-toast-message";
 
 const Cart = () => {
 
@@ -91,8 +92,6 @@ const Cart = () => {
         <View style={styles.cart}>
             {isModalVisible &&
                 <AddItemModal visible={isModalVisible} closeModal={closeAddItemModal} openModal={() => {
-
-
                     openAddItemModal()
                 }}/>}
             {cartItems.length === 0 && customItems.length === 0 ?

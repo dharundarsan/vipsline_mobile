@@ -1,4 +1,5 @@
 import {StyleSheet} from "react-native";
+import Toast from "react-native-toast-message";
 
 export const capitalizeFirstLetter = (string) => {
     if (string === undefined) return;
@@ -77,4 +78,13 @@ export const formatDateWithAddedMonths = (monthsToAdd) => {
     return formattedDate;
 }
 
+export const showToast = (toastOptions) => {
+    Toast.show({
+        type: toastOptions.type,
+        text1: toastOptions.text1,
+        text2: toastOptions.text2,
+        text1Style:{fontSize:15},
+        text2Style:{fontSize:12}
+    });
+}
 

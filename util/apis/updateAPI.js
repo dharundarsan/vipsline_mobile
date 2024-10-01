@@ -1,14 +1,14 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {ToastAndroid} from "react-native";
-import Toast from "react-native-root-toast";
+import * as SecureStore from 'expo-secure-store';
 
 export default async function updateAPI(response, mode_of_payment, splitUpState, clientInfo) {
     let authToken = "";
     let businessId = "";
     try {
-        authToken = await AsyncStorage.getItem('authKey') || "";
-        businessId = await AsyncStorage.getItem('businessId') || "";
+        // authToken = await AsyncStorage.getItem('authKey') || "";
+        authToken = await SecureStore.getItemAsync('authKey') || "";
+        // businessId = await AsyncStorage.getItem('businessId') || "";
+        businessId = await SecureStore.getItemAsync('businessId') || "";
     } catch (e) {
         console.error("Error fetching from AsyncStorage:", e);
         throw e; // Ensure that the error is propagated
@@ -72,23 +72,27 @@ export default async function updateAPI(response, mode_of_payment, splitUpState,
             }
         );
         // ToastAndroid.show("updated successfully!", ToastAndroid.LONG);
-        Toast.show("Updated Successfully", {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow: false,
-            backgroundColor: "black",
-            opacity: 1
-        })
+        // TODO
+
+        // Toast.show("Updated Successfully", {
+        //     duration: Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow: false,
+        //     backgroundColor: "black",
+        //     opacity: 1
+        // })
     } catch (error) {
         console.error("Error during updateAPI call:", error);
         // ToastAndroid.show("not updated successfully!", ToastAndroid.LONG);
-        Toast.show("Not Updated Successfully", {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow: false,
-            backgroundColor: "black",
-            opacity: 1
-        })
+        // TODO
+
+        // Toast.show("Not Updated Successfully", {
+        //     duration: Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow: false,
+        //     backgroundColor: "black",
+        //     opacity: 1
+        // })
         throw error; // Ensure that the error is propagated
     }
 }

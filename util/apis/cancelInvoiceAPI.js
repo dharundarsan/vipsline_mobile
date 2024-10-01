@@ -1,18 +1,17 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-root-toast";
+import * as SecureStore from 'expo-secure-store';
 
 export default async function cancelInvoiceAPI(status, bookingId) {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
     } catch (e) {
         console.log("auth token fetching error. inside cancelInvoiceAPI()" + e);
     }
-
 
 
     try {
@@ -31,21 +30,25 @@ export default async function cancelInvoiceAPI(status, bookingId) {
         );
 
         // ToastAndroid.show("Invoice Cancelled successfully!", ToastAndroid.LONG);
-        Toast.show("Invoice Cancelled Succuessfully",{
-            duration:Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow:false,
-            backgroundColor:"black",
-            opacity:1
-        })
+        // TODO
+
+        // Toast.show("Invoice Cancelled Succuessfully", {
+        //     duration: Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow: false,
+        //     backgroundColor: "black",
+        //     opacity: 1
+        // })
     } catch (error) {
-                // ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
-        Toast.show("Falied To Cancel Invoice",{
-            duration:Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow:false,
-            backgroundColor:"black",
-            opacity:1
-        })
+        // ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
+        // TODO
+
+        // Toast.show("Falied To Cancel Invoice", {
+        //     duration: Toast.durations.LONG,
+        //     position: Toast.positions.BOTTOM,
+        //     shadow: false,
+        //     backgroundColor: "black",
+        //     opacity: 1
+        // })
     }
 }

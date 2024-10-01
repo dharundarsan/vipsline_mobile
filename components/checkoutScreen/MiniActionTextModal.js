@@ -26,7 +26,7 @@ import { shadowStyling } from "../../util/Helpers";
 import { Col } from "react-native-table-component";
 
 const MiniActionTextModal = React.memo((props) => {
-  const [selectedDiscountMode, setSelectedDiscountMode] = useState("PERCENTAGE")
+  const [selectedDiscountMode, setSelectedDiscountMode] = useState(props.selectedDiscountMode)
   const [discountValue, setDiscountValue] = useState(props.discountValue);
   const [errorHandler, setErrorHandler] = useState({
     discount: false,

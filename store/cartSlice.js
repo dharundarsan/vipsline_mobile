@@ -3,8 +3,8 @@ import uuid from "react-native-uuid";
 import axios from "axios";
 import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {formatDate} from "../util/Helpers";
+import * as SecureStore from 'expo-secure-store';
 import {useState} from "react";
 
 const initialCartState = {
@@ -37,7 +37,8 @@ const initialCartState = {
 async function getBusinessId() {
     let businessId = ""
     try {
-        const value = await AsyncStorage.getItem('businessId');
+        // const value = await AsyncStorage.getItem('businessId');
+        const value = await SecureStore.getItemAsync('businessId');
         if (value !== null) {
             return value;
         }
@@ -49,7 +50,8 @@ async function getBusinessId() {
 export const addItemToCart = (data) => async (dispatch, getState) => {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -71,8 +73,13 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
                 }
             }
         );
+        if (response.data.status_code === 404) {
+            throw response;
+        }
         dispatch(await loadCartFromDB())
     } catch (error) {
+        //TODO
+        console.log(error.data.other_message)
     }
 }
 
@@ -85,7 +92,8 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
     const {clientInfo} = getState();
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -218,7 +226,8 @@ export const removeItemFromCart = (itemId) => async (dispatch, getState) => {
 
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -440,14 +449,13 @@ export const cartSlice = createSlice({
                     // if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
                     console.log(state.editedCart.filter(item => item.gender === "prepaid"))
                     if (state.prepaid_wallet.length > 0) {
-                        console.log(payload)
                         // state.prepaid_wallet[0].source = "add_prepaid";
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
                             source: "add_prepaid"
                         }]
                     }
-                    if (state.prepaid_wallet.length > 0  || state.editedCart.filter(item => item.gender === "prepaid").length > 0) {
+                    if (state.prepaid_wallet.length > 0 || state.editedCart.filter(item => item.gender === "prepaid").length > 0) {
                         // state.prepaid_wallet[0].resource_id = payload;
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],

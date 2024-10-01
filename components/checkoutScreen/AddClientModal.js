@@ -13,9 +13,10 @@ import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
 import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {shadowStyling} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
+import * as SecureStore from 'expo-secure-store';
+import Toast from "react-native-toast-message";
 
 const AddClientModal = (props) => {
     // const pageNo = useSelector(state => state.client.pageNo);
@@ -34,7 +35,9 @@ const AddClientModal = (props) => {
 
         let authToken = ""
         try {
-            const value = await AsyncStorage.getItem('authKey');
+            // const value = await AsyncStorage.getItem('authKey');
+            const value = await SecureStore.getItemAsync('authKey');
+
             if (value !== null) {
                 authToken = value;
             }
@@ -44,7 +47,8 @@ const AddClientModal = (props) => {
 
         let businessId = ""
         try {
-            const value = await AsyncStorage.getItem('businessId');
+            // const value = await AsyncStorage.getItem('businessId');
+            const value = await SecureStore.getItemAsync('businessId');
             if (value !== null) {
                 businessId = value;
             }
@@ -94,11 +98,12 @@ const AddClientModal = (props) => {
 
     return (
         <Modal visible={props.isVisible} animationType={"slide"}
-        presentationStyle="pageSheet" onRequestClose={props.closeModal}>
+               presentationStyle="pageSheet" onRequestClose={props.closeModal}>
             <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
                 dispatch(loadClientsFromDb());
                 setIsCreateClientModalVisible(false);
-            }}/>
+            }} closeAddClientModal={props.closeModal}
+            />
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
                 <PrimaryButton
@@ -175,6 +180,7 @@ const AddClientModal = (props) => {
                     />
                 )}
             </View>
+            <Toast/>
         </Modal>
     );
 };

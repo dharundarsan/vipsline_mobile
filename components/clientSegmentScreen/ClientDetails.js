@@ -78,7 +78,7 @@ export default function ClientDetails(props) {
 
 
     return (
-        <ScrollView style={styles.clientDetails} contentContainerStyle={{alignItems: "center",}}>
+        <ScrollView style={styles.clientDetails} contentContainerStyle={{alignItems: "center",}} showsVerticalScrollIndicator={false}>
             <View style={styles.titleContainer}>
                 <UpdateClientModal
                     isVisible={updateModalVisibility}
@@ -163,16 +163,16 @@ export default function ClientDetails(props) {
 
 const styles = StyleSheet.create({
     clientDetails: {
-        flex: 1,
     },
     titleContainer: {
         marginTop: 16,
-        width: '95%',
+        width: '100%',
         flexDirection: 'row',
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+
     },
     title: {
-        marginLeft: 16
+        marginLeft: 16,
     },
     editButton: {
         backgroundColor: Colors.white,
@@ -196,14 +196,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: Colors.grey250,
         borderRadius: 8,
-        width: '95%',
+        width: '100%',
         marginTop: 32,
         height: 120
-    },
-    clientInfoTextBox: {
-        width: '85%',
-        marginLeft: 32,
-        marginTop: 8
     },
     clientInfoBoxLabelContainer: {
         borderBottomWidth: 1,
@@ -227,7 +222,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: Colors.grey250,
         borderRadius: 8,
-        width: '95%',
+        width: '100%',
         marginTop: 32,
         marginBottom: 40
     },

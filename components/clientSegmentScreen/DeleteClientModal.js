@@ -57,7 +57,7 @@ export default function DeleteClient(props) {
                             if(props.setVisible !== undefined){
                                 // props.setVisible(false);
                                 // console.log("reload "+reload);
-                                
+
                                 // setTimeout(()=>{
                                 //     navigation.navigate("Checkout", { screen: "CheckoutScreen" });
                                 // },100)
@@ -82,11 +82,18 @@ export default function DeleteClient(props) {
                             onPress={props.onCloseModal}
                         />
                         <PrimaryButton
-                            label={"Delete"}
+                            label={props.ActionOptionName !== undefined ? props.ActionOptionName : "Delete"}
                             buttonStyle={styles.deleteButton}
                             textStyle={[textTheme.titleMedium]}
                             onPress={() => {
                                 if(props.deleteClient) deleteClientAPI(currentClientId);
+                                // TODO
+                                // else Toast.show({
+                                //     type: ALERT_TYPE.SUCCESS,
+                                //     title: "Sale cancelled",
+                                //     // textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                //     autoClose: 1500,
+                                // });
                                 if(props.setVisible !== undefined){
                                     props.setVisible(false);
                                 }
@@ -98,13 +105,9 @@ export default function DeleteClient(props) {
                                 dispatch(loadClientFiltersFromDb(10, "All"));
                                 dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
                             }}
-
                         />
                     </View>
-
                 </View>
-
-
             </TouchableOpacity>
         </Modal>
     );
@@ -118,7 +121,7 @@ const styles = StyleSheet.create({
     closeButton: {
         position: "absolute",
         right: 10,
-        top:5,
+        top: 5,
         backgroundColor: Colors.white,
     },
     closeButtonPressable: {
@@ -139,7 +142,7 @@ const styles = StyleSheet.create({
     },
     label: {
         width: "100%",
-        paddingVertical:5,
+        paddingVertical: 5,
         backgroundColor: Colors.background,
         alignItems: "center",
         elevation: 0.5,
