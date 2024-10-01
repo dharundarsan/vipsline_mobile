@@ -6,6 +6,7 @@ import {clearBusinessId, clearInBusiness, updateAuthStatus} from "../store/authS
 import { clearListOfBusiness } from '../store/listOfBusinessSlice';
 import { useLocationContext } from '../context/LocationContext';
 import { useFocusEffect } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store'
 
 const SignOutPrompt = ({ navigation }) => {
     const { getLocation,currentLocation } = useLocationContext();

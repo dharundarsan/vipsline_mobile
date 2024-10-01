@@ -149,6 +149,10 @@ const InvoiceModal = (props) => {
         textAlign: "center"
     }
 
+    // console.log(JSON.stringify(selectedClientDetails,null,3));
+    console.log(selectedClientDetails.username.trim()==="");
+    
+
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}
         // presentationStyle="pageSheet" onRequestClose={()=>{
@@ -442,10 +446,10 @@ styles.heading]}>Invoice</Text>*/}
                                 style={textTheme.titleMedium}>Contact
                                 : </Text>{selectedClientDetails.mobile_1}</Text>
                             {
-                                selectedClientDetails.username === "" ?
+                                selectedClientDetails.username.trim() !== "" ?
                                     <Text style={textTheme.bodyLarge}><Text
                                         style={textTheme.titleMedium}>Email
-                                        : </Text>{selectedClientDetails.username}</Text> :
+                                        : </Text>{selectedClientDetails.username.trim()}</Text> :
                                     <></>
                             }
                             {
