@@ -754,7 +754,7 @@ const PaymentModal = (props) => {
                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                                if (selectedPaymentOption === null) {
                                    // TODO
-                                   console.log("Please select any payment method")
+                                   toastRef.current.show("Please select any payment method", 2000);
                                    return;
                                }
                                setIsLoading(true);
@@ -772,7 +772,7 @@ const PaymentModal = (props) => {
                                                        //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                                            // autoClose: 1500,
                                                        // });
-                                                       toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
+                                                       toastRef.current.show("Something went wrong", 2000);
                                                        return;
                                                    } else {
                                                        props.setIsInvoiceModalVisible(true);
@@ -826,7 +826,7 @@ const PaymentModal = (props) => {
                                            })[0].amount).then(response => {
                                                if (response.data === null || response.message === "Something went wrong") {
                                                    // TODO
-                                                   toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
+                                                   toastRef.current.show("Something went wrong", 2000);
 
                                                    // Toast.show({
                                                    //     type: ALERT_TYPE.DANGER,
@@ -886,7 +886,8 @@ const PaymentModal = (props) => {
                                            //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                            // autoClose: 1500,
                                            // });
-                                           toastRef.current.show("Adjust the stock quantity on the products page to make it available for sale", 2000);
+                                           console.log(response)
+                                           toastRef.current.show(response.other_message, 2000);
 
                                            return;
                                        } else {

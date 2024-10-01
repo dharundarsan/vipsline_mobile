@@ -75,6 +75,7 @@ export default function ClientCard(props) {
             alignItems: "center",
         },
         clientDetailsContainer: {
+            width:"80%",
             marginLeft: 16,
             flexDirection: 'column',
         },
@@ -90,7 +91,7 @@ export default function ClientCard(props) {
         },
         opacity: {
             opacity: Platform.OS === 'ios' ? 0.5 : 1,
-        }
+        },
     })
 
 
@@ -113,7 +114,7 @@ export default function ClientCard(props) {
 
                     <View style={[styles.clientDetailsContainer, props.clientDetailsContainer]}>
                         {
-                            checkNullUndefined(props.name) ? <Text style={[textTheme.titleSmall, props.nameText]} ellipsizeMode="tail"
+                            checkNullUndefined(props.name) ? <Text style={[textTheme.titleSmall,styles.nameText ,props.nameText]} ellipsizeMode="tail"
                             numberOfLines={1}>{props.name}</Text> : <Text>hello</Text>
                         }
                         {

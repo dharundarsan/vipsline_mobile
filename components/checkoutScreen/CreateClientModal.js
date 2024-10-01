@@ -8,7 +8,7 @@ import {Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
-import {formatDate, showToast} from "../../util/Helpers";
+import {checkNullUndefined, formatDate, showToast} from "../../util/Helpers";
 import {useDispatch} from "react-redux";
 import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import { shadowStyling } from "../../util/Helpers";
@@ -217,14 +217,7 @@ const CreateClientModal = (props) => {
                         placeholder="Enter email address"
                         value={email}
                         onChangeText={setEmail}
-                        validator={(text) => {
-                            if (text.trim().length === 0) {
-                                return true;
-                            } else {
-                                if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "") return "Email is invalid";
-                                else return true;
-                            }
-                        }}
+                        validator={(text) => !checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
                     />
                     <CustomTextInput
                         type="dropdown"
@@ -271,7 +264,7 @@ const CreateClientModal = (props) => {
                         label="GST number"
                         placeholder="Enter client's GSTIN"
                         validator={(text) => {
-                            if (text.length !== 0){
+                            if ( checkNullUndefined(text) && text.trim().length !== 0){
                                 let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
                                 if(regex.test(text) === true) return true;
                                 else return "Please enter valid GST number"

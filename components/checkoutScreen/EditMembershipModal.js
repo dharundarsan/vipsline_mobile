@@ -101,10 +101,24 @@ const EditMembershipModal = (props) => {
                     <View style={styles.modalContent}>
                         <CustomTextInput label={"Valid from"} type={"date"} value={new Date(validFromDate)}
                                          minimumDate={new Date()}
-                                         onChangeValue={setValidFromDate}/>
+                                         onChangeValue={(value) => {
+                                             if(new Date(value).getTime() > new Date(validUntilDate).getTime()){
+                                                 setValidUntilDate(new Date(value).getTime() + (props.data.duration * 24 * 60 * 60 * 1000))
+                                             }
+                                             if(new Date(value).getTime() < new Date(validUntilDate).getTime()){
+                                                 setValidUntilDate(new Date(value).getTime() + (props.data.duration * 24 * 60 * 60 * 1000))
+                                             }
+                                             setValidFromDate(value)
+                                         }}/>
                         <CustomTextInput label={"Valid until"} type={"date"} value={new Date(validUntilDate)}
                                          minimumDate={new Date()}
-                                         onChangeValue={setValidUntilDate}/>
+                                         onChangeValue={ (value) => {
+                                             if(new Date(validFromDate).getTime() > new Date(value).getTime()){
+                                                 toastRef.current.show("Valid from date cannot be higher than valid until date")
+                                                 return;
+                                             }
+                                             setValidUntilDate(value)
+                                         }}/>
                         <CustomTextInput label={"Membership Price"} type={"price"} value={membershipPrice.toString()}
                                          onChangeText={(price) => {
                                              if (price === "") setMembershipPrice(0)

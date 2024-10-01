@@ -291,7 +291,7 @@ const CartItem = (props) => {
                 </PrimaryButton>
                 <Text style={[textTheme.labelLarge, styles.discountText]}>
                     {editedData
-                        ? (editedData.disc_value !== 0 ? `Discount ₹${editedData.disc_value.toFixed(2)}` : "")
+                        ? editedData.gender === "membership" || editedData.gender === "prepaid" ? "" : (editedData.disc_value !== 0 ? `Discount ₹${editedData.disc_value.toFixed(2)}` : "")
                         : (props.data.price - props.data.discounted_price !== 0 &&
                             props.data.gender !== "custom_item" &&
                             props.data.gender !== "prepaid" &&

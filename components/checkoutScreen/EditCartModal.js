@@ -2,7 +2,7 @@ import {Modal, Platform, StyleSheet, Text, ToastAndroid, View} from "react-nativ
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons, Feather} from "@expo/vector-icons";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Colors from "../../constants/Colors";
 import MembershipItem from "./MembershipItem";
 import CustomTextInput from "../../ui/CustomTextInput";
@@ -20,6 +20,7 @@ import {
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import {formatDate} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
+import Toast from "../../ui/Toast";
 
 const EditCartModal = (props) => {
     const editedCart = useSelector((state) => state.cart.editedCart);
@@ -60,8 +61,11 @@ const EditCartModal = (props) => {
         api();
     }, [selectedDiscountMode]);
 
+    const toastRef = useRef(null);
+
     return <Modal visible={props.isVisible} animationType={"slide"} style={styles.editCartModal}
                   presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+        <Toast ref={toastRef}/>
         <View style={styles.headingAndCloseContainer}>
             <Text style={[textTheme.titleLarge, styles.heading]}>Edit {props.data.resource_category_name}</Text>
             <PrimaryButton
@@ -150,7 +154,8 @@ const EditCartModal = (props) => {
             <PrimaryButton onPress={async () => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                 if (discountAmount >= price) {
-                    ToastAndroid.show("Discount should not be equal or greater than price", ToastAndroid.SHORT);
+                    toastRef.current.show("Discount should not be equal or greater than price", 2000);
+                    // ToastAndroid.show("Discount should not be equal or greater than price", ToastAndroid.SHORT);
                     return;
                 }
                 if (price !== parseFloat(props.data.price) || discountAmount !== props.data.dicounted_amount) {

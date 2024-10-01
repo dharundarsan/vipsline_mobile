@@ -26,9 +26,15 @@ import * as SecureStore from 'expo-secure-store';
 import {useFocusEffect} from "@react-navigation/native";
 import {clearClientInfo} from "../store/clientInfoSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
-import {clearCalculatedPrice, clearCustomItems, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "../store/cartSlice";
+import {
+    clearCalculatedPrice,
+    clearCustomItems,
+    clearLocalCart,
+    clearSalesNotes,
+    modifyClientMembershipId
+} from "../store/cartSlice";
 import * as Haptics from "expo-haptics";
-import { useLocationContext } from '../context/LocationContext';
+import {useLocationContext} from '../context/LocationContext';
 import DeleteClient from '../components/clientSegmentScreen/DeleteClientModal';
 import Toast from "../ui/Toast";
 
@@ -37,31 +43,31 @@ export default function ListOfBusinessesScreen({navigation}) {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     const name = useSelector(state => state.loginUser.details).name;
     const dispatch = useDispatch();
-    const { getLocation, currentLocation,reload,setReload } = useLocationContext();
+    const {getLocation, currentLocation, reload, setReload} = useLocationContext();
     const toastRef = useRef();
-    
+
     useFocusEffect(useCallback(() => {
         getLocation("List of Business");
     }, []))
-    
+
     // useLayoutEffect(() => {
-        // dispatch(loadServicesDataFromDb("women"));
-        // dispatch(loadServicesDataFromDb("men"));
-        // dispatch(loadServicesDataFromDb("kids"));
-        // dispatch(loadServicesDataFromDb("general"));
-        // dispatch(loadProductsDataFromDb());
-        // dispatch(loadPackagesDataFromDb());
-        // dispatch(loadMembershipsDataFromDb());
-        // dispatch(loadClientsFromDb());
-        // dispatch(loadClientCountFromDb());
-        // dispatch(loadClientFiltersFromDb(10, "All"));
-        // dispatch(clearClientInfo());
-        // dispatch(clearCustomItems());
-        // console.log("List Of Business");
-        // dispatch(clearLocalCart());
-        // clearCartAPI();
-        // dispatch(loadBusinessesListFromDb());
-        // dispatch(loadLoginUserDetailsFromDb());
+    // dispatch(loadServicesDataFromDb("women"));
+    // dispatch(loadServicesDataFromDb("men"));
+    // dispatch(loadServicesDataFromDb("kids"));
+    // dispatch(loadServicesDataFromDb("general"));
+    // dispatch(loadProductsDataFromDb());
+    // dispatch(loadPackagesDataFromDb());
+    // dispatch(loadMembershipsDataFromDb());
+    // dispatch(loadClientsFromDb());
+    // dispatch(loadClientCountFromDb());
+    // dispatch(loadClientFiltersFromDb(10, "All"));
+    // dispatch(clearClientInfo());
+    // dispatch(clearCustomItems());
+    // console.log("List Of Business");
+    // dispatch(clearLocalCart());
+    // clearCartAPI();
+    // dispatch(loadBusinessesListFromDb());
+    // dispatch(loadLoginUserDetailsFromDb());
     // }, []);
 
 
@@ -126,64 +132,68 @@ export default function ListOfBusinessesScreen({navigation}) {
     function listOfBusinessToast(message, duration) {
         toastRef.current.show(message, duration);
     }
+
     const token = useSelector(state => state.authDetails.authToken);
     const id = useSelector(state => state.authDetails.businessId);
     const cartItems = useSelector(state => state.cart.items);
     const [isDelete, setIsDelete] = useState(false);
     return (
         cartItems.length === 0 ?
-            <ScrollView style={styles.listOfBusinesses} contentContainerStyle={{alignItems: "center"}}>
+            <View style={{flex: 1}}>
+
                 <Toast ref={toastRef}/>
-    
-                <Divider/>
-                <View style={styles.body}>
-                    <Text style={[textTheme.titleMedium]}>
-                        Hi, {name}!
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, styles.descriptionText]}>
-                        You are a part of the following business. Go to the business which you wish to access now
-                    </Text>
-    
-                    <FlatList
-                        data={listOfBusinesses}
-                        renderItem={renderItem}
-                        style={styles.listStyle}
-                        scrollEnabled={false}
-                        contentContainerStyle={{gap: 16, borderRadius: 8, overflow: 'hidden'}}
-                    />
-                </View>
-    
-            </ScrollView>
-            :<DeleteClient
-            isVisible={isDelete}
-            setVisible={setIsDelete}
-            onCloseModal={async () => {
-                // Navigate directly to CheckoutScreen
-                setTimeout(() => {
-                    setIsDelete(false);
-                    navigation.navigate("Checkout", { screen: "CheckoutScreen" });
-                }, 10);
-                setReload(true)
-                // console.log(navigationRef.current.getRootState());
-                // navigate("Checkout")
-            }}
-            header={"Cancel Sale"}
-            content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
-            onCloseClientInfoAfterDeleted={async () => {
-                await clearCartAPI();
-                dispatch(modifyClientMembershipId({ type: "clear" }));
-                clearSalesNotes();
-                dispatch(clearLocalCart());
-                dispatch(clearClientInfo());
-                dispatch(clearCalculatedPrice());
-                setTimeout(() => {
-                    // navigation.navigate("Checkout", { screen: "CheckoutScreen" });
-                    setReload(false);
-                    navigation.navigate(currentLocation);
-                }, 10);
-            }}
-            checkoutScreenToast={() => null}
-        />
+                <ScrollView style={styles.listOfBusinesses} contentContainerStyle={{alignItems: "center"}}>
+
+                    <Divider/>
+                    <View style={styles.body}>
+                        <Text style={[textTheme.titleMedium]}>
+                            Hi, {name}!
+                        </Text>
+                        <Text style={[textTheme.bodyMedium, styles.descriptionText]}>
+                            You are a part of the following business. Go to the business which you wish to access now
+                        </Text>
+
+                        <FlatList
+                            data={listOfBusinesses}
+                            renderItem={renderItem}
+                            style={styles.listStyle}
+                            scrollEnabled={false}
+                            contentContainerStyle={{gap: 16, borderRadius: 8, overflow: 'hidden'}}
+                        />
+                    </View>
+
+                </ScrollView>
+            </View>
+            : <DeleteClient
+                isVisible={isDelete}
+                setVisible={setIsDelete}
+                onCloseModal={async () => {
+                    // Navigate directly to CheckoutScreen
+                    setTimeout(() => {
+                        setIsDelete(false);
+                        navigation.navigate("Checkout", {screen: "CheckoutScreen"});
+                    }, 10);
+                    setReload(true)
+                    // console.log(navigationRef.current.getRootState());
+                    // navigate("Checkout")
+                }}
+                header={"Cancel Sale"}
+                content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
+                onCloseClientInfoAfterDeleted={async () => {
+                    await clearCartAPI();
+                    dispatch(modifyClientMembershipId({type: "clear"}));
+                    clearSalesNotes();
+                    dispatch(clearLocalCart());
+                    dispatch(clearClientInfo());
+                    dispatch(clearCalculatedPrice());
+                    setTimeout(() => {
+                        // navigation.navigate("Checkout", { screen: "CheckoutScreen" });
+                        setReload(false);
+                        navigation.navigate(currentLocation);
+                    }, 10);
+                }}
+                checkoutScreenToast={() => null}
+            />
     );
 }
 

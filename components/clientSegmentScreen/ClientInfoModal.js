@@ -185,6 +185,7 @@ export default function clientInfoModal(props) {
             />
             <View style={styles.modalContent}>
                 <ClientCard
+                    clientDetailsContainer={{width:"auto"}}
                     name={details.name}
                     phone={details.mobile_1}
                     card={styles.clientDetailsContainer}
@@ -437,9 +438,10 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
     },
     clientProfileCard: {
+        width:"70%",
+        justifyContent:"center",
         paddingVertical: 0,
         paddingHorizontal: 0,
-        width: 'auto',
     },
     cardInnerContainer: {
         marginLeft: 0

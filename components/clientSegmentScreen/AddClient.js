@@ -52,7 +52,7 @@ export default function AddClient() {
                 <View style={{flexDirection: 'row'}}>
                     <View style={styles.addTextContainer}>
                         <Text
-                            style={[textTheme.titleSmall, styles.addText, {paddingTop: Platform.OS === 'ios' ? 0 : 0}]}>Add</Text>
+                            style={[textTheme.titleSmall, styles.addText, {paddingTop: Platform.OS === 'ios' ? 0 : 2}]}>Add</Text>
                     </View>
                     <View style={styles.addSymbolContainer}>
                         <FontAwesome6 name="add" size={14} color={Colors.darkBlue}/>
