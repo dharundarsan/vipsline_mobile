@@ -89,7 +89,7 @@ export default function App() {
         <Provider store={store}>
             {/*<SafeAreaView style={styles.safeAreaView}>*/}
 
-            <AppNavigator auth={isAuth}/>
+            <AppNavigator auth={isAuth} setAuth={setIsAuth}/>
             {/*</SafeAreaView>*/}
         </Provider>
     );
@@ -184,14 +184,15 @@ const AppNavigator = (props) => {
         try {
             // const authKey = await AsyncStorage.getItem('authKey');
             const authKey = await SecureStore.getItemAsync('authKey');
-            
             if (authKey !== null) {
                 // setIsAuthenticated(true);
                 dispatch(updateAuthStatus(true));
+                props.setAuth(true)
 
             } else {
                 // setIsAuthenticated(false);
                 dispatch(updateAuthStatus(false));
+                props.setAuth(false);
             }
         } catch (e) {
             console.log('Error checking authentication:', e);
@@ -297,9 +298,10 @@ const MainDrawerNavigator = (props) => {
         }
     }, [currentLocation])
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
+    
     return (
         <>
-            { !props.auth ? <AuthNavigator/> :
+            {!props.auth ? <AuthNavigator/> :
                 isDelete ?
                     <DeleteClient
                         isVisible={isDelete}
