@@ -316,7 +316,9 @@ const CartItem = (props) => {
                             props.data.gender !== "custom_item" &&
                             props.data.gender !== "prepaid" &&
                             props.data.gender === "packages")
-                            ? `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}`
+                            ? props.data.price - props.data.total_price === 0
+                                ? ""
+                                : `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}`
                             : props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General"
                                 ? (props.data.service_discount !== 0)
                                     ? `Discount ₹${(props.data.service_discount).toFixed(2)}`

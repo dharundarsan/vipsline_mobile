@@ -569,7 +569,7 @@ const PaymentModal = (props) => {
                                          if (price.split(" ").length > 1) return;
                                          if (price.split(".").length > 2) return;
 
-                                         setTotalPrice(price);
+                                         setTotalPrice(price.trim());
                                      }}
                                      onEndEditing={(value) => {
                                          if (parseFloat(value) < props.price) {
@@ -607,7 +607,7 @@ const PaymentModal = (props) => {
                                                 } else {
                                                     return ({
                                                         ...split,
-                                                        amount: text.trim().length === 0 ? 0 : parseFloat(text)
+                                                        amount: text.trim().length === 0 ? 0 : text
                                                     })
                                                 }
                                             }

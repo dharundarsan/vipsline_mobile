@@ -147,6 +147,8 @@ const InvoiceModal = (props) => {
         fontWeight: "bold"
     };
 
+    console.log(JSON.stringify(details, null, 3));
+
     const textStyle2 = {
         textAlign: "center"
     }
