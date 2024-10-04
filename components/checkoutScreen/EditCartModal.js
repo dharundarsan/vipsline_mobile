@@ -27,15 +27,22 @@ const EditCartModal = (props) => {
     const editedItem = editedCart.find(item => props.data.item_id === item.item_id) || {};
 
     const isEdited = props.data.edited;
-    const hasDiscountedPrice = props.data.discounted_price !== 0;
+    const hasDiscountedPrice = props.data.dis !== 0;
 
     const initialDiscountMode = editedItem.type === "PERCENT" ? "percentage" :
         editedItem.type === "AMOUNT" ? "cash" :
             hasDiscountedPrice ? "cash" : "percentage";
 
     const initialDiscountValue = isEdited
-        ? editedItem.type === "PERCENT" ? (props.data.disc_value / props.data.price) * 100 : props.data.disc_value
-        : hasDiscountedPrice ? props.data.price - props.data.discounted_price : 0;
+        ? editedItem.type === "PERCENT"
+            ? (props.data.disc_value / props.data.price) * 100
+            : props.data.disc_value
+        : hasDiscountedPrice
+            // ? props.data.price - props.data.discounted_price
+            ? props.data.dis
+            : 0;
+
+    console.log(initialDiscountValue)
 
     const initialDiscountAmount = isEdited ? props.data.disc_value : (hasDiscountedPrice ? props.data.price - props.data.discounted_price : 0);
 

@@ -82,7 +82,7 @@ const ProductsList = (props) => {
                 }
             </View>
             {
-                productsData[0] === null || productsData[0] === undefined ? <View style={styles.noDataMessage}>
+                productsData[0] === null || productsData[0] === undefined || filteredProductsData.length === 0 ? <View style={styles.noDataMessage}>
                     <Text style={TextTheme.titleMedium}>No Products Available</Text>
                 </View>
                     :
