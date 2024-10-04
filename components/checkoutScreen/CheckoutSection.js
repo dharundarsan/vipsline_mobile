@@ -360,13 +360,16 @@ const CheckoutSection = (props) => {
                               setIsPaymentModalVisible(false)
                           }}
                           setIsInvoiceModalVisible={setIsInvoiceModalVisible}
+                          checkoutScreenToast={() => {
+                              props.checkoutScreenToast("Sale Cancelled", 2000);
+                          }}
                           price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price}/>
         }
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
                 <InvoiceModal data={props.data} isVisible={isInvoiceModalVisible} onCloseModal={() => {
                     setIsInvoiceModalVisible(false);
-                    // props.onCloseModal();
+                    // props.onClhttps://gamma.partners.vipsline.com/checkoutoseModal();
                 }}/> :
                 null
         }

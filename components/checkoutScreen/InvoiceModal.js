@@ -41,6 +41,7 @@ const InvoiceModal = (props) => {
     const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
+    console.log(selectedClientDetails)
 
     const dispatch = useDispatch();
 
@@ -443,7 +444,7 @@ styles.heading]}>Invoice</Text>*/}
                                 style={textTheme.titleMedium}>Contact
                                 : </Text>{selectedClientDetails.mobile_1}</Text>
                             {
-                                selectedClientDetails.username.trim() !== "" ?
+                                 checkNullUndefined(selectedClientDetails.username) && selectedClientDetails.username.trim() !== "" ?
                                     <Text style={textTheme.bodyLarge}><Text
                                         style={textTheme.titleMedium}>Email
                                         : </Text>{selectedClientDetails.username.trim()}</Text> :
