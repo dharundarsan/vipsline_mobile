@@ -89,12 +89,13 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
     if (clientFilter.isFetchingSearchClient) return;
 
     try {
+        // if(query.trim() === "") return;
         dispatch(updateSearchClientFetchingState(true));
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/client/searchClientSegment?pageNo=${clientFilter.searchPageNo}&pageSize=${pageSize}`,
             {
                 business_id: `${await getBusinessId()}`,
-                query: query,
+                query: query.trim(),
                 type: filter,
             },
             {
@@ -176,6 +177,10 @@ export const clientFilterSlice = createSlice({
         updateSearchClientMaxEntry(state, action) {
             state.searchMaxEntry = action.payload;
         },
+        resetMaxEntry(state, action) {
+            state.maxEntry = 10;
+            state.searchClientMaxEntry = 10;
+        }
 
     }
 });
@@ -195,7 +200,8 @@ export const {
     decrementSearchPageNumber,
     updateTotalSearchClientCount,
     updateSearchClientMaxEntry,
-    updateAnalyticDetails
+    updateAnalyticDetails,
+    resetMaxEntry,
 } = clientFilterSlice.actions;
 
 export default clientFilterSlice.reducer;

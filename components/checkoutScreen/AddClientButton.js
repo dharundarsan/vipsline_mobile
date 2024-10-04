@@ -120,6 +120,7 @@ const AddClientButton = (props) => {
                                 phone={clientInfo.details.mobile_1}
                                 name={clientInfo.details.firstName}
                                 id={clientInfo.details.id}
+                                deleteClientToast={props.deleteClientToast}
                             />
                         )}
                         {/* <UpdateClientModal

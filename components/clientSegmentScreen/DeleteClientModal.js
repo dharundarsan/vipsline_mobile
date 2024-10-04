@@ -86,14 +86,15 @@ export default function DeleteClient(props) {
                             buttonStyle={styles.deleteButton}
                             textStyle={[textTheme.titleMedium]}
                             onPress={() => {
-                                if(props.deleteClient) deleteClientAPI(currentClientId);
+                                if(props.deleteClient) {
+                                    deleteClientAPI(currentClientId);
+                                    props.deleteClientToast();
+                                }
+                                else {
+                                    props.checkoutScreenToast();
+                                }
                                 // TODO
-                                // else Toast.show({
-                                //     type: ALERT_TYPE.SUCCESS,
-                                //     title: "Sale cancelled",
-                                //     // textBody: "Adjust the stock quantity on the products page to make it available for sale",
-                                //     autoClose: 1500,
-                                // });
+
                                 if(props.setVisible !== undefined){
                                     props.setVisible(false);
                                 }

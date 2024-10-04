@@ -79,7 +79,7 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
         dispatch(await loadCartFromDB())
     } catch (error) {
         //TODO
-        console.log(error.data.other_message)
+        throw error.data.other_message;
     }
 }
 

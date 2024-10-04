@@ -12,6 +12,7 @@ import {
 import {chooseFilterCount, clientFilterNames} from "../../util/chooseFilter";
 import {useDispatch, useSelector} from "react-redux";
 import Colors from "../../constants/Colors";
+import {loadClientCountFromDb} from "../../store/clientSlice";
 
 /**
  * Pagination Component
@@ -39,9 +40,6 @@ import Colors from "../../constants/Colors";
 export default function Pagination(props) {
     const dispatch = useDispatch();
 
-    const [totalCount, setTotalCount] = useState(0);
-    const [upperCount, setUpperCount] = useState(10);
-    const [lowerCount, setLowerCount] = useState(1);
 
     const maxEntry = useSelector(state => state.clientFilter.maxEntry);
 
@@ -54,15 +52,23 @@ export default function Pagination(props) {
     let currentClientCount = 0;
 
 
+    const [totalCount, setTotalCount] = useState(allClientCount);
+    const [upperCount, setUpperCount] = useState(10);
+    const [lowerCount, setLowerCount] = useState(1);
+
+
 
     useEffect(() => {
-        dispatch(updateMaxEntry(10))
+        dispatch(updateMaxEntry(10));
+
 
         currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         dispatch(resetClientFilter());
         if(currentClientCount > 10) {
             dispatch(loadClientFiltersFromDb(10, clientFilterNames(props.filterPressed)))
         }
+        console.log(currentClientCount)
+        setTotalCount("currentClientCount");
         setTotalCount(currentClientCount);
         setLowerCount(1);
         setUpperCount(10 > currentClientCount ? currentClientCount : 10);
@@ -174,7 +180,7 @@ export default function Pagination(props) {
 
             <View style={styles.paginationInnerContainer}>
                 <Text style={styles.pagingText}>
-                    {lowerCount < 0 ? 0 : lowerCount} - {upperCount} of {totalCount}
+                    {lowerCount < 0 ? 0 : lowerCount} - {upperCount} of {props.totalCount}
                 </Text>
                 <PrimaryButton
                     buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}

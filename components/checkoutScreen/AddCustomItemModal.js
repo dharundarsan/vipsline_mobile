@@ -3,7 +3,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
-import React, { useState } from "react";
+import React, {useRef, useState} from "react";
 import Colors from "../../constants/Colors";
 import { formatDate, shadowStyling, showToast } from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -11,7 +11,7 @@ import { addCustomItems, addItemToCart, updateCalculatedPrice, updateCustomItem 
 import { useDispatch } from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
 import * as Haptics from "expo-haptics";
-import Toast from "react-native-toast-message";
+import Toast from "../../ui/Toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const AddCustomItemModal = (props) => {
@@ -19,8 +19,10 @@ const AddCustomItemModal = (props) => {
     const [itemPrice, setItemPrice] = useState(props.edited ? props.data.price : 0);
     const dispatch = useDispatch();
     const insets = useSafeAreaInsets();
+    const toastRef = useRef(null);
     return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}
         presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+        <Toast ref={toastRef}/>
         <KeyboardAvoidingView style={{ flex: 1,paddingBottom:insets.bottom }} keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}
         behavior="height">
             <View style={[styles.headingAndCloseContainer, shadowStyling]}>
@@ -48,17 +50,11 @@ const AddCustomItemModal = (props) => {
                 <PrimaryButton onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
                     if (itemName.trim() === "") {
-                        showToast({
-                            type: "error",
-                            text1: "Please enter item name",
-                        });
+                        toastRef.current.show("Please enter item name", 2000);
                         return;
                     }
                     if (itemPrice === 0 || !parseFloat(itemPrice)) {
-                        showToast({
-                            type: "error",
-                            text1: "Invalid Amount",
-                        });
+                        toastRef.current.show("Invalid amount", 2000);
                         return;
                     }
                     let price;

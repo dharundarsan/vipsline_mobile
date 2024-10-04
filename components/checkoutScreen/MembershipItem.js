@@ -54,11 +54,11 @@ const MembershipItem = (props) => {
     })
 
     return <>
-        <EditMembershipModal isVisible={isEditMembershipModalVisible} onCloseModal={closeEditMembershipModal}
-                             data={props.data}
-                             closeOverallModal={props.closeOverallModal}
+        { isEditMembershipModalVisible && <EditMembershipModal isVisible={isEditMembershipModalVisible} onCloseModal={closeEditMembershipModal}
+                              data={props.data}
+                              closeOverallModal={props.closeOverallModal}
 
-        />
+        />}
         <PrimaryButton buttonStyle={styles.membershipItemButton} pressableStyle={styles.membershipItemPressable}
                        onPress={() => {
 
