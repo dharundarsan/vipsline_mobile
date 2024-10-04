@@ -83,14 +83,14 @@ export default function ClientDetails(props) {
         <ScrollView style={styles.clientDetails} contentContainerStyle={{alignItems: "center",}} showsVerticalScrollIndicator={false}>
             <Toast ref={toastRef}/>
             <View style={styles.titleContainer}>
-                <UpdateClientModal
+                { updateModalVisibility && <UpdateClientModal
                     isVisible={updateModalVisibility}
                     details={details}
                     onCloseModal={() => setUpdateModalVisibility(false)}
                     updateClientToast={(message, duration) => {
                         toastRef.current.show(message, duration);
                     }}
-                />
+                />}
                 <Text style={[textTheme.titleMedium, styles.title]}>
                     {props.title}
                 </Text>

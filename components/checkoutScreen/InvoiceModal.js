@@ -17,7 +17,7 @@ import sendEmailAPI from "../../util/apis/sendEmailAPI";
 import sendSMSAPI from "../../util/apis/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
 import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 import clearCartAPI from "../../util/apis/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import {
@@ -80,7 +80,8 @@ const InvoiceModal = (props) => {
 
     async function getBusinessId() {
         try {
-            const value = await AsyncStorage.getItem('businessId');
+            // const value = await AsyncStorage.getItem('businessId');
+            const value = await SecureStore.getItemAsync('businessId');
             if (value !== null) {
                 return value;
             }
@@ -151,7 +152,6 @@ const InvoiceModal = (props) => {
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}
-
         // presentationStyle="pageSheet" onRequestClose={()=>{
         //     clearCartAPI();
         //     dispatch(modifyClientMembershipId({type: "clear"}))
@@ -395,84 +395,84 @@ styles.heading]}>Invoice</Text>*/}
                     }
 
 
-                </View>
-                <Divider/>
-                <View style={styles.invoiceHeadingContainer}>
-                    <View style={styles.invoiceHeading}>
-                        <Text style={[textTheme.titleMedium,
-                            styles.invoiceHeadingText]}>Invoice</Text>
                     </View>
-                </View>
-                <Divider thickness={0.5} color={Colors.highlight}/>
-                <View style={styles.invoice}>
-                    <View style={{
-                        paddingVertical: 10,
-                        paddingHorizontal: 15,
-                        gap: 3
-                    }}>
-                        <Text
-                            style={textTheme.titleMedium}>{businessName}</Text>
-                        <Text
-                            style={textTheme.bodyLarge}>{businessAddress}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Contact
-                            : </Text>{businessContact}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Email
-                            : </Text>{businessEmail}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            //     style={textTheme.titleMedium}>Contact : </Text>
-                            // </Text>
-                            // <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>GSTIN : </Text>{selectedBusinessDetails.gstin}
-                        </Text>
+                    <Divider/>
+                    <View style={styles.invoiceHeadingContainer}>
+                        <View style={styles.invoiceHeading}>
+                            <Text style={[textTheme.titleMedium,
+                                styles.invoiceHeadingText]}>Invoice</Text>
+                        </View>
                     </View>
-                    <View style={styles.invoiceNumberAndDateContainer}>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Invoice no :
-                        </Text>{invoiceDetails.business_invoice_num}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Invoice date :
-                        </Text>{invoiceDetails.invoice_created_date}</Text>
-                    </View>
-                    <View style={styles.invoiceDetailsOutlineCard}>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Name
-                            : </Text>{selectedClientDetails.name}</Text>
-                        <Text style={textTheme.bodyLarge}><Text
-                            style={textTheme.titleMedium}>Contact
-                            : </Text>{selectedClientDetails.mobile_1}</Text>
+                    <Divider thickness={0.5} color={Colors.highlight}/>
+                    <View style={styles.invoice}>
+                        <View style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 15,
+                            gap: 3
+                        }}>
+                            <Text
+                                style={textTheme.titleMedium}>{businessName}</Text>
+                            <Text
+                                style={textTheme.bodyLarge}>{businessAddress}</Text>
+                            <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Contact
+                                : </Text>{businessContact}</Text>
+                            <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Email
+                                : </Text>{businessEmail}</Text>
+                            <Text style={textTheme.bodyLarge}><Text
+                                //     style={textTheme.titleMedium}>Contact : </Text>
+                                // </Text>
+                                // <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>GSTIN : </Text>{selectedBusinessDetails.gstin}
+                            </Text>
+                        </View>
+                        <View style={styles.invoiceNumberAndDateContainer}>
+                            <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Invoice no :
+                            </Text>{invoiceDetails.business_invoice_num}</Text>
+                            <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Invoice date :
+                            </Text>{invoiceDetails.invoice_created_date}</Text>
+                        </View>
+                        <View style={styles.invoiceDetailsOutlineCard}>
+                            <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Name
+                                : </Text>{selectedClientDetails.name}</Text>
+                            <Text style={textTheme.bodyLarge}><Text
+                                style={textTheme.titleMedium}>Contact
+                                : </Text>{selectedClientDetails.mobile_1}</Text>
+                            {
+                                selectedClientDetails.username.trim() !== "" ?
+                                    <Text style={textTheme.bodyLarge}><Text
+                                        style={textTheme.titleMedium}>Email
+                                        : </Text>{selectedClientDetails.username.trim()}</Text> :
+                                    <></>
+                            }
+                            {
+                                walletBalance.wallet_balance > 0 ?
+                                    <Text style={textTheme.bodyLarge}>
+                                        <Text style={textTheme.titleMedium}>Prepaid :
+                                        </Text> {walletBalance.wallet_balance}</Text> :
+                                    <></>
+                            }
+                            {
+                                selectedClientDetails.customer_gst !== null && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                                    <Text style={textTheme.bodyLarge}><Text
+                                        style={textTheme.titleMedium}>GSTIN
+                                        : </Text>{selectedClientDetails.customer_gst}</Text> :
+                                    <></>
+                            }
+                        </View>
                         {
-                            selectedClientDetails.username === "" ?
-                                <Text style={textTheme.bodyLarge}><Text
-                                    style={textTheme.titleMedium}>Email
-                                    : </Text>{selectedClientDetails.username}</Text> :
-                                <></>
-                        }
-                        {
-                            walletBalance.wallet_balance > 0 ?
-                                <Text style={textTheme.bodyLarge}>
-                                    <Text style={textTheme.titleMedium}>Prepaid :
-                                    </Text> {walletBalance.wallet_balance}</Text> :
-                                <></>
-                        }
-                        {
-                            selectedClientDetails.customer_gst !== null && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
-                                <Text style={textTheme.bodyLarge}><Text
-                                    style={textTheme.titleMedium}>GSTIN
-                                    : </Text>{selectedClientDetails.customer_gst}</Text> :
-                                <></>
-                        }
-                    </View>
-                    {
-                        checkNullUndefined(details) ?
-                            checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
-                            <Table style={styles.cartItemTable}>
-                                <Row
-                                    textStyle={textStyle1}
-                                    style={styles.cartItemTableHead}
-                                    data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
-                                />
+                            checkNullUndefined(details) ?
+                                checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
+                                <Table style={styles.cartItemTable}>
+                                    <Row
+                                        textStyle={textStyle1}
+                                        style={styles.cartItemTableHead}
+                                        data={["ITEM", "STAFF", "QTY", "AMOUNT"]}
+                                    />
 
 
                                 {

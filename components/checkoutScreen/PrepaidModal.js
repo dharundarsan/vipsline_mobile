@@ -19,7 +19,8 @@ import * as Haptics from "expo-haptics";
 import Toast from "../../ui/Toast";
 
 const PrepaidModal = (props) => {
-    const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
+    const appointment_date = useSelector(state => state.cart.appointment_date);
+    const [selectedDate, setSelectedDate] = useState(new Date(appointment_date));
     const [prepaidSource, setPrepaidSource] = useState("Add prepaid");
     const [prepaidAmount, setPrepaidAmount] = useState(props.edited ? props.data.wallet_amount : 0)
     const [prepaidBonus, setPrepaidBonus] = useState(props.edited ? props.data.wallet_bonus : 0)
@@ -45,7 +46,7 @@ const PrepaidModal = (props) => {
         </View>
         <View style={styles.modalContent}>
             <ScrollView>
-                <CustomTextInput label={"Date"} type={"date"} value={selectedDate} onChangeValue={setSelectedDate}/>
+                <CustomTextInput label={"Date"} type={"date"} readOnly={true} value={selectedDate} onChangeValue={setSelectedDate}/>
                 <CustomTextInput label={"Prepaid Source"} type={"dropdown"}
                                  dropdownItems={["Add prepaid", "Balance carry forward"]} value={prepaidSource}
                                  onChangeValue={setPrepaidSource}/>

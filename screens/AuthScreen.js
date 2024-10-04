@@ -162,7 +162,7 @@ function AuthScreen() {
                     </PrimaryButton>
                 </View>
                 {isMobileOtp ? <MobileOtp /> : <EmailLogin />}
-                <View style={styles.orContainer}>
+                {/* <View style={styles.orContainer}>
 
                     <View style={styles.hr}></View>
                     <Text style={[textTheme.bodyMedium, {paddingHorizontal: 8}]}>or</Text>
@@ -175,7 +175,7 @@ function AuthScreen() {
                     <Pressable onPress={signUpHandler}>
                         <Text style={[textTheme.bodyMedium, styles.signUpText]}>Sign Up Now</Text>
                     </Pressable>
-                </View>
+                </View> */}
             </View>
             </ScrollView>
         </SafeAreaView>

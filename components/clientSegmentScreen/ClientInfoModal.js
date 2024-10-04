@@ -53,9 +53,7 @@ const getCategoryTitle =
     "review": "Review",
     "giftVoucher": "Gift Voucher",
     "seeMoreStats": "Statistics"
-
 }
-
 
 
 export default function clientInfoModal(props) {
@@ -64,7 +62,6 @@ export default function clientInfoModal(props) {
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
     const details = useSelector(state => state.clientInfo.details);
-
 
 
     const [totalSales, setTotalSales] = useState("");
@@ -150,7 +147,7 @@ export default function clientInfoModal(props) {
 
             />
 
-            <UpdateClientModal
+            { editClientModalVisibility && <UpdateClientModal
                 isVisible={editClientModalVisibility}
                 onCloseModal={() => {
                     dispatch(loadClientInfoFromDb(props.id))
@@ -165,7 +162,7 @@ export default function clientInfoModal(props) {
                     toastRef.current.show(message, duration);
                 }}
 
-            />
+            />}
 
             <DeleteClient
                 isVisible={deleteClientModalVisibility}
@@ -187,8 +184,8 @@ export default function clientInfoModal(props) {
 
             />
             <View style={styles.modalContent}>
-
                 <ClientCard
+                    clientDetailsContainer={{width:"auto"}}
                     name={details.name}
                     phone={details.mobile_1}
                     card={styles.clientDetailsContainer}
@@ -441,9 +438,10 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
     },
     clientProfileCard: {
+        width:"70%",
+        justifyContent:"center",
         paddingVertical: 0,
         paddingHorizontal: 0,
-        width: 'auto',
     },
     cardInnerContainer: {
         marginLeft: 0
