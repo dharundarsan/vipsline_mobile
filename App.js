@@ -69,10 +69,16 @@ export default function App() {
         'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
         'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
     });
+    const [isAuth, setIsAuth] = useState(false)
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
         }
+        async function get(){
+            setIsAuth(!!await SecureStore.getItemAsync('authKey'))
+        }
+        get()
+
     }, [loaded, error]);
 
     if (!loaded && !error) {
@@ -83,7 +89,7 @@ export default function App() {
         <Provider store={store}>
             {/*<SafeAreaView style={styles.safeAreaView}>*/}
 
-            <AppNavigator/>
+            <AppNavigator auth={isAuth}/>
             {/*</SafeAreaView>*/}
         </Provider>
     );
@@ -126,7 +132,7 @@ function CustomDrawerIcon({navigation}) {
 }
 
 
-const AppNavigator = () => {
+const AppNavigator = (props) => {
 
     const dispatch = useDispatch();
 
@@ -204,11 +210,11 @@ const AppNavigator = () => {
     return (
         <NavigationContainer>
             <SafeAreaProvider>
-                {reduxAuthStatus ?
+                {/* {isAuth ? */}
                     <LocationProvider>
-                        <MainDrawerNavigator/>
+                        <MainDrawerNavigator auth={props.auth}/>
                     </LocationProvider>
-                    : <AuthNavigator/>}
+                    {/* : <AuthNavigator/>} */}
             </SafeAreaProvider>
         </NavigationContainer>
     );
@@ -223,7 +229,7 @@ const AuthNavigator = () => (
 );
 
 
-const MainDrawerNavigator = () => {
+const MainDrawerNavigator = (props) => {
     const navigation = useNavigation();
     const { currentLocation, reload, setReload } = useLocationContext();
     useEffect(() => {
@@ -293,7 +299,7 @@ const MainDrawerNavigator = () => {
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
     return (
         <>
-            {
+            { !props.auth ? <AuthNavigator/> :
                 isDelete ?
                     <DeleteClient
                         isVisible={isDelete}
