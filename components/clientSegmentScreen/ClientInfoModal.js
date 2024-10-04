@@ -258,6 +258,7 @@ export default function clientInfoModal(props) {
         content =
             <ClientDetails
                 title={getCategoryTitle[clientMoreDetails]}
+                details={details}
 
             />
     }
