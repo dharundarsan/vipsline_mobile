@@ -30,9 +30,9 @@ export default function ClientStatistics(props) {
         {id: "totalVisit", label: "Total Visit", value: props.totalVisits},
         {id: "lastVisit", label: "Last Visit", value: props.lastVisit},
         {id: "completed", label: "Completed", value: props.completedAppointment},
-        {id: "canceled", label: "Canceled", value: props.cancelledAppointment},
+        {id: "canceled", label: "Cancelled", value: props.cancelledAppointment},
         {id: "No shows", label: "No shows", value: props.noShows},
-        {id: "reviews", label: "Reviews", value: props.feedbackCount},
+        {id: "reviews", label: "Feedback", value: props.feedbackCount},
     ]
 
 
