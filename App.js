@@ -130,47 +130,49 @@ const AppNavigator = () => {
 
     const dispatch = useDispatch();
 
-    // const [isAuthenticated, setIsAuthenticated] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
 
 
-    useEffect(() => {
-        const backAction = () => {
-            Alert.alert(
-                "Exit App",
-                "Are you sure you want to exit the app?",
-                [
-                    {
-                        text: "No",
-                        onPress: () => null,
-                        style: "cancel"
-                    },
-                    {
-                        text: "Yes",
-                        onPress: () => {
 
-                            clearCartAPI();
-                            dispatch(modifyClientMembershipId({type: "clear"}))
-                            dispatch(clearSalesNotes());
-                            dispatch(clearLocalCart());
-                            dispatch(clearClientInfo());
-                            dispatch(clearCalculatedPrice());
-                            BackHandler.exitApp();
-                        },
-                    }
-                ],
-                { cancelable: false }
-            );
-            return true;
-        };
-
-        const backHandler = BackHandler.addEventListener(
-            "hardwareBackPress",
-            backAction
-        );
-
-        return () => backHandler.remove();
-    }, []);
+    // useEffect(() => {
+    //     const backAction = () => {
+    //         Alert.alert(
+    //             "Exit App",
+    //             "Are you sure you want to exit the app?",
+    //             [
+    //                 {
+    //                     text: "No",
+    //                     onPress: () => null,
+    //                     style: "cancel"
+    //                 },
+    //                 {
+    //                     text: "Yes",
+    //                     onPress: () => {
+    //
+    //                         clearCartAPI();
+    //                         dispatch(modifyClientMembershipId({type: "clear"}))
+    //                         dispatch(clearSalesNotes());
+    //                         dispatch(clearLocalCart());
+    //                         dispatch(clearClientInfo());
+    //                         dispatch(clearCalculatedPrice());
+    //                         BackHandler.exitApp();
+    //
+    //
+    //                     },
+    //                 }
+    //             ],
+    //             { cancelable: false }
+    //         );
+    //         return true;
+    //     };
+    //
+    //     const backHandler = BackHandler.addEventListener(
+    //         "hardwareBackPress",
+    //         backAction
+    //     );
+    //
+    //     return () => backHandler.remove();
+    // }, []);
 
     const checkAuthentication = async () => {
         try {
@@ -224,17 +226,45 @@ const AuthNavigator = () => (
 const MainDrawerNavigator = () => {
     const navigation = useNavigation();
     const { currentLocation, reload, setReload } = useLocationContext();
-    // useEffect(() => {
-    //     if(!reload && currentLocation === "List of Business"){
-    //         navigation.dispatch(
-    //             CommonActions.reset({
-    //                 index: 0,
-    //                 routes: [{ name: 'List of Business' }],
-    //             })
-    //         );
-    //     }
-    //     setReload(false);
-    // }, [navigation,currentLocation]);
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert(
+                "Exit App",
+                "Are you sure you want to exit the app?",
+                [
+                    {
+                        text: "No",
+                        onPress: () => null,
+                        style: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        onPress: () => {
+
+                            clearCartAPI();
+                            dispatch(modifyClientMembershipId({type: "clear"}))
+                            dispatch(clearSalesNotes());
+                            dispatch(clearLocalCart());
+                            dispatch(clearClientInfo());
+                            dispatch(clearCalculatedPrice());
+                            BackHandler.exitApp();
+                            navigation.navigate("List of Business");
+
+                        },
+                    }
+                ],
+                { cancelable: false }
+            );
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
     const cartItems = useSelector(state => state.cart.items);
 
     const [isDelete, setIsDelete] = useState(false);
