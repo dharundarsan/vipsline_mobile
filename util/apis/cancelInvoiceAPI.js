@@ -1,10 +1,11 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 export default async function cancelInvoiceAPI(status, bookingId) {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -28,6 +29,8 @@ export default async function cancelInvoiceAPI(status, bookingId) {
             }
         );
 
+        return "Invoice Cancelled successfully!";
+
         // ToastAndroid.show("Invoice Cancelled successfully!", ToastAndroid.LONG);
         // TODO
 
@@ -39,6 +42,7 @@ export default async function cancelInvoiceAPI(status, bookingId) {
         //     opacity: 1
         // })
     } catch (error) {
+        return "Failed to cancel Invoice";
         // ToastAndroid.show("Failed to cancel Invoice", ToastAndroid.LONG);
         // TODO
 

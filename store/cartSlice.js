@@ -3,8 +3,8 @@ import uuid from "react-native-uuid";
 import axios from "axios";
 import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
 import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {formatDate} from "../util/Helpers";
+import * as SecureStore from 'expo-secure-store';
 import {useState} from "react";
 
 const initialCartState = {
@@ -37,7 +37,8 @@ const initialCartState = {
 async function getBusinessId() {
     let businessId = ""
     try {
-        const value = await AsyncStorage.getItem('businessId');
+        // const value = await AsyncStorage.getItem('businessId');
+        const value = await SecureStore.getItemAsync('businessId');
         if (value !== null) {
             return value;
         }
@@ -49,7 +50,8 @@ async function getBusinessId() {
 export const addItemToCart = (data) => async (dispatch, getState) => {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -77,7 +79,7 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
         dispatch(await loadCartFromDB())
     } catch (error) {
         //TODO
-        console.log(error.data.other_message)
+        throw error.data.other_message;
     }
 }
 
@@ -90,7 +92,8 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
     const {clientInfo} = getState();
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -223,7 +226,8 @@ export const removeItemFromCart = (itemId) => async (dispatch, getState) => {
 
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }

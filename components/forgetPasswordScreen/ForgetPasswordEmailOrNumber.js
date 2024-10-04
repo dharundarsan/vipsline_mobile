@@ -159,13 +159,12 @@ export default function ForgetPasswordEmailOrNumber(props) {
                         setIsSendOtpPressed(false)
 
                     }}
-                    maxLength={10}
                 />
                 {
                     isUserTyping ?
                         <Text></Text> :
-                        isSendOtpPressed ?
-                        <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number / Email is required </Text> :
+                        isSendOtpPressed && mobileNumber.trim().length === 0 ?
+                                <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number / Email is required </Text> :
                         !isUserFound ?
                             <Text style={[textTheme.titleSmall, {color: Colors.error}]}>
                                 Incorrect Mobile number / email

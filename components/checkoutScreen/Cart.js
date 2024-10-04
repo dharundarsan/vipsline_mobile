@@ -19,7 +19,7 @@ import {updateDiscount} from '../../store/cartSlice';
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";
 
-const Cart = () => {
+const Cart = (props) => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const cartItems = useSelector((state) => state.cart.items);
@@ -122,7 +122,9 @@ const Cart = () => {
                             </View>
                         </PrimaryButton>
                     </View>
-                    <CheckoutSection />
+                    <CheckoutSection
+                        checkoutScreenToast={props.showToast}
+                    />
                 </>
             }
         </View>

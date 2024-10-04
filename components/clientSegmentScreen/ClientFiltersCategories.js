@@ -19,6 +19,7 @@ export default function ClientFiltersCategories(props) {
 
     const scrollViewRef = useRef(null);
 
+
     useFocusEffect(useCallback(
         () => {
             return () => {
@@ -43,6 +44,8 @@ export default function ClientFiltersCategories(props) {
         //     backgroundColor: "black",
         //     opacity: 1
         // })
+        props.clientSegmentToast("Fetching Please Wait!", 2000);
+
     }
 
     return (

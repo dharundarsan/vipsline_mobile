@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 const initial = {
     clients: [],
@@ -21,7 +21,8 @@ const initial = {
 async function getBusinessId() {
     let businessId = ""
     try {
-        const value = await AsyncStorage.getItem('businessId');
+        // const value = await AsyncStorage.getItem('businessId');
+        const value = await SecureStore.getItemAsync('businessId');
         if (value !== null) {
             return value;
         }
@@ -33,7 +34,8 @@ async function getBusinessId() {
 export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, getState) => {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -74,7 +76,8 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
 export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async (dispatch, getState) => {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -86,12 +89,13 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
     if (clientFilter.isFetchingSearchClient) return;
 
     try {
+        // if(query.trim() === "") return;
         dispatch(updateSearchClientFetchingState(true));
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/client/searchClientSegment?pageNo=${clientFilter.searchPageNo}&pageSize=${pageSize}`,
             {
                 business_id: `${await getBusinessId()}`,
-                query: query,
+                query: query.trim(),
                 type: filter,
             },
             {
@@ -173,6 +177,10 @@ export const clientFilterSlice = createSlice({
         updateSearchClientMaxEntry(state, action) {
             state.searchMaxEntry = action.payload;
         },
+        resetMaxEntry(state, action) {
+            state.maxEntry = 10;
+            state.searchClientMaxEntry = 10;
+        }
 
     }
 });
@@ -192,7 +200,8 @@ export const {
     decrementSearchPageNumber,
     updateTotalSearchClientCount,
     updateSearchClientMaxEntry,
-    updateAnalyticDetails
+    updateAnalyticDetails,
+    resetMaxEntry,
 } = clientFilterSlice.actions;
 
 export default clientFilterSlice.reducer;

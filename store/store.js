@@ -10,6 +10,7 @@ import loginUserReducer from "./loginUserSlice";
 import authReducer from "./authSlice";
 import invoiceReducer from "./invoiceSlice";
 import checkoutActionReducer from "./CheckoutActionSlice";
+import toastReducer from "./toastSlice";
 const store = configureStore({
     reducer: {
         cart: cartReducer,
@@ -22,7 +23,8 @@ const store = configureStore({
         loginUser: loginUserReducer,
         authDetails: authReducer,
         invoice: invoiceReducer,
-        checkoutAction:checkoutActionReducer
+        checkoutAction:checkoutActionReducer,
+        toast: toastReducer,
     },
 });
 

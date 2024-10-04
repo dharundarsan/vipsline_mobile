@@ -12,8 +12,8 @@ import {addItemToCart, loadCartFromDB, removeItemFromCart} from "../../store/car
 import packageSittingItem from "./PackageSittingItem";
 import PackageSittingItem from "./PackageSittingItem";
 import {useDispatch, useSelector} from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
+import * as SecureStore from 'expo-secure-store';
 
 const PackageModal = (props) => {
     const [packageDetails, setPackageDetails] = useState([
@@ -53,7 +53,8 @@ const PackageModal = (props) => {
         const getPackageDetailsFromDB = async () => {
             let businessId = ""
             try {
-                const value = await AsyncStorage.getItem('businessId');
+                // const value = await AsyncStorage.getItem('businessId');
+                const value = await SecureStore.getItemAsync('businessId');
                 if (value !== null) {
                     businessId = value;
                 }
@@ -63,7 +64,8 @@ const PackageModal = (props) => {
 
             let authToken = ""
             try {
-                const value = await AsyncStorage.getItem('authKey');
+                // const value = await AsyncStorage.getItem('authKey');
+                const value = await SecureStore.getItemAsync('authKey');
                 if (value !== null) {
                     authToken = value;
                 }

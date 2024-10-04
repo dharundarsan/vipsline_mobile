@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {loadCartFromDB} from "./cartSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 const initialStaffState = {
     staffs: []
@@ -11,7 +11,8 @@ const initialStaffState = {
 async function getBusinessId() {
     let businessId = ""
     try {
-        const value = await AsyncStorage.getItem('businessId');
+        // const value = await AsyncStorage.getItem('businessId');
+        const value = await SecureStore.getItemAsync('businessId');
         if (value !== null) {
             return value;
         }
@@ -22,7 +23,8 @@ async function getBusinessId() {
 export const loadStaffsFromDB = () => async (dispatch, getState) => {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -51,7 +53,8 @@ export const loadStaffsFromDB = () => async (dispatch, getState) => {
 export const updateCartItemStaff = (res_list) => async (dispatch, getState) => {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }

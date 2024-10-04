@@ -2,12 +2,13 @@ import {useDispatch} from "react-redux";
 import axios from "axios";
 import {updateBusinessNotificationDetails} from "../../store/listOfBusinessSlice";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_AUTH_KEY, EXPO_PUBLIC_BUSINESS_ID} from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 export default async function getBusinessNotificationDetailsAPI() {
     let authToken = ""
     try {
-        const value = await AsyncStorage.getItem('authKey');
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
         if (value !== null) {
             authToken = value;
         }
@@ -18,7 +19,8 @@ export default async function getBusinessNotificationDetailsAPI() {
 
     let businessId = ""
     try {
-        const value = await AsyncStorage.getItem('businessId');
+        // const value = await AsyncStorage.getItem('businessId');
+        const value = await SecureStore.getItemAsync('businessId');
         if (value !== null) {
             businessId = value;
         }

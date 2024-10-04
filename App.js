@@ -18,7 +18,6 @@ import ListOfBusinessesScreen from "./screens/ListOfBusinessesScreen";
 // import ClientSegmentScreen from "./screens/ClientSegmentScreen";
 //Font And SplashScreen Imports
 import * as SplashScreen from 'expo-splash-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Font from 'expo-font';
 
 
@@ -55,6 +54,7 @@ import { LocationProvider, useLocationContext } from './context/LocationContext'
 import { loadBusinessesListFromDb } from './store/listOfBusinessSlice';
 import { loadLoginUserDetailsFromDb } from './store/loginUserSlice';
 import drawerItem from "react-native-paper/src/components/Drawer/DrawerItem";
+import * as SecureStore from 'expo-secure-store';
 
 enableScreens();
 
@@ -130,51 +130,55 @@ const AppNavigator = () => {
 
     const dispatch = useDispatch();
 
-    // const [isAuthenticated, setIsAuthenticated] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
 
 
-    useEffect(() => {
-        const backAction = () => {
-            Alert.alert(
-                "Exit App",
-                "Are you sure you want to exit the app?",
-                [
-                    {
-                        text: "No",
-                        onPress: () => null,
-                        style: "cancel"
-                    },
-                    {
-                        text: "Yes",
-                        onPress: () => {
 
-                            clearCartAPI();
-                            dispatch(modifyClientMembershipId({type: "clear"}))
-                            dispatch(clearSalesNotes());
-                            dispatch(clearLocalCart());
-                            dispatch(clearClientInfo());
-                            dispatch(clearCalculatedPrice());
-                            BackHandler.exitApp();
-                        },
-                    }
-                ],
-                { cancelable: false }
-            );
-            return true;
-        };
-
-        const backHandler = BackHandler.addEventListener(
-            "hardwareBackPress",
-            backAction
-        );
-
-        return () => backHandler.remove();
-    }, []);
+    // useEffect(() => {
+    //     const backAction = () => {
+    //         Alert.alert(
+    //             "Exit App",
+    //             "Are you sure you want to exit the app?",
+    //             [
+    //                 {
+    //                     text: "No",
+    //                     onPress: () => null,
+    //                     style: "cancel"
+    //                 },
+    //                 {
+    //                     text: "Yes",
+    //                     onPress: () => {
+    //
+    //                         clearCartAPI();
+    //                         dispatch(modifyClientMembershipId({type: "clear"}))
+    //                         dispatch(clearSalesNotes());
+    //                         dispatch(clearLocalCart());
+    //                         dispatch(clearClientInfo());
+    //                         dispatch(clearCalculatedPrice());
+    //                         BackHandler.exitApp();
+    //
+    //
+    //                     },
+    //                 }
+    //             ],
+    //             { cancelable: false }
+    //         );
+    //         return true;
+    //     };
+    //
+    //     const backHandler = BackHandler.addEventListener(
+    //         "hardwareBackPress",
+    //         backAction
+    //     );
+    //
+    //     return () => backHandler.remove();
+    // }, []);
 
     const checkAuthentication = async () => {
         try {
-            const authKey = await AsyncStorage.getItem('authKey');
+            // const authKey = await AsyncStorage.getItem('authKey');
+            const authKey = await SecureStore.getItemAsync('authKey');
+            
             if (authKey !== null) {
                 // setIsAuthenticated(true);
                 dispatch(updateAuthStatus(true));
@@ -222,17 +226,45 @@ const AuthNavigator = () => (
 const MainDrawerNavigator = () => {
     const navigation = useNavigation();
     const { currentLocation, reload, setReload } = useLocationContext();
-    // useEffect(() => {
-    //     if(!reload && currentLocation === "List of Business"){
-    //         navigation.dispatch(
-    //             CommonActions.reset({
-    //                 index: 0,
-    //                 routes: [{ name: 'List of Business' }],
-    //             })
-    //         );
-    //     }
-    //     setReload(false);
-    // }, [navigation,currentLocation]);
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert(
+                "Exit App",
+                "Are you sure you want to exit the app?",
+                [
+                    {
+                        text: "No",
+                        onPress: () => null,
+                        style: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        onPress: () => {
+
+                            clearCartAPI();
+                            dispatch(modifyClientMembershipId({type: "clear"}))
+                            dispatch(clearSalesNotes());
+                            dispatch(clearLocalCart());
+                            dispatch(clearClientInfo());
+                            dispatch(clearCalculatedPrice());
+                            BackHandler.exitApp();
+                            navigation.navigate("List of Business");
+
+                        },
+                    }
+                ],
+                { cancelable: false }
+            );
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
     const cartItems = useSelector(state => state.cart.items);
 
     const [isDelete, setIsDelete] = useState(false);
@@ -279,7 +311,6 @@ const MainDrawerNavigator = () => {
                         header={"Cancel Sale"}
                         content={"If you cancel this sale transaction will not be processed."}
                         onCloseClientInfoAfterDeleted={async () => {
-                            console.log("Clearing data and navigating");
                             await clearCartAPI();
                             dispatch(modifyClientMembershipId({ type: "clear" }));
                             clearSalesNotes();
@@ -292,6 +323,7 @@ const MainDrawerNavigator = () => {
                                 navigation.navigate(currentLocation);
                             }, 10);
                         }}
+                        checkoutScreenToast={() => null}
                     />
                     :
                     wentToBusiness ?

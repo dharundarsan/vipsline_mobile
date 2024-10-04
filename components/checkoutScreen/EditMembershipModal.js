@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import {AntDesign, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import PrimaryButton from "../../ui/PrimaryButton";
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import Divider from "../../ui/Divider";
@@ -23,6 +23,7 @@ import {addItemToCart, addItemToEditedCart} from "../../store/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import CustomTextInput from "../../ui/CustomTextInput";
 import * as Haptics from "expo-haptics";
+import Toast from "../../ui/Toast";
 
 
 const EditMembershipModal = (props) => {
@@ -35,6 +36,8 @@ const EditMembershipModal = (props) => {
     const cartItems = useSelector(state => state.cart.items);
     const editedCart = useSelector(state => state.cart.editedCart);
 
+    const toastRef = useRef(null);
+
     const handleSave = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (cartItems.some(item => item.membership_id === props.data.id || editedCart.some(item => item.membership_id === props.data.id))) {
@@ -45,6 +48,10 @@ const EditMembershipModal = (props) => {
             //     textBody: "Membership already exists in cart",
             //     autoClose: 1500,
             // });
+
+            toastRef.current.show("Membership already exists in cart", 2000);
+
+
             return;
         }
 
@@ -78,14 +85,7 @@ const EditMembershipModal = (props) => {
     return <>
         <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}
                presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
-            <AlertNotificationRoot theme={"light"}
-                                   toastConfig={{titleStyle: {fontSize: 15}, textBodyStyle: {fontSize: 12}}}
-                                   colors={[{
-                                       label:Colors.white,
-                                       // card: Colors.grey200,
-                                       // card: "#ff7171",
-                                       card: "#b73737",
-                                   }]}>
+            <Toast ref={toastRef}/>
 
                 <View style={styles.headingAndCloseContainer}>
                     <Text style={[textTheme.titleLarge, styles.heading]}>{props.data.name}</Text>
@@ -101,10 +101,24 @@ const EditMembershipModal = (props) => {
                     <View style={styles.modalContent}>
                         <CustomTextInput label={"Valid from"} type={"date"} value={new Date(validFromDate)}
                                          minimumDate={new Date()}
-                                         onChangeValue={setValidFromDate}/>
+                                         onChangeValue={(value) => {
+                                             if(new Date(value).getTime() > new Date(validUntilDate).getTime()){
+                                                 setValidUntilDate(new Date(value).getTime() + (props.data.duration * 24 * 60 * 60 * 1000))
+                                             }
+                                             if(new Date(value).getTime() < new Date(validUntilDate).getTime()){
+                                                 setValidUntilDate(new Date(value).getTime() + (props.data.duration * 24 * 60 * 60 * 1000))
+                                             }
+                                             setValidFromDate(value)
+                                         }}/>
                         <CustomTextInput label={"Valid until"} type={"date"} value={new Date(validUntilDate)}
                                          minimumDate={new Date()}
-                                         onChangeValue={setValidUntilDate}/>
+                                         onChangeValue={ (value) => {
+                                             if(new Date(validFromDate).getTime() > new Date(value).getTime()){
+                                                 toastRef.current.show("Valid from date cannot be higher than valid until date")
+                                                 return;
+                                             }
+                                             setValidUntilDate(value)
+                                         }}/>
                         <CustomTextInput label={"Membership Price"} type={"price"} value={membershipPrice.toString()}
                                          onChangeText={(price) => {
                                              if (price === "") setMembershipPrice(0)
@@ -118,7 +132,6 @@ const EditMembershipModal = (props) => {
                 <View style={styles.addToCartButtonContainer}>
                     <PrimaryButton onPress={handleSave} label={"Add to cart"}/>
                 </View>
-            </AlertNotificationRoot>
         </Modal>
     </>
 

@@ -244,7 +244,7 @@ const CustomTextInput = (props) => {
             <>
                 {(isDateTimePickerVisible) && (
                      <DateTimePickerModal
-                     isVisible={isDateTimePickerVisible}       // Visibility state
+                     isVisible={ props.readOnly ? false : isDateTimePickerVisible}       // Visibility state
                      mode="date"                              // Mode is set to "date"
                      maximumDate={props.maximumDate}          // Maximum date from props
                      minimumDate={props.minimumDate}          // Minimum date from props
@@ -274,9 +274,10 @@ const CustomTextInput = (props) => {
                 <PrimaryButton
                     buttonStyle={styles.dateTimeButtom}
                     pressableStyle={styles.dateTimeButtonPressable}
+                    disableRipple={props.readOnly}
                     onPress={() => setIsDateTimePickerVisible(true)}
                 >
-                    <Text style={[textTheme.bodyLarge, styles.dateTimeButtonText]}>
+                    <Text style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>
                         {props.value === undefined || props.value === null ? "Select " + props.label : formatDate(new Date(props.value))}
                     </Text>
                     <MaterialCommunityIcons

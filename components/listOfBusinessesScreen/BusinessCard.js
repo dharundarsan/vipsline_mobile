@@ -69,7 +69,7 @@ export default function BusinessCard(props) {
                 if (props.status === "unverified") {
                     // ToastAndroid.show("Business yet to be verified", ToastAndroid.SHORT);
                     //TODO
-
+                    props.listOfBusinessToast("Business yet to be verified", 2000);
                     // Toast.show("Business yet to be verified",{
                     //     duration:Toast.durations.SHORT,
                     //     position: Toast.positions.BOTTOM,

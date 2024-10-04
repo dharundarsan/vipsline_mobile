@@ -3,7 +3,7 @@ import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import {Ionicons} from '@expo/vector-icons';
 import PrimaryButton from "../../ui/PrimaryButton";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import ServiceItem from "./ServiceItem";
 import {useSelector, shallowEqual} from "react-redux";
 import {useMemo, useCallback, useReducer} from 'react';
@@ -57,7 +57,15 @@ const ServicesList = React.memo((props) => {
         setFilteredMenServicesData(filteredMen);
         setFilteredKidsServicesData(filteredKids);
         setFilteredGeneralServicesData(filteredGeneral);
+
     }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
+
+    useEffect(() => {
+        console.log(filteredKidsServicesData.length)
+        console.log(filteredMenServicesData.length)
+        console.log(filteredWomenServicesData.length)
+        console.log(filteredGeneralServicesData.length)
+    });
 
     return (
         isFetching ?
@@ -68,8 +76,7 @@ const ServicesList = React.memo((props) => {
             }}>
                 <ActivityIndicator color={Colors.darkBlue} size={"large"}/>
             </View>
-            :
-            <View style={styles.commonSelectTemplate}>
+            : <View style={styles.commonSelectTemplate}>
                 <View style={styles.headingAndSearchContainer}>
                     <View style={styles.headingAndSearchContainer}>
                         <SearchBar filter={false}
@@ -79,108 +86,114 @@ const ServicesList = React.memo((props) => {
                                    placeholder={"Search by service name or prices"}/>
                     </View>
                 </View>
-                <View>
-                    <View style={styles.flatListContainer}>
-                        <ScrollView fadingEdgeLength={75}>
-                            <FlatList data={filteredWomenServicesData}
-                                      scrollEnabled={false}
-                                      renderItem={({item}) => {
-                                          return item.resource_categories.length === 0 ? <></> : <>
-                                              <View style={styles.parentCategoryAndGenderContainer}>
-                                                  <Text
-                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
-                                                  <View
-                                                      style={[styles.genderTextContainer, {borderColor: Colors.orange}]}>
+                {filteredGeneralServicesData.length === 0 && filteredKidsServicesData.length === 0 &&
+                filteredWomenServicesData.length === 0 && filteredMenServicesData.length === 0 &&
+                filteredKidsServicesData.length === 0 ?
+                    <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                        <Text style={[textTheme.titleMedium]}>No Service Available</Text>
+                    </View> :
+                    <View>
+                        <View style={styles.flatListContainer}>
+                            <ScrollView fadingEdgeLength={75}>
+                                <FlatList data={filteredWomenServicesData}
+                                          scrollEnabled={false}
+                                          renderItem={({item}) => {
+                                              return item.resource_categories.length === 0 ? <></> : <>
+                                                  <View style={styles.parentCategoryAndGenderContainer}>
                                                       <Text
-                                                          style={[textTheme.labelMedium, styles.genderText]}>Women</Text>
+                                                          style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                      <View
+                                                          style={[styles.genderTextContainer, {borderColor: Colors.orange}]}>
+                                                          <Text
+                                                              style={[textTheme.labelMedium, styles.genderText]}>Women</Text>
+                                                      </View>
                                                   </View>
-                                              </View>
-                                              <FlatList data={item.resource_categories}
-                                                        renderItem={({item}) => {
-                                                            return <ServiceItem
-                                                                closeOverallModal={props.closeOverallModal}
-                                                                leftBarColor={Colors.orange}
-                                                                data={item}
-                                                            />
-                                                        }}>
-                                              </FlatList>
-                                          </>
-                                      }}/>
-                            <FlatList data={filteredMenServicesData}
-                                      scrollEnabled={false}
-                                      renderItem={({item}) => {
-                                          return item.resource_categories.length === 0 ? <></> : <>
-                                              <View style={styles.parentCategoryAndGenderContainer}>
-                                                  <Text
-                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
-                                                  <View
-                                                      style={[styles.genderTextContainer, {borderColor: Colors.blue}]}>
+                                                  <FlatList data={item.resource_categories}
+                                                            renderItem={({item}) => {
+                                                                return <ServiceItem
+                                                                    closeOverallModal={props.closeOverallModal}
+                                                                    leftBarColor={Colors.orange}
+                                                                    data={item}
+                                                                />
+                                                            }}>
+                                                  </FlatList>
+                                              </>
+                                          }}/>
+                                <FlatList data={filteredMenServicesData}
+                                          scrollEnabled={false}
+                                          renderItem={({item}) => {
+                                              return item.resource_categories.length === 0 ? <></> : <>
+                                                  <View style={styles.parentCategoryAndGenderContainer}>
                                                       <Text
-                                                          style={[textTheme.labelMedium, styles.genderText]}>Men</Text>
+                                                          style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                      <View
+                                                          style={[styles.genderTextContainer, {borderColor: Colors.blue}]}>
+                                                          <Text
+                                                              style={[textTheme.labelMedium, styles.genderText]}>Men</Text>
+                                                      </View>
                                                   </View>
-                                              </View>
-                                              <FlatList data={item.resource_categories}
-                                                        renderItem={({item}) => {
-                                                            return <ServiceItem
-                                                                closeOverallModal={props.closeOverallModal}
-                                                                leftBarColor={Colors.blue}
-                                                                data={item}
-                                                            />
-                                                        }}>
-                                              </FlatList>
-                                          </>
-                                      }}/>
-                            <FlatList data={filteredKidsServicesData}
-                                      scrollEnabled={false}
-                                      renderItem={({item}) => {
-                                          return item.resource_categories.length === 0 ? <></> : <>
-                                              <View style={styles.parentCategoryAndGenderContainer}>
-                                                  <Text
-                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
-                                                  <View
-                                                      style={[styles.genderTextContainer, {borderColor: Colors.purple}]}>
+                                                  <FlatList data={item.resource_categories}
+                                                            renderItem={({item}) => {
+                                                                return <ServiceItem
+                                                                    closeOverallModal={props.closeOverallModal}
+                                                                    leftBarColor={Colors.blue}
+                                                                    data={item}
+                                                                />
+                                                            }}>
+                                                  </FlatList>
+                                              </>
+                                          }}/>
+                                <FlatList data={filteredKidsServicesData}
+                                          scrollEnabled={false}
+                                          renderItem={({item}) => {
+                                              return item.resource_categories.length === 0 ? <></> : <>
+                                                  <View style={styles.parentCategoryAndGenderContainer}>
                                                       <Text
-                                                          style={[textTheme.labelMedium, styles.genderText]}>Kids</Text>
+                                                          style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                      <View
+                                                          style={[styles.genderTextContainer, {borderColor: Colors.purple}]}>
+                                                          <Text
+                                                              style={[textTheme.labelMedium, styles.genderText]}>Kids</Text>
+                                                      </View>
                                                   </View>
-                                              </View>
-                                              <FlatList data={item.resource_categories}
-                                                        renderItem={({item}) => {
-                                                            return <ServiceItem
-                                                                closeOverallModal={props.closeOverallModal}
-                                                                leftBarColor={Colors.purple}
-                                                                data={item}
-                                                            />
-                                                        }}>
-                                              </FlatList>
-                                          </>
-                                      }}/>
-                            <FlatList data={filteredGeneralServicesData}
-                                      scrollEnabled={false}
-                                      renderItem={({item}) => {
-                                          return item.resource_categories.length === 0 ? <></> : <>
-                                              <View style={styles.parentCategoryAndGenderContainer}>
-                                                  <Text
-                                                      style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
-                                                  <View
-                                                      style={[styles.genderTextContainer, {borderColor: Colors.brown}]}>
+                                                  <FlatList data={item.resource_categories}
+                                                            renderItem={({item}) => {
+                                                                return <ServiceItem
+                                                                    closeOverallModal={props.closeOverallModal}
+                                                                    leftBarColor={Colors.purple}
+                                                                    data={item}
+                                                                />
+                                                            }}>
+                                                  </FlatList>
+                                              </>
+                                          }}/>
+                                <FlatList data={filteredGeneralServicesData}
+                                          scrollEnabled={false}
+                                          renderItem={({item}) => {
+                                              return item.resource_categories.length === 0 ? <></> : <>
+                                                  <View style={styles.parentCategoryAndGenderContainer}>
                                                       <Text
-                                                          style={[textTheme.labelMedium, styles.genderText]}>General</Text>
+                                                          style={[textTheme.titleMedium, styles.parentCategoryText]}>{item.parent_category}</Text>
+                                                      <View
+                                                          style={[styles.genderTextContainer, {borderColor: Colors.brown}]}>
+                                                          <Text
+                                                              style={[textTheme.labelMedium, styles.genderText]}>General</Text>
+                                                      </View>
                                                   </View>
-                                              </View>
-                                              <FlatList data={item.resource_categories}
-                                                        renderItem={({item}) => {
-                                                            return <ServiceItem
-                                                                closeOverallModal={props.closeOverallModal}
-                                                                leftBarColor={Colors.brown}
-                                                                data={item}
-                                                            />
-                                                        }}>
-                                              </FlatList>
-                                          </>
-                                      }}/>
-                        </ScrollView>
-                    </View>
-                </View>
+                                                  <FlatList data={item.resource_categories}
+                                                            renderItem={({item}) => {
+                                                                return <ServiceItem
+                                                                    closeOverallModal={props.closeOverallModal}
+                                                                    leftBarColor={Colors.brown}
+                                                                    data={item}
+                                                                />
+                                                            }}>
+                                                  </FlatList>
+                                              </>
+                                          }}/>
+                            </ScrollView>
+                        </View>
+                    </View>}
             </View>
     );
 });

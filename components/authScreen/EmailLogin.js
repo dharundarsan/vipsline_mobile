@@ -9,7 +9,7 @@ import findUser from "../../util/apis/findUserApi";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch} from "react-redux";
 import {updateAuthStatus, updateAuthToken} from "../../store/authSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 export default function EmailLogin() {
     const navigation = useNavigation();
@@ -54,7 +54,8 @@ export default function EmailLogin() {
 
     const storeData = async (value) => {
         try {
-            await AsyncStorage.setItem('my-key', value);
+            // await AsyncStorage.setItem('my-key', value);
+            await SecureStore.setItemAsync('my-key',value);
         } catch (e) {
             // saving error
         }
@@ -81,12 +82,16 @@ export default function EmailLogin() {
                 });
                 dispatch(updateAuthToken(response.data.other_message));
                 try {
-                    await AsyncStorage.setItem('authKey', response.data.other_message);
+                    // await AsyncStorage.setItem('authKey', response.data.other_message);
+                    await SecureStore.setItemAsync('authKey', response.data.other_message)
                 } catch (e) {
                 }
             } catch (error) {
+                console.log("sdgsdg")
+                setPasswordPrompt("Incorrect password");
                 setIsLoading(false);
                 setIsPasswordValid(false);
+                setIsPasswordTyping(false);
             }
             isAuthenticationSuccessful = response.data.message === undefined ?
                 "" :
@@ -100,6 +105,7 @@ export default function EmailLogin() {
 
 
         if (isAuthenticationSuccessful) {
+            console.log("succ")
             setPasswordPrompt("");
             setIsPasswordValid(true);
             dispatch(updateAuthStatus(true));
@@ -266,6 +272,7 @@ export default function EmailLogin() {
                     }
                     if(email.trim().length === 0 && password.trim().length > 0) {
                         setEmailPrompt("Email is required");
+                        console.log("3")
                         setPasswordPrompt("");
                         // console.log("2")
 
@@ -286,21 +293,6 @@ export default function EmailLogin() {
                         await signInHandler();
                         setIsEmailTyping(false);
                         setIsPasswordTyping(false)
-                        // console.log(isUserFound);
-                        // console.log(isPasswordValid);
-                        // if(isUserFound) {
-                        //     setEmailPrompt("");
-                        // }
-                        // else {
-                        //     setEmailPrompt("Incorrect email");
-                        // }
-                        // if(isPasswordValid) {
-                        //     setPasswordPrompt("");
-                        // }
-                        // else {
-                        //     setPasswordPrompt("Incorrect password")
-                        // }
-                        // console.log("5")
                     }
 
 

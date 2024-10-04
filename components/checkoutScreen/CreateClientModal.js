@@ -8,12 +8,13 @@ import {Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
 import createNewClientAPI from "../../util/apis/createNewClientAPI";
-import {formatDate, showToast} from "../../util/Helpers";
+import {checkNullUndefined, formatDate, showToast} from "../../util/Helpers";
 import {useDispatch} from "react-redux";
 import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { shadowStyling } from "../../util/Helpers";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import * as SecureStore from 'expo-secure-store';
+import Toast from "../../ui/Toast";
 
 const CreateClientModal = (props) => {
     const [firstName, setFirstName] = useState("");
@@ -32,6 +33,7 @@ const CreateClientModal = (props) => {
     const [isAnniversarySelected, setIsAnniversarySelected] = useState(false);
 
     const dispatch = useDispatch();
+    const toastRef = useRef(null);
 
     const firstNameRef = useRef(null);
     const lastNameRef = useRef(null);
@@ -65,19 +67,21 @@ const CreateClientModal = (props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
-        let businessId = ""
-        try {
-            const value = await AsyncStorage.getItem('businessId');
-            if (value !== null) {
-                businessId = value;
-            }
-        } catch (e) {
-            console.log("businessId fetching error. (inside createClientModal)" + e);
-        }
 
 
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
+            let businessId = ""
+            try {
+                // const value = await AsyncStorage.getItem('businessId');
+                const value = await SecureStore.getItemAsync('businessId');
+
+                if (value !== null) {
+                    businessId = value;
+                }
+            } catch (e) {
+                console.log("businessId fetching error. (inside createClientModal)" + e);
+            }
             const response = await createNewClientAPI({
                 address: clientAddress,
                 anniversary: isAnniversarySelected ? formatDate(anniversaryDate, "yyyy-dd-mm") : null,
@@ -98,9 +102,10 @@ const CreateClientModal = (props) => {
                 pinCode: "",
                 state: "Tamilnadu",
             });
-            // ToastAndroid.show("User added Successfully", ToastAndroid.LONG)
+
             if(response.toString() === "false") {
                 // TODO
+                toastRef.current.show("User already exists", 1000);
                 // Toast.show({
                 //     type: ALERT_TYPE.WARNING,
                 //     title: "User already exists",
@@ -110,7 +115,7 @@ const CreateClientModal = (props) => {
             }
             else {
                 // TODO
-
+                toastRef.current.show("User added Successfully", 1000);
                 // Toast.show({
                 //     type: ALERT_TYPE.SUCCESS,
                 //     title: "User added successfully",
@@ -128,7 +133,7 @@ const CreateClientModal = (props) => {
         } catch (e) {
             // ToastAndroid.show(e, ToastAndroid.LONG),
             // TODO
-
+            toastRef.current.show("Something went wrong", 1000);
             // Toast.show(e, {
             //     duration: Toast.durations.LONG,
             //     position: Toast.positions.BOTTOM,
@@ -165,7 +170,10 @@ const CreateClientModal = (props) => {
                         value={firstName}
                         onChangeText={setFirstName}
                         validator={(text) => {
-                            if (text.length === 0) return "First name is required";
+                            if (text.trim().length === 0) {
+                                setFirstName("");
+                                return "First name is required"
+                            }
                             else return true;
                         }}
                         onSave={(callback) => {
@@ -209,14 +217,7 @@ const CreateClientModal = (props) => {
                         placeholder="Enter email address"
                         value={email}
                         onChangeText={setEmail}
-                        validator={(text) => {
-                            if (text.trim().length === 0) {
-                                return true;
-                            } else {
-                                if (!text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "") return "Email is invalid";
-                                else return true;
-                            }
-                        }}
+                        validator={(text) => !checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
                     />
                     <CustomTextInput
                         type="dropdown"
@@ -262,6 +263,14 @@ const CreateClientModal = (props) => {
                         type="text"
                         label="GST number"
                         placeholder="Enter client's GSTIN"
+                        validator={(text) => {
+                            if ( checkNullUndefined(text) && text.trim().length !== 0){
+                                let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
+                                if(regex.test(text) === true) return true;
+                                else return "Please enter valid GST number"
+                            }
+                            else return true;
+                        }}
                         value={gstNo}
                         onChangeText={setGstNo}
                     />
@@ -294,6 +303,7 @@ const CreateClientModal = (props) => {
             <View style={styles.saveButtonContainer}>
                 <PrimaryButton label={"Save"} onPress={handleSave}/>
             </View>
+            <Toast ref={toastRef}/>
         </Modal>
     );
 };
