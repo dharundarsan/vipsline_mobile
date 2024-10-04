@@ -69,10 +69,16 @@ export default function App() {
         'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
         'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
     });
+    const [isAuth, setIsAuth] = useState(false)
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
         }
+        async function get(){
+            setIsAuth(!!await SecureStore.getItemAsync('authKey'))
+        }
+        get()
+
     }, [loaded, error]);
 
     if (!loaded && !error) {
@@ -83,7 +89,7 @@ export default function App() {
         <Provider store={store}>
             {/*<SafeAreaView style={styles.safeAreaView}>*/}
 
-            <AppNavigator/>
+            <AppNavigator auth={isAuth} setAuth={setIsAuth}/>
             {/*</SafeAreaView>*/}
         </Provider>
     );
@@ -126,7 +132,7 @@ function CustomDrawerIcon({navigation}) {
 }
 
 
-const AppNavigator = () => {
+const AppNavigator = (props) => {
 
     const dispatch = useDispatch();
 
@@ -178,14 +184,15 @@ const AppNavigator = () => {
         try {
             // const authKey = await AsyncStorage.getItem('authKey');
             const authKey = await SecureStore.getItemAsync('authKey');
-            
             if (authKey !== null) {
                 // setIsAuthenticated(true);
                 dispatch(updateAuthStatus(true));
+                props.setAuth(true)
 
             } else {
                 // setIsAuthenticated(false);
                 dispatch(updateAuthStatus(false));
+                props.setAuth(false);
             }
         } catch (e) {
             console.log('Error checking authentication:', e);
@@ -204,11 +211,11 @@ const AppNavigator = () => {
     return (
         <NavigationContainer>
             <SafeAreaProvider>
-                {reduxAuthStatus ?
+                {/* {isAuth ? */}
                     <LocationProvider>
-                        <MainDrawerNavigator/>
+                        <MainDrawerNavigator auth={props.auth}/>
                     </LocationProvider>
-                    : <AuthNavigator/>}
+                    {/* : <AuthNavigator/>} */}
             </SafeAreaProvider>
         </NavigationContainer>
     );
@@ -223,7 +230,7 @@ const AuthNavigator = () => (
 );
 
 
-const MainDrawerNavigator = () => {
+const MainDrawerNavigator = (props) => {
     const navigation = useNavigation();
     const { currentLocation, reload, setReload } = useLocationContext();
     useEffect(() => {
@@ -291,9 +298,10 @@ const MainDrawerNavigator = () => {
         }
     }, [currentLocation])
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
+    
     return (
         <>
-            {
+            {!props.auth ? <AuthNavigator/> :
                 isDelete ?
                     <DeleteClient
                         isVisible={isDelete}

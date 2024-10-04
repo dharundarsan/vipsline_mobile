@@ -156,7 +156,7 @@ const AddClientButton = (props) => {
                                 {
                                     clientInfo.membershipDetails.length !== 0
                                     || clientInfo.packageDetails.length !== 0
-                                    || clientInfo.details.wallet_balance !== undefined
+                                    || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0) 
                                         ? (
                                             isClientInfo ? (
                                                 <PrimaryButton
