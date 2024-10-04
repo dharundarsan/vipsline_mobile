@@ -69,10 +69,16 @@ export default function App() {
         'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
         'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
     });
+    const [isAuth, setIsAuth] = useState(false)
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
         }
+        async function get(){
+            setIsAuth(!!await SecureStore.getItemAsync('authKey'))
+        }
+        get()
+
     }, [loaded, error]);
 
     if (!loaded && !error) {
@@ -83,7 +89,7 @@ export default function App() {
         <Provider store={store}>
             {/*<SafeAreaView style={styles.safeAreaView}>*/}
 
-            <AppNavigator/>
+            <AppNavigator auth={isAuth} setAuth={setIsAuth}/>
             {/*</SafeAreaView>*/}
         </Provider>
     );
@@ -126,14 +132,107 @@ function CustomDrawerIcon({navigation}) {
 }
 
 
-const AppNavigator = () => {
+const AppNavigator = (props) => {
 
     const dispatch = useDispatch();
 
-    // const [isAuthenticated, setIsAuthenticated] = useState(false);
     const reduxAuthStatus = useSelector((state) => state.authDetails.isAuthenticated);
 
 
+
+    // useEffect(() => {
+    //     const backAction = () => {
+    //         Alert.alert(
+    //             "Exit App",
+    //             "Are you sure you want to exit the app?",
+    //             [
+    //                 {
+    //                     text: "No",
+    //                     onPress: () => null,
+    //                     style: "cancel"
+    //                 },
+    //                 {
+    //                     text: "Yes",
+    //                     onPress: () => {
+    //
+    //                         clearCartAPI();
+    //                         dispatch(modifyClientMembershipId({type: "clear"}))
+    //                         dispatch(clearSalesNotes());
+    //                         dispatch(clearLocalCart());
+    //                         dispatch(clearClientInfo());
+    //                         dispatch(clearCalculatedPrice());
+    //                         BackHandler.exitApp();
+    //
+    //
+    //                     },
+    //                 }
+    //             ],
+    //             { cancelable: false }
+    //         );
+    //         return true;
+    //     };
+    //
+    //     const backHandler = BackHandler.addEventListener(
+    //         "hardwareBackPress",
+    //         backAction
+    //     );
+    //
+    //     return () => backHandler.remove();
+    // }, []);
+
+    const checkAuthentication = async () => {
+        try {
+            // const authKey = await AsyncStorage.getItem('authKey');
+            const authKey = await SecureStore.getItemAsync('authKey');
+            if (authKey !== null) {
+                // setIsAuthenticated(true);
+                dispatch(updateAuthStatus(true));
+                props.setAuth(true)
+
+            } else {
+                // setIsAuthenticated(false);
+                dispatch(updateAuthStatus(false));
+                props.setAuth(false);
+            }
+        } catch (e) {
+            console.log('Error checking authentication:', e);
+            dispatch(updateAuthStatus(false));
+            // setIsAuthenticated(false);
+        }
+
+
+    };
+
+    useEffect(() => {
+        checkAuthentication();
+    }, [reduxAuthStatus]);
+
+
+    return (
+        <NavigationContainer>
+            <SafeAreaProvider>
+                {/* {isAuth ? */}
+                    <LocationProvider>
+                        <MainDrawerNavigator auth={props.auth}/>
+                    </LocationProvider>
+                    {/* : <AuthNavigator/>} */}
+            </SafeAreaProvider>
+        </NavigationContainer>
+    );
+};
+
+const AuthNavigator = () => (
+    <AuthStack.Navigator screenOptions={{headerShown: false}}>
+        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
+        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
+        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+    </AuthStack.Navigator>
+);
+
+
+const MainDrawerNavigator = (props) => {
+    const navigation = useNavigation();
+    const { currentLocation, reload, setReload } = useLocationContext();
     useEffect(() => {
         const backAction = () => {
             Alert.alert(
@@ -156,6 +255,8 @@ const AppNavigator = () => {
                             dispatch(clearClientInfo());
                             dispatch(clearCalculatedPrice());
                             BackHandler.exitApp();
+                            navigation.navigate("List of Business");
+
                         },
                     }
                 ],
@@ -171,70 +272,6 @@ const AppNavigator = () => {
 
         return () => backHandler.remove();
     }, []);
-
-    const checkAuthentication = async () => {
-        try {
-            // const authKey = await AsyncStorage.getItem('authKey');
-            const authKey = await SecureStore.getItemAsync('authKey');
-            
-            if (authKey !== null) {
-                // setIsAuthenticated(true);
-                dispatch(updateAuthStatus(true));
-
-            } else {
-                // setIsAuthenticated(false);
-                dispatch(updateAuthStatus(false));
-            }
-        } catch (e) {
-            console.log('Error checking authentication:', e);
-            dispatch(updateAuthStatus(false));
-            // setIsAuthenticated(false);
-        }
-
-
-    };
-
-    useEffect(() => {
-        checkAuthentication();
-    }, [reduxAuthStatus]);
-
-
-    return (
-        <NavigationContainer>
-            <SafeAreaProvider>
-                {reduxAuthStatus ?
-                    <LocationProvider>
-                        <MainDrawerNavigator/>
-                    </LocationProvider>
-                    : <AuthNavigator/>}
-            </SafeAreaProvider>
-        </NavigationContainer>
-    );
-};
-
-const AuthNavigator = () => (
-    <AuthStack.Navigator screenOptions={{headerShown: false}}>
-        <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
-        <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
-        <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
-    </AuthStack.Navigator>
-);
-
-
-const MainDrawerNavigator = () => {
-    const navigation = useNavigation();
-    const { currentLocation, reload, setReload } = useLocationContext();
-    // useEffect(() => {
-    //     if(!reload && currentLocation === "List of Business"){
-    //         navigation.dispatch(
-    //             CommonActions.reset({
-    //                 index: 0,
-    //                 routes: [{ name: 'List of Business' }],
-    //             })
-    //         );
-    //     }
-    //     setReload(false);
-    // }, [navigation,currentLocation]);
     const cartItems = useSelector(state => state.cart.items);
 
     const [isDelete, setIsDelete] = useState(false);
@@ -261,9 +298,10 @@ const MainDrawerNavigator = () => {
         }
     }, [currentLocation])
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
+    
     return (
         <>
-            {
+            {!props.auth ? <AuthNavigator/> :
                 isDelete ?
                     <DeleteClient
                         isVisible={isDelete}

@@ -7,7 +7,7 @@ export const isStorageAvailable = async() => {
     }
 }
 
-export async function removeKey(key){
+export async function removeStorageKey(key){
     await isStorageAvailable();
     try {
         await Storage.deleteItemAsync(key);
@@ -16,16 +16,16 @@ export async function removeKey(key){
     }
 }
 
-export async function getKey(key){
+export async function getStorageKey(key){
     await isStorageAvailable();
     try {
-        await Storage.getItemAsync(key);
+        return await Storage.getItemAsync(key);
     } catch (error) {
         throw error;
     }
 }
 
-export async function setKey(key){
+export async function setStorageKey(key){
     await isStorageAvailable();
     try {
         await Storage.setItemAsync(key)
