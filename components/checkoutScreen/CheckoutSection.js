@@ -80,26 +80,25 @@ const CheckoutSection = (props) => {
     });
 
     const cartDetails = useSelector(state => state.cart.items);
-
+    console.log(calculatedPrice[0].service_discounts_in_price);
     useEffect(() => {
-        const updatedCategory = { service: 0, product: 0, package: 0 };
+        // const updatedCategory = { service: 0, product: 0, package: 0 };
 
-        cartDetails.forEach(item => {
-            if (["Women", "Men", "General"].includes(item.gender)) {
-                updatedCategory.service += item.service_discount;
-            } else if (item.gender === "Products") {
-                updatedCategory.product += item.service_discount;
-            } else if (item.gender === "packages") {
-                updatedCategory.package += item.price - item.total_price;
-            }
-        });
-
-        setDiscountCategory({
-            service: updatedCategory.service.toFixed(0),
-            product: updatedCategory.product.toFixed(0),
-            package: updatedCategory.package.toFixed(0),
-        });
-    }, [cartDetails]);
+        // cartDetails.forEach(item => {
+        //     if (["Women", "Men", "General"].includes(item.gender)) {
+        //         updatedCategory.service += item.service_discount;
+        //     } else if (item.gender === "Products") {
+        //         updatedCategory.product += item.service_discount;
+        //     } else if (item.gender === "packages") {
+        //         updatedCategory.package += item.price - item.total_price;
+        //     }
+        // });
+            setDiscountCategory({
+                service: calculatedPrice[0].service_discounts_in_price.toFixed(0),
+                product: calculatedPrice[0].product_discounts_in_price.toFixed(0),
+                package: calculatedPrice[0].package_discounts_in_price.toFixed(0),
+            });
+    }, [calculatedPrice]);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
@@ -439,13 +438,13 @@ const CheckoutSection = (props) => {
                     checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
                         <Pressable style={styles.checkoutDetailInnerContainer}>
                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
-                                (18%)</Text>
+                                </Text>
                             <MaterialCommunityIcons name="information-outline" size={24} color="black" />
                         </Pressable> :
                         <Popover popoverStyle={styles.popoverStyle}
                             from={<Pressable style={styles.checkoutDetailInnerContainer}>
                                 <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
-                                    (18%)</Text>
+                                    </Text>
                                 <MaterialCommunityIcons name="information-outline" size={24} color="black" />
                             </Pressable>}
                             offset={Platform.OS === "ios" ? 0 : 32}
