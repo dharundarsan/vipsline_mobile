@@ -19,15 +19,17 @@ import * as Haptics from "expo-haptics";
 import Toast from "../../ui/Toast";
 
 const PrepaidModal = (props) => {
+    const prepaid_wallet = useSelector(state => state.cart.prepaid_wallet)
     const appointment_date = useSelector(state => state.cart.appointment_date);
     const [selectedDate, setSelectedDate] = useState(new Date(appointment_date));
     const [prepaidSource, setPrepaidSource] = useState("Add prepaid");
-    const [prepaidAmount, setPrepaidAmount] = useState(props.edited ? props.data.wallet_amount : 0)
-    const [prepaidBonus, setPrepaidBonus] = useState(props.edited ? props.data.wallet_bonus : 0)
+    // const [prepaidAmount, setPrepaidAmount] = useState(props.edited ? props.data.wallet_amount : 0)
+    const [prepaidAmount, setPrepaidAmount] = useState(props.edited ? prepaid_wallet[0].wallet_amount : 0)
+    // const [prepaidBonus, setPrepaidBonus] = useState(props.edited ? props.data.wallet_bonus : 0)
+    const [prepaidBonus, setPrepaidBonus] = useState(props.edited ? prepaid_wallet[0].bonus_value : 0)
     const [description, setDescription] = useState(props.edited ? props.data.wallet_bonus : "")
     const dispatch = useDispatch();
     const prepaidAmountRef = useRef(null);
-    const prepaid_wallet = useSelector(state => state.cart.prepaid_wallet)
 
     const toastRef = useRef(null);
 

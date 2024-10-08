@@ -35,6 +35,7 @@ const CartItem = (props) => {
     const [isEditMembershipModalVisible, setIsEditMembershipModalVisible] = useState(false);
     const [isEditPackageModalVisible, setIsEditPackageModalVisible] = useState(false);
     const editedCart = useSelector(state => state.cart.editedCart);
+    const prepaidDetails = useSelector(state => state.cart.prepaid_wallet)
     let editedData;
     if (props.data.gender === "membership") {
         editedData = editedCart.filter(item => item.id === props.data.membership_id)[0];
@@ -172,7 +173,7 @@ const CartItem = (props) => {
         }
     });
 
-    console.log(props.data)
+    console.log(prepaidDetails)
 
     // console.log(originalProductItem)
     // console.log(useSelector(state => state.catalogue.products.items))
@@ -242,7 +243,7 @@ const CartItem = (props) => {
             <View style={styles.itemNameAndDetailsContainer}>
                 {props.data.gender === "prepaid" ? <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>Prepaid value
-                    ₹{parseFloat(props.data.wallet_amount) + parseFloat(props.data.wallet_bonus)}</Text> : <Text
+                    ₹{parseFloat(prepaidDetails[0].bonus_value) + parseFloat(prepaidDetails[0].wallet_amount)}</Text> : <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>}
 
                 <View style={styles.itemDetailsContainer}>

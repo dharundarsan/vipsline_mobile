@@ -75,7 +75,7 @@ export default function DeleteClient(props) {
                     <Text style={[textTheme.bodyLarge]}>{props.content}</Text>
                     <View style={styles.deleteClientCardButtonContainer}>
                         <PrimaryButton
-                            label={"Cancel"}
+                            label={props.deleteClient ? "Cancel" : "Close"}
                             buttonStyle={styles.cancelButton}
                             pressableStyle={styles.cancelButtonPressable}
                             textStyle={[textTheme.titleMedium, styles.cancelButtonText]}
