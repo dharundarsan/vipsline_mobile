@@ -19,6 +19,8 @@ const AddCustomItemModal = (props) => {
     const [itemPrice, setItemPrice] = useState(props.edited ? props.data.price : 0);
     const dispatch = useDispatch();
     const insets = useSafeAreaInsets();
+    const itemNameRef = useRef();
+    const itemPriceRef = useRef();
     const toastRef = useRef(null);
     return <Modal visible={props.isVisible} onCancel={props.onCloseModal} animationType={"slide"}
         presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
@@ -35,7 +37,17 @@ const AddCustomItemModal = (props) => {
                 </PrimaryButton>
             </View>
             <View style={styles.modalContent}>
-                <CustomTextInput label={"Custom Item Name"} type={"text"} onChangeText={setItemName} value={itemName} />
+                <CustomTextInput label={"Custom Item Name"} type={"text"} onChangeText={setItemName} value={itemName} 
+                validator={(text) => {
+                    if (text.trim().length === 0) {
+                        return "Please enter item name"
+                    }
+                    else return true;
+                }}
+                onSave={(callback)=>{
+                    itemNameRef.current = callback;
+                }}
+                />
                 <CustomTextInput label={"Price"}
                     type={"price"}
                     placeholder={"0.00"}
@@ -44,11 +56,27 @@ const AddCustomItemModal = (props) => {
                     onEndEditing={price => {
                         if (price === "") setItemPrice(0)
                         else setItemPrice(parseFloat(price))
-                    }} />
+                    }}
+                    validator={(text) => {
+                        console.log(text);
+                        if (text == 0) {
+                            console.log("123");
+                            
+                            return "First name is required"
+                        }
+                        else return true;
+                    }}
+                    onSave={(callback)=>{
+                        itemPriceRef.current = callback
+                    }}
+                    />
             </View>
             <View style={styles.addToCartButtonContainer}>
                 <PrimaryButton onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
+                    const itemNameValid = itemNameRef.current();
+                    const itemPriceValid = itemPriceRef.current();
+                    if(!itemNameValid || !itemPriceValid) return;
                     if (itemName.trim() === "") {
                         toastRef.current.show("Please enter item name", 2000);
                         return;
