@@ -41,7 +41,7 @@ const InvoiceModal = (props) => {
     const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
-    console.log(selectedClientDetails)
+    // console.log(selectedClientDetails)
 
     const dispatch = useDispatch();
 
@@ -146,6 +146,8 @@ const InvoiceModal = (props) => {
         textAlign: "center",
         fontWeight: "bold"
     };
+
+    console.log(JSON.stringify(details, null, 3));
 
     const textStyle2 = {
         textAlign: "center"

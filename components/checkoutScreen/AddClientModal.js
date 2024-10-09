@@ -133,51 +133,58 @@ const AddClientModal = (props) => {
                 </PrimaryButton>
                 <Divider/>
                 {props.searchClientQuery === "" ? (
-                    <FlatList
-                        data={clientsList}
-                        keyExtractor={(item) => item.id.toString()}
-                        // onEndReachedThreshold={0.7}
-                        renderItem={({item}) => (
-                            <ClientCard
-                                clientId={item.id}
-                                name={item.name}
-                                phone={item.mobile_1}
-                                email={item.username}
-                                divider={true}
-                                onPress={(clientId) => {
+                    clientsList.length === 0 ? <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                            <Text style={textTheme.titleMedium}>No Clients available</Text>
+                        </View> :
+                        <FlatList
+                            data={clientsList}
+                            keyExtractor={(item) => item.id.toString()}
+                            // onEndReachedThreshold={0.7}
+                            renderItem={({item}) => (
+                                <ClientCard
+                                    clientId={item.id}
+                                    name={item.name}
+                                    phone={item.mobile_1}
+                                    email={item.username}
+                                    divider={true}
+                                    onPress={(clientId) => {
 
 
-                                    props.closeModal();
-                                    dispatch(loadClientInfoFromDb(item.id));
-                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
-                                    dispatch(updateClientId(item.id))
-                                }}
-                            />
-                        )}
-                    />
+                                        props.closeModal();
+                                        dispatch(loadClientInfoFromDb(item.id));
+                                        dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                        dispatch(updateClientId(item.id))
+                                    }}
+                                />
+                            )}
+                        />
                 ) : (
-                    <FlatList
-                        data={searchedClients}
-                        keyExtractor={(item) => item.id.toString()}
-                        onEndReachedThreshold={0.7}
-                        onEndReached={loadMoreClients}
-                        renderItem={({item}) => (
-                            <ClientCard
-                                clientId={item.id}
-                                name={item.name}
-                                phone={item.mobile_1}
-                                email={item.username}
-                                divider={true}
-                                onPress={(clientId) => {
-                                    props.closeModal();
-                                    dispatch(loadClientInfoFromDb(item.id));
-                                    dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
-                                    props.setSearchClientQuery("");
-                                    dispatch(updateClientId(item.id))
-                                }}
-                            />
-                        )}
-                    />
+                    searchedClients.length === 0 ?
+                        <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                            <Text style={textTheme.titleMedium}>No Clients available</Text>
+                        </View> :
+                        <FlatList
+                            data={searchedClients}
+                            keyExtractor={(item) => item.id.toString()}
+                            onEndReachedThreshold={0.7}
+                            onEndReached={loadMoreClients}
+                            renderItem={({item}) => (
+                                <ClientCard
+                                    clientId={item.id}
+                                    name={item.name}
+                                    phone={item.mobile_1}
+                                    email={item.username}
+                                    divider={true}
+                                    onPress={(clientId) => {
+                                        props.closeModal();
+                                        dispatch(loadClientInfoFromDb(item.id));
+                                        dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                        props.setSearchClientQuery("");
+                                        dispatch(updateClientId(item.id))
+                                    }}
+                                />
+                            )}
+                        />
                 )}
             </View>
             <Toast/>

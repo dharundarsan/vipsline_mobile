@@ -67,7 +67,7 @@ const CheckoutScreen = ({ navigation, route }) => {
     }, [showDrawerIcon]);
 
     const toastRef = useRef(null);
-    useEffect(() => {
+    useLayoutEffect(() => {
         const loadData = async () => {
             if (!reload) {
                 setIsLoading(true)

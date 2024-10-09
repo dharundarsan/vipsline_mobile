@@ -4,7 +4,7 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useSelector} from "react-redux";
-import {dateFormatter} from "../../util/Helpers";
+import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
 import {useRef, useState} from "react";
 import UpdateClientModal from "./UpdateClientModal";
 import Toast from "../../ui/Toast";
@@ -35,13 +35,20 @@ import Toast from "../../ui/Toast";
 
 export default function ClientDetails(props) {
 
-    const details = useSelector(state => state.clientInfo.details);
+    // const details = useSelector(state => state.clientInfo.details);
+
+    const details = props.details;
+
+    // console.log(JSON.stringify(details, null, 3));
+
     const name = details.name
     const mobile = details.mobile_1;
     const altPhone =
-        details.mobile_2 === null || (details.mobile_2).trim().length === 0 ?
-        "Not selected" :
-        details.mobile_2;
+        checkNullUndefined((details.mobile_2)) ?
+            details.mobile_2.trim().length !== 0 ?
+            details.mobile_2 :
+            "Not selected" :
+            "Not selected"
     const address =
         details.address === null || (details.address).trim().length === 0 ?
             "Not selected" :
@@ -55,24 +62,23 @@ export default function ClientDetails(props) {
             details.gender;
     const clientSource =
         details.client_source === null || (details.client_source).trim().length === 0 ?
-        "Not selected" :
-        details.client_source;
+            "Not selected" :
+            details.client_source;
     const anniversary =
         details.anniversary === null ?
-        "Not selected" :
-        dateFormatter(details.anniversary, 'long');
-    const clientNotes =
-        details.client_notes === null || (details.client_notes).trim.length === 0 ?
-        "Add any important client information" :
-        details.client_notes;
+            "Not selected" :
+            dateFormatter(details.anniversary, 'long');
+    const clientNotes = checkNullUndefined(details.client_notes) && details.client_notes.trim().length !== 0?
+        details.client_notes :
+        "Add any important client information"
     const dob =
         details.dob === null || (details.dob).trim().length === 0 ?
-        "Not selected" :
-        dateFormatter(details.dob, 'long');
+            "Not selected" :
+            dateFormatter(details.dob, 'long');
     const customerGST =
         details.customer_gst === null || (details.customer_gst).trim().length === 0 ?
-        "Not selected" :
-        details.customer_gst;
+            "Not selected" :
+            details.customer_gst;
 
 
     const [updateModalVisibility, setUpdateModalVisibility] = useState(false);
@@ -80,16 +86,20 @@ export default function ClientDetails(props) {
 
 
     return (
-        <ScrollView style={styles.clientDetails} contentContainerStyle={{alignItems: "center",}} showsVerticalScrollIndicator={false}>
-            <Toast ref={toastRef}/>
+        <View  style={styles.clientDetails}>
+            <Toast ref={toastRef} />
+        <ScrollView  style={{flex: 1}} contentContainerStyle={{alignItems: "center",}}
+                    showsVerticalScrollIndicator={false}>
+
             <View style={styles.titleContainer}>
-                { updateModalVisibility && <UpdateClientModal
+                {updateModalVisibility && <UpdateClientModal
                     isVisible={updateModalVisibility}
                     details={details}
                     onCloseModal={() => setUpdateModalVisibility(false)}
                     updateClientToast={(message, duration) => {
                         toastRef.current.show(message, duration);
                     }}
+                    type={"update"}
                 />}
                 <Text style={[textTheme.titleMedium, styles.title]}>
                     {props.title}
@@ -156,20 +166,18 @@ export default function ClientDetails(props) {
                 <Text style={[textTheme.bodyLarge, styles.personalDetailsLabel]}>Client GST</Text>
                 <Text style={[textTheme.titleMedium, styles.personalDetailsValue]}>{customerGST}</Text>
 
-                <Text style={[textTheme.bodyLarge, styles.personalDetailsLabel]}>Client source</Text>
-                <Text style={[textTheme.titleMedium, styles.personalDetailsValue]}>{clientSource}</Text>
 
                 <Text style={[textTheme.bodyLarge, styles.personalDetailsLabel]}>Address</Text>
                 <Text style={[textTheme.titleMedium, styles.personalDetailsValue, {marginBottom: 32}]}>{address}</Text>
             </View>
 
         </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    clientDetails: {
-    },
+    clientDetails: {},
     titleContainer: {
         marginTop: 16,
         width: '100%',

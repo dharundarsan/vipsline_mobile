@@ -76,30 +76,21 @@ const CheckoutSection = (props) => {
     const chargesAmount = useSelector(state => state.cart.chargesData);
 
     const [discountCategory, setDiscountCategory] = useState({
-        service: "", product: "", package: "",
+        service: 0, product: 0, package: 0,
     });
-
     const cartDetails = useSelector(state => state.cart.items);
-
     useEffect(() => {
-        const updatedCategory = { service: 0, product: 0, package: 0 };
-
-        cartDetails.forEach(item => {
-            if (["Women", "Men", "General"].includes(item.gender)) {
-                updatedCategory.service += item.service_discount;
-            } else if (item.gender === "Products") {
-                updatedCategory.product += item.service_discount;
-            } else if (item.gender === "packages") {
-                updatedCategory.package += item.price - item.total_price;
-            }
-        });
-
-        setDiscountCategory({
-            service: updatedCategory.service.toFixed(0),
-            product: updatedCategory.product.toFixed(0),
-            package: updatedCategory.package.toFixed(0),
-        });
-    }, [cartDetails]);
+        console.log('Updated calculatedPrice:', calculatedPrice);
+        if (calculatedPrice[0]?.service_discounts_in_price !== undefined &&
+            calculatedPrice[0]?.product_discounts_in_price !== undefined &&
+            calculatedPrice[0]?.package_discounts_in_price !== undefined) {
+            setDiscountCategory({
+                service: calculatedPrice[0].service_discounts_in_price,
+                product: calculatedPrice[0].product_discounts_in_price,
+                package: calculatedPrice[0].package_discounts_in_price,
+            });
+        }
+    }, [calculatedPrice, cartDetails]);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
 
@@ -404,11 +395,11 @@ const CheckoutSection = (props) => {
                                 </Pressable>}
                                 offset={Platform.OS === "ios" ? 0 : 32}
                             >
-                                {discountCategory.service !== "0" ?
+                                {discountCategory.service !== 0 ?
                                     <Text>Service Discount: ₹{discountCategory.service}</Text> : null}
-                                {discountCategory.product !== "0" ?
+                                {discountCategory.product !== 0 ?
                                     <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
-                                {discountCategory.package !== "0" ?
+                                {discountCategory.package !== 0 ?
                                     <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
                                 {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount) ?
                                     <Text>Custom
@@ -439,13 +430,13 @@ const CheckoutSection = (props) => {
                     checkNullUndefined(calculatedPrice[0]) && calculatedPrice[0].gst_charges === 0 ?
                         <Pressable style={styles.checkoutDetailInnerContainer}>
                             <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
-                                (18%)</Text>
+                                </Text>
                             <MaterialCommunityIcons name="information-outline" size={24} color="black" />
                         </Pressable> :
                         <Popover popoverStyle={styles.popoverStyle}
                             from={<Pressable style={styles.checkoutDetailInnerContainer}>
                                 <Text style={[textTheme.titleMedium, styles.checkoutDetailText]}>GST
-                                    (18%)</Text>
+                                    </Text>
                                 <MaterialCommunityIcons name="information-outline" size={24} color="black" />
                             </Pressable>}
                             offset={Platform.OS === "ios" ? 0 : 32}

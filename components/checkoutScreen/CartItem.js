@@ -35,6 +35,7 @@ const CartItem = (props) => {
     const [isEditMembershipModalVisible, setIsEditMembershipModalVisible] = useState(false);
     const [isEditPackageModalVisible, setIsEditPackageModalVisible] = useState(false);
     const editedCart = useSelector(state => state.cart.editedCart);
+    const prepaidDetails = useSelector(state => state.cart.prepaid_wallet)
     let editedData;
     if (props.data.gender === "membership") {
         editedData = editedCart.filter(item => item.id === props.data.membership_id)[0];
@@ -172,6 +173,11 @@ const CartItem = (props) => {
         }
     });
 
+    console.log(prepaidDetails)
+
+    // console.log(originalProductItem)
+    // console.log(useSelector(state => state.catalogue.products.items))
+
     return <>
         <View style={styles.cartItem}>
             {isEditPrepaidModalVisible && <PrepaidModal edited={true}
@@ -186,7 +192,18 @@ const CartItem = (props) => {
 
                                                           setIsEditCartModalVisible(false)
                                                       }}
-                                                      data={{...props.data, ...editedData}}/>}
+                                                      data={{
+                                                          ...props.data, ...editedData,
+                                                          dis: props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General"
+                                                              ? props.data.service_discount !== 0
+                                                                  ? props.data.service_discount
+                                                                  : 0
+                                                              : props.data.gender === "Products"
+                                                                  ? props.data.service_discount !== 0
+                                                                      ? props.data.service_discount
+                                                                      : 0
+                                                                  : 0
+                                                      }}/>}
             {isEditCustomItemModalVisible && <AddCustomItemModal edited={true}
                                                                  isVisible={isEditCustomItemModalVisible}
                                                                  data={props.data}
@@ -226,7 +243,7 @@ const CartItem = (props) => {
             <View style={styles.itemNameAndDetailsContainer}>
                 {props.data.gender === "prepaid" ? <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>Prepaid value
-                    ₹{parseFloat(props.data.wallet_amount) + parseFloat(props.data.wallet_bonus)}</Text> : <Text
+                    ₹{parseFloat(prepaidDetails[0].bonus_value) + parseFloat(prepaidDetails[0].wallet_amount)}</Text> : <Text
                     style={[TextTheme.bodyLarge, styles.itemNameText]}>{props.data.resource_category_name === null ? props.data.name : props.data.resource_category_name}</Text>}
 
                 <View style={styles.itemDetailsContainer}>
@@ -291,13 +308,27 @@ const CartItem = (props) => {
                 </PrimaryButton>
                 <Text style={[textTheme.labelLarge, styles.discountText]}>
                     {editedData
-                        ? editedData.gender === "membership" || editedData.gender === "prepaid" ? "" : (editedData.disc_value !== 0 ? `Discount ₹${editedData.disc_value.toFixed(2)}` : "")
+                        ? editedData.gender === "membership" || editedData.gender === "prepaid"
+                            ? ""
+                            : (editedData.disc_value !== 0
+                                ? `Discount ₹${editedData.disc_value.toFixed(2)}`
+                                : "")
                         : (props.data.price - props.data.discounted_price !== 0 &&
                             props.data.gender !== "custom_item" &&
                             props.data.gender !== "prepaid" &&
                             props.data.gender === "packages")
-                            ? `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}`
-                            : props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General" || props.data.gender === "Products" ? (props.data.discounted_price === 0 || props.data.discounted_price === props.data.price) ? null : `Discount ₹${(props.data.price - props.data.discounted_price).toFixed(2)}` : null
+                            ? props.data.price - props.data.total_price === 0
+                                ? ""
+                                : `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}`
+                            : props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General"
+                                ? (props.data.service_discount !== 0)
+                                    ? `Discount ₹${(props.data.service_discount).toFixed(2)}`
+                                    : ""
+                                : props.data.gender === "Products"
+                                    ? props.data.service_discount !== 0
+                                        ? `Discount ₹${(props.data.service_discount).toFixed(2)}`
+                                        : ""
+                                    : ""
                     }
                 </Text>
 
