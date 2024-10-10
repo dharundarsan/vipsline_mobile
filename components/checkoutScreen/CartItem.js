@@ -45,6 +45,10 @@ const CartItem = (props) => {
     // const edited = editedData.some(item => props.data.item_id === item.item_id);
 
     const removeItemHandler = async () => {
+        4
+        4
+        4
+
         if (isLoading) return;
         dispatch(updateLoadingState(true));
         dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
