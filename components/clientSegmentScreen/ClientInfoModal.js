@@ -258,8 +258,11 @@ export default function clientInfoModal(props) {
         content =
             <ClientDetails
                 title={getCategoryTitle[clientMoreDetails]}
+                details={details}
 
             />
+    } else {
+        content = <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>Coming Soon</Text></View>
     }
 
 

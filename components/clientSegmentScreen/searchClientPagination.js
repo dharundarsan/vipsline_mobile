@@ -57,7 +57,9 @@ export default function SearchClientPagination(props) {
     useEffect(() => {
         dispatch(updateSearchClientMaxEntry(10))
         dispatch(resetSearchClientFilter());
-        dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
+        if(getTotalCount > 10) {
+            dispatch(loadSearchClientFiltersFromDb(10, clientFilterNames(props.filterPressed), props.query))
+        }
         // setTotalCount(totalCount);
         setLowerCount(1);
         setUpperCount(10 > getTotalCount ? getTotalCount : 10);
@@ -69,7 +71,9 @@ export default function SearchClientPagination(props) {
     console.log(props.filterPressed);
 
     useEffect(() => {
-                dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
+        if(getTotalCount > 10) {
+            dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
+        }
         if(lowerCount === 1) {
             setIsBackwardButtonDisabled(true);
         }
@@ -92,7 +96,11 @@ export default function SearchClientPagination(props) {
 
 
     useEffect(() => {
-        dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
+
+        if(getTotalCount > 10 ) {
+
+            dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed), props.query));
+        }
 
         let upper_count = 0;
                 if(maxEntry > getTotalCount) {
@@ -103,7 +111,7 @@ export default function SearchClientPagination(props) {
         }
         setLowerCount(1);
         setUpperCount(upper_count);
-    }, [maxEntry, getTotalCount]);
+    }, [maxEntry, getTotalCount, props.query]);
 
 
     const [isBackwardButtonDisabled, setIsBackwardButtonDisabled]  = useState(false);

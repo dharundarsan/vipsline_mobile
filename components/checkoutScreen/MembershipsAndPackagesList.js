@@ -19,14 +19,14 @@ const MembershipsAndPackagesList = (props) => {
     const data = useSelector(state => props.category === "memberships" ? state.catalogue.memberships.items : state.catalogue.packages.items);
     const [filteredData, setFilteredData] = useState(data);
 
-
     const searchData = (searchValue) => {
+        console.log(searchValue)
         const lowerCaseFilterValue = searchValue.toLowerCase();
         setFilteredData(data.filter(item => {
             if (props.category === "memberships")
-                return item.name.toLowerCase().includes(searchValue) || item.price.toString().includes(searchValue)
+                return item.name.toLowerCase().includes(lowerCaseFilterValue) || item.price.toString().includes(lowerCaseFilterValue)
             else
-                return item.name.toLowerCase().includes(searchValue) || item.price.toString().includes(searchValue) || item.package_cost.toString().includes(searchValue)
+                return item.name.toLowerCase().includes(lowerCaseFilterValue) || item.price.toString().includes(lowerCaseFilterValue) || item.package_cost.toString().includes(lowerCaseFilterValue)
 
         }))
     };
@@ -35,19 +35,13 @@ const MembershipsAndPackagesList = (props) => {
         <>
             <View style={styles.commonSelectTemplate}>
                 <View style={styles.headingAndSearchContainer}>
-                    {
-                        filteredData.length !== 0 ?
-                            <>
-                                <Text
-                                    style={[textTheme.titleMedium, styles.headingText]}>Select {props.category === "packages" ? "Package" : "Membership"}</Text>
-                                <SearchBar filter={false}
-                                           onPressFilter={() => {
-                                           }}
-                                           onChangeText={searchData}
-                                           placeholder={"Search by name or prices"}/>
-                            </>
-                            : null
-                    }
+                    <Text
+                        style={[textTheme.titleMedium, styles.headingText]}>Select {props.category === "packages" ? "Package" : "Membership"}</Text>
+                    <SearchBar filter={false}
+                               onPressFilter={() => {
+                               }}
+                               onChangeText={searchData}
+                               placeholder={"Search by name or prices"}/>
                 </View>
                 {
                     filteredData.length === 0 ? <View style={styles.noDataMessage}>

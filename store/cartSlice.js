@@ -161,12 +161,12 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
                 if (item.gender === "membership") {
                     const originalData = cart.items.filter(ele => ele.membership_id === item.id)[0];
                     return {
-                        amount: item.price,
+                        amount: item.amount,
                         bonus_value: 0,
                         disc_value: 0,
                         itemId: originalData.item_id,
                         membership_id: item.id,
-                        membership_number: "",
+                        membership_number: item.membership_number,
                         res_cat_id: originalData.resource_category_id,
                         resource_id: originalData.resource_id,
                         type: "AMOUNT",

@@ -97,6 +97,11 @@ export default function ClientSegmentScreen(props) {
     useFocusEffect(useCallback( ()=>{
          dispatch(loadClientFiltersFromDb(10, "All"));
         getLocation("Clients");
+        dispatch(clearClientInfo())
+
+        // return () => {
+        //     dispatch(clearClientInfo());
+        // }
 
     },[]))
 
@@ -145,14 +150,19 @@ export default function ClientSegmentScreen(props) {
     // }, [currentFilterClientCount]);
 
     useEffect(() => {
-        setIsSearchLoading(true)
-        dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
-        if (currentFilterClientCount !== clientCount) {
-            dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
+        async function f() {
+            setIsSearchLoading(true);
+            if (searchClientTotalCount <= 10) {
+                await dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
+            }
+            // if (currentFilterClientCount !== clientCount) {
+            //     dispatch(loadSearchClientFiltersFromDb(maxEntry, clientFilterNames(filterPressed), searchQuery));
+            // }
+            setTimeout(() => {
+                setIsSearchLoading(false);
+            }, 200)
         }
-        setTimeout(() => {
-            setIsSearchLoading(false);
-        }, 200)
+        f();
 
     }, [searchQuery]);
 
@@ -221,7 +231,6 @@ export default function ClientSegmentScreen(props) {
         if (option === "edit") {
             // setIsClientInfoModalVisible(false);
             {
-                console.log(editClientModalVisibility);
                 setEditClientModalVisibility(true);
             }
 

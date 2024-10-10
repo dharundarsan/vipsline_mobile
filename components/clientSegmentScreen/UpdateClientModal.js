@@ -43,15 +43,17 @@ import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 
 
-const UpdateClientModal = React.memo((props) => {
-    // const details = useSelector(state => state.clientInfo.details);
+const UpdateClientModal = ((props) => {
     const details = props.details;
+
+    console.log("kgsdkgbskdjbskdjbkb");
+
 
     const [clientData, setClientData] = useState({
         firstName: details.firstName,
         lastName: "",
         phoneNo: ["+91", details.mobile_1],
-        secondaryNo: ["+91", ""],
+        secondaryNo: ["+91", details.mobile_2],
         email: "",
         gender: "",
         clientSource: "",
@@ -73,8 +75,6 @@ const UpdateClientModal = React.memo((props) => {
 
 
     const existingValues = () => {
-        console.log("DOB")
-        console.log(details.dob)
         setClientData({
             firstName: details.firstName,
             lastName: details.lastName,
@@ -106,6 +106,8 @@ const UpdateClientModal = React.memo((props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
+        console.log(clientData.clientSource);
+
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
             await updateClientAPI(clientDetails.id, {
@@ -114,6 +116,8 @@ const UpdateClientModal = React.memo((props) => {
                 businessId: businessId,
                 city: "",
                 clientNotes: clientData.clientNotes,
+                client_notes: props.type === "update" ? clientData.clientNotes : undefined,
+                client_source: props.type === "update" ? clientData.clientSource : undefined,
                 clientSource: clientData.clientSource,
                 country: "India",
                 countryCode: clientData.phoneNo[0],
@@ -285,7 +289,7 @@ const UpdateClientModal = React.memo((props) => {
                         label="Secondary Number"
                         placeholder="0123456789"
                         value={clientData.secondaryNo[1]}
-                        onChangeText={(value) => handleChange("secondaryNo", ["+91", value])}
+                        onChangeText={(value) => handleChange("secondaryNo", [value[0], value[1]])}
                     />
                     <CustomTextInput
                         type="multiLine"

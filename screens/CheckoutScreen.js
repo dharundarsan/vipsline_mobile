@@ -39,6 +39,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocationContext } from "../context/LocationContext";
 import Toast from "../ui/Toast";
 import {updateToastRef} from "../store/toastSlice";
+import {loadBusinessDetail} from "../store/BusinessDetailSlice";
 
 const CheckoutScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -67,7 +68,7 @@ const CheckoutScreen = ({ navigation, route }) => {
     }, [showDrawerIcon]);
 
     const toastRef = useRef(null);
-    useEffect(() => {
+    useLayoutEffect(() => {
         const loadData = async () => {
             if (!reload) {
                 setIsLoading(true)
@@ -94,6 +95,7 @@ const CheckoutScreen = ({ navigation, route }) => {
                     await dispatch(loadStaffsFromDB());
                     await dispatch(loadBusinessNotificationDetails());
                     await dispatch(loadClientCountFromDb());
+                    await dispatch(loadBusinessDetail());
                     // dispatch(loadCartFromDB());
                     // dispatch(loadBookingDetailsFromDb());
                 }
