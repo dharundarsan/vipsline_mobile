@@ -25,6 +25,7 @@ import AddCustomItemModal from "./AddCustomItemModal";
 import PackageModal from "./PackageModal";
 import {clientSlice} from "../../store/clientSlice";
 import * as Haptics from "expo-haptics";
+import EditMembershipModal from "./EditMembershipModal";
 
 const CartItem = (props) => {
     const dispatch = useDispatch();
@@ -180,6 +181,13 @@ const CartItem = (props) => {
 
     return <>
         <View style={styles.cartItem}>
+            {isEditMembershipModalVisible && <EditMembershipModal edited={true}
+                                                                  data={props.data}
+                                                                  isVisible={isEditMembershipModalVisible}
+                                                                  onCloseModal={() => {
+                                                                      setIsEditMembershipModalVisible(false);
+                                                                  }}
+            />}
             {isEditPrepaidModalVisible && <PrepaidModal edited={true}
                                                         data={props.data}
                                                         isVisible={isEditPrepaidModalVisible}
@@ -262,6 +270,8 @@ const CartItem = (props) => {
                                     setIsEditCustomItemModalVisible(true);
                                 } else if (props.data.gender === "packages") {
                                     setIsEditPackageModalVisible(true);
+                                } else if(props.data.gender === "membership"){
+                                    setIsEditMembershipModalVisible(true);
                                 } else {
                                     setIsEditCartModalVisible(true)
                                 }

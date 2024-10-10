@@ -59,44 +59,44 @@ export default function ClientInfoCategories(props) {
     function renderItem(itemData) {
         return (
             <>
-            <PrimaryButton
-                buttonStyle={[
-                    styles.button,
-                    {
-                        borderTopWidth: itemData.item.divider ?
-                            itemData.item.thickness :
-                            null,
-                        borderTopColor: Colors.grey250
-                    }
-                    ]}
-                pressableStyle={styles.pressableStyle}
-                onPress={ () => {
-                    props.onPress(itemData.item.id)
-                }}
-            >
-                <View style={styles.innerContainer}>
-                    <View style={{flexDirection: "row", alignItems: "center",}}>
-                        <Text style={[TextTheme.labelLarge]}>
-                            {itemData.item.title}
-                        </Text>
+                <PrimaryButton
+                    buttonStyle={[
+                        styles.button,
                         {
-                            itemData.item.msg ?
-                                <Text style={{marginHorizontal: 16}}>
-                                    <ItemCount count={itemData.item.count} />
-                                </Text> :
-                                null
+                            borderTopWidth: itemData.item.divider ?
+                                itemData.item.thickness :
+                                null,
+                            borderTopColor: Colors.grey250
                         }
+                    ]}
+                    pressableStyle={styles.pressableStyle}
+                    onPress={() => {
+                        props.onPress(itemData.item.id)
+                    }}
+                >
+                    <View style={styles.innerContainer}>
+                        <View style={{flexDirection: "row", alignItems: "center",}}>
+                            <Text style={[TextTheme.labelLarge]}>
+                                {itemData.item.title}
+                            </Text>
+                            {
+                                itemData.item.msg ?
+                                    <Text style={{marginHorizontal: 16}}>
+                                        <ItemCount count={itemData.item.count}/>
+                                    </Text> :
+                                    null
+                            }
 
+                        </View>
+                        <Entypo name="chevron-small-right" size={24} color="black"/>
                     </View>
-                    <Entypo name="chevron-small-right" size={24} color="black" />
-                </View>
-            </PrimaryButton>
+                </PrimaryButton>
             </>
         );
     }
 
     return (
-        <View >
+        <View>
             <FlatList
                 data={modalClientDetails}
                 renderItem={renderItem}

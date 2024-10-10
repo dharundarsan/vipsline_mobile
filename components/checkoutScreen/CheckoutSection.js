@@ -171,6 +171,19 @@ const CheckoutSection = (props) => {
             dispatch(updateDiscount([]));
             setSelectedDiscountMode("PERCENTAGE")
         } else {
+            const canAllowDiscount = cartItems.some(item => item.gender === "Women" ||
+                item.gender === "Men" ||
+                item.gender === "Kids" ||
+                item.gender === "General" ||
+                item.gender === "Products" ||
+                item.gender === "custom_item"
+            )
+            if(!canAllowDiscount) {
+                setActionModal(false);
+                setDiscountValue("");
+                props.checkoutScreenToast("Discount is not valid for the items in cart")
+                return;
+            }
             if (selectedDiscountMode === "AMOUNT") {
                 if ((calculatedPrice[0].total_price_after_discount - discountValue) <= 0) {
                     setDiscountValue(discountValue)
