@@ -33,6 +33,7 @@ import Toast from "../../ui/Toast";
 // import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
 
 
+
 const InvoiceModal = (props) => {
 
     const details = useSelector(state => state.invoice.details);
@@ -91,6 +92,16 @@ const InvoiceModal = (props) => {
     }
 
 
+
+    let extraCharges = 0;
+    {
+        details.extra_charges && details.extra_charges.length > 0 && details.extra_charges.map((item, index) => {
+            extraCharges += item.amount;
+        })
+    }
+
+
+
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
     // let selectedBusinessDetails = "";
     // getBusinessId().then(r => {
@@ -147,7 +158,6 @@ const InvoiceModal = (props) => {
         fontWeight: "bold"
     };
 
-    console.log(JSON.stringify(details, null, 3));
 
     const textStyle2 = {
         textAlign: "center"
@@ -557,6 +567,26 @@ styles.heading]}>Invoice</Text>*/}
                             styles.checkoutDetailText]}>₹
                             {(details.sub_total_with_discount).toFixed(2)}</Text>
                     </View>
+                    <Divider />
+                    {
+                        extraCharges ?
+                        <View style={styles.calculatepriceRow}>
+                        <Text style={[textTheme.bodyLarge,
+                            styles.checkoutDetailText]}>Extra Charges</Text>
+                        <Text
+                            style={[textTheme.bodyLarge,
+                                styles.checkoutDetailText]}>₹
+                            {extraCharges}
+
+                        </Text>
+                        </View> :
+                            <></>
+                    }
+                    {
+                        extraCharges ?
+                        <Divider/> :
+                            <></>
+                    }
                     {
                         calculatedPrice[0].tax_details.map((item, index) => (
                             <View key={index} style={styles.calculatepriceRow}>
@@ -569,7 +599,7 @@ styles.heading]}>Invoice</Text>*/}
 
                     }
 
-                    <Divider />
+
                     <View style={styles.calculatepriceRow}>
                         <Text style={[textTheme.titleMedium,
                         styles.checkoutDetailText]}>Total</Text>
