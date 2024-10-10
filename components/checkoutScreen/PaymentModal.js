@@ -65,6 +65,7 @@ const PaymentModal = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isOptionsDropdownModalVisible, setIsOptionsDropdownModalVisible] = useState(false)
     const [isCancelSalesModalVisible, setIsCancelSalesModalVisible] = useState(false)
+    const isZeroPayment = props.price === 0;
 
 
     const [splitUpState, setSplitUpState] = useState([
@@ -474,11 +475,18 @@ const PaymentModal = (props) => {
         </View>
         <ScrollView>
             <View style={styles.modalContent}>
+                { isZeroPayment && <View style={styles.zeroPaymentNote}>
+                    <View style={styles.zeroPaymentNoteBar}/>
+                    <Text style={[textTheme.labelLarge, {paddingLeft: 20, padding: 10}]}>
+                        There is no payment required for this sale. you can save it now.
+                    </Text>
+                </View>}
                 <View style={styles.paymentOptionsContainer}>
                     <View style={styles.paymentOptionsRow}>
                         <PrimaryButton
+                            disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "cash" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => {
+                            onPress={ isZeroPayment ? () => {} : () => {
                                 setSelectedPaymentOption("cash")
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
@@ -486,13 +494,13 @@ const PaymentModal = (props) => {
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
                             </View> : null}
-                            <MaterialCommunityIcons name="cash" size={30} color={Colors.green}/>
+                            <MaterialCommunityIcons name="cash" size={30} color={ isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Cash</Text>
                         </PrimaryButton>
                         <PrimaryButton
+                            disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "card" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => {
-
+                            onPress={ isZeroPayment ? () => {} : () => {
                                 setSelectedPaymentOption("card")
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
@@ -500,15 +508,15 @@ const PaymentModal = (props) => {
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
                             </View> : null}
-                            <Ionicons name="card-outline" size={30} color={Colors.green}/>
+                            <Ionicons name="card-outline" size={30} color={ isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Debit / Credit card</Text>
                         </PrimaryButton>
                     </View>
                     <View style={styles.paymentOptionsRow}>
                         <PrimaryButton
+                            disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "digital payments" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => {
-
+                            onPress={ isZeroPayment ? () => {} : () => {
                                 setSelectedPaymentOption("digital payments")
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
@@ -516,13 +524,13 @@ const PaymentModal = (props) => {
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
                             </View> : null}
-                            <MaterialCommunityIcons name="contactless-payment" size={30} color={Colors.green}/>
+                            <MaterialCommunityIcons name="contactless-payment" size={30} color={ isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Digital Payments</Text>
                         </PrimaryButton>
                         <PrimaryButton
+                            disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}
-                            onPress={() => {
-
+                            onPress={ isZeroPayment ? () => {} : () => {
                                 setSelectedPaymentOption("split_payment")
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
@@ -530,7 +538,7 @@ const PaymentModal = (props) => {
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                         color={Colors.highlight}/>
                             </View> : null}
-                            <MaterialCommunityIcons name="table-split-cell" size={30} color={Colors.green}/>
+                            <MaterialCommunityIcons name="table-split-cell" size={30} color={ isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Split Payment</Text>
                         </PrimaryButton>
                     </View>
@@ -756,12 +764,34 @@ const PaymentModal = (props) => {
                            } : null]}
                            onPress={async () => {
                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                               if (selectedPaymentOption === null) {
-                                   // TODO
+                               if (!isZeroPayment && selectedPaymentOption === null) {
                                    toastRef.current.show("Please select any payment method", 2000);
                                    return;
                                }
                                setIsLoading(true);
+                               if (isZeroPayment) {
+                                   await checkoutBookingAPI(details, cartSliceState).then(response => {
+                                       if (response.data === null || response.message === "Something went wrong") {
+                                           console.log(response)
+                                           toastRef.current.show(response.other_message, 2000);
+                                           return;
+                                       } else {
+                                           props.setIsInvoiceModalVisible(true);
+                                           setTimeout(() => {
+                                               props.onCloseModal();
+                                           }, 100)
+                                       }
+                                       updateAPI(response.data[0], "NIL", splitUpState, clientInfo);
+                                       setTimeout(() => {
+                                           updateLiveStatusAPI(response.data[0].booking_id);
+                                           dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                           dispatch(updateBookingId(response.data[0].booking_id));
+                                           dispatch(loadWalletPriceFromDb(details.id));
+                                           dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                       }, 500);
+                                   });
+                                   return;
+                               }
                                if (selectedPaymentOption === "prepaid" || (selectedPaymentOption === "split_payment" && splitUpState.some(item => (item.mode === "prepaid" && item.shown)))) {
                                    if (selectedPaymentOption === "prepaid") {
                                        dispatch(updateCalculatedPrice(details.id, true, props.price));
@@ -943,20 +973,17 @@ const PaymentModal = (props) => {
 const styles = StyleSheet.create({
     paymentModal: {
         flex: 1,
-    }
-    ,
+    },
     headingAndCloseContainer: {
         marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingVertical:
             15,
         alignItems:
             "center",
-    }
-    ,
+    },
     heading: {
         fontWeight: 500
-    }
-    ,
+    },
     closeButton: {
         position: "absolute",
         right:
@@ -965,14 +992,24 @@ const styles = StyleSheet.create({
             5,
         backgroundColor:
         Colors.background,
-    }
-    ,
+    },
     modalContent: {
         flex: 1,
         padding:
             25,
-    }
-    ,
+    },
+    zeroPaymentNoteBar: {
+        position: "absolute",
+        backgroundColor: Colors.highlight,
+        width: 5,
+        left: 0,
+        height: "100%",
+    },
+    zeroPaymentNote: {
+        backgroundColor: "#e7e8ff",
+        borderRadius: 8,
+        overflow: "hidden"
+    },
     paymentOptionsContainer: {
         marginTop: 10,
         gap:
