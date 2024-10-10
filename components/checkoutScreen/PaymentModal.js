@@ -569,6 +569,7 @@ const PaymentModal = (props) => {
                     </PrimaryButton>}
                 {selectedPaymentOption === "cash" || selectedPaymentOption === null || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" || selectedPaymentOption === "prepaid" ? <>
                     <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
+                                     readOnly={isZeroPayment}
                                      placeholder={"Price"}
                                      onChangeText={(price) => {
                                          if (price.trim().length === 0) {
