@@ -65,6 +65,10 @@ import { loadBusinessesListFromDb } from './store/listOfBusinessSlice';
 import { loadLoginUserDetailsFromDb } from './store/loginUserSlice';
 import drawerItem from "react-native-paper/src/components/Drawer/DrawerItem";
 import * as SecureStore from 'expo-secure-store';
+import DashboardScreen from './screens/DashboardScreen';
+import SalesDashboard from './components/DashboardScreen/SalesDashboard';
+import StaffDashboard from './components/DashboardScreen/StaffDashboard';
+import ClientDashboard from './components/DashboardScreen/ClientDashboard';
 
 enableScreens();
 
@@ -134,6 +138,34 @@ export default function App() {
             {/*</UserInactivity>*/}
         </Provider>
     );
+}
+const BackButton = () => {
+    const navigation = useNavigation();
+  
+    return (
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingLeft: 10 }}>
+        <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
+      </TouchableOpacity>
+    );
+  };
+const DashboardStack = ({route}) => {
+    return (
+    <Stack.Navigator
+    initialRouteName="DashboardScreen"
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        headerTitleAlign: 'center',
+      })}
+    >
+        <Stack.Screen name='DashboardScreen' component={DashboardScreen}/>
+        <Stack.Screen name='SalesScreen' component={SalesDashboard} 
+        options={{headerTitle:"Sales Dashboard",headerLeft:()=><BackButton/>}}/>
+        <Stack.Screen name='StaffScreen' component={StaffDashboard} 
+        options={{headerTitle:"Staff Dashboard",headerLeft:()=><BackButton/>}}/>
+        <Stack.Screen name='ClientScreen' component={ClientDashboard} 
+        options={{headerTitle:"Client Dashboard",headerLeft:()=><BackButton/>}}/>
+    </Stack.Navigator>
+    )
 }
 
 const CheckoutStack = ({route}) => {
@@ -403,24 +435,24 @@ const MainDrawerNavigator = (props) => {
                                 )
                             })}
                         >
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Dashboard"*/}
-                            {/*    component={CheckoutStack}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Appointments"*/}
-                            {/*    component={CheckoutStack}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
+                            <Drawer.Screen
+                                name="Dashboard"
+                                component={DashboardStack}
+                                options={{
+                                    drawerIcon: () => <Image
+                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
+                                        style={{ resizeMode: "contain" }} />
+                                }}
+                            />
+                            {/* <Drawer.Screen
+                                name="Appointments"
+                                component={CheckoutStack}
+                                options={{
+                                    drawerIcon: () => <Image
+                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
+                                        style={{ resizeMode: "contain" }} />
+                                }} 
+                            />  */}
                             <Drawer.Screen
                                 name="Checkout"
                                 component={CheckoutStack}

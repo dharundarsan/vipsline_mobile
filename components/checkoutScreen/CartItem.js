@@ -178,8 +178,6 @@ const CartItem = (props) => {
         }
     });
 
-    console.log(prepaidDetails)
-
     // console.log(originalProductItem)
     // console.log(useSelector(state => state.catalogue.products.items))
 
