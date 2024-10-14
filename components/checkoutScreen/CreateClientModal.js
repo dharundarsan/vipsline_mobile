@@ -217,7 +217,7 @@ const CreateClientModal = (props) => {
                         placeholder="Enter email address"
                         value={email}
                         onChangeText={setEmail}
-                        validator={(text) => !checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
+                        validator={(text) =>  (text === null || text === undefined || text.trim() === "") ? true : !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Phone number is Invalid" : true}
                     />
                     <CustomTextInput
                         type="dropdown"
@@ -265,8 +265,7 @@ const CreateClientModal = (props) => {
                         placeholder="Enter client's GSTIN"
                         validator={(text) => {
                             if ( checkNullUndefined(text) && text.trim().length !== 0){
-                                let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
-                                if(regex.test(text) === true) return true;
+                                if(text.match(/\d{2}[A-Z]{5}\d{4}[A-Z][A-Z\d][A-Z\d]/)) return true;
                                 else return "Please enter valid GST number"
                             }
                             else return true;
@@ -280,6 +279,7 @@ const CreateClientModal = (props) => {
                         label="Secondary Number"
                         placeholder="0123456789"
                         value={secondaryNo[1]}
+                        validator={(text) => (text === null || text === undefined || text.trim() === "") ? true : text.length !== 10 ? "Phone number is Invalid" : true}
                         onChangeText={setSecondaryNo}
                     />
                     <CustomTextInput

@@ -137,14 +137,17 @@ const PackageModal = (props) => {
     }, []);
 
 
-    return <Modal visible={props.isVisible} style={styles.packageModal} animationType={"slide"}
+    return <Modal visible={props.isVisible} style={styles.packageModal} animationType={props.singlePackage ? "none" : "slide"}
                   presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text
                 style={[textTheme.titleLarge, styles.heading]}>{props.edited ? props.data.resource_category_name : props.data.name === undefined ? props.data.package_name : props.data.name}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
-                onPress={props.onCloseModal}
+                onPress={() => {
+                    if(props.singlePackage) props.closeOverallModal();
+                    else props.onCloseModal();
+                }}
             >
                 <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>

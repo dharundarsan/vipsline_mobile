@@ -87,7 +87,6 @@ export default function EmailLogin() {
                 } catch (e) {
                 }
             } catch (error) {
-                console.log("sdgsdg")
                 setPasswordPrompt("Incorrect password");
                 setIsLoading(false);
                 setIsPasswordValid(false);

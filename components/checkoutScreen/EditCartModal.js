@@ -42,8 +42,6 @@ const EditCartModal = (props) => {
             ? props.data.dis
             : 0;
 
-    console.log(initialDiscountValue)
-
     const initialDiscountAmount = isEdited ? props.data.disc_value : (hasDiscountedPrice ? props.data.price - props.data.discounted_price : 0);
 
     const [selectedDiscountMode, setSelectedDiscountMode] = useState(initialDiscountMode);
@@ -74,7 +72,8 @@ const EditCartModal = (props) => {
                   presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <Toast ref={toastRef}/>
         <View style={styles.headingAndCloseContainer}>
-            <Text style={[textTheme.titleLarge, styles.heading]}>Edit {props.data.resource_category_name}</Text>
+            {/*<Text style={[textTheme.titleLarge, styles.heading]}>Edit {props.data.resource_category_name}</Text>*/}
+            <Text style={[textTheme.titleLarge, styles.heading]}>Edit Cart Item</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={props.onCloseModal}
@@ -102,17 +101,14 @@ const EditCartModal = (props) => {
                         <CustomTextInput labelTextStyle={textTheme.titleMedium} flex={1} type={"number"}
                                          label={"Enter discount"}
                                          value={discountValue.toString()}
-                                         onChangeText={setDiscountValue}
-                                         onEndEditing={async (value) => {
+                                         onChangeText={async (value) => {
+                                             setDiscountValue(value)
                                              if (value === "") {
                                                  setDiscountValue(0)
                                                  setDiscountAmount(0)
                                                  return;
                                              } else if (selectedDiscountMode === "percentage" && parseFloat(value) > 100) {
                                                  setDiscountValue(prev => prev);
-                                             } else if (selectedDiscountMode === "cash" && parseFloat(value) > parseFloat(price)) {
-                                                 setDiscountValue(prev => prev);
-                                                 return;
                                              } else {
                                                  setDiscountValue(parseFloat(value));
                                              }
@@ -122,9 +118,32 @@ const EditCartModal = (props) => {
                                              if (selectedDiscountMode === "percentage") {
                                                  setDiscountAmount(await getDiscountAPI({
                                                      price: price,
-                                                     disc_percent: discountValue
+                                                     disc_percent: value
                                                  }))
                                              }
+                                         }}
+                                         onEndEditing={async (value) => {
+                                             // if (value === "") {
+                                             //     setDiscountValue(0)
+                                             //     setDiscountAmount(0)
+                                             //     return;
+                                             // } else if (selectedDiscountMode === "percentage" && parseFloat(value) > 100) {
+                                             //     setDiscountValue(prev => prev);
+                                             // } else if (selectedDiscountMode === "cash" && parseFloat(value) > parseFloat(price)) {
+                                             //     setDiscountValue(prev => prev);
+                                             //     return;
+                                             // } else {
+                                             //     setDiscountValue(parseFloat(value));
+                                             // }
+                                             // if (selectedDiscountMode === "cash") {
+                                             //     setDiscountAmount(parseFloat(value));
+                                             // }
+                                             // if (selectedDiscountMode === "percentage") {
+                                             //     setDiscountAmount(await getDiscountAPI({
+                                             //         price: price,
+                                             //         disc_percent: discountValue
+                                             //     }))
+                                             // }
                                          }}
                         />
                         <PrimaryButton
@@ -158,7 +177,15 @@ const EditCartModal = (props) => {
         </View>
         <Divider/>
         <View style={styles.addToCartButtonContainer}>
-            <PrimaryButton onPress={async () => {
+            <PrimaryButton buttonStyle={{
+                flex: 1,
+                backgroundColor: Colors.transparent,
+                borderWidth: 1,
+                borderColor: Colors.grey300,
+            }} textStyle={{color: Colors.black}} onPress={async () => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }} label={"Cancel"}/>
+            <PrimaryButton buttonStyle={{flex: 1}} onPress={async () => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                 if (discountAmount >= price) {
                     toastRef.current.show("Discount should not be equal or greater than price", 2000);
@@ -249,11 +276,10 @@ const styles = StyleSheet.create({
     }
     ,
     heading: {
-        textAlign: "center",
+        // textAlign: "center",
         fontWeight:
             500
-    }
-    ,
+    },
     closeButton: {
         position: "absolute",
         right:
@@ -294,6 +320,8 @@ const styles = StyleSheet.create({
     percentAndAmountPressable: {}
     ,
     addToCartButtonContainer: {
+        flexDirection: "row",
+        gap: 20,
         marginHorizontal: 30,
         marginTop:
             20,

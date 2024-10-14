@@ -28,11 +28,8 @@ import Toast from "../../ui/Toast";
 
 const EditMembershipModal = (props) => {
     const dispatch = useDispatch();
-    console.log(props.data);
     const editedCart = useSelector(state => state.cart.editedCart);
     const editedData = editedCart.filter(item => item.membership_id === props.data.membership_id)[0]
-    console.log("Edited")
-    console.log(editedData)
     const [date, setDate] = useState(new Date(Date.now()).setHours(0, 0, 0, 0));
     const [validFromDate, setValidFromDate] = useState(editedData ? new Date(editedData.valid_from) : date);
     const [validUntilDate, setValidUntilDate] = useState(editedData ? new Date(editedData.valid_until) : date + (props.data.duration * 24 * 60 * 60 * 1000));
