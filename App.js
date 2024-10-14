@@ -65,7 +65,6 @@ import { loadBusinessesListFromDb } from './store/listOfBusinessSlice';
 import { loadLoginUserDetailsFromDb } from './store/loginUserSlice';
 import drawerItem from "react-native-paper/src/components/Drawer/DrawerItem";
 import * as SecureStore from 'expo-secure-store';
-import UserInactivity from "react-native-user-inactivity";
 
 enableScreens();
 
