@@ -33,6 +33,7 @@ import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientMod
 import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
 import { useLocationContext } from "../context/LocationContext";
 import Toast from "../ui/Toast";
+import AdvancedFilters from "../components/clientSegmentScreen/AdvancedFilters";
 
 
 export default function ClientSegmentScreen(props) {
@@ -64,6 +65,7 @@ export default function ClientSegmentScreen(props) {
 
     const [modalVisibility, setModalVisibility] = useState(false)
     const [editClientModalVisibility, setEditClientModalVisibility] = useState(false);
+    const [advancedFilterVisibility, setAdvancedFiltersVisibility] = useState(false);
 
     const details = useSelector(state => state.clientInfo.details);
     const isSearchClientFetching = useSelector(state => state.clientFilter.isFetchingSearchClient);
@@ -320,6 +322,14 @@ export default function ClientSegmentScreen(props) {
                     />
                 }
 
+                {
+                    advancedFilterVisibility &&
+                    <AdvancedFilters
+                        isVisible={advancedFilterVisibility}
+                        onClose={() => setAdvancedFiltersVisibility(false)}
+                    />
+                }
+
                 <AddClient/>
 
                 <Divider color={Colors.grey250}/>
@@ -362,6 +372,7 @@ export default function ClientSegmentScreen(props) {
 
                     <PrimaryButton
                         buttonStyle={styles.filterButton}
+                        onPress={() => setAdvancedFiltersVisibility(true)}
                     >
                         <SimpleLineIcons
                             name="equalizer"
