@@ -69,6 +69,7 @@ import DashboardScreen from './screens/DashboardScreen';
 import SalesDashboard from './components/DashboardScreen/SalesDashboard';
 import StaffDashboard from './components/DashboardScreen/StaffDashboard';
 import ClientDashboard from './components/DashboardScreen/ClientDashboard';
+import { DataProvider, useDataContext } from './context/DataFlowContext';
 
 enableScreens();
 
@@ -138,34 +139,6 @@ export default function App() {
             {/*</UserInactivity>*/}
         </Provider>
     );
-}
-const BackButton = () => {
-    const navigation = useNavigation();
-  
-    return (
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingLeft: 10 }}>
-        <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
-      </TouchableOpacity>
-    );
-  };
-const DashboardStack = ({route}) => {
-    return (
-    <Stack.Navigator
-    initialRouteName="DashboardScreen"
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        headerTitleAlign: 'center',
-      })}
-    >
-        <Stack.Screen name='DashboardScreen' component={DashboardScreen}/>
-        <Stack.Screen name='SalesScreen' component={SalesDashboard} 
-        options={{headerTitle:"Sales Dashboard",headerLeft:()=><BackButton/>}}/>
-        <Stack.Screen name='StaffScreen' component={StaffDashboard} 
-        options={{headerTitle:"Staff Dashboard",headerLeft:()=><BackButton/>}}/>
-        <Stack.Screen name='ClientScreen' component={ClientDashboard} 
-        options={{headerTitle:"Client Dashboard",headerLeft:()=><BackButton/>}}/>
-    </Stack.Navigator>
-    )
 }
 
 const CheckoutStack = ({route}) => {
@@ -286,7 +259,9 @@ const AppNavigator = (props) => {
             <SafeAreaProvider>
                 {/* {isAuth ? */}
                     <LocationProvider>
-                        <MainDrawerNavigator auth={props.auth}/>
+                        <DataProvider>
+                            <MainDrawerNavigator auth={props.auth}/>
+                        </DataProvider>
                     </LocationProvider>
                     {/* : <AuthNavigator/>} */}
             </SafeAreaProvider>
@@ -302,10 +277,72 @@ const AuthNavigator = () => (
     </AuthStack.Navigator>
 );
 
+const BackButton = () => {
+    const navigation = useNavigation();
+    const {setIsDashboardPage} = useDataContext()
+    return (
+        <TouchableOpacity onPress={() => {
+            setTimeout(() => {
+                setIsDashboardPage(true)
+            }, 40);
+            setTimeout(() => {
+                navigation.goBack()
+            }, 50);
+        }} 
+        style={{ paddingLeft: 10 }}>
+        <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
+        </TouchableOpacity>
+    );
+};
 
 const MainDrawerNavigator = (props) => {
     const navigation = useNavigation();
     const { currentLocation, reload, setReload } = useLocationContext();
+    const {isDashboardPage} = useDataContext();
+    
+    const DashboardStack = ({route}) => {
+        return (
+        <Stack.Navigator
+        initialRouteName="DashboardScreen"
+          screenOptions={({ route }) => ({
+            headerShown: !isDashboardPage,
+            headerTitleAlign: 'center',
+          })}
+        >
+            <Stack.Screen name='DashboardScreen' 
+            component={DashboardScreen}
+            options={{headerTitle:""}}
+            />
+            <Stack.Screen
+            name="SalesScreen"
+            component={SalesDashboard}
+            options={{
+                headerTitle: "Sales Dashboard",
+                headerLeft: () => <BackButton />,
+                animation: "ios",
+            }}
+            />
+            <Stack.Screen 
+            name='StaffScreen' 
+            component={StaffDashboard} 
+            options={{
+                headerTitle:"Staff Dashboard",
+                headerLeft:()=><BackButton/>,
+                animation: "ios",
+            }}
+            />
+            <Stack.Screen 
+            name='ClientScreen' 
+            component={ClientDashboard} 
+            options={{
+                headerTitle:"Client Dashboard",
+                headerLeft:()=><BackButton/>,
+                animation: "ios",
+            }}
+            />
+        </Stack.Navigator>
+        )
+    }
     useEffect(() => {
         const backAction = () => {
             Alert.alert(
@@ -439,6 +476,8 @@ const MainDrawerNavigator = (props) => {
                                 name="Dashboard"
                                 component={DashboardStack}
                                 options={{
+                                    headerTitleAlign:"center",
+                                    headerShown:isDashboardPage,
                                     drawerIcon: () => <Image
                                         source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
                                         style={{ resizeMode: "contain" }} />

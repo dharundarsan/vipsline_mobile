@@ -1,19 +1,28 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Colors from "../constants/Colors";
 import { dashboardSelection } from "../data/DashboardSelection";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useDataContext } from "../context/DataFlowContext";
+import { useLocationContext } from "../context/LocationContext";
 
 export default function DashboardScreen() {
   const navigate = useNavigation();
+  const {setIsDashboardPage} = useDataContext();
+
   return (
     <View style={styles.container}>
       <View style={styles.cardcontainer}>
         {dashboardSelection.map((item, index) => {
           return (
-            <TouchableOpacity key={index} style={styles.card} activeOpacity={0.4} onPress={()=>{
-              navigate.navigate('SalesScreen')
+            <TouchableOpacity key={index} style={styles.card} activeOpacity={0.4} onPress={() => {
+              setTimeout(() => {
+                setIsDashboardPage(false);
+                setTimeout(() => {
+                  navigate.navigate(item.navigate);
+                }, 50);
+              }, 5); 
             }}>
               <View style={styles.headerContainer}>
                 <Image
