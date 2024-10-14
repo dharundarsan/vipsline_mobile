@@ -55,7 +55,7 @@ const CheckoutSection = (props) => {
         0;
 
     const cart = useSelector(state => state.cart);
-    // console.log(cart);
+    // console.log(JSON.stringify(cart,null,3));
 
     const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
     const dispatch = useDispatch();
@@ -80,7 +80,6 @@ const CheckoutSection = (props) => {
     });
     const cartDetails = useSelector(state => state.cart.items);
     useEffect(() => {
-        console.log('Updated calculatedPrice:', calculatedPrice);
         if (calculatedPrice[0]?.service_discounts_in_price !== undefined &&
             calculatedPrice[0]?.product_discounts_in_price !== undefined &&
             calculatedPrice[0]?.package_discounts_in_price !== undefined) {
@@ -150,10 +149,7 @@ const CheckoutSection = (props) => {
     const [data, setData] = useState([{}])
 
     useEffect(() => {
-        // console.log(JSON.stringify(cartItems,null,3));
-        // if(cartItems.length === 0){
-        dispatch(updateDiscount([]));
-        // }
+        dispatch(updateDiscount(cart.additionalDiscounts));
     }, [])
 
     function openModal(title, value) {

@@ -182,7 +182,8 @@ const CartItem = (props) => {
         }
     });
 
-    console.log(editedData);
+    // console.log(originalProductItem)
+    // console.log(useSelector(state => state.catalogue.products.items))
 
     return <>
         <View style={styles.cartItem}>

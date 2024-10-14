@@ -46,7 +46,7 @@ import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 const UpdateClientModal = ((props) => {
     const details = props.details;
 
-    console.log("kgsdkgbskdjbskdjbkb");
+
 
 
     const [clientData, setClientData] = useState({
@@ -106,7 +106,7 @@ const UpdateClientModal = ((props) => {
         const phoneNoValid = phoneNoRef.current();
         // const emailValid = emailRef.current();
 
-        console.log(clientData.clientSource);
+
 
         if (!firstNameValid || !lastNameValid || !phoneNoValid) return;
         try {
@@ -151,7 +151,6 @@ const UpdateClientModal = ((props) => {
             // ToastAndroid.show(e + "error", ToastAndroid.LONG);
             // TODO
             props.updateClientToast("failed to update client", 2000);
-            console.log("updated")
             // Toast.show(e+" error",{
             //     duration:Toast.durations.LONG,
             //     position: Toast.positions.BOTTOM,

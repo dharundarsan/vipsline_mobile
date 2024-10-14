@@ -59,8 +59,6 @@ const AddCustomItemModal = (props) => {
                     }}
                     validator={(text) => {
                         if (text == 0) {
-                            console.log("123");
-                            
                             return "First name is required"
                         }
                         else return true;

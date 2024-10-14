@@ -104,7 +104,6 @@ export default function EmailLogin() {
 
 
         if (isAuthenticationSuccessful) {
-            console.log("succ")
             setPasswordPrompt("");
             setIsPasswordValid(true);
             dispatch(updateAuthStatus(true));
@@ -271,16 +270,12 @@ export default function EmailLogin() {
                     }
                     if(email.trim().length === 0 && password.trim().length > 0) {
                         setEmailPrompt("Email is required");
-                        console.log("3")
                         setPasswordPrompt("");
-                        // console.log("2")
 
                     }
                     else if(email.trim().length > 0 && password.trim().length === 0){
                         setPasswordPrompt("Password is required")
                         setEmailPrompt("");
-                        // console.log("3")
-
                     }
 
                     else if(email.trim().length === 0 && password.trim().length === 0) {
