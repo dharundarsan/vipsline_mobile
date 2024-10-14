@@ -11,6 +11,8 @@ import authReducer from "./authSlice";
 import invoiceReducer from "./invoiceSlice";
 import checkoutActionReducer from "./CheckoutActionSlice";
 import toastReducer from "./toastSlice";
+import businessDetailReducer from "./BusinessDetailSlice";
+
 const store = configureStore({
     reducer: {
         cart: cartReducer,
@@ -24,6 +26,7 @@ const store = configureStore({
         authDetails: authReducer,
         invoice: invoiceReducer,
         checkoutAction:checkoutActionReducer,
+        businessDetail: businessDetailReducer,
         toast: toastReducer,
     },
 });

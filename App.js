@@ -1,5 +1,15 @@
 import {StatusBar} from 'expo-status-bar';
-import {Alert, BackHandler, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+    Alert,
+    AppState,
+    BackHandler,
+    Image,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import {CommonActions, NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
@@ -55,6 +65,11 @@ import { loadBusinessesListFromDb } from './store/listOfBusinessSlice';
 import { loadLoginUserDetailsFromDb } from './store/loginUserSlice';
 import drawerItem from "react-native-paper/src/components/Drawer/DrawerItem";
 import * as SecureStore from 'expo-secure-store';
+import DashboardScreen from './screens/DashboardScreen';
+import SalesDashboard from './components/DashboardScreen/SalesDashboard';
+import StaffDashboard from './components/DashboardScreen/StaffDashboard';
+import ClientDashboard from './components/DashboardScreen/ClientDashboard';
+import { DataProvider, useDataContext } from './context/DataFlowContext';
 
 enableScreens();
 
@@ -77,20 +92,51 @@ export default function App() {
         async function get(){
             setIsAuth(!!await SecureStore.getItemAsync('authKey'))
         }
-        get()
+        get();
+        // const subscription = AppState.addEventListener('change', handleAppStateChange);
+        // return () => subscription.remove();
 
     }, [loaded, error]);
 
     if (!loaded && !error) {
         return null;
     }
+
+
+    // const handleAppStateChange = (nextAppState) => {
+    //     if (nextAppState === 'background') {
+    //         // App is in the background
+    //         console.log('App has moved to the background');
+    //     } else if (nextAppState === 'active') {
+    //         // App has come to the foreground
+    //         console.log('App is active');
+    //     }
+    // };
+
+    // const [isActive, setIsActive] = useState(true);
+
+    // Callback to handle user activity
+    // const handleUserActivity = (active) => {
+    //     console.log(active);
+    //     if(!active) {
+    //
+    //     Alert.alert("this is app time out alert", "please close the app and restart");
+    //     }
+    // };
+
     return (
 
         <Provider store={store}>
+            {/*<UserInactivity*/}
+            {/*    timeForInactivity={5000}  // Time in milliseconds*/}
+            {/*    onAction={handleUserActivity}  // Callback when user becomes inactive*/}
+            {/*    style={{ flex: 1 }}*/}
+            {/*>*/}
             {/*<SafeAreaView style={styles.safeAreaView}>*/}
 
             <AppNavigator auth={isAuth} setAuth={setIsAuth}/>
             {/*</SafeAreaView>*/}
+            {/*</UserInactivity>*/}
         </Provider>
     );
 }
@@ -213,7 +259,9 @@ const AppNavigator = (props) => {
             <SafeAreaProvider>
                 {/* {isAuth ? */}
                     <LocationProvider>
-                        <MainDrawerNavigator auth={props.auth}/>
+                        <DataProvider>
+                            <MainDrawerNavigator auth={props.auth}/>
+                        </DataProvider>
                     </LocationProvider>
                     {/* : <AuthNavigator/>} */}
             </SafeAreaProvider>
@@ -229,10 +277,72 @@ const AuthNavigator = () => (
     </AuthStack.Navigator>
 );
 
+const BackButton = () => {
+    const navigation = useNavigation();
+    const {setIsDashboardPage} = useDataContext()
+    return (
+        <TouchableOpacity onPress={() => {
+            setTimeout(() => {
+                setIsDashboardPage(true)
+            }, 40);
+            setTimeout(() => {
+                navigation.goBack()
+            }, 50);
+        }} 
+        style={{ paddingLeft: 10 }}>
+        <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
+        </TouchableOpacity>
+    );
+};
 
 const MainDrawerNavigator = (props) => {
     const navigation = useNavigation();
     const { currentLocation, reload, setReload } = useLocationContext();
+    const {isDashboardPage} = useDataContext();
+    
+    const DashboardStack = ({route}) => {
+        return (
+        <Stack.Navigator
+        initialRouteName="DashboardScreen"
+          screenOptions={({ route }) => ({
+            headerShown: !isDashboardPage,
+            headerTitleAlign: 'center',
+          })}
+        >
+            <Stack.Screen name='DashboardScreen' 
+            component={DashboardScreen}
+            options={{headerTitle:""}}
+            />
+            <Stack.Screen
+            name="SalesScreen"
+            component={SalesDashboard}
+            options={{
+                headerTitle: "Sales Dashboard",
+                headerLeft: () => <BackButton />,
+                animation: "ios",
+            }}
+            />
+            <Stack.Screen 
+            name='StaffScreen' 
+            component={StaffDashboard} 
+            options={{
+                headerTitle:"Staff Dashboard",
+                headerLeft:()=><BackButton/>,
+                animation: "ios",
+            }}
+            />
+            <Stack.Screen 
+            name='ClientScreen' 
+            component={ClientDashboard} 
+            options={{
+                headerTitle:"Client Dashboard",
+                headerLeft:()=><BackButton/>,
+                animation: "ios",
+            }}
+            />
+        </Stack.Navigator>
+        )
+    }
     useEffect(() => {
         const backAction = () => {
             Alert.alert(
@@ -362,24 +472,26 @@ const MainDrawerNavigator = (props) => {
                                 )
                             })}
                         >
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Dashboard"*/}
-                            {/*    component={CheckoutStack}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Appointments"*/}
-                            {/*    component={CheckoutStack}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
+                            <Drawer.Screen
+                                name="Dashboard"
+                                component={DashboardStack}
+                                options={{
+                                    headerTitleAlign:"center",
+                                    headerShown:isDashboardPage,
+                                    drawerIcon: () => <Image
+                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
+                                        style={{ resizeMode: "contain" }} />
+                                }}
+                            />
+                            {/* <Drawer.Screen
+                                name="Appointments"
+                                component={CheckoutStack}
+                                options={{
+                                    drawerIcon: () => <Image
+                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
+                                        style={{ resizeMode: "contain" }} />
+                                }} 
+                            />  */}
                             <Drawer.Screen
                                 name="Checkout"
                                 component={CheckoutStack}

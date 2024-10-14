@@ -58,10 +58,7 @@ const AddCustomItemModal = (props) => {
                         else setItemPrice(parseFloat(price))
                     }}
                     validator={(text) => {
-                        console.log(text);
                         if (text == 0) {
-                            console.log("123");
-                            
                             return "First name is required"
                         }
                         else return true;

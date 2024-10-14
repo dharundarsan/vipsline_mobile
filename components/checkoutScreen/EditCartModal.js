@@ -42,7 +42,6 @@ const EditCartModal = (props) => {
             ? props.data.dis
             : 0;
 
-    console.log(initialDiscountValue)
 
     const initialDiscountAmount = isEdited ? props.data.disc_value : (hasDiscountedPrice ? props.data.price - props.data.discounted_price : 0);
 

@@ -25,6 +25,7 @@ import AddCustomItemModal from "./AddCustomItemModal";
 import PackageModal from "./PackageModal";
 import {clientSlice} from "../../store/clientSlice";
 import * as Haptics from "expo-haptics";
+import EditMembershipModal from "./EditMembershipModal";
 
 const CartItem = (props) => {
     const dispatch = useDispatch();
@@ -45,6 +46,10 @@ const CartItem = (props) => {
     // const edited = editedData.some(item => props.data.item_id === item.item_id);
 
     const removeItemHandler = async () => {
+        4
+        4
+        4
+
         if (isLoading) return;
         dispatch(updateLoadingState(true));
         dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
@@ -173,13 +178,18 @@ const CartItem = (props) => {
         }
     });
 
-    console.log(prepaidDetails)
-
     // console.log(originalProductItem)
     // console.log(useSelector(state => state.catalogue.products.items))
 
     return <>
         <View style={styles.cartItem}>
+            {isEditMembershipModalVisible && <EditMembershipModal edited={true}
+                                                                  data={props.data}
+                                                                  isVisible={isEditMembershipModalVisible}
+                                                                  onCloseModal={() => {
+                                                                      setIsEditMembershipModalVisible(false);
+                                                                  }}
+            />}
             {isEditPrepaidModalVisible && <PrepaidModal edited={true}
                                                         data={props.data}
                                                         isVisible={isEditPrepaidModalVisible}
@@ -262,6 +272,8 @@ const CartItem = (props) => {
                                     setIsEditCustomItemModalVisible(true);
                                 } else if (props.data.gender === "packages") {
                                     setIsEditPackageModalVisible(true);
+                                } else if(props.data.gender === "membership"){
+                                    setIsEditMembershipModalVisible(true);
                                 } else {
                                     setIsEditCartModalVisible(true)
                                 }
