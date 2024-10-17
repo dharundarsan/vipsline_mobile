@@ -160,6 +160,9 @@ const InvoiceModal = (props) => {
         textAlign: "center"
     }
 
+
+    console.log(JSON.stringify(details, null, 2));
+
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}
         // presentationStyle="pageSheet" onRequestClose={()=>{
@@ -488,11 +491,16 @@ styles.heading]}>Invoice</Text>*/}
                                 {
                                     checkNullUndefined(details) ?
                                         checkNullUndefined(details.organized_list) && checkNullUndefined(details.organized_list.length) &&
+
                                         details.organized_list.map((item) => (
                                                 checkNullUndefined(item.list) && checkNullUndefined(item.list.length) &&
                                                 item.list.map((innerItem, index) => {
                                                     // setTotalDiscount(prev => prev + innerItem.discount_percent);
-                                                    return (<>
+                                                    return (
+                                                        (item.gender === "GENERAL" || item.gender === "GENERAL & KIDS") && innerItem.parent_category_name === "custom_service" ?
+                                                            <></> :
+                                                        <>
+
                                                         <Row
                                                             key={index}
                                                             data={

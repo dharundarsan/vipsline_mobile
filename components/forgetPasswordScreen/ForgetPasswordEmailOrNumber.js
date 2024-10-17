@@ -6,6 +6,8 @@ import {useNavigation} from "@react-navigation/native";
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useRef, useState} from "react";
 import axios from "axios";
+import forgetPasswordAPI from "../../util/apis/forgetPasswordAPI";
+import Toast from "../../ui/Toast";
 
 export default function ForgetPasswordEmailOrNumber(props) {
     const navigation = useNavigation();
@@ -27,6 +29,8 @@ export default function ForgetPasswordEmailOrNumber(props) {
 
     const BaseURL = process.env.EXPO_PUBLIC_API_URI
     const platform = "BUSINESS";
+
+
 
     let responseUserMessage = "";
 
@@ -134,6 +138,7 @@ export default function ForgetPasswordEmailOrNumber(props) {
 
     return (
         <View style={styles.forgetPasswordBody}>
+
             <PrimaryButton
                 buttonStyle={styles.buttonStyle}
                 onPress={() => {
@@ -176,17 +181,29 @@ export default function ForgetPasswordEmailOrNumber(props) {
             </View>
             <PrimaryButton
                 buttonStyle={styles.sendOtpButton}
-                onPress={() => {
+                onPress={async () => {
                     if (isLoading) {
                         return null;
                     }
                     else {
-                        sendOtp().then(r => null);
-                        setEmailPrompt("");
-                        setIsUserTyping(false)
+                        setIsLoading(true);
+                        const message = await forgetPasswordAPI(mobileNumber, "BUSINESS");
+                        setIsLoading(false);
+
+                        if(message === "OTP has been sent") {
+                            setIsUserFound(true)
+                            setEmailPrompt("");
+                            setIsUserTyping(false);
+                            props.setMobileNumber(mobileNumber);
+                            props.otpHandler(message);
+                        }
+                        else {
+                            setIsUserFound(false)
+                        }
                     }
 
-                    setIsSendOtpPressed(true)
+                    setIsSendOtpPressed(true);
+                    setIsUserTyping(false)
 
 
                 }}
