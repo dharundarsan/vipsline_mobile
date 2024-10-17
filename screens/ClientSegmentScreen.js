@@ -382,7 +382,7 @@ export default function ClientSegmentScreen(props) {
 
                     <PrimaryButton
                         buttonStyle={styles.filterButton}
-                        onPress={() => setAdvancedFiltersVisibility(true)}
+                        onPress={() => null}
                     >
                         <SimpleLineIcons
                             name="equalizer"
