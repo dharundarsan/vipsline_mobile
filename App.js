@@ -472,17 +472,17 @@ const MainDrawerNavigator = (props) => {
                                 )
                             })}
                         >
-                            <Drawer.Screen
-                                name="Dashboard"
-                                component={DashboardStack}
-                                options={{
-                                    headerTitleAlign:"center",
-                                    headerShown:isDashboardPage,
-                                    drawerIcon: () => <Image
-                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
-                                        style={{ resizeMode: "contain" }} />
-                                }}
-                            />
+                            {/*<Drawer.Screen*/}
+                            {/*    name="Dashboard"*/}
+                            {/*    component={DashboardStack}*/}
+                            {/*    options={{*/}
+                            {/*        headerTitleAlign:"center",*/}
+                            {/*        headerShown:isDashboardPage,*/}
+                            {/*        drawerIcon: () => <Image*/}
+                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
+                            {/*            style={{ resizeMode: "contain" }} />*/}
+                            {/*    }}*/}
+                            {/*/>*/}
                             {/* <Drawer.Screen
                                 name="Appointments"
                                 component={CheckoutStack}
