@@ -28,7 +28,7 @@ const AddCustomItemModal = (props) => {
         <KeyboardAvoidingView style={{ flex: 1,paddingBottom:insets.bottom }} keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}
         behavior="height">
             <View style={[styles.headingAndCloseContainer, shadowStyling]}>
-                <Text style={[textTheme.titleLarge, styles.heading]}>Edit Custom Item</Text>
+                <Text style={[textTheme.titleLarge, styles.heading]}>{props.edited ? "Edit Custom Item" : "Add Custom Item"} </Text>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     onPress={props.onCloseModal}
@@ -58,10 +58,7 @@ const AddCustomItemModal = (props) => {
                         else setItemPrice(parseFloat(price))
                     }}
                     validator={(text) => {
-                        console.log(text);
                         if (text == 0) {
-                            console.log("123");
-                            
                             return "First name is required"
                         }
                         else return true;

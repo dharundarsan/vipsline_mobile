@@ -27,7 +27,7 @@ const PrepaidModal = (props) => {
     const [prepaidAmount, setPrepaidAmount] = useState(props.edited ? prepaid_wallet[0].wallet_amount : 0)
     // const [prepaidBonus, setPrepaidBonus] = useState(props.edited ? props.data.wallet_bonus : 0)
     const [prepaidBonus, setPrepaidBonus] = useState(props.edited ? prepaid_wallet[0].bonus_value : 0)
-    const [description, setDescription] = useState(props.edited ? props.data.wallet_bonus : "")
+    const [description, setDescription] = useState(props.edited ? prepaid_wallet[0].description : "")
     const dispatch = useDispatch();
     const prepaidAmountRef = useRef(null);
 

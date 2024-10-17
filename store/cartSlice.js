@@ -316,7 +316,6 @@ export const cartSlice = createSlice({
                 const originalData = state.items.filter(item => item.membership_id === action.payload.id)[0];
                 const validFrom = new Date(Date.now()).setHours(0, 0, 0, 0)
                 const validUntil = validFrom + (originalData.duration * 24 * 60 * 60 * 1000)
-                console.log({...originalData, ...action.payload.data})
                 state.editedCart = [...state.editedCart, {
                     ...originalData, ...action.payload.data,
                     valid_from: formatDate(validFrom, "yyyy-mm-dd"),
@@ -447,7 +446,6 @@ export const cartSlice = createSlice({
                     break;
                 case "updateResourceId":
                     // if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
-                    console.log(state.editedCart.filter(item => item.gender === "prepaid"))
                     if (state.prepaid_wallet.length > 0) {
                         // state.prepaid_wallet[0].source = "add_prepaid";
                         state.prepaid_wallet = [{

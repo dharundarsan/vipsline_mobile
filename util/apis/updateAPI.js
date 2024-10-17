@@ -58,6 +58,16 @@ export default async function updateAPI(response, mode_of_payment, splitUpState,
                 wallet_id: clientInfo.wallet_id
             };
             break;
+        case "NIL":
+            data = {
+                status: "paid_at_venue",
+                bookingId: response.booking_id,
+                mode_of_payment: "NIL",
+                transactionId: "",
+                prepaid_wallet_details: Object.keys(response.prepaid_wallet_details).length !== 0 ? response.prepaid_wallet_details : undefined,
+                wallet_id: clientInfo.wallet_id
+            };
+            break;
         default:
             throw new Error("Unknown payment mode");
     }

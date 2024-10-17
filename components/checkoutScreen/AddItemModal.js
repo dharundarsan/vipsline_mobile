@@ -54,6 +54,7 @@ const AddItemModal = (props) => {
     const [selectedDate, setSelectedDate] = useState(appointmentDate);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [womenServicesData, setWomenServicesData] = useState();
+    const [isBackDateInvoiceNoteVisible, setIsBackDateInvoiceNoteVisible] = useState(new Date(appointmentDate).getDate() !== new Date(Date.now()).getDate());
 
     const toastRef = useRef(null);
 
@@ -155,6 +156,18 @@ const AddItemModal = (props) => {
     let content;
     if (selectedCategory === null) {
         content = <View style={styles.modalContent}>
+            { isBackDateInvoiceNoteVisible && <View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "rgba(253,253,150,.6)",
+                paddingVertical: 10,
+                justifyContent: "center",
+                gap: 10
+            }}>
+                <AntDesign name="warning" size={28} color={Colors.orange}/>
+                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You are trying to raise the invoice on a
+                    previous date</Text>
+            </View>}
             <View style={styles.modalHeader}>
                 <View style={styles.dateContainer}>
                     <Text
@@ -199,9 +212,9 @@ const AddItemModal = (props) => {
                                         now.getFullYear() === selectedDateLocal.getFullYear();
 
                                     if (!isSameDay) {
-
-                                        toastRef.current.show("you're trying to raise the invoice on a previous date", 1000);
-
+                                        setIsBackDateInvoiceNoteVisible(true);
+                                    } else {
+                                        setIsBackDateInvoiceNoteVisible(false);
                                     }
                                 }
                                 setIsDatePickerVisible(false);

@@ -34,6 +34,7 @@ import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptio
 import { useLocationContext } from "../context/LocationContext";
 import Toast from "../ui/Toast";
 import AdvancedFilters from "../components/clientSegmentScreen/AdvancedFilters";
+import CustomTagFilter from "../ui/CustomTagFilter";
 
 
 export default function ClientSegmentScreen(props) {
@@ -94,6 +95,12 @@ export default function ClientSegmentScreen(props) {
     const [isLoading, setIsLoading] = useState(false);
     const [isSearchLoading, setIsSearchLoading] = useState(false);
     const toastRef = useRef(null);
+
+    const [selectedFilters, setSelectedFilters] = useState([]);
+
+    const handleSelectionChange = (updatedFilters) => {
+        setSelectedFilters(updatedFilters);
+    };
 
     const { getLocation,currentLocation } = useLocationContext();
     useFocusEffect(useCallback( ()=>{
@@ -327,6 +334,9 @@ export default function ClientSegmentScreen(props) {
                     <AdvancedFilters
                         isVisible={advancedFilterVisibility}
                         onClose={() => setAdvancedFiltersVisibility(false)}
+                        selectedOptions={(options) => {
+                            setSelectedFilters(options);
+                        }}
                     />
                 }
 
@@ -372,7 +382,7 @@ export default function ClientSegmentScreen(props) {
 
                     <PrimaryButton
                         buttonStyle={styles.filterButton}
-                        onPress={() => setAdvancedFiltersVisibility(true)}
+                        onPress={() => null}
                     >
                         <SimpleLineIcons
                             name="equalizer"
@@ -383,6 +393,11 @@ export default function ClientSegmentScreen(props) {
                     </PrimaryButton>
 
                 </View>
+
+                <CustomTagFilter
+                    options={selectedFilters}
+                    onSelectionChange={handleSelectionChange}
+                />
 
                 <View style={styles.clientCount}>
                     <Image source={require("../assets/icons/menu.png")} style={styles.menuImage}/>

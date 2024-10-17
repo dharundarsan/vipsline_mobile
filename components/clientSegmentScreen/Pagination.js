@@ -67,7 +67,6 @@ export default function Pagination(props) {
         if(currentClientCount > 10) {
             dispatch(loadClientFiltersFromDb(10, clientFilterNames(props.filterPressed)))
         }
-        console.log(currentClientCount)
         setTotalCount("currentClientCount");
         setTotalCount(currentClientCount);
         setLowerCount(1);

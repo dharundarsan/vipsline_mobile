@@ -65,6 +65,12 @@ import { loadBusinessesListFromDb } from './store/listOfBusinessSlice';
 import { loadLoginUserDetailsFromDb } from './store/loginUserSlice';
 import drawerItem from "react-native-paper/src/components/Drawer/DrawerItem";
 import * as SecureStore from 'expo-secure-store';
+import DashboardScreen from './screens/DashboardScreen';
+import SalesDashboard from './components/DashboardScreen/SalesDashboard';
+import StaffDashboard from './components/DashboardScreen/StaffDashboard';
+import ClientDashboard from './components/DashboardScreen/ClientDashboard';
+import { DataProvider, useDataContext } from './context/DataFlowContext';
+import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 
 enableScreens();
 
@@ -254,7 +260,9 @@ const AppNavigator = (props) => {
             <SafeAreaProvider>
                 {/* {isAuth ? */}
                     <LocationProvider>
-                        <MainDrawerNavigator auth={props.auth}/>
+                        <DataProvider>
+                            <MainDrawerNavigator auth={props.auth}/>
+                        </DataProvider>
                     </LocationProvider>
                     {/* : <AuthNavigator/>} */}
             </SafeAreaProvider>
@@ -267,13 +275,76 @@ const AuthNavigator = () => (
         <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
         <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
         <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+        <AuthStack.Screen name="ChangePasswordScreen" component={ChangePasswordScreen}/>
     </AuthStack.Navigator>
 );
 
+const BackButton = () => {
+    const navigation = useNavigation();
+    const {setIsDashboardPage} = useDataContext()
+    return (
+        <TouchableOpacity onPress={() => {
+            setTimeout(() => {
+                setIsDashboardPage(true)
+            }, 40);
+            setTimeout(() => {
+                navigation.goBack()
+            }, 50);
+        }} 
+        style={{ paddingLeft: 10 }}>
+        <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
+        </TouchableOpacity>
+    );
+};
 
 const MainDrawerNavigator = (props) => {
     const navigation = useNavigation();
     const { currentLocation, reload, setReload } = useLocationContext();
+    const {isDashboardPage} = useDataContext();
+    
+    const DashboardStack = ({route}) => {
+        return (
+        <Stack.Navigator
+        initialRouteName="DashboardScreen"
+          screenOptions={({ route }) => ({
+            headerShown: !isDashboardPage,
+            headerTitleAlign: 'center',
+          })}
+        >
+            <Stack.Screen name='DashboardScreen' 
+            component={DashboardScreen}
+            options={{headerTitle:""}}
+            />
+            <Stack.Screen
+            name="SalesScreen"
+            component={SalesDashboard}
+            options={{
+                headerTitle: "Sales Dashboard",
+                headerLeft: () => <BackButton />,
+                animation: "ios",
+            }}
+            />
+            <Stack.Screen 
+            name='StaffScreen' 
+            component={StaffDashboard} 
+            options={{
+                headerTitle:"Staff Dashboard",
+                headerLeft:()=><BackButton/>,
+                animation: "ios",
+            }}
+            />
+            <Stack.Screen 
+            name='ClientScreen' 
+            component={ClientDashboard} 
+            options={{
+                headerTitle:"Client Dashboard",
+                headerLeft:()=><BackButton/>,
+                animation: "ios",
+            }}
+            />
+        </Stack.Navigator>
+        )
+    }
     useEffect(() => {
         const backAction = () => {
             Alert.alert(
@@ -403,24 +474,26 @@ const MainDrawerNavigator = (props) => {
                                 )
                             })}
                         >
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Dashboard"*/}
-                            {/*    component={CheckoutStack}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Appointments"*/}
-                            {/*    component={CheckoutStack}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
+                            <Drawer.Screen
+                                name="Dashboard"
+                                component={DashboardStack}
+                                options={{
+                                    headerTitleAlign:"center",
+                                    headerShown:isDashboardPage,
+                                    drawerIcon: () => <Image
+                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
+                                        style={{ resizeMode: "contain" }} />
+                                }}
+                            />
+                            {/* <Drawer.Screen
+                                name="Appointments"
+                                component={CheckoutStack}
+                                options={{
+                                    drawerIcon: () => <Image
+                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
+                                        style={{ resizeMode: "contain" }} />
+                                }} 
+                            />  */}
                             <Drawer.Screen
                                 name="Checkout"
                                 component={CheckoutStack}

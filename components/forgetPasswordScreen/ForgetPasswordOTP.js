@@ -10,6 +10,8 @@ import {useDispatch} from "react-redux";
 import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
 import {useNavigation} from "@react-navigation/native";
 import {updateAuthStatus} from "../../store/authSlice";
+import verifyOTPAPI from "../../util/apis/verifyOTPAPI";
+import forgetPasswordAPI from "../../util/apis/forgetPasswordAPI";
 
 export default function ForgetPasswordOTP(props) {
     const [otp, setOtp] = useState("");
@@ -32,7 +34,7 @@ export default function ForgetPasswordOTP(props) {
     }, [timer])
 
     async function resendOTPHandler() {
-        await sendOTPApi(props.mobileNumber, "BUSINESS");
+        await forgetPasswordAPI(props.mobileNumber, "BUSINESS");
         setTimer(60);
     }
 
@@ -85,11 +87,15 @@ export default function ForgetPasswordOTP(props) {
                 buttonStyle={styles.submitButton}
                 textStyle={[textTheme.titleMedium]}
                 onPress={async () => {
-                    const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS")
-                    setIsAuthenticated(authStatus);
+                    const authStatus = await verifyOTPAPI(props.mobileNumber, "BUSINESS", otp);
+                    props.verifyOTP(authStatus);
                     setChanging(true);
-                    if(authStatus === true) {
-                        dispatch(updateAuthStatus(true));
+                    if(authStatus === "Your otp is verified") {
+                        setIsAuthenticated(true);
+                        navigation.navigate("ChangePasswordScreen", {
+                            username: props.mobileNumber,
+                            otp: otp
+                        });
                     }
                 }}
             />
