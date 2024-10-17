@@ -70,6 +70,7 @@ import SalesDashboard from './components/DashboardScreen/SalesDashboard';
 import StaffDashboard from './components/DashboardScreen/StaffDashboard';
 import ClientDashboard from './components/DashboardScreen/ClientDashboard';
 import { DataProvider, useDataContext } from './context/DataFlowContext';
+import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 
 enableScreens();
 
@@ -274,6 +275,7 @@ const AuthNavigator = () => (
         <AuthStack.Screen name="AuthScreen" component={AuthScreen}/>
         <AuthStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
         <AuthStack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen}/>
+        <AuthStack.Screen name="ChangePasswordScreen" component={ChangePasswordScreen}/>
     </AuthStack.Navigator>
 );
 

@@ -7,7 +7,7 @@ import PrimaryButton from "./PrimaryButton";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {formatDate} from "../util/Helpers";
+import {checkNullUndefined, formatDate} from "../util/Helpers";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 /**
@@ -103,6 +103,9 @@ const CustomTextInput = (props) => {
                         setErrorMessage("");
                     }
                 }}
+                cursorColor={props.cursorColor}
+                onFocus={props.onFocus}
+                secureTextEntry={props.secureTextEntry}
             />
         );
     }else if(props.type === "email"){
@@ -256,6 +259,7 @@ const CustomTextInput = (props) => {
                      onConfirm={handleConfirm}                // Function called on date selection
                      onCancel={handleCancel}                  // Function called on cancel
                      themeVariant="light"
+                     style={props.dateStyle}
                  />
                     // <RNDateTimePicker
                     // maximumDate={props.maximumDate}
@@ -276,7 +280,7 @@ const CustomTextInput = (props) => {
                     // />
                 )}
                 <PrimaryButton
-                    buttonStyle={styles.dateTimeButtom}
+                    buttonStyle={[styles.dateTimeButtom, props.dateInputContainer]}
                     pressableStyle={styles.dateTimeButtonPressable}
                     disableRipple={props.readOnly}
                     onPress={() => setIsDateTimePickerVisible(true)}
@@ -296,8 +300,11 @@ const CustomTextInput = (props) => {
     }
 
     return (
-        <View style={[styles.commonContainer, props.flex !== undefined ? {flex: 1} : {}]}>
-            <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}</Text>
+        <View style={[styles.commonContainer, props.flex !== undefined ? {flex: 1} : {}, props.container]}>
+            {
+                !checkNullUndefined(props.labelEnabled) &&
+                <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}</Text>
+            }
             {content}
             {error && <Text style={[textTheme.bodyMedium, styles.errorText]}>{errorMessage}</Text>}
         </View>

@@ -3,17 +3,23 @@ import SignInHeader from "../components/authScreen/SignInHeader";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {StatusBar} from "expo-status-bar";
 import Colors from "../constants/Colors";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import ForgetPasswordEmailOrNumber from "../components/forgetPasswordScreen/ForgetPasswordEmailOrNumber";
 import ForgetPasswordOTP from "../components/forgetPasswordScreen/ForgetPasswordOTP";
+import Toast from "../ui/Toast";
 
 export default function ForgetPasswordScreen() {
-    function sendOtpHandler() {
+    function sendOtpHandler(message) {
         setIsOtp(true);
+        toastRef.current.show(message);
     }
 
     function backHandler() {
         setIsOtp(false);
+    }
+
+    function verifyOTPMessage(message) {
+        toastRef.current.show(message);
     }
 
     /**
@@ -23,6 +29,7 @@ export default function ForgetPasswordScreen() {
     const [isOtp, setIsOtp] = useState(false);
 
     const [mobileNumber, setMobileNumber] = useState("");
+    const toastRef = useRef(null)
 
 
     return(
@@ -31,9 +38,12 @@ export default function ForgetPasswordScreen() {
             <StatusBar style="light" />
             <View style={styles.forgetPassword}>
                 <SignInHeader />
+                <Toast
+                    ref={toastRef}
+                />
                 {
                     isOtp ?
-                        <ForgetPasswordOTP backHandler={backHandler} mobileNumber={mobileNumber} /> :
+                        <ForgetPasswordOTP backHandler={backHandler} mobileNumber={mobileNumber} verifyOTP={verifyOTPMessage}/> :
                         <ForgetPasswordEmailOrNumber otpHandler={sendOtpHandler} setMobileNumber={setMobileNumber} />
                 }
 

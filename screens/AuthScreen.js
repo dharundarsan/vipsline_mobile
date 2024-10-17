@@ -7,7 +7,7 @@ import {Entypo} from '@expo/vector-icons';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import MobileOtp from "../components/authScreen/MobileOtp";
 import EmailLogin from "../components/authScreen/EmailLogin";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
 import textTheme from "../constants/TextTheme";
@@ -23,8 +23,10 @@ import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
 import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
 import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
 import {useDispatch} from "react-redux";
+import Toast from "../ui/Toast";
+import {checkNullUndefined} from "../util/Helpers";
 
-function AuthScreen() {
+function AuthScreen(props) {
     const navigate = useNavigation();
     const dispatch = useDispatch();
 
@@ -120,6 +122,14 @@ function AuthScreen() {
         }
     });
 
+    useEffect(() => {
+        if(checkNullUndefined(props.route.params) && checkNullUndefined(props.route.params.message)) {
+            toastRef.current.show(props.route.params.message)
+        }
+    }, [props.route.params]);
+
+    const toastRef = useRef(null);
+
 
     return (
         <>
@@ -135,6 +145,9 @@ function AuthScreen() {
             />
             <ScrollView style={{flex: 1, backgroundColor: Colors.white}}>
             <SignInHeader/>
+                <Toast
+                    ref={toastRef}
+                />
             <View style={styles.body}>
                 <Text style={[textTheme.headlineMedium, styles.signInText]}>Sign in</Text>
                 <View style={styles.buttonContainer}>
