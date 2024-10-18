@@ -149,7 +149,7 @@ const CheckoutSection = (props) => {
     const [data, setData] = useState([{}])
 
     useEffect(() => {
-        dispatch(updateDiscount(cart.additionalDiscounts));
+        dispatch(updateDiscount([]));
     }, [])
 
     function openModal(title, value) {

@@ -365,7 +365,7 @@ styles.heading]}>Invoice</Text>*/}
                         </View> :
                         <></>
                 }
-                <View style={styles.logoAndButtonContainer}>git
+                <View style={styles.logoAndButtonContainer}>
                     <Feather name="check-circle" size={50}
                              color={Colors.highlight}/>
                     <Text style={[textTheme.titleMedium]}>Checkout
@@ -499,51 +499,51 @@ styles.heading]}>Invoice</Text>*/}
                                                     return (
                                                         (item.gender === "GENERAL" || item.gender === "GENERAL & KIDS") && innerItem.parent_category_name === "custom_service" ?
                                                             <></> :
-                                                        <>
+                                                            <>
 
-                                                        <Row
-                                                            key={index}
-                                                            data={
-                                                                [
-                                                                    innerItem.resource_service,
-                                                                    innerItem.resource_name,
-                                                                    innerItem.count,
-                                                                    (innerItem.service_cost).toFixed(2)
+                                                                <Row
+                                                                    key={index}
+                                                                    data={
+                                                                        [
+                                                                            innerItem.resource_service,
+                                                                            innerItem.resource_name,
+                                                                            innerItem.count,
+                                                                            (innerItem.service_cost).toFixed(2)
 
-                                                                ]
-                                                            }
-                                                            style={styles.cartItemTableRow}
-                                                            textStyle={textStyle2}
-                                                        />
-                                                        {
-                                                            checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" && innerItem.parent_category_name === "membership" ?
-                                                                <View style={styles.durationDetails}>
-                                                                    <Text>
-                                                                        Duration: {innerItem.duration} days
-                                                                    </Text>
-                                                                    <Text>
-                                                                        Start date: {innerItem.valid_from} | Expiry
-                                                                        date: {innerItem.valid_till}
-                                                                    </Text>
-                                                                </View> :
-                                                                <></>
-                                                        }
-                                                        {
-                                                            checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" && innerItem.parent_category_name === "packages" ?
-                                                                <View style={styles.durationDetails}>
-                                                                    <Text>
-                                                                        Duration: {innerItem.duration} days
-                                                                    </Text>
-                                                                    <Text>
-                                                                        Start date: {innerItem.valid_from} | Expiry
-                                                                        date: {innerItem.valid_till}
-                                                                    </Text>
+                                                                        ]
+                                                                    }
+                                                                    style={styles.cartItemTableRow}
+                                                                    textStyle={textStyle2}
+                                                                />
+                                                                {
+                                                                    checkNullUndefined(item.gender === "Membership") && item.gender === "Membership" && innerItem.parent_category_name === "membership" ?
+                                                                        <View style={styles.durationDetails}>
+                                                                            <Text>
+                                                                                Duration: {innerItem.duration} days
+                                                                            </Text>
+                                                                            <Text>
+                                                                                Start date: {innerItem.valid_from} | Expiry
+                                                                                date: {innerItem.valid_till}
+                                                                            </Text>
+                                                                        </View> :
+                                                                        <></>
+                                                                }
+                                                                {
+                                                                    checkNullUndefined(item.gender === "Packages") && item.gender === "Packages" && innerItem.parent_category_name === "packages" ?
+                                                                        <View style={styles.durationDetails}>
+                                                                            <Text>
+                                                                                Duration: {innerItem.duration} days
+                                                                            </Text>
+                                                                            <Text>
+                                                                                Start date: {innerItem.valid_from} | Expiry
+                                                                                date: {innerItem.valid_till}
+                                                                            </Text>
 
-                                                                </View> : <></>
+                                                                        </View> : <></>
 
-                                                        }
+                                                                }
 
-                                                    </>)
+                                                            </>)
 
                                                 })
 

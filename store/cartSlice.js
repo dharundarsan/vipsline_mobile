@@ -76,7 +76,7 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
         if (response.data.status_code > 400) {
             throw response;
         }
-        await dispatch(loadCartFromDB())
+        await dispatch(await loadCartFromDB())
 
     } catch (error) {
         //TODO

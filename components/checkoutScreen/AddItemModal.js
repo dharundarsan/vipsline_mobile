@@ -156,16 +156,16 @@ const AddItemModal = (props) => {
     let content;
     if (selectedCategory === null) {
         content = <View style={styles.modalContent}>
-            { isBackDateInvoiceNoteVisible && <View style={{
+            {isBackDateInvoiceNoteVisible && <View style={{
                 flexDirection: "row",
                 alignItems: "center",
                 backgroundColor: "rgba(253,253,150,.6)",
                 paddingVertical: 10,
                 justifyContent: "center",
-                gap: 10
+                gap: 3
             }}>
-                <AntDesign name="warning" size={28} color={Colors.orange}/>
-                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You are trying to raise the invoice on a
+                <AntDesign name="warning" size={22} color={Colors.orange}/>
+                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You're trying to raise the invoice on a
                     previous date</Text>
             </View>}
             <View style={styles.modalHeader}>
