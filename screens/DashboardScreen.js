@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useEffect } from "react";
 import Colors from "../constants/Colors";
 import { dashboardSelection } from "../data/DashboardSelection";
@@ -14,30 +14,34 @@ export default function DashboardScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.cardcontainer}>
-        {dashboardSelection.map((item, index) => {
-          return (
-            <TouchableOpacity key={index} style={styles.card} activeOpacity={0.4} onPress={() => {
+        <FlatList
+        data={dashboardSelection}
+        keyExtractor={(item)=>item.header.toString()}
+        renderItem={(item)=>{
+          return(
+          <TouchableOpacity style={styles.card} activeOpacity={0.4} onPress={() => {
+            setTimeout(() => {
+              setIsDashboardPage(false);
               setTimeout(() => {
-                setIsDashboardPage(false);
-                setTimeout(() => {
-                  navigate.navigate(item.navigate);
-                }, 50);
-              }, 5); 
-            }}>
-              <View style={styles.headerContainer}>
-                <Image
-                  source={item.icon}
-                  style={{ width: 24, height: 24 }}
-                  resizeMode="contain"
-                />
-                <Text style={styles.header}>{item.header}</Text>
-              </View>
-              <Text style={{ paddingTop: 10 }}>
-                Dashboard of your business performance
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+                navigate.navigate(item.item.navigate);
+              }, 50);
+            }, 5); 
+          }}>
+            <View style={styles.headerContainer}>
+              <Image
+                source={item.item.icon}
+                style={{ width: 24, height: 24 }}
+                resizeMode="contain"
+              />
+              <Text style={styles.header}>{item.item.header}</Text>
+            </View>
+            <Text style={{ paddingTop: 10 }}>
+              {item.item.desc}
+            </Text>
+          </TouchableOpacity>
+          )
+        }}
+        />
       </View>
     </View>
   );

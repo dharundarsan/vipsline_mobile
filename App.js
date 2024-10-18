@@ -285,9 +285,9 @@ const BackButton = () => {
             setTimeout(() => {
                 setIsDashboardPage(true)
             }, 40);
-            setTimeout(() => {
+            // setTimeout(() => {
                 navigation.goBack()
-            }, 50);
+            // }, 50);
         }} 
         style={{ paddingLeft: 10 }}>
         <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
