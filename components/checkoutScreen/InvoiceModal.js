@@ -365,7 +365,7 @@ styles.heading]}>Invoice</Text>*/}
                         </View> :
                         <></>
                 }
-                <View style={styles.logoAndButtonContainer}>
+                <View style={styles.logoAndButtonContainer}>git
                     <Feather name="check-circle" size={50}
                              color={Colors.highlight}/>
                     <Text style={[textTheme.titleMedium]}>Checkout

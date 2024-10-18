@@ -73,13 +73,14 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
                 }
             }
         );
-        if (response.data.status_code === 404) {
+        if (response.data.status_code > 400) {
             throw response;
         }
-        dispatch(await loadCartFromDB())
+        await dispatch(loadCartFromDB())
+
     } catch (error) {
         //TODO
-        throw error.data.other_message;
+        throw error.data.other_message
     }
 }
 
@@ -103,7 +104,7 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
 
     const {cart} = getState();
     try {
-        const response = await axios.post(
+        let response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URI}/cart/getCheckoutItemsInCart2ByBusiness`,
             {
                 business_id: `${await getBusinessId()}`,
