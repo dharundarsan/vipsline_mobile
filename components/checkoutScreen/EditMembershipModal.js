@@ -71,7 +71,8 @@ const EditMembershipModal = (props) => {
                 if (new Date(validFromDate).getTime() !== new Date(date).getTime() ||
                     new Date(validUntilDate).getTime() !== new Date(date + (props.data.duration * 24 * 60 * 60 * 1000)).getTime() ||
                     membershipPrice !== props.data.price ||
-                    membershipNumber !== "") {
+                    membershipNumber !== "" ||
+                    new Date(appointmentDate).getDate() !== new Date(Date.now()).getDate()) {
                     dispatch(addItemToEditedCart({
                         ...props.data,
                         gender: "membership",
