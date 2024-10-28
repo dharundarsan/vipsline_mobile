@@ -8,6 +8,8 @@ import { getStorageKey } from "../config/storage";
 import axios from "axios";
 
 const initialDashboardState = {
+  dashboardName:"",
+  isLoading:false,
   expenseValues: {
     totalBillCount: 0,
     totalSalesValue: 0,
@@ -15,12 +17,20 @@ const initialDashboardState = {
     avgBillValue: 0,
   },
   dateData: [
-    { label: "Today", value: "" },
-    { label: "Yesterday", value: "" },
-    { label: "Last 7 days", value: "" },
-    { label: "Last 30 days", value: "" },
+    { label: "Today", value: "",day:0 },
+    { label: "Yesterday", value: "",day:-1 },
+    { label: "Last 7 days", value: "",day:-6 },
+    { label: "Last 30 days", value: "",day:-29 },
+    { label: "This month", value: "This month",day1:0,day2:0},
+    { label: "Custom range", value: "",day1: 0,day2: 0 },
+  ],
+  toggleDateData: [
     { label: "This month", value: "" },
-    { label: "Custom range", value: "" },
+    { label: "Today", value: "",day:0 },
+    { label: "Yesterday", value: "",day:-1 },
+    { label: "Last 7 days", value: "",day:-6 },
+    { label: "Last 30 days", value: "",day:-29 },
+    { label: "Custom range", value: "Custom range" },
   ],
   listData: {
     totalAppointments: 0,
@@ -106,7 +116,40 @@ const initialDashboardState = {
   revenueByGender:[{
     label_list:[""],
     chart_series:[1]
-  }]
+  }],
+  revenueCountByGender:[{
+    label_list:[""],
+    chart_series:[1]
+  }],
+  revenueCountByPrepaid:[{
+    label_list:[""],
+    chart_series:[1]
+  }],
+  accountResourceId:"",
+  staffPieChartData:{
+    label_list:[""],
+    chart_series:[1]
+  },
+  top_performer_report:[{
+    total_value:1,
+    name:""
+  }],
+  staff_sales_report:[
+    {
+      "item_count": 0,
+      "total_value": 0,
+      "package_service_value": 0,
+      "product": 0,
+      "service": 0,
+      "name": "",
+      "custom_item": 0,
+      "prepaid": 0,
+      "membership": 0,
+      "avg_bill_value": 0,
+      "packages": 0,
+      "customer_count": 0
+    }
+  ]
 };
 
 export const loadSalesDashboard =
@@ -187,8 +230,16 @@ export const loadTopRevenueServices = (fromDate, toDate) => async(dispatch, getS
       },
     }
   ).then(res => {
-    // console.log(res.data.data);
-    dispatch(updateTopRevenueService(res.data.data))
+    console.log("Out");
+    try{
+      dispatch(updateTopRevenueService(res.data.data))
+    }
+    catch(e){
+      // console.log("222");
+      console.log(res.data.data);
+      console.log(e);
+    }
+    
   }).catch(err =>{
     console.error("Error Fetching Top Revenue Services");
     console.log(err);
@@ -294,7 +345,221 @@ export const loadRevenueByGender = (fromDate,toDate) => async(dispatch, getState
       },
     }
   ).then(res => {
-    dispatch(updateRevenueByGender(res.data.data))
+    if(res.data.data[0]?.label_list.length > 0){
+      dispatch(updateRevenueByGender(res.data.data))
+    }
+    else{
+      dispatch(updateRevenueByGender([{
+        label_list:[""],
+        chart_series:[1]
+      }]))
+    }
+  }).catch(err => {
+    console.error("Error Fetching loadrevenuebygender");
+    console.log(err);
+    
+  })
+}
+export const loadRevenueCountByGender = (fromDate,toDate) => async(dispatch, getState) =>{
+  const { authDetails } = getState();
+  
+  let authToken = "";
+  try {
+    // const value = await AsyncStorage.getItem('authKey');
+    const value = await getStorageKey("authKey");
+    if (value !== null) {
+      authToken = value;
+    }
+  } catch (e) {
+    console.error(
+      "auth token fetching error. (inside dashboardSlice loadSalesDashBoard)" +
+        e
+    );
+  }
+  await axios
+  .post(
+    process.env.EXPO_PUBLIC_API_URI + "/analytics/getClientDashboardCountByGender",
+    {
+      business_id: authDetails.businessId,
+      fromDate: fromDate,
+      toDate: toDate,
+    },
+    {
+      headers: {
+        authorization: "Bearer " + authToken,
+      },
+    }
+  ).then(res => {
+    if(res.data.data[0]?.label_list.length > 0){
+      dispatch(updateRevenueCountByGender(res.data.data))
+    }
+    else {
+      dispatch(updateRevenueCountByGender([{
+        label_list:[""],
+        chart_series:[1]
+      }]))
+    }
+  }).catch(err => {
+    console.error("Error Fetching loadRevenueCountByGender");
+    console.log(err);
+  })
+}
+export const loadRevenueByPrepaid = (fromDate,toDate) => async(dispatch, getState) =>{
+  const { authDetails } = getState();
+  
+  let authToken = "";
+  try {
+    // const value = await AsyncStorage.getItem('authKey');
+    const value = await getStorageKey("authKey");
+    if (value !== null) {
+      authToken = value;
+    }
+  } catch (e) {
+    console.error(
+      "auth token fetching error. (inside dashboardSlice loadSalesDashBoard)" +
+        e
+    );
+  }
+  await axios
+  .post(
+    process.env.EXPO_PUBLIC_API_URI + "/analytics/getClientDashboardPrepaidRevenue",
+    {
+      business_id: authDetails.businessId,
+      fromDate: fromDate,
+      toDate: toDate,
+    },
+    {
+      headers: {
+        authorization: "Bearer " + authToken,
+      },
+    }
+  ).then(res => {
+    if(res.data.data[0]?.label_list.length > 0){
+      dispatch(updateRevenueByPrepaid(res.data.data))
+    }else{
+      dispatch(updateRevenueByPrepaid([{
+        label_list:[""],
+        chart_series:[1]
+      }]))
+    }
+
+  }).catch(err => {
+    console.error("Error Fetching loadRevenueByPrepaid");
+    console.log(err);
+  })
+}
+
+export const loadResourceIdByUserInfo = (username) => async(dispatch, getState) =>{
+  const { authDetails } = getState();
+  
+  let authToken = "";
+  try {
+    // const value = await AsyncStorage.getItem('authKey');
+    const value = await getStorageKey("authKey");
+    if (value !== null) {
+      authToken = value;
+    }
+  } catch (e) {
+    console.error(
+      "auth token fetching error. (inside dashboardSlice loadSalesDashBoard)" +
+        e
+    );
+  }
+  await axios
+  .post(
+    process.env.EXPO_PUBLIC_API_URI + "/user/getResourceIdByUserInfo",
+    {
+      username: username,
+    },
+    {
+      headers: {
+        authorization: "Bearer " + authToken,
+      },
+    }
+  ).then(res => {
+    // console.log(res.data.other_message);
+    dispatch(updateResourceId(res.data.other_message))
+  }).catch(err => {
+    console.error("Error Fetching loadRevenueCountByGender");
+    console.log(err);
+  })
+}
+export const loadAllowedPage = (username) => async(dispatch, getState) =>{
+  const { authDetails,dashboardDetails } = getState();
+  
+  let authToken = "";
+  try {
+    // const value = await AsyncStorage.getItem('authKey');
+    const value = await getStorageKey("authKey");
+    if (value !== null) {
+      authToken = value;
+    }
+  } catch (e) {
+    console.error(
+      "auth token fetching error. (inside dashboardSlice loadSalesDashBoard)" +
+        e
+    );
+  }
+  await axios
+  .post(
+    process.env.EXPO_PUBLIC_API_URI + "/resource/getAllowedPagesForStaff",
+    {
+      business_id: authDetails.businessId,
+      resource_id: dashboardDetails.accountResourceId,
+    },
+    {
+      headers: {
+        authorization: "Bearer " + authToken,
+      },
+    }
+  ).then(res => {
+    // console.log(res.data.other_message);
+    dispatch(updateResourceId(res.data.other_message))
+  }).catch(err => {
+    console.error("Error Fetching loadRevenueCountByGender");
+    console.log(err);
+  })
+}
+
+export const loadStaffDashboardReport = (fromDate,toDate) => async(dispatch, getState) =>{
+  const { authDetails } = getState();
+  
+  let authToken = "";
+  try {
+    // const value = await AsyncStorage.getItem('authKey');
+    const value = await getStorageKey("authKey");
+    if (value !== null) {
+      authToken = value;
+    }
+  } catch (e) {
+    console.error(
+      "auth token fetching error. (inside dashboardSlice loadSalesDashBoard)" +
+        e
+    );
+  }
+  await axios
+  .post(
+    process.env.EXPO_PUBLIC_API_URI + "/analytics/getStaffDashboardReportByBusiness",
+    {
+      business_id: authDetails.businessId,
+      // fromDate:'2024-10-01',
+      // toDate:'2024-10-31'
+      fromDate:fromDate,
+      toDate:toDate
+    },
+    {
+      headers: {
+        authorization: "Bearer " + authToken,
+      },
+    }
+  ).then(res => {
+    // console.log(res.data.data[0]);
+    dispatch(updateStaffPieChart(res.data.data[0].pie_chart_data));
+    dispatch(updateTopPerformer(res.data.data[0].top_performer_report));
+    dispatch(updateSalesReport(res.data.data[0].staff_sales_report))
+  }).catch(err => {
+    console.error("Error Fetching loadRevenueCountByGender");
+    console.log(err);
   })
 }
 
@@ -302,6 +567,12 @@ export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState: initialDashboardState,
   reducers: {
+    updateDashBoardName(state,action){
+      state.dashboardName = action.payload;
+    },
+    updateLoadingState(state, action) {
+      state.isLoading = action.payload
+    },
     updateSalesCard(state, action) {
       state.expenseValues.totalBillCount = action.payload.total_bill_count;
       state.expenseValues.totalSalesValue = action.payload.total_sales_value;
@@ -348,11 +619,43 @@ export const dashboardSlice = createSlice({
     },
     updateRevenueByGender(state, action) {
       state.revenueByGender = action.payload
-    }
+    },
+    updateRevenueCountByGender(state, action) {
+      state.revenueCountByGender = action.payload;
+    },
+    updateRevenueByPrepaid(state, action) {
+      state.revenueCountByPrepaid = action.payload
+    },
+    updateResourceId(state, action) {
+      state.accountResourceId = action.payload
+    },
+    updateStaffPieChart(state, action) {
+      state.staffPieChartData = action.payload
+    },
+    updateTopPerformer(state, action) {
+      state.top_performer_report = action.payload
+    },
+    updateSalesReport(state, action) {
+      state.staff_sales_report = action.payload
+    },
+    updateDate(state,action) {
+      if(action.payload.data !== undefined){
+        state.dateData[action.payload.type].value = action.payload.data.toString();
+      }
+      else{
+        state.dateData[action.payload.type].day1 = action.payload.day1;
+        state.dateData[action.payload.type].day2 = action.payload.day2;
+      }
+    },
+    updateLabelDate(state,action) {
+      state.toggleDateData[action.payload.type].value = action.payload.data.toString();
+    },
   },
 });
 
 export const {
+  updateDashBoardName,
+  updateLoadingState,
   updateSalesCard,
   updateListData,
   updatePaymentMode,
@@ -363,6 +666,14 @@ export const {
   updateTopRevenueProduct,
   updateClientStatistics,
   updateRevenueByGender,
+  updateRevenueCountByGender,
+  updateRevenueByPrepaid,
+  updateResourceId,
+  updateStaffPieChart,
+  updateTopPerformer,
+  updateSalesReport,
+  updateDate,
+  updateLabelDate,
 } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

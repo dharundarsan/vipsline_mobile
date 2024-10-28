@@ -40,7 +40,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     width: "45%",
     borderWidth:1,
-    borderColor:Colors.grey250
+    borderColor:Colors.grey250,
+    // Adding shadow
+    // elevation: 3,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
   },
   leftBar: {
     width: 6,

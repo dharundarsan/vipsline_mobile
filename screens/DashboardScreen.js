@@ -1,16 +1,51 @@
 import { FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import Colors from "../constants/Colors";
 import { dashboardSelection } from "../data/DashboardSelection";
 import { TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDataContext } from "../context/DataFlowContext";
 import { useLocationContext } from "../context/LocationContext";
+import { useDispatch, useSelector } from "react-redux";
+import { formatDateYYYYMMDD, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonthYYYYMMMDD } from "../util/Helpers";
+import { updateDate, updateLabelDate } from "../store/dashboardSlice";
 
 export default function DashboardScreen() {
+  const dispatch = useDispatch();
   const navigate = useNavigation();
   const {setIsDashboardPage} = useDataContext();
+  const {getLocation} = useLocationContext()
 
+  useFocusEffect(useCallback(() => {
+    getLocation("Dashboard");
+  }, []))
+
+  const date = useSelector(state => state.dashboardDetails.dateData);
+  const labelData = useSelector(state => state.dashboardDetails.toggleDateData);
+
+  useEffect(()=>{
+    date.map((item,index)=>{
+      if(item.day !== undefined){
+        const datedata = formatDateYYYYMMDD(item.day);
+        // console.log(index,datedata);
+        dispatch(updateDate({type:index,data:datedata}))
+      }
+      else if(item.value === "This month"){
+        console.log(123);
+        dispatch(updateDate({type:index,day1:getFirstDateOfCurrentMonthYYYYMMDD(),day2:getLastDateOfCurrentMonthYYYYMMMDD()}))
+      }
+      else{
+        dispatch(updateDate({type:index,day1:item.day1,day2:item.day2}))
+      }
+    })
+    labelData.map((item,index)=>{
+      if(item.day !== undefined){
+        const datedata = formatDateYYYYMMDD(item.day);
+        // console.log(index,datedata);
+        dispatch(updateLabelDate({type:index,data:datedata}))
+      } 
+    })
+  },[])
   return (
     <View style={styles.container}>
       <View style={styles.cardcontainer}>
@@ -54,6 +89,7 @@ const styles = StyleSheet.create({
   },
   cardcontainer: {
     padding: 30,
+    flex:1
   },
   card: {
     borderColor: Colors.grey250,

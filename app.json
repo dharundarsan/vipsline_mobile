@@ -31,7 +31,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.business.vipsline"
     },
     "android": {
       "versionCode": 1,

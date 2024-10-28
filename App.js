@@ -70,6 +70,8 @@ import SalesDashboard from './components/DashboardScreen/SalesDashboard';
 import StaffDashboard from './components/DashboardScreen/StaffDashboard';
 import ClientDashboard from './components/DashboardScreen/ClientDashboard';
 import { DataProvider, useDataContext } from './context/DataFlowContext';
+import { formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonthYYYYMMMDD } from './util/Helpers';
+import { loadResourceIdByUserInfo, loadRevenueByGender, loadRevenueByPrepaid, loadRevenueCountByGender, loadSalesDashboard, loadStaffDashboardReport, loadTopRevenueProducts, loadTopRevenueServices } from './store/dashboardSlice';
 
 enableScreens();
 
@@ -278,14 +280,29 @@ const AuthNavigator = () => (
 );
 
 const BackButton = () => {
+    const dispatch = useDispatch();
     const navigation = useNavigation();
+    const username = useSelector((state) => state.loginUser.details);
+    const page = useSelector((state) => state.dashboardDetails.dashboardName)
     const {setIsDashboardPage} = useDataContext()
     return (
-        <TouchableOpacity onPress={() => {
+        <TouchableOpacity onPress={async() => {
             setTimeout(() => {
                 setIsDashboardPage(true)
             }, 40);
             // setTimeout(() => {
+                // dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+                // dispatch(loadTopRevenueServices(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+                // dispatch(loadTopRevenueProducts(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+                if(page === "Client"){
+                    dispatch(loadRevenueByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                    dispatch(loadRevenueCountByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                    dispatch(loadRevenueByPrepaid(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));    
+                }
+                else if(page === "Staff"){
+                    dispatch(loadResourceIdByUserInfo(username.username));
+                    dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+                }
                 navigation.goBack()
             // }, 50);
         }} 

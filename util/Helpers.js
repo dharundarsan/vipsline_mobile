@@ -111,7 +111,7 @@ export function convertToTitleCase(str) {
     .join(" ");
 }
 
-export const formatDateYYYYMMDD = (daysOffset = 0) => {
+export const formatDateDDMMYYYY = (daysOffset = 0) => {
   const date = new Date();
   date.setDate(date.getDate() + daysOffset);
   return date.toLocaleDateString("en-GB", {
@@ -120,31 +120,78 @@ export const formatDateYYYYMMDD = (daysOffset = 0) => {
     year: "numeric",
   });
 };
+
+export const formatDateYYYYMMDD = (daysOffset = 0) => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysOffset);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 export const getFirstDateOfCurrentMonth = () =>
   formatDateYYYYMMDD(1 - new Date().getDate());
 export const getLastDateOfCurrentMonth = () => {
-    const now = new Date();
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Get the last day of the current month
-    return lastDay.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Get the last day of the current month
+  return lastDay.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+export const formatDateYYYYMMDDD = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Ensures two digits for month
+  const day = String(date.getDate()).padStart(2, "0"); // Ensures two digits for day
+  return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
+};
+export const getFirstDateOfCurrentMonthYYYYMMDD = () => {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1); // Get the first day of the current month
+  return formatDateYYYYMMDDD(firstDay);
+};
+
+export const getLastDateOfCurrentMonthYYYYMMMDD = () => {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Get the last day of the current month
+  return formatDateYYYYMMDDD(lastDay);
+};
+
+export function getFirstAndLastDateOfCurrentMonthDDMMYYYY() {
+  const today = new Date();
+
+  // Get the first day of the current month
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  // Get the last day of the current month
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  // Format the date to "DD MMM YYYY"
+  const options = { day: "2-digit", month: "short", year: "numeric" };
+  const firstDateFormatted = firstDay.toLocaleDateString("en-GB", options);
+  const lastDateFormatted = lastDay.toLocaleDateString("en-GB", options);
+
+  return {
+    firstDateDDMMYYYY: firstDateFormatted,
+    lastDateDDMMYYYY: lastDateFormatted,
   };
-  export const formatDateYYYYMMDDD = (date = new Date()) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensures two digits for month
-    const day = String(date.getDate()).padStart(2, '0'); // Ensures two digits for day
-    return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
-  };
-  export const getFirstDateOfCurrentMonthYYYYMMDD = () => {
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1); // Get the first day of the current month
-    return formatDateYYYYMMDDD(firstDay);
-  };
-  
-  export const getLastDateOfCurrentMonthYYYYMMMDD = () => {
-    const now = new Date();
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Get the last day of the current month
-    return formatDateYYYYMMDDD(lastDay);
-  };
+}
+
+export const formatDateToWeekDayDDMMMYYYY = (offset) => {
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const date = new Date();
+  date.setDate(date.getDate() + offset);
+
+  const dayOfWeek = daysOfWeek[date.getDay()];
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  return `${dayOfWeek}, ${day} ${month} ${year}`;
+};
