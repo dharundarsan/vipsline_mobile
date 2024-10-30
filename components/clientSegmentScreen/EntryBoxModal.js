@@ -23,14 +23,12 @@ import {updateSalesMaxEntry} from "../../store/clientInfoSlice";
 
 const modalHeight = 180;
 
-export default function EntryModel(props) {
+export default function EntryBoxModal(props) {
 
     const dispatch = useDispatch();
 
     const [checkedNumber, setCheckedNumber] = useState(10);
 
-    const normalMaxEntry = useSelector(state => state.clientFilter.maxEntry);
-    const searchMaxEntry = useSelector(state => state.clientFilter.searchMaxEntry);
 
     const [selectedOption, setSelectedOption] = useState(null);
 
@@ -41,21 +39,10 @@ export default function EntryModel(props) {
         {label: '100', value: 100},
     ];
 
-    // useEffect(() => {
-    //     console.log(selectedOption);
-    // }, [selectedOption]);
 
     useEffect(() => {
-        setCheckedNumber(10);
-    }, [props.filterPressed]);
-
-    useEffect(() => {
-        if (props.query === "") {
-            setCheckedNumber(normalMaxEntry);
-        } else {
-            setCheckedNumber(searchMaxEntry);
-        }
-    }, [normalMaxEntry, searchMaxEntry]);
+        setCheckedNumber(props.maxEntry);
+    }, [props.maxEntry]);
 
     return (
         <Modal
@@ -79,9 +66,7 @@ export default function EntryModel(props) {
                             onPress={(value) => {
                                 setCheckedNumber(value)
                                 props.setIsModalVisible(false);
-                                dispatch(updateMaxEntry(value));
-                                dispatch(updateSearchClientMaxEntry(value));
-                                dispatch(updateSalesMaxEntry(value))
+                                props.radioButtomPressed(value);
                             }}
                         />
                     </View>

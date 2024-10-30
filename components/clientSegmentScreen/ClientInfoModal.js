@@ -21,6 +21,11 @@ import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../st
 import ContentLoader from "../../ui/ContentLoader";
 import { loadClientsFromDb } from "../../store/clientSlice";
 import Toast from "../../ui/Toast";
+import BillingActivity from "./BillingActivity";
+import Appointments from "./Appointments";
+import {MembershipDetails} from "./MembershipDetails";
+import {PackageDetails} from "./PackageDetails";
+import {PrepaidDetails} from "./PrepaidDetails";
 
 /**
  * ClientInfoModal Component
@@ -60,8 +65,11 @@ export default function clientInfoModal(props) {
 
     const dispatch = useDispatch();
 
-    const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
-    const details = useSelector(state => state.clientInfo.details);
+    const analyticDetails = useSelector(state => state.clientInfo.analyticDetails || {});
+    const details = useSelector(state => state.clientInfo.details || {} );
+    const salesData = useSelector(state => state.clientInfo.analyticDetails || {});
+    const membershipData = useSelector(state => state.clientInfo.membershipList  || {});
+    const packageData = useSelector(state => state.clientInfo.packageList || {} );
 
 
     const [totalSales, setTotalSales] = useState("");
@@ -77,10 +85,13 @@ export default function clientInfoModal(props) {
     const toastRef = useRef(null)
 
 
+
+
+
     useEffect(() => {
         setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
         setLastVisit(
-            analyticDetails.history_appointmentList !== undefined ?
+            analyticDetails.history_appointmentList !== undefined && analyticDetails.history_appointmentList.length !== undefined ?
                 analyticDetails.history_appointmentList.length !== 0 ?
                     dateFormatter(analyticDetails.history_appointmentList[0].appointment_date, 'short') :
                     "" : "");
@@ -136,16 +147,20 @@ export default function clientInfoModal(props) {
 
     if (clientMoreDetails === null) {
         content = <ScrollView style={{flex: 1, width: '100%'}} showsVerticalScrollIndicator={false}>
-            <MoreOptionDropDownModal
-                isVisible={props.modalVisibility}
-                onCloseModal={() => props.setModalVisibility(false)}
-                dropdownItems={[
-                    "Edit client",
-                    "Delete client",
-                ]}
-                setOption={props.setSelectedOption}
+            {
+                props.modalVisibility &&
+                <MoreOptionDropDownModal
+                    isVisible={props.modalVisibility}
+                    onCloseModal={() => props.setModalVisibility(false)}
+                    dropdownItems={[
+                        "Edit client",
+                        "Delete client",
+                    ]}
+                    setOption={props.setSelectedOption}
 
-            />
+                />
+
+            }
 
             { editClientModalVisibility && <UpdateClientModal
                 isVisible={editClientModalVisibility}
@@ -235,6 +250,9 @@ export default function clientInfoModal(props) {
                 <View style={styles.clientInfoCategoryContainer}>
                     <ClientInfoCategories
                         onPress={clientInfoCategoryPressHandler}
+                        membershipCount={checkNullUndefined(membershipData.length) ? membershipData.length : 0}
+                        packageCount={checkNullUndefined(packageData.length) ? packageData.length : 0}
+                        prepaidCount={details.wallet_status ? 1 : 0}
                     />
                 </View>
             </View>
@@ -261,8 +279,42 @@ export default function clientInfoModal(props) {
                 details={details}
 
             />
-    } else {
-        content = <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>Coming Soon</Text></View>
+    }
+    else if(clientMoreDetails === "billActivity") {
+        content = <BillingActivity
+            salesData={salesData}
+            clientid={details.id}
+        />
+    }
+    else if(clientMoreDetails === "appointments") {
+        content = <Appointments
+            salesData={salesData}
+            clientid={details.id}
+        />
+    }
+    else if(clientMoreDetails === "memberships") {
+        content = checkNullUndefined(membershipData) && checkNullUndefined(membershipData.length) && membershipData.length > 0 ?
+            <MembershipDetails
+            membershipData={membershipData}
+        /> :
+        <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>No membership for this client</Text></View>
+    }
+    else if(clientMoreDetails === "packageSales") {
+        content = checkNullUndefined(packageData) && checkNullUndefined(packageData.length) && packageData.length > 0 ?
+            <PackageDetails
+                pacakgeData={packageData}
+            /> :
+            <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>No package for this client</Text></View>
+    }
+    else if(clientMoreDetails === "prepaidSales") {
+        content = checkNullUndefined(details) && checkNullUndefined(details.wallet_status)  && details.wallet_status ?
+            <PrepaidDetails
+            details={details} /> :
+        <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>No Prepaid for this client</Text></View>
+
+    }
+    else {
+        content = <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>Coming Soons</Text></View>
     }
 
 
@@ -325,6 +377,8 @@ export default function clientInfoModal(props) {
 
 
             {
+                // checkNullUndefined(details.length) &&
+                details === undefined || analyticDetails === undefined || membershipData === undefined || packageData === undefined ||
                 Object.keys(details).length === 0 ?
                 <View style={{alignItems: 'center', width: "100%",}}>
 

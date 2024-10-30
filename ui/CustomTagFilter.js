@@ -2,12 +2,14 @@ import React, {useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Colors from "../constants/Colors";
 import colors from "../constants/Colors";
+import {useDispatch} from "react-redux";
+import {clearAppliedFilters, loadClientFiltersFromDb, updateAppliedFilters} from "../store/clientFilterSlice";
 
-const CustomTagFilter = ({ options, onSelectionChange }) => {
+const CustomTagFilter = ({ options, onSelectionChange, filter }) => {
     const [selectedOptions, setSelectedOptions] = useState(options);
 
     useEffect(() => {
-        setSelectedOptions(options);
+        setSelectedOptions(options.filter(str => /^[A-Za-z\s-]+$/.test(str)));
     }, [options]);
 
     // Remove a single option when the "x" is clicked
@@ -16,23 +18,39 @@ const CustomTagFilter = ({ options, onSelectionChange }) => {
         setSelectedOptions(updatedOptions);
         onSelectionChange(updatedOptions); // Send updated array to the parent
     };
+    const dispatch = useDispatch();
 
     // Clear all options
     const clearAll = () => {
         setSelectedOptions([]);
         onSelectionChange([]); // Send empty array to the parent
+        dispatch(loadClientFiltersFromDb(10, filter))
+        dispatch(clearAppliedFilters());
+
     };
 
+    useEffect(() => {
+        setSelectedOptions([]);
+        onSelectionChange([]); // Send empty array to the parent
+        dispatch(loadClientFiltersFromDb(10, filter));
+        dispatch(clearAppliedFilters());
+    }, [filter]);
+
+
     return (
-        selectedOptions.length > 0 && <View style={styles.container}>
+        (selectedOptions.length > 0) && <View style={styles.container}>
             <View style={styles.tagsContainer}>
                 {selectedOptions.map((option, index) => (
+                    /^[A-Za-z\s-]+$/.test(option) ?
                     <View key={index} style={styles.tag}>
-                        <Text style={styles.tagText}>{option}</Text>
-                        <TouchableOpacity onPress={() => removeOption(option)}>
-                            <Text style={styles.closeButton}>x</Text>
+                        <Text style={styles.tagText} key={index}>{option}</Text>
+                        <TouchableOpacity onPress={() => {
+                            removeOption(option);
+                            dispatch(loadClientFiltersFromDb(10, filter))
+                        }}>
+                            <Text style={styles.closeButton} >x</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> : <></>
                 ))}
                 {selectedOptions.length > 0 && (<TouchableOpacity onPress={clearAll} style={styles.clearAllButton}>
                     <Text style={styles.clearAll}>Clear All</Text>
