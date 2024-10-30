@@ -50,10 +50,6 @@ const PieChartBox = (props) => {
     year: "numeric",
   });
 
-  console.log("formattedDate");
-  console.log(todayDate);
-  
-
   const [fromDateVisibility, setFromDateVisibility] = useState(false);
   const [toDateVisibility, setToDateVisibility] = useState(false);
   const [selectedFromCustomDate, setSelectedFromCustomDate] = useState("0");
@@ -100,14 +96,12 @@ const PieChartBox = (props) => {
 
   const handleSelection = async (item) => {
     setSelectedValue(item.value);
-    console.log("Selected range:", item);
-    console.log("Selected range", props?.pieDataArray);
     const currentDate = formatDateYYYYMMDD(0);
     if (props.pieDataArray[0]?.page === "salesPercent") {
       if (item.day !== undefined) {
         setIsCustomRange(false);
         dispatch(loadTopRevenueServices(formatDateYYYYMMDD(item.day),formatDateYYYYMMDD(0)));
-      } else if(item.day !== undefined && item.value === "This month") {
+      } else if(item.day !== undefined || item.label === "This month") {
         setIsCustomRange(false);
         dispatch(loadTopRevenueServices(getFirstMonth, getLastMonth));
       }
@@ -131,7 +125,7 @@ const PieChartBox = (props) => {
             )
           );
         }
-      } else if (item.day !== undefined && item.value === "This month") {
+      } else if (item.day !== undefined || item.label === "This month") {
         setIsCustomRange(false)
         dispatch(loadTopRevenueProducts(getFirstMonth, getLastMonth));
       }
@@ -201,9 +195,6 @@ const PieChartBox = (props) => {
   };
 
   const handleCustomDate = async (type, date, page) => {
-    console.log(type);
-    
-    console.log(page);
     if (type === 1) {
       if (page === "clientGender") {
         setCustomFromClientGenderPassData(date);
@@ -279,7 +270,6 @@ const PieChartBox = (props) => {
 
         {props.toggleDateDropdown ? (
           <Dropdown
-            dropdownPosition="auto"
             iconColor="#6950F3"
             style={styles.dropdown}
             data={props.dateArray}
@@ -499,6 +489,8 @@ const PieChartBox = (props) => {
               strokeWidth={2}
               strokeColor="white"
               radius={150}
+              isAnimated
+              animationDuration={5000}
               centerLabelComponent={() =>
                 props.totalCenterValue !== undefined ? (
                   <View style={styles.piechart}>
@@ -522,8 +514,6 @@ const PieChartBox = (props) => {
               showText
               textColor="white"
               textSize={14}
-              isAnimated
-              animationDuration={1}
             />
           ) : (
             <PieChart
@@ -540,6 +530,7 @@ const PieChartBox = (props) => {
               textColor="white"
               textSize={14}
               isAnimated
+              animationDuration={5000}
             />
             // null
           )}
@@ -648,15 +639,15 @@ const styles = StyleSheet.create({
   },
   legendItem: {
     backgroundColor: "#F2F2F7",
-    borderWidth: 1,
+    // borderWidth: 0.2,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
     borderColor: Colors.grey250,
     // width: "45%",
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
   },
   totalValue: {
     fontSize: 18,

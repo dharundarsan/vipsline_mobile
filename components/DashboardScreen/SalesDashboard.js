@@ -34,7 +34,8 @@ import {
   loadTopRevenueProducts,
   loadTopRevenueServices,
   updateLoadingState,
-  updateDashBoardName
+  updateDashBoardName,
+  loadDailyAppointmentAnalyticsForBusiness
 } from "../../store/dashboardSlice";
 import {
   convertToTitleCase,
@@ -53,6 +54,7 @@ import { calculateTotalValue, processPieChartData } from "./PieData";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import TextTheme from "../../constants/TextTheme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import LineChartBox from "./LineChartBox";
 
 const SalesDashboard = () => {
   const dispatch = useDispatch();
@@ -70,11 +72,6 @@ const SalesDashboard = () => {
   const [customFromPassData, setCustomFromPassData] = useState(formatDateYYYYMMDD(0));
   const [customToPassData, setCustomToPassData] = useState(formatDateYYYYMMDD(0));
 
-  // const date = formatDateDDMMYYYY();
-  const getFormattedDate = () => formatDateYYYYMMDD(0);
-
-  const getLast7thDayDate = () => formatDateYYYYMMDD(-7);
-  const getLast30thDayDate = () => formatDateYYYYMMDD(-30);
   const lastMonthDate = getLastDateOfCurrentMonthYYYYMMMDD();
   const firstMonthDate = getFirstDateOfCurrentMonthYYYYMMDD();
 
@@ -91,6 +88,9 @@ const SalesDashboard = () => {
   const topRevenueDetails = useSelector((state) => state.dashboardDetails.topRevenueServiceDetails);
   const topProductDetails = useSelector((state) => state.dashboardDetails.topRevenueProductDetails);
   const labelArray = useSelector((state) => state.dashboardDetails.toggleDateData);
+  const totalSalesOverTime = useSelector((state) => state.dashboardDetails.totalSalesOverTime);
+  const totalSalesOverTimeDropdown = useSelector((state) => state.dashboardDetails.lineChartData);
+  const totalAppointmentOverTime = useSelector((state) => state.dashboardDetails.totalAppointmentOverTime);
 
   // const servicesChartData = topRevenueDetails[0].chart_series.map((value) => ({ value }));
   // const servicesTotalValue = servicesChartData.reduce((sum, item) => sum + item.value, 0);
@@ -106,6 +106,9 @@ const SalesDashboard = () => {
   );
 
   const data = billItemDetails[0].series.map((value) => ({ value })) || [];
+  const totalSalesOverTimeData = totalSalesOverTime.count.map((value) => ({ value }))
+  const totalAppointmentsOverTimeData = totalAppointmentOverTime.count.map((value) => ({ value }))
+
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
   const percentageBillData = data.map((item, index) => {
     const percentage = totalValue
@@ -185,7 +188,6 @@ const SalesDashboard = () => {
 
   const handleSelection = async (item) => {
     setSelectedValue(item.value);
-    console.log("Selected range:", item);
     if (item.day1 === undefined) {
       setIsCustomRange(false);
       
@@ -236,11 +238,42 @@ const SalesDashboard = () => {
   }
 
   useEffect(() => {
-    dispatch(updateDashBoardName("Sales"))
-    dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
-    dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
-    dispatch(loadTopRevenueProducts(firstMonthDate, lastMonthDate));
+    async function initialCall(){
+      dispatch(updateDashBoardName("Sales"))
+      dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+      dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
+      dispatch(loadTopRevenueProducts(firstMonthDate, lastMonthDate));
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false,"currentmonth"))
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(true,"currentmonth"))
+    }
+    initialCall();
   }, []);
+  const totalSalesOverTimeArr = [...totalSalesOverTime.count];
+  const maxTotalSalesValue = totalSalesOverTimeArr.sort((a, b) => b - a)[0];
+  const appointmentsOverTimeArr = [...totalAppointmentOverTime.count];
+  const maxAppointmentsOverTime = appointmentsOverTimeArr.sort((a, b) => b - a)[0];
+
+  function roundUpToNearestPowerOfTen(value) {
+    const power = Math.pow(10, Math.floor(Math.log10(value))); // Calculate the power of ten
+    return Math.ceil(value / power) * power; // Round up to the nearest power of ten
+  }
+  
+  function roundUp(value) {
+    return value <= 10 ? value : roundUpToNearestPowerOfTen(value);
+  }
+
+  function removeZero(roundedValue){
+    return roundedValue.toString().replace(/0+$/, '');
+  }
+  
+  function calculateLabelWidth(maxValue) {
+    const labelText = maxValue.toLocaleString();
+    const approximateCharWidth = 8;
+    return labelText.length * approximateCharWidth;
+  }
+  
+  const maxRevenueWidth = Math.ceil(Math.max(...barData.map(item => item.value)));
+  const yAxisLabelWidth = calculateLabelWidth(maxRevenueWidth);
 
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
@@ -434,8 +467,6 @@ const SalesDashboard = () => {
           labelArray={billItemDetails[0].labels}
           pieDataArray={percentageBillData}
         />
-
-        {/* Revenue Report Section with BarChart */}
         <View style={styles.commonContainer}>
           <Text
             style={[
@@ -452,17 +483,20 @@ const SalesDashboard = () => {
                 data={barData}
                 barWidth={10}
                 spacing={50}
+                // isAnimated
+                // animationDuration={5000}
                 yAxisTextNumberOfLines={100}
-                yAxisLabelWidth={80}
-                noOfSections={5}
-                maxValue={Math.ceil(maxRevenue)}
-                yAxisLabelTexts={(value) => Math.round(value).toString()}
+                yAxisLabelWidth={yAxisLabelWidth}
+                noOfSections={parseInt(removeZero(roundUp(maxRevenue)))}
+                maxValue={roundUp(maxRevenue)}
+                xAxisColor={'black'}
+                // yAxisLabelTexts={(value) => Math.round(value).toString()}
                 // maxValue={Math.ceil(maxRevenue / 100000) * 100000} // Rounds up to the nearest hundred thousand
                 // yAxisLabelTexts={(value) => {
                 //   // Format the value to round to nearest hundred thousand
                 //   return `${(Math.round(value / 100000) * 100000).toLocaleString()}`;
                 // }}
-                xAxisLabelTextStyle={{ color: "gray", fontSize: 12 }}
+                // xAxisLabelTextStyle={{ color: "gray", fontSize: 12 }}
               />
             }
             <View style={styles.legendContainer}>
@@ -481,6 +515,26 @@ const SalesDashboard = () => {
             </View>
           </View>
         </View>
+        <LineChartBox
+          title={"Total sales over time"}
+          toggleDateDropdown
+          dateArray={totalSalesOverTimeDropdown}
+          xLabelArrayData={totalSalesOverTime.date}
+          lineChartData={totalSalesOverTimeData}
+          max={roundUp(maxTotalSalesValue)}
+          page="SalesOverTime"
+          sections={removeZero(roundUp(maxTotalSalesValue))}
+          />
+        <LineChartBox 
+          title={"Appointments over time"}
+          toggleDateDropdown
+          dateArray={totalSalesOverTimeDropdown}
+          xLabelArrayData={totalAppointmentOverTime.date}
+          lineChartData={totalAppointmentsOverTimeData}
+          page="AppointmentOverTime"
+          max={roundUp(maxAppointmentsOverTime)}
+          sections={removeZero(roundUp(maxAppointmentsOverTime))}
+          />
         <PieChartBox
           title={"Top Services"}
           pieDataArray={
@@ -609,12 +663,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+    alignItems:'center'
   },
   legendItem: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
-    width: "45%",
+    // width: "45%",
+    marginHorizontal: 10,
   },
   totalValue: {
     fontSize: 18,

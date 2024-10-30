@@ -149,7 +149,27 @@ const initialDashboardState = {
       "packages": 0,
       "customer_count": 0
     }
-  ]
+  ],
+  totalSalesOverTime:{
+    date:[""],
+    duration:"",
+    count:[1]
+  },
+  totalAppointmentOverTime:{
+    date:[""],
+    duration:"",
+    count:[1]
+  },
+  lineChartData:[
+    { label: "This month", value: "currentmonth" },
+    { label: "Last 7 days", value: "last7days" },
+    { label: "Last 30 days", value: "last30days" },
+    { label: "Last 3 months", value: "last3months" },
+    { label: "Last 6 months", value: "last6months" },
+    { label: "Last 1 year", value: "last1year" },
+    { label: "Current year", value: "thisyear" },
+    { label: "Past year", value: "previousyear" },
+  ],
 };
 
 export const loadSalesDashboard =
@@ -562,6 +582,52 @@ export const loadStaffDashboardReport = (fromDate,toDate) => async(dispatch, get
     console.log(err);
   })
 }
+export const loadDailyAppointmentAnalyticsForBusiness = (isCount,date) => async(dispatch, getState) =>{
+  const { authDetails } = getState();
+  console.log(isCount);
+  console.log(date);
+  
+  let authToken = "";
+  try {
+    // const value = await AsyncStorage.getItem('authKey');
+    const value = await getStorageKey("authKey");
+    if (value !== null) {
+      authToken = value;
+    }
+  } catch (e) {
+    console.error(
+      "auth token fetching error. (inside dashboardSlice loadSalesDashBoard)" +
+        e
+    );
+  }
+  await axios
+  .post(
+    process.env.EXPO_PUBLIC_API_URI + "/analytics/getDailyAppointmentAnalyticsForBusiness",
+    {
+      business_id: authDetails.businessId,
+      // fromDate:'2024-10-01',
+      // toDate:'2024-10-31'
+      isCount:isCount,
+      period:date
+    },
+    {
+      headers: {
+        authorization: "Bearer " + authToken,
+      },
+    }
+  ).then(res => {
+    // console.log(res.data.data[0]);
+    if(isCount){
+      dispatch(updateTotalAppointmentOverTime(res.data.data[0]))
+    }
+    else{
+      dispatch(updateTotalSalesOverTime(res.data.data[0]));
+    }
+  }).catch(err => {
+    console.error("Error Fetching loadDailyAppointmentAnalyticsForBusiness");
+    console.log(err);
+  })
+}
 
 export const dashboardSlice = createSlice({
   name: "dashboard",
@@ -650,6 +716,12 @@ export const dashboardSlice = createSlice({
     updateLabelDate(state,action) {
       state.toggleDateData[action.payload.type].value = action.payload.data.toString();
     },
+    updateTotalSalesOverTime(state,action) {
+      state.totalSalesOverTime = action.payload;
+    },
+    updateTotalAppointmentOverTime(state,action) {
+      state.totalAppointmentOverTime = action.payload;
+    },
   },
 });
 
@@ -674,6 +746,8 @@ export const {
   updateSalesReport,
   updateDate,
   updateLabelDate,
+  updateTotalSalesOverTime,
+  updateTotalAppointmentOverTime
 } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;
