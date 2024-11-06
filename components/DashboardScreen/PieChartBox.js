@@ -194,7 +194,7 @@ const PieChartBox = (props) => {
     }
   };
 
-  const handleCustomDate = async (type, date, page) => {
+  const handleCustomDate = async (type, date, page,originalDate) => {
     if (type === 1) {
       if (page === "clientGender") {
         setCustomFromClientGenderPassData(date);
@@ -205,14 +205,17 @@ const PieChartBox = (props) => {
           loadRevenueCountByGender(date, customToClientGenderPassData)
         );
       } else if (page === "clientRedemption") {
+        
         setCustomFromClientRedemptionPassData(date);
         await dispatch(
           loadRevenueByPrepaid(date, customToClientRedemptionPassData)
         );
       } else if(page === "salesPercent"){
+        // setCustomTopServicesFromDateData(originalDate);
         setCustomTopServicesFromPassData(date);
         await dispatch(loadTopRevenueServices(date,customTopServicesToPassData))
       } else if(page === "salesProduct"){
+        // setCustomTopProductsFromDateData(originalDate);
         setCustomTopProductsFromPassData(date);
         await dispatch(loadTopRevenueProducts(date,customTopProductsToPassData));
       }
@@ -314,7 +317,8 @@ const PieChartBox = (props) => {
           handleCustomDate(
             1,
             formatDateYYYYMMDDD(date),
-            props.pieDataArray[0]?.page
+            props.pieDataArray[0]?.page,
+            date
           );
         }}
         isVisible={fromDateVisibility}
@@ -396,9 +400,22 @@ const PieChartBox = (props) => {
             ? customTopProductsToDateData
             : new Date()
         }
-        // maximumDate={new Date()}
+        minimumDate={
+          props.pieDataArray[0]?.page === "clientGender"
+          ? customFromGenderDateData
+          : props.pieDataArray[0]?.page === "clientCount"
+          ? customFromCountDateData
+          : props.pieDataArray[0]?.page === "clientRedemption"
+          ? customFromRedemptionDateData
+          : props.pieDataArray[0]?.page === "salesPercent"
+          ? customTopServicesFromDateData
+          : props.pieDataArray[0]?.page === "salesProduct"
+          ? customTopProductsFromDateData
+          : new Date()
+        }
         themeVariant="light"
         onCancel={() => setToDateVisibility(false)}
+        maximumDate={new Date()}
       />
       <View style={isCustomRange && styles.customDateBox}>
         {isCustomRange ? (

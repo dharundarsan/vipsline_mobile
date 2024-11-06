@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import TextTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
@@ -8,6 +8,7 @@ import { Divider } from "react-native-paper";
 import { useDispatch } from "react-redux";
 import { loadDailyAppointmentAnalyticsForBusiness } from "../../store/dashboardSlice";
 
+const { width: screenWidth } = Dimensions.get('window');
 const LineChartBox = (props) => {
     const dispatch = useDispatch();
     const [selectedValue, setSelectedValue] = useState("currentmonth");
@@ -29,6 +30,7 @@ const LineChartBox = (props) => {
     // const yAxisLabels = Array.from({ length: 6 }, (_, i) =>
     // Math.round((maxValue / 5) * i).toString()
     // );
+    const dropdownWidth = screenWidth * 0.35;
     return (
         <View style={styles.commonContainer}>
             <View
@@ -49,7 +51,7 @@ const LineChartBox = (props) => {
                 <Dropdown
                     dropdownPosition="auto"
                     iconColor="#6950F3"
-                    style={styles.dropdown}
+                    style={[styles.dropdown,{width:dropdownWidth}]}
                     data={props.dateArray}
                     selectedTextStyle={{ color: "#6950F3" }}
                     placeholderStyle={{ color: "#6950F3" }}
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   dropdown: {
-    width: "40%",
+    // width: "40%",
     color: Colors.highlight,
     paddingHorizontal: 10,
   },
