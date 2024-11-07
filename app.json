@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Vipsline Business",
+    "name": "VIPsline Business",
     "slug": "vipsline_mobile",
     "version": "1.0.0",
     "orientation": "default",
@@ -39,7 +39,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.naveenakash.vipsline_mobile"
+      "package": "com.business.vipsline"
     },
     "web": {
       "favicon": "./assets/favicon.png"

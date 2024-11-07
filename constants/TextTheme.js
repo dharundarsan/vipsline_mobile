@@ -89,7 +89,7 @@ const TextTheme = StyleSheet.create({
         fontFamily:"Inter-Bold",
         fontSize: 14,
         fontWeight: "500",
-        letterSpacing: 1,
+        letterSpacing: 0.5,
         lineHeight: 20,
     },
     labelMedium: {

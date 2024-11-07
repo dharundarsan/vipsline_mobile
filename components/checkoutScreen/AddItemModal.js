@@ -140,7 +140,7 @@ const AddItemModal = (props) => {
         },
         categoryListItemButton: {
             borderBottomColor: Colors.grey500,
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.5,
             backgroundColor: Colors.transparent,
             alignSelf: "auto",
         },
@@ -322,7 +322,7 @@ const AddItemModal = (props) => {
                 }
                 <View style={styles.newSaleTextContainer}>
                     <Text
-                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
+                        style={[textTheme.titleLarge, styles.newSaleText, {letterSpacing: -0.5}]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
                 </View>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
