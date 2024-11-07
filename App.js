@@ -71,6 +71,7 @@ import StaffDashboard from './components/DashboardScreen/StaffDashboard';
 import ClientDashboard from './components/DashboardScreen/ClientDashboard';
 import { DataProvider, useDataContext } from './context/DataFlowContext';
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
+import AppointmentsScreen from "./screens/AppointmentsScreen";
 
 enableScreens();
 
@@ -485,15 +486,15 @@ const MainDrawerNavigator = (props) => {
                             {/*            style={{ resizeMode: "contain" }} />*/}
                             {/*    }}*/}
                             {/*/>*/}
-                            {/* <Drawer.Screen
-                                name="Appointments"
-                                component={CheckoutStack}
-                                options={{
-                                    drawerIcon: () => <Image
-                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
-                                        style={{ resizeMode: "contain" }} />
-                                }} 
-                            />  */}
+                            {/*<Drawer.Screen*/}
+                            {/*    name="Appointments"*/}
+                            {/*    component={AppointmentsScreen}*/}
+                            {/*    options={{*/}
+                            {/*        drawerIcon: () => <Image*/}
+                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
+                            {/*            style={{ resizeMode: "contain" }} />*/}
+                            {/*    }}*/}
+                            {/*/>*/}
                             <Drawer.Screen
                                 name="Checkout"
                                 component={CheckoutStack}
