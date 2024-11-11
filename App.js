@@ -78,6 +78,7 @@ import ClientDashboard from './components/DashboardScreen/ClientDashboard';
 import {DataProvider, useDataContext} from './context/DataFlowContext';
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import AppointmentsScreen from "./screens/AppointmentsScreen";
+import LeadManagementScreen from "./screens/LeadManagementScreen";
 
 enableScreens();
 
@@ -536,6 +537,17 @@ const MainDrawerNavigator = (props) => {
                                     headerTitleAlign: 'center',
                                 }}
                             />
+                            <Drawer.Screen name="Lead Management"
+                                           component={LeadManagementScreen}
+                                           options={{
+                                               drawerIcon: () => <Image
+                                                   source={{uri: Image.resolveAssetSource(marketing_icon).uri}}
+                                                   width={25}
+                                                   height={25}
+                                                   style={{resizeMode: "contain"}}/>,
+                                               headerTitle: 'Lead Management',
+                                               headerTitleAlign: 'center',
+                                           }}/>
                             {/*<Drawer.Screen name="Marketing" component={CheckoutStack} options={{*/}
                             {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}*/}
                             {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}

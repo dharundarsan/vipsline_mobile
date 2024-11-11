@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
 import * as SecureStore from 'expo-secure-store';
@@ -29,7 +29,7 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-            }
+    }
 }
 
 
@@ -45,7 +45,7 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
         console.log("auth token fetching error. (inside loadClientFilterFromDb)" + e);
     }
 
-    const { clientFilter } = getState();
+    const {clientFilter} = getState();
     if (clientFilter.isFetching) return;
 
     try {
@@ -87,7 +87,7 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
         console.log("auth token fetching error. (inside clientFilterSlice loadSearchClientFilterFromDb)" + e);
     }
 
-    const { clientFilter } = getState();
+    const {clientFilter} = getState();
     if (clientFilter.isFetchingSearchClient) return;
 
     try {
@@ -117,8 +117,6 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
 }
 
 
-
-
 export const clientFilterSlice = createSlice({
     name: "clientFilter",
     initialState: initial,
@@ -133,15 +131,14 @@ export const clientFilterSlice = createSlice({
         updateFetchingState(state, action) {
             state.isFetching = action.payload;
         },
-        incrementPageNumber(state, action)  {
+        incrementPageNumber(state, action) {
             state.pageNo++;
         },
-        decrementPageNumber(state, action)  {
+        decrementPageNumber(state, action) {
             const page_no = state.pageNo - 1;
-            if(page_no < 0) {
+            if (page_no < 0) {
                 state.pageNo = 0;
-            }
-            else {
+            } else {
                 state.pageNo--;
             }
         },
@@ -164,12 +161,11 @@ export const clientFilterSlice = createSlice({
         incrementSearchClientPageNumber(state, action) {
             state.searchPageNo++;
         },
-        decrementSearchPageNumber(state, action)  {
+        decrementSearchPageNumber(state, action) {
             const page_no = state.searchPageNo - 1;
-            if(page_no < 0) {
+            if (page_no < 0) {
                 state.searchPageNo = 0;
-            }
-            else {
+            } else {
                 state.searchPageNo--;
             }
         },
@@ -193,7 +189,7 @@ export const {
     decrementPageNumber,
     incrementPageNumber,
     updateMaxEntry,
-    resetClientFilter ,
+    resetClientFilter,
     updateSearchClientFetchingState,
     updateSearchClientList,
     resetSearchClientFilter,

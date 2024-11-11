@@ -12,6 +12,7 @@ import invoiceReducer from "./invoiceSlice";
 import checkoutActionReducer from "./CheckoutActionSlice";
 import toastReducer from "./toastSlice";
 import businessDetailReducer from "./BusinessDetailSlice";
+import leadManagementReducer from "./leadManagementSlice";
 
 const store = configureStore({
     reducer: {
@@ -28,6 +29,7 @@ const store = configureStore({
         checkoutAction:checkoutActionReducer,
         businessDetail: businessDetailReducer,
         toast: toastReducer,
+        leads: leadManagementReducer,
     },
 });
 

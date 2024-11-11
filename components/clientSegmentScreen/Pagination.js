@@ -57,14 +57,13 @@ export default function Pagination(props) {
     const [lowerCount, setLowerCount] = useState(1);
 
 
-
     useEffect(() => {
         dispatch(updateMaxEntry(10));
 
 
         currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         dispatch(resetClientFilter());
-        if(currentClientCount > 10) {
+        if (currentClientCount > 10) {
             dispatch(loadClientFiltersFromDb(10, clientFilterNames(props.filterPressed)))
         }
         setTotalCount("currentClientCount");
@@ -77,17 +76,15 @@ export default function Pagination(props) {
     useEffect(() => {
         dispatch(loadClientFiltersFromDb(maxEntry, clientFilterNames(props.filterPressed)));
 
-        if(lowerCount === 1) {
+        if (lowerCount === 1) {
             setIsBackwardButtonDisabled(true);
-        }
-        else {
+        } else {
             setIsBackwardButtonDisabled(false);
         }
 
-        if(upperCount === totalCount) {
-                        setIsForwardButtonDisabled(true);
-        }
-        else {
+        if (upperCount === totalCount) {
+            setIsForwardButtonDisabled(true);
+        } else {
             setIsForwardButtonDisabled(false);
         }
     }, [lowerCount, upperCount]);
@@ -95,11 +92,10 @@ export default function Pagination(props) {
     useEffect(() => {
         currentClientCount = chooseFilterCount(props.filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
         setLowerCount(1);
-        if(maxEntry > currentClientCount) {
+        if (maxEntry > currentClientCount) {
 
             setUpperCount(currentClientCount);
-        }
-        else {
+        } else {
             setUpperCount(maxEntry);
         }
 
@@ -108,61 +104,56 @@ export default function Pagination(props) {
     }, [maxEntry]);
 
 
-    const [isBackwardButtonDisabled, setIsBackwardButtonDisabled]  = useState(false);
-    const [isForwardButtonDisabled, setIsForwardButtonDisabled]  = useState(false);
+    const [isBackwardButtonDisabled, setIsBackwardButtonDisabled] = useState(false);
+    const [isForwardButtonDisabled, setIsForwardButtonDisabled] = useState(false);
 
 
-    function forwardButtonHandler(){
-        if(!isForwardButtonDisabled) {
+    function forwardButtonHandler() {
+        if (!isForwardButtonDisabled) {
             let lowerCountAfter = lowerCount + maxEntry;
             let upperCountAfter = upperCount + maxEntry;
 
-            if(upperCountAfter > totalCount && lowerCountAfter < 0) {
+            if (upperCountAfter > totalCount && lowerCountAfter < 0) {
                 setLowerCount(totalCount - maxEntry);
                 setUpperCount(totalCount);
-                            }
-            else if(upperCountAfter <= totalCount && lowerCountAfter >= 0) {
-                                setLowerCount(lowerCountAfter);
+            } else if (upperCountAfter <= totalCount && lowerCountAfter >= 0) {
+                setLowerCount(lowerCountAfter);
                 setUpperCount(upperCountAfter);
                 dispatch(incrementPageNumber());
-            }
-            else if(upperCountAfter > totalCount && upperCountAfter >= 0) {
-                                dispatch(incrementPageNumber());
+            } else if (upperCountAfter > totalCount && upperCountAfter >= 0) {
+                dispatch(incrementPageNumber());
                 setUpperCount(totalCount);
                 setLowerCount(lowerCountAfter)
-            }
-            else if(lowerCountAfter < 0 && upperCountAfter < totalCount) {
-                                dispatch(incrementPageNumber());
+            } else if (lowerCountAfter < 0 && upperCountAfter < totalCount) {
+                dispatch(incrementPageNumber());
                 setUpperCount(upperCountAfter)
                 setLowerCount(0)
             }
         }
     }
 
-    function backwardButtonHandler(){
-        if(!isBackwardButtonDisabled) {
+    function backwardButtonHandler() {
+        if (!isBackwardButtonDisabled) {
             let lowerCountAfter = lowerCount - maxEntry;
             let upperCountAfter = upperCount - maxEntry;
 
             if (lowerCountAfter === 1 && upperCountAfter < maxEntry) {
-                                setLowerCount(1);
+                setLowerCount(1);
                 setUpperCount(maxEntry);
                 dispatch(decrementPageNumber());
-            }
-            else if(lowerCountAfter < 1 && upperCountAfter < maxEntry) {
-                                setLowerCount(1);
+            } else if (lowerCountAfter < 1 && upperCountAfter < maxEntry) {
+                setLowerCount(1);
                 setUpperCount(maxEntry);
                 dispatch(decrementPageNumber());
-            }
-            else if(upperCountAfter >= 1 && upperCountAfter >= maxEntry) {
-                                setLowerCount(lowerCountAfter);
+            } else if (upperCountAfter >= 1 && upperCountAfter >= maxEntry) {
+                setLowerCount(lowerCountAfter);
                 setUpperCount(upperCountAfter);
                 dispatch(decrementPageNumber());
             }
         }
     }
 
-    return(
+    return (
         <View style={styles.pagination}>
             <PrimaryButton
                 pressableStyle={styles.entryButton}
@@ -185,17 +176,16 @@ export default function Pagination(props) {
                     buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}
                     onPress={backwardButtonHandler}
                 >
-                    <FontAwesome6 name="angle-left" size={24} color="black" />
+                    <FontAwesome6 name="angle-left" size={24} color="black"/>
                 </PrimaryButton>
                 <PrimaryButton
                     buttonStyle={[isForwardButtonDisabled ? [styles.pageForwardButton, styles.disabled] : [styles.pageForwardButton]]}
                     onPress={forwardButtonHandler}
                 >
-                    <FontAwesome6 name="angle-right" size={24} color="black" />
+                    <FontAwesome6 name="angle-right" size={24} color="black"/>
                 </PrimaryButton>
 
             </View>
-
         </View>
     );
 }
@@ -210,11 +200,8 @@ const styles = StyleSheet.create({
     disabled: {
         opacity: 0.4,
     },
-    entryText: {
-    },
-    entryButton: {
-
-    },
+    entryText: {},
+    entryButton: {},
     entryButtonContainer: {
         borderWidth: 1,
         borderColor: Colors.grey250,
@@ -227,12 +214,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     pageForwardButton: {
-        backgroundColor :Colors.white,
+        backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
     },
     pageBackwardButton: {
-        backgroundColor :Colors.white,
+        backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
         marginHorizontal: 16

@@ -79,9 +79,8 @@ const ServicesList = React.memo((props) => {
             : <View style={styles.commonSelectTemplate}>
                 <View style={styles.headingAndSearchContainer}>
                     <View style={styles.headingAndSearchContainer}>
+                        <Text style={[textTheme.titleMedium, styles.headingText]}>Select Service</Text>
                         <SearchBar filter={false}
-                                   onPressFilter={() => {
-                                   }}
                                    onChangeText={filterServicesData}
                                    placeholder={"Search by service name or prices"}/>
                     </View>
@@ -203,7 +202,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndSearchContainer: {
-        padding: 15,
+        marginTop:10,
+        marginHorizontal:10,
     },
     headingText: {
         marginBottom: 10

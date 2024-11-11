@@ -91,3 +91,9 @@ export const showToast = (toastOptions) => {
 export const formatNumber = (number) => {
     return number % 1 === 0 ? number.toFixed(0) : number.toFixed(2);
 }
+
+export const checkAPIError = (response) => {
+    if(response.data.status_code > 399) {
+        throw response;
+    }
+}
