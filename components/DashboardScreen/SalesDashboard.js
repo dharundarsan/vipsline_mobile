@@ -1,8 +1,8 @@
-import { Pressable,ScrollView,StyleSheet,Text,View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../../constants/Colors";
-import { listData,pieChartColorCode,salesCardData,salesData } from "../../data/DashboardSelection";
+import { listData, pieChartColorCode, salesCardData, salesData } from "../../data/DashboardSelection";
 import DashboardCard from "../../ui/DashboardCard";
 import ListIconData from "./ListIconData";
 import { Divider } from "react-native-paper";
@@ -10,19 +10,21 @@ import textTheme from "../../constants/TextTheme";
 import ServiceList from "./ServiceList";
 import { BarChart } from "react-native-gifted-charts";
 import { useDispatch, useSelector } from "react-redux";
-import { loadSalesDashboard,loadTopRevenueProducts,loadTopRevenueServices,updateLoadingState,updateDashBoardName,loadDailyAppointmentAnalyticsForBusiness} from "../../store/dashboardSlice";
-import { convertToTitleCase,formatDateDDMMYYYY,formatDateToWeekDayDDMMMYYYY,formatDateYYYYMMDD,formatDateYYYYMMDDD,getFirstAndLastDateOfCurrentMonthDDMMYYYY,getFirstDateOfCurrentMonth,getFirstDateOfCurrentMonthYYYYMMDD,getLastDateOfCurrentMonth,getLastDateOfCurrentMonthYYYYMMMDD } from "../../util/Helpers";
+import { loadSalesDashboard, loadTopRevenueProducts, loadTopRevenueServices, updateLoadingState, updateDashBoardName, loadDailyAppointmentAnalyticsForBusiness } from "../../store/dashboardSlice";
+import { convertToTitleCase, formatDateDDMMYYYY, formatDateToWeekDayDDMMMYYYY, formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstAndLastDateOfCurrentMonthDDMMYYYY, getFirstDateOfCurrentMonth, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonth, getLastDateOfCurrentMonthYYYYMMMDD } from "../../util/Helpers";
 import PieChartBox from "./PieChartBox";
 import { calculateTotalValue, processPieChartData } from "./PieData";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import LineChartBox from "./LineChartBox";
 import GroupedBarChart from "./GroupedBarChart";
+import ContentLoader, { Bullets, FacebookLoader, InstagramLoader } from "react-native-easy-content-loader";
 
 const SalesDashboard = () => {
   const dispatch = useDispatch();
 
   const [selectedValue, setSelectedValue] = useState("today");
+  const [isPageLoading, setIsPageLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState(formatDateDDMMYYYY().toString());
   const [isCustomRange, setIsCustomRange] = useState(false);
@@ -34,6 +36,16 @@ const SalesDashboard = () => {
   const [customToDateData, setCustomToDateData] = useState(new Date());
   const [customFromPassData, setCustomFromPassData] = useState(formatDateYYYYMMDD(0));
   const [customToPassData, setCustomToPassData] = useState(formatDateYYYYMMDD(0));
+  const [isDateDataLoading, setIsDateDataLoading] = useState(false);
+  // const [firstRowLoader, setFirstRowLoader] = useState(false)
+  // const [secondRowLoader, setSecondRowLoader] = useState(false)
+  // const [thirdRowLoader, setThirdRowLoader] = useState(false)
+  // const [fourthRowLoader, setFourthRowLoader] = useState(false)
+  // const [fifthRowLoader, setFifthRowLoader] = useState(false)
+  // const [sixthRowLoader, setSixthRowLoader] = useState(false)
+  // const [seventhRowLoader, setSeventhRowLoader] = useState(false)
+  // const [eightRowLoader, setEightRowLoader] = useState(false)
+  // const [nineRowLoader, setNinethRowLoader] = useState(false)
 
   const lastMonthDate = getLastDateOfCurrentMonthYYYYMMMDD();
   const firstMonthDate = getFirstDateOfCurrentMonthYYYYMMDD();
@@ -100,7 +112,7 @@ const SalesDashboard = () => {
   // const normalizedCount = count.map((value) => (value ));
   // console.log("normalizedCount");
   // console.log(normalizedCount);
-  
+
   const barData = month.flatMap((label, index) => {
     if (normalizedCount[index] === NaN) return;
     return [
@@ -121,11 +133,12 @@ const SalesDashboard = () => {
   });
 
   const handleSelection = async (item) => {
+    setIsDateDataLoading(true)
     setSelectedValue(item.value);
     if (item.day1 === undefined) {
       setIsCustomRange(false);
-      
-      if (item.label !== "This month" && item.value !== "Custom range") {        
+
+      if (item.label !== "This month" && item.value !== "Custom range") {
         // dispatch(updateLoadingState(true));
         setDate(
           item.day !== -6 && item.day !== -29
@@ -140,13 +153,13 @@ const SalesDashboard = () => {
           )
         );
       }
-    } else if(item.label === "This month") {
+    } else if (item.label === "This month") {
       setIsCustomRange(false);
       setIsLoading(true);
       setDate(firstDateDDMMYYYY + " - " + lastDateDDMMYYYY);
       await dispatch(loadSalesDashboard(firstMonthDate, lastMonthDate));
     }
-    else{
+    else {
       setIsLoading(true);
       setIsCustomRange(true);
       const customDay1 = formatDateToWeekDayDDMMMYYYY(item.day1);
@@ -157,14 +170,15 @@ const SalesDashboard = () => {
     }
     // dispatch(updateLoadingState(false));
     setIsLoading(false);
+    setIsDateDataLoading(false);
   };
 
-  const handleCustomDate = async(type,date) => {
-    if(type === 1){
+  const handleCustomDate = async (type, date) => {
+    if (type === 1) {
       setCustomFromPassData(date);
       await dispatch(loadSalesDashboard(date, customToPassData));
     }
-    else if(type === 2){
+    else if (type === 2) {
       setCustomToPassData(date);
       await dispatch(loadSalesDashboard(customFromPassData, date));
     }
@@ -172,13 +186,15 @@ const SalesDashboard = () => {
   }
 
   useEffect(() => {
-    async function initialCall(){
-      dispatch(updateDashBoardName("Sales"))
-      dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
-      dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
-      dispatch(loadTopRevenueProducts(firstMonthDate, lastMonthDate));
-      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false,"currentmonth"))
-      await dispatch(loadDailyAppointmentAnalyticsForBusiness(true,"currentmonth"))
+    async function initialCall() {
+      setIsPageLoading(true);
+      await dispatch(updateDashBoardName("Sales"))
+      await dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+      await dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
+      await dispatch(loadTopRevenueProducts(firstMonthDate, lastMonthDate));
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false, "currentmonth"))
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(true, "currentmonth"))
+      setIsPageLoading(false);
     }
     initialCall();
   }, []);
@@ -191,21 +207,21 @@ const SalesDashboard = () => {
     const power = Math.pow(10, Math.floor(Math.log10(value)));
     return Math.ceil(value / power) * power;
   }
-  
+
   function roundUp(value) {
     return value <= 10 ? value : roundUpToNearestPowerOfTen(value);
   }
 
-  function removeZero(roundedValue){
+  function removeZero(roundedValue) {
     return roundedValue.toString().replace(/0+$/, '');
   }
-  
+
   function calculateLabelWidth(maxValue) {
     const labelText = maxValue.toLocaleString();
     const approximateCharWidth = 8;
     return labelText.length * approximateCharWidth;
   }
-  
+
   const maxRevenueWidth = Math.ceil(Math.max(...barData.map(item => item.value)));
   const yAxisLabelWidth = calculateLabelWidth(maxRevenueWidth);
   const barSections = parseInt(removeZero(roundUp(maxRevenue)))
@@ -213,192 +229,461 @@ const SalesDashboard = () => {
   const removeZeroLineSalesOverTime = removeZero(roundUp(maxTotalSalesValue)) || 10;
   const roundLineSalesOverTime = roundUp(maxTotalSalesValue)
 
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setFirstRowLoader(true)
+  //   }, 0);
+  //   setTimeout(() => {
+  //     setSecondRowLoader(true)
+  //   }, 1000);
+  //   setTimeout(() => {
+  //     setThirdRowLoader(true)
+  //   }, 2500);
+  //   setTimeout(() => {
+  //     setFourthRowLoader(true)
+  //   }, 4000);
+  //   setTimeout(() => {
+  //     setFifthRowLoader(true)
+  //   }, 5500);
+  //   setTimeout(() => {
+  //     setSixthRowLoader(true)
+  //   }, 7000);
+  //   setTimeout(() => {
+  //     setSeventhRowLoader(true)
+  //   }, 8500);
+  //   setTimeout(() => {
+  //     setEightRowLoader(true)
+  //   }, 1000);
+  //   setTimeout(() => {
+  //     setNinethRowLoader(true)
+  //   }, 1500);
+
+  // }, [])
+
+
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
       <View style={styles.container}>
-        <View style={isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
-          <Dropdown
-            style={isCustomRange ? styles.customDropdown : styles.dropdown}
-            data={dateData}
-            labelField="label"
-            valueField="value"
-            value={selectedValue}
-            onChange={handleSelection}
-            placeholder="Today"
-            disable={isLoading}
-          />
-            <DateTimePickerModal
-            onConfirm={(date) => {
-              setFromDateVisibility(false);
-              setCustomFromDateData(date)
-              const formatted = date.toLocaleDateString("en-GB", {
-                weekday: "short",
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              });
-              setSelectedFromCustomDate(formatted)
-              handleCustomDate(1,formatDateYYYYMMDDD(date))
-            }}
-            isVisible={fromDateVisibility}
-            mode="date"
-            date={customFromDateData}
-            maximumDate={customToDateData}
-            themeVariant="light"
-            onCancel={() => setFromDateVisibility(false)}
-            />
-            <DateTimePickerModal
-              onConfirm={(date) => {
-                setToDateVisibility(false);
-                setCustomToDateData(date)
-                const formatted = date.toLocaleDateString("en-GB", {
-                  weekday: "short",
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                });
-                setSelectedToCustomDate(formatted)
-                handleCustomDate(2,formatDateYYYYMMDDD(date))
-              }}
-              minimumDate={customFromDateData}
-              isVisible={toDateVisibility}
-              mode="date"
-              date={customToDateData}
-              maximumDate={new Date()}
-              themeVariant="light"
-              onCancel={() => setToDateVisibility(false)}
-            />
-          <View style={isCustomRange ? styles.customDateBox : styles.dateBox}>
-            {isCustomRange ? (
-              <View style={styles.customDateContainer}>
-                <Pressable
-                  style={styles.datePressable}
-                  android_ripple={{ color: Colors.ripple }}
-                  onPress={() => setFromDateVisibility(true)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter-Bold",
-                      fontSize: 12,
-                      fontWeight: "500",
-                      letterSpacing: 0.1,
-                      lineHeight: 20,
-                    }}
-                  >
-                    {selectedFromCustomDate}
-                  </Text>
-                  <MaterialCommunityIcons
-                    name="calendar-month-outline"
-                    size={18}
-                    color={Colors.darkBlue}
-                  />
-                </Pressable>
-                <Text> TO </Text>
-                <Pressable
-                  style={styles.datePressable}
-                  android_ripple={{ color: Colors.ripple }}
-                  onPress={() => setToDateVisibility(true)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter-Bold",
-                      fontSize: 12,
-                      fontWeight: "500",
-                      letterSpacing: 0.1,
-                      lineHeight: 20,
-                    }}
-                  >
-                    {selectedToCustomDate}
-                  </Text>
-                  <MaterialCommunityIcons
-                    name="calendar-month-outline"
-                    size={18}
-                    color={Colors.darkBlue}
-                  />
-                </Pressable>
-              </View>
-            ) : (
-              <Text style={styles.dateText}>{date}</Text>
-            )}
-          </View>
-        </View>
-        <View style={styles.statisticContainer}>
-          {salesCardData.map((item, index) => {
-            const expenseKeys = Object.keys(expenseValues);
-            const expenseValue = expenseValues[expenseKeys[index]];
-            return (
-              <DashboardCard
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                color={item.color}
-                value={expenseValue}
-              />
-            );
-          })}
-        </View>
-        <View style={styles.listDataContainer}>
-          {listData.map((item, index) => {
-            const value = valueMap[item.title] || 0;
-            return (
-              <ListIconData
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                value={value}
-              />
-            );
-          })}
-        </View>
+        {
+          isPageLoading ?
+            <>
+              <View >
+                <View style={[styles.dateContainer, { columnGap: 0, width: "50%" }]}>
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[45]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
 
-        <View style={styles.commonContainer}>
-          <Text
-            style={[
-              textTheme.titleMedium,
-              { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
-            ]}
-          >
-            Payment Mode
-          </Text>
-          {paymentStoreData.length > 0 ? (
-            paymentStoreData.map((item, index) => {
-              const title = convertToTitleCase(item.mode_of_payment);
-              return (
-                title !== "Nil" && (
-                  <View key={index}>
-                    <ServiceList title={title} value={item.net_sales} />
-                    {index !== paymentStoreData.length - 1 && <Divider />}
-                  </View>
-                )
-              );
-            })
-          ) : (
-            <Text style={{ textAlign: "center", marginBottom: 20 }}>
-              No data found!{" "}
-            </Text>
-          )}
-        </View>
+                  />
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[45]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
 
-        <View style={styles.commonContainer}>
-          <Text
-            style={[
-              textTheme.titleMedium,
-              { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
-            ]}
-          >
-            Total Sales
-          </Text>
-          {salesData.map((item, index) => {
-            const revenueKeys = Object.keys(totalSalesRevenue);
-            const revenueValue = totalSalesRevenue[revenueKeys[index]];
-            return (
-              <View key={index}>
-                <ServiceList title={item.title} value={revenueValue} />
-                {index !== salesData.length - 1 && <Divider />}
+                  />
+                </View>
+                <View style={{ marginTop: "7%", flexDirection: "row", paddingHorizontal: 10 }}>
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[85]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
+                    containerStyles={{ width: '50%' }}
+
+                  />
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[85]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
+                    containerStyles={{ width: "50%" }}
+
+                  />
+                </View>
+                <View style={{ marginTop: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[85]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
+                    containerStyles={{ width: '50%' }}
+
+                  />
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[85]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
+                    containerStyles={{ width: "50%" }}
+
+                  />
+                </View>
               </View>
-            );
-          })}
-        </View>
+              <View style={{ marginVertical: "0%", paddingHorizontal: 10, rowGap: 10 }}>
+                <ContentLoader
+                  pRows={1}
+                  pHeight={[35]}
+                  pWidth={["100%"]}
+                  active
+                  title={false}
+
+                />
+                <ContentLoader
+                  pRows={1}
+                  pHeight={[35]}
+                  pWidth={["100%"]}
+                  active
+                  title={false}
+
+                />
+                <ContentLoader
+                  pRows={1}
+                  pHeight={[35]}
+                  pWidth={["100%"]}
+                  active
+                  title={false}
+
+                />
+                <ContentLoader
+                  pRows={1}
+                  pHeight={[35]}
+                  pWidth={["100%"]}
+                  active
+                  title={false}
+
+                />
+                <ContentLoader
+                  pRows={1}
+                  pHeight={[35]}
+                  pWidth={["100%"]}
+                  active
+                  title={false}
+
+                />
+              </View>
+              <View style={{ marginVertical: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
+                <ContentLoader
+                  pRows={1}
+                  pHeight={[300]}
+                  pWidth={["100%"]}
+                  active
+                  title={false}
+                />
+              </View>
+            </> :
+            <>
+              <View style={isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
+                <Dropdown
+                  style={isCustomRange ? styles.customDropdown : styles.dropdown}
+                  data={dateData}
+                  labelField="label"
+                  valueField="value"
+                  value={selectedValue}
+                  onChange={handleSelection}
+                  placeholder="Today"
+                  disable={isLoading}
+                />
+                <DateTimePickerModal
+                  onConfirm={(date) => {
+                    setFromDateVisibility(false);
+                    setCustomFromDateData(date)
+                    const formatted = date.toLocaleDateString("en-GB", {
+                      weekday: "short",
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    });
+                    setSelectedFromCustomDate(formatted)
+                    handleCustomDate(1, formatDateYYYYMMDDD(date))
+                  }}
+                  isVisible={fromDateVisibility}
+                  mode="date"
+                  date={customFromDateData}
+                  maximumDate={customToDateData}
+                  themeVariant="light"
+                  onCancel={() => setFromDateVisibility(false)}
+                />
+                <DateTimePickerModal
+                  onConfirm={(date) => {
+                    setToDateVisibility(false);
+                    setCustomToDateData(date)
+                    const formatted = date.toLocaleDateString("en-GB", {
+                      weekday: "short",
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    });
+                    setSelectedToCustomDate(formatted)
+                    handleCustomDate(2, formatDateYYYYMMDDD(date))
+                  }}
+                  minimumDate={customFromDateData}
+                  isVisible={toDateVisibility}
+                  mode="date"
+                  date={customToDateData}
+                  maximumDate={new Date()}
+                  themeVariant="light"
+                  onCancel={() => setToDateVisibility(false)}
+                />
+                <View style={isCustomRange ? styles.customDateBox : styles.dateBox}>
+                  {isCustomRange ? (
+                    <View style={styles.customDateContainer}>
+                      <Pressable
+                        style={styles.datePressable}
+                        android_ripple={{ color: Colors.ripple }}
+                        onPress={() => setFromDateVisibility(true)}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: "Inter-Bold",
+                            fontSize: 12,
+                            fontWeight: "500",
+                            letterSpacing: 0.1,
+                            lineHeight: 20,
+                          }}
+                        >
+                          {selectedFromCustomDate}
+                        </Text>
+                        <MaterialCommunityIcons
+                          name="calendar-month-outline"
+                          size={18}
+                          color={Colors.darkBlue}
+                        />
+                      </Pressable>
+                      <Text> TO </Text>
+                      <Pressable
+                        style={styles.datePressable}
+                        android_ripple={{ color: Colors.ripple }}
+                        onPress={() => setToDateVisibility(true)}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: "Inter-Bold",
+                            fontSize: 12,
+                            fontWeight: "500",
+                            letterSpacing: 0.1,
+                            lineHeight: 20,
+                          }}
+                        >
+                          {selectedToCustomDate}
+                        </Text>
+                        <MaterialCommunityIcons
+                          name="calendar-month-outline"
+                          size={18}
+                          color={Colors.darkBlue}
+                        />
+                      </Pressable>
+                    </View>
+                  ) : (
+                    <Text style={styles.dateText}>{date}</Text>
+                  )}
+                </View>
+              </View>
+              {
+                isDateDataLoading ?
+                  <>
+                    <View >
+                      <View style={[styles.dateContainer, { columnGap: 0, width: "50%" }]}>
+                        <ContentLoader
+                          pRows={1}
+                          pHeight={[45]}
+                          pWidth={["100%"]}
+                          active
+                          title={false}
+
+                        />
+                        <ContentLoader
+                          pRows={1}
+                          pHeight={[45]}
+                          pWidth={["100%"]}
+                          active
+                          title={false}
+
+                        />
+                      </View>
+                      <View style={{ marginTop: "7%", flexDirection: "row", paddingHorizontal: 10 }}>
+                        <ContentLoader
+                          pRows={1}
+                          pHeight={[85]}
+                          pWidth={["100%"]}
+                          active
+                          title={false}
+                          containerStyles={{ width: '50%' }}
+
+                        />
+                        <ContentLoader
+                          pRows={1}
+                          pHeight={[85]}
+                          pWidth={["100%"]}
+                          active
+                          title={false}
+                          containerStyles={{ width: "50%" }}
+
+                        />
+                      </View>
+                      <View style={{ marginTop: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
+                        <ContentLoader
+                          pRows={1}
+                          pHeight={[85]}
+                          pWidth={["100%"]}
+                          active
+                          title={false}
+                          containerStyles={{ width: '50%' }}
+
+                        />
+                        <ContentLoader
+                          pRows={1}
+                          pHeight={[85]}
+                          pWidth={["100%"]}
+                          active
+                          title={false}
+                          containerStyles={{ width: "50%" }}
+
+                        />
+                      </View>
+                    </View>
+                    <View style={{ marginVertical: "0%", paddingHorizontal: 10, rowGap: 10 }}>
+                      <ContentLoader
+                        pRows={1}
+                        pHeight={[35]}
+                        pWidth={["100%"]}
+                        active
+                        title={false}
+
+                      />
+                      <ContentLoader
+                        pRows={1}
+                        pHeight={[35]}
+                        pWidth={["100%"]}
+                        active
+                        title={false}
+
+                      />
+                      <ContentLoader
+                        pRows={1}
+                        pHeight={[35]}
+                        pWidth={["100%"]}
+                        active
+                        title={false}
+
+                      />
+                      <ContentLoader
+                        pRows={1}
+                        pHeight={[35]}
+                        pWidth={["100%"]}
+                        active
+                        title={false}
+
+                      />
+                      <ContentLoader
+                        pRows={1}
+                        pHeight={[35]}
+                        pWidth={["100%"]}
+                        active
+                        title={false}
+
+                      />
+                    </View>
+                    <View style={{ marginVertical: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
+                      <ContentLoader
+                        pRows={1}
+                        pHeight={[300]}
+                        pWidth={["100%"]}
+                        active
+                        title={false}
+                      />
+                    </View>
+                  </> :
+                <>
+                <View style={styles.statisticContainer}>
+                {salesCardData.map((item, index) => {
+                  const expenseKeys = Object.keys(expenseValues);
+                  const expenseValue = expenseValues[expenseKeys[index]];
+                  return (
+                    <DashboardCard
+                      key={index}
+                      icon={item.icon}
+                      title={item.title}
+                      color={item.color}
+                      value={expenseValue}
+                    />
+                  );
+                })}
+              </View>
+              <View style={styles.listDataContainer}>
+                {listData.map((item, index) => {
+                  const value = valueMap[item.title] || 0;
+                  return (
+                    <ListIconData
+                      key={index}
+                      icon={item.icon}
+                      title={item.title}
+                      value={value}
+                    />
+                  );
+                })}
+              </View>
+
+              <View style={styles.commonContainer}>
+                <Text
+                  style={[
+                    textTheme.titleMedium,
+                    { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
+                  ]}
+                >
+                  Payment Mode
+                </Text>
+                {paymentStoreData.length > 0 ? (
+                  paymentStoreData.map((item, index) => {
+                    const title = convertToTitleCase(item.mode_of_payment);
+                    return (
+                      title !== "Nil" && (
+                        <View key={index}>
+                          <ServiceList title={title} value={item.net_sales} />
+                          {index !== paymentStoreData.length - 1 && <Divider />}
+                        </View>
+                      )
+                    );
+                  })
+                ) : (
+                  <Text style={{ textAlign: "center", marginBottom: 20 }}>
+                    No data found!{" "}
+                  </Text>
+                )}
+              </View>
+
+              <View style={styles.commonContainer}>
+                <Text
+                  style={[
+                    textTheme.titleMedium,
+                    { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
+                  ]}
+                >
+                  Total Sales
+                </Text>
+                {salesData.map((item, index) => {
+                  const revenueKeys = Object.keys(totalSalesRevenue);
+                  const revenueValue = totalSalesRevenue[revenueKeys[index]];
+                  return (
+                    <View key={index}>
+                      <ServiceList title={item.title} value={revenueValue} />
+                      {index !== salesData.length - 1 && <Divider />}
+                    </View>
+                  );
+                })}
+              </View>
+                </>
+              }
+              </>
+        }
+
 
         <PieChartBox
           title={"Bill Items"}
@@ -418,36 +703,36 @@ const SalesDashboard = () => {
           <View style={styles.barchartContainer}>
             {
               <BarChart
-              data={barData}
-              barWidth={10}
-              spacing={50}
-              // width={100}
-              yAxisTextNumberOfLines={100}
-              yAxisLabelWidth={yAxisLabelWidth} /* Optional: Set width for y-axis labels */
-              noOfSections={barSections || 1}
-              maxValue={barMaxValue}
-              xAxisColor={'black'}
+                data={barData}
+                barWidth={10}
+                spacing={50}
+                // width={100}
+                yAxisTextNumberOfLines={100}
+                yAxisLabelWidth={yAxisLabelWidth} /* Optional: Set width for y-axis labels */
+                noOfSections={barSections || 1}
+                maxValue={barMaxValue}
+                xAxisColor={'black'}
               // secondaryYAxis={{
               //   noOfSections:6,
               //   maxValue:300,
-                
+
               // }}
-              
-            />
+
+              />
               // <GroupedBarChart month={month} count={count} revenue={revenue} />
             }
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
-                  <View
-                    style={[styles.legendColor, { backgroundColor: "#9B9BFF" }]}
-                  />
-                  <Text style={styles.legendText}>Bill value</Text>
-                </View>
-                <View style={styles.legendItem}>
-                  <View
-                    style={[styles.legendColor, { backgroundColor: "#4A90E2" }]}
-                  />
-                  <Text style={styles.legendText}>Bill count</Text>
+                <View
+                  style={[styles.legendColor, { backgroundColor: "#9B9BFF" }]}
+                />
+                <Text style={styles.legendText}>Bill value</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View
+                  style={[styles.legendColor, { backgroundColor: "#4A90E2" }]}
+                />
+                <Text style={styles.legendText}>Bill count</Text>
               </View>
             </View>
           </View>
@@ -461,17 +746,19 @@ const SalesDashboard = () => {
           max={roundLineSalesOverTime}
           sections={removeZeroLineSalesOverTime}
           page="SalesOverTime"
-          />
-        <LineChartBox 
+          key1={"SalesOverTime"}
+        />
+        <LineChartBox
           title={"Appointments over time"}
           toggleDateDropdown
           dateArray={totalSalesOverTimeDropdown}
           xLabelArrayData={totalAppointmentOverTime.date}
           lineChartData={totalAppointmentsOverTimeData}
           page="AppointmentOverTime"
+          key1={"SalesOverTime"}
           max={roundUp(maxAppointmentsOverTime)}
           sections={removeZero(roundUp(maxAppointmentsOverTime)) || 10}
-          />
+        />
         <PieChartBox
           title={"Top Services"}
           pieDataArray={
@@ -589,7 +876,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 30,
-    // overflow: "hidden",
+    overflow: "hidden",
   },
   piechart: {
     justifyContent: "center",
@@ -600,7 +887,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    alignItems:'center'
+    alignItems: 'center'
   },
   legendItem: {
     flexDirection: "row",

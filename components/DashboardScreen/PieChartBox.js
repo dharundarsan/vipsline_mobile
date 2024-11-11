@@ -50,6 +50,9 @@ const PieChartBox = (props) => {
     year: "numeric",
   });
 
+
+  
+
   const [fromDateVisibility, setFromDateVisibility] = useState(false);
   const [toDateVisibility, setToDateVisibility] = useState(false);
   const [selectedFromCustomDate, setSelectedFromCustomDate] = useState("0");
@@ -270,9 +273,9 @@ const PieChartBox = (props) => {
         >
           {props.title}
         </Text>
-
         {props.toggleDateDropdown ? (
-          <Dropdown
+          <Dropdown 
+            dropdownPosition = {props?.labelArray?.[0] !== "" &&props?.pieDataArray[0]?.text !== "0%" &&props.pieDataArray.length !== 0 ? "auto" : "top"}
             iconColor="#6950F3"
             style={styles.dropdown}
             data={props.dateArray}
@@ -306,7 +309,8 @@ const PieChartBox = (props) => {
             setCustomFromRedemptionDateData(date);
             setCustomClientFromRedemption(formatted);
           } else if(page === "salesPercent"){
-            setCustomTopServicesToDateData(date);
+            // setCustomTopServicesToDateData(date);
+            setCustomTopServicesFromDateData(date);
             setCustomTopServicesFromSelected(formatted)
           } else if(page === "salesProduct"){
             setCustomTopProductsToDateData(date);
@@ -454,7 +458,7 @@ const PieChartBox = (props) => {
                 color={Colors.darkBlue}
               />
             </Pressable>
-            <Text style={{ alignSelf: "center" }}> TO </Text>
+            <Text> TO </Text>
             <Pressable
               style={styles.datePressable}
               android_ripple={{ color: Colors.ripple }}
@@ -503,7 +507,7 @@ const PieChartBox = (props) => {
                   : [{ color: "#357AF6", text: "0%", value: 1 }]
               }
               donut
-              strokeWidth={2}
+              strokeWidth={0.5}
               strokeColor="white"
               radius={150}
               isAnimated
@@ -541,7 +545,7 @@ const PieChartBox = (props) => {
               }
               radius={150}
               innerRadius={55}
-              strokeWidth={2}
+              strokeWidth={0.5}
               strokeColor="white"
               showText
               textColor="white"
@@ -681,7 +685,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   dropdown: {
-    width: "40%",
+    width: "48%",
     color: Colors.highlight,
     paddingHorizontal: 10,
   },
