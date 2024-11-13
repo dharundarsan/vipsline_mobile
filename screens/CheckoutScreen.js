@@ -40,6 +40,7 @@ import { useLocationContext } from "../context/LocationContext";
 import Toast from "../ui/Toast";
 import {updateToastRef} from "../store/toastSlice";
 import {loadBusinessDetail} from "../store/BusinessDetailSlice";
+import {getExpenseCategoryId, getExpenseSubCategoryId} from "../store/ExpensesSlice";
 
 const CheckoutScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -96,6 +97,8 @@ const CheckoutScreen = ({ navigation, route }) => {
                     await dispatch(loadBusinessNotificationDetails());
                     await dispatch(loadClientCountFromDb());
                     await dispatch(loadBusinessDetail());
+                    await dispatch(getExpenseCategoryId());
+                    await dispatch(getExpenseSubCategoryId())
                     // dispatch(loadCartFromDB());
                     // dispatch(loadBookingDetailsFromDb());
                 }

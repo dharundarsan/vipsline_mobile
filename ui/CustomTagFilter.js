@@ -4,6 +4,7 @@ import Colors from "../constants/Colors";
 import colors from "../constants/Colors";
 import {useDispatch} from "react-redux";
 import {clearAppliedFilters, loadClientFiltersFromDb, updateAppliedFilters} from "../store/clientFilterSlice";
+import textTheme from "../constants/TextTheme";
 
 const CustomTagFilter = ({ options, onSelectionChange, filter }) => {
     const [selectedOptions, setSelectedOptions] = useState(options);
@@ -48,7 +49,7 @@ const CustomTagFilter = ({ options, onSelectionChange, filter }) => {
                             removeOption(option);
                             dispatch(loadClientFiltersFromDb(10, filter))
                         }}>
-                            <Text style={styles.closeButton} >x</Text>
+                            <Text style={[styles.closeButton, textTheme.titleSmall]} >x</Text>
                         </TouchableOpacity>
                     </View> : <></>
                 ))}

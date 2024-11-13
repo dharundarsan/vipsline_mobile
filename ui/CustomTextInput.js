@@ -306,7 +306,7 @@ const CustomTextInput = (props) => {
                 <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}</Text>
             }
             {content}
-            {error && <Text style={[textTheme.bodyMedium, styles.errorText]}>{errorMessage}</Text>}
+            {error && <Text style={[textTheme.bodyMedium, styles.errorText, props.errorStyle]}>{errorMessage}</Text>}
         </View>
     );
 };

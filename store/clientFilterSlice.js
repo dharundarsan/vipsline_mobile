@@ -130,9 +130,6 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
     }
 }
 
-
-
-
 export const clientFilterSlice = createSlice({
     name: "clientFilter",
     initialState: initial,

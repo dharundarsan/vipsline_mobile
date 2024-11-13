@@ -5,7 +5,7 @@ import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import CustomDropdown from "../../ui/CustomDropdown";
 import CustomTextInput from "../../ui/CustomTextInput";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {clearAppliedFilters, loadClientFiltersFromDb, updateAppliedFilters} from "../../store/clientFilterSlice";
 import {convertAppliedFilters, dateFormatter, formatDate, shadowStyling, shadowStylingTop} from "../../util/Helpers";
@@ -20,6 +20,7 @@ export default function AdvancedFilters(props) {
     const [fromDate, setFromDate] = useState(null)
     const [toDate, setToDate] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState([]);
+    const [isNewClient, setIsNewClient] = useState(false);
 
     const appliedFilters = useSelector(state => state.clientFilter.appliedFilters);
 
@@ -27,7 +28,15 @@ export default function AdvancedFilters(props) {
     useEffect(() => {
         const x = getActiveFilters(appliedFilters)
         setSelectedOptions(x);
+        setFromDate(appliedFilters.fromDate === "" ? null : appliedFilters.fromDate);
+        setToDate(appliedFilters.toDate === "" ? null : appliedFilters.toDate);
     }, []);
+
+
+    useEffect(() => {
+        const containNewClient = selectedOptions.some(item => item.includes("New client"));
+        setIsNewClient(containNewClient);
+    }, [selectedOptions]);
 
     // useEffect(() => {
     //     props.selectedOptions(selectedOptions);
@@ -57,6 +66,12 @@ export default function AdvancedFilters(props) {
             .map(([key, value]) => filterMapping[value] || value); // Map to descriptive strings
     };
 
+    const fromDateRef = useRef(null)
+    const toDateRef = useRef(null)
+
+
+
+
     return <Modal style={{flex: 1}} visible={props.isVisible} animationType={"slide"}>
            <View style={styles.advancedFilters}>
                <View style={styles.header}>
@@ -85,6 +100,7 @@ export default function AdvancedFilters(props) {
                        checkBoxSize={30}
                        selectedOptions={selectedOptions}
                        setSelectedOptions={setSelectedOptions}
+
                    />
 
                    <Text style={[textTheme.titleMedium, styles.lastVisitedText]}>
@@ -103,6 +119,16 @@ export default function AdvancedFilters(props) {
                               setFromDate(value)
                           }}
                           value={fromDate === null || fromDate === undefined ? null : new Date(fromDate)}
+                          validator={(text) => {
+                              if(isNewClient) {
+                                  return "From Date is Required"
+                              }
+                          }}
+                          onSave={(callback) => {
+                              fromDateRef.current = callback;
+                          }}
+                          errorStyle={{marginLeft: 16}}
+
 
                        />
                        <CustomTextInput
@@ -118,6 +144,15 @@ export default function AdvancedFilters(props) {
                                setToDate(value);
                            }}
                            minimumDate={fromDate === null ? undefined : fromDate}
+                           validator={(text) => {
+                               if(isNewClient) {
+                                   return "To Date is Required"
+                               }
+                           }}
+                           onSave={(callback) => {
+                                toDateRef.current = callback;
+                           }}
+                           errorStyle={{marginLeft: 16}}
                        />
                    </View>
 
@@ -132,6 +167,7 @@ export default function AdvancedFilters(props) {
                     textStyle={[styles.clearFilterText, textTheme.titleSmall]}
                     onPress={() => {
                         dispatch(clearAppliedFilters());
+                        dispatch(loadClientFiltersFromDb(10, clientFilterNames(props.filterPressed)));
                         const initialState = {
                                 fromDate: "",
                                 toDate: "",
@@ -151,6 +187,13 @@ export default function AdvancedFilters(props) {
                     buttonStyle={styles.applyButton}
                     textStyle={[styles.applyText, textTheme.titleSmall]}
                     onPress={async () => {
+                        const fromDateRefHandler = fromDateRef.current();
+                        const toDateRefHandler = toDateRef.current();
+
+
+
+                        if((isNewClient) && (fromDate === null || toDate === null)) return;
+
                         props.setVisibility(false);
                         const _appliedFilters = convertAppliedFilters(fromDate, toDate, selectedOptions);
                         dispatch(updateAppliedFilters(_appliedFilters));

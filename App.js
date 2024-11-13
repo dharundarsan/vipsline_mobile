@@ -71,6 +71,7 @@ import StaffDashboard from './components/DashboardScreen/StaffDashboard';
 import ClientDashboard from './components/DashboardScreen/ClientDashboard';
 import { DataProvider, useDataContext } from './context/DataFlowContext';
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
+import Expenses from "./screens/Expenses";
 
 enableScreens();
 
@@ -574,6 +575,10 @@ const MainDrawerNavigator = (props) => {
                             <Drawer.Screen name="Sign Out" component={signOutScreen} options={{
                                 drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(logout_icon).uri }}
                                     width={25} height={25} style={{ resizeMode: "contain", tintColor: Colors.white }} />
+                            }} />
+                            <Drawer.Screen name="Expenses" component={Expenses} options={{
+                                drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
+                                                         width={25} height={25} style={{ resizeMode: "contain", tintColor: Colors.white }} />
                             }} />
                         </Drawer.Navigator>
                         : <Drawer.Navigator initialRouteName="List Of Business"
