@@ -7,7 +7,7 @@ import PrimaryButton from "./PrimaryButton";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {checkNullUndefined, formatDate} from "../util/Helpers";
+import {checkNullUndefined, formatDate, formatTime} from "../util/Helpers";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 /**
@@ -60,6 +60,10 @@ const CustomTextInput = (props) => {
 
     const handleConfirm = (selectedDate) => {
         setIsDateTimePickerVisible(false);
+        if (error && props.validator && props.validator(selectedDate) === true) {
+            setError(false);
+            setErrorMessage("");
+        }
         if (selectedDate) {
             props.onChangeValue(new Date(selectedDate.getTime())); // Pass the selected date to parent via callback
         }
@@ -108,7 +112,7 @@ const CustomTextInput = (props) => {
                 secureTextEntry={props.secureTextEntry}
             />
         );
-    }else if(props.type === "email"){
+    } else if (props.type === "email") {
         content = (
             <TextInput
                 onEndEditing={props.onEndEditing !== undefined ? (event) => props.onEndEditing(event.nativeEvent.text) : () => {
@@ -138,9 +142,8 @@ const CustomTextInput = (props) => {
                 }}
             />
         );
-        
-    } 
-    else if (props.type === "price") {
+
+    } else if (props.type === "price") {
         content = (
             <View style={[styles.priceInputContainer,
                 {borderColor: error ? Colors.error : Colors.grey400},
@@ -232,6 +235,8 @@ const CustomTextInput = (props) => {
                         props.onChangeValue(value);
                         setIsDropdownModalVisible(false);
                     }}
+                    object={props.object}
+                    objectName={props.objectName}
                     dropdownItems={props.dropdownItems}
                 />
                 <PrimaryButton
@@ -239,9 +244,12 @@ const CustomTextInput = (props) => {
                     pressableStyle={styles.dropdownButtonPressable}
                     onPress={() => setIsDropdownModalVisible(true)}
                 >
-                    <Text style={[textTheme.bodyLarge]}>
-                        {props.value === undefined || props.value === "" ? "Select " + props.label : props.value}
-                    </Text>
+
+                    {props.object ? <Text style={[textTheme.bodyLarge]}>
+                        {props.value === undefined || props.value === null || props.value === "" ? "Select " + props.label : props.value.name}
+                    </Text> : <Text style={[textTheme.bodyLarge]}>
+                        {props.value === undefined || props.value === null || props.value === "" ? "Select " + props.label : props.value}
+                    </Text>}
                     <FontAwesome name="angle-down" size={24} color="black"/>
                 </PrimaryButton>
             </>
@@ -250,17 +258,17 @@ const CustomTextInput = (props) => {
         content = (
             <>
                 {(isDateTimePickerVisible) && (
-                     <DateTimePickerModal
-                     isVisible={ props.readOnly ? false : isDateTimePickerVisible}       // Visibility state
-                     mode="date"                              // Mode is set to "date"
-                     maximumDate={props.maximumDate}          // Maximum date from props
-                     minimumDate={props.minimumDate}          // Minimum date from props
-                     date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)} // Initial date
-                     onConfirm={handleConfirm}                // Function called on date selection
-                     onCancel={handleCancel}                  // Function called on cancel
-                     themeVariant="light"
-                     style={props.dateStyle}
-                 />
+                    <DateTimePickerModal
+                        isVisible={props.readOnly ? false : isDateTimePickerVisible}       // Visibility state
+                        mode="date"                              // Mode is set to "date"
+                        maximumDate={props.maximumDate}          // Maximum date from props
+                        minimumDate={props.minimumDate}          // Minimum date from props
+                        date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)} // Initial date
+                        onConfirm={handleConfirm}                // Function called on date selection
+                        onCancel={handleCancel}                  // Function called on cancel
+                        themeVariant="light"
+                        style={props.dateStyle}
+                    />
                     // <RNDateTimePicker
                     // maximumDate={props.maximumDate}
                     // minimumDate={props.minimumDate}
@@ -280,17 +288,68 @@ const CustomTextInput = (props) => {
                     // />
                 )}
                 <PrimaryButton
-                    buttonStyle={[styles.dateTimeButtom, props.dateInputContainer]}
+                    buttonStyle={[styles.dateTimeButtom, props.dateInputContainer, error ? {borderColor: Colors.error} : {}]}
                     pressableStyle={styles.dateTimeButtonPressable}
                     disableRipple={props.readOnly}
                     onPress={() => setIsDateTimePickerVisible(true)}
                 >
-                    <Text style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>
+                    <Text
+                        style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>
                         {props.value === undefined || props.value === null ? "Select " + props.label : formatDate(new Date(props.value))}
                     </Text>
                     <MaterialCommunityIcons
                         style={styles.dateTimeButtonIcon}
                         name="calendar-month-outline"
+                        size={24}
+                        color={Colors.grey600}
+                    />
+                </PrimaryButton>
+            </>
+        );
+    } else if (props.type === "time") {
+        content = (
+            <>
+                {(isDateTimePickerVisible) && (
+                    <DateTimePickerModal
+                        isVisible={props.readOnly ? false : isDateTimePickerVisible}       // Visibility state
+                        mode="time"                              // Mode is set to "date"
+                        date={props.value === undefined || props.value === null ? new Date() : new Date(props.value)} // Initial date
+                        onConfirm={handleConfirm}                // Function called on date selection
+                        onCancel={handleCancel}                  // Function called on cancel
+                        themeVariant="light"
+                        style={props.dateStyle}
+                    />
+                    // <RNDateTimePicker
+                    // maximumDate={props.maximumDate}
+                    // minimumDate={props.minimumDate}
+                    //     value={props.value === undefined || props.value === null ? new Date(Date.now()) : new Date(props.value)}
+                    //     mode="date"
+                    //     display="default"
+                    //     onChange={(event, selectedDate) => {
+                    //         if (event.type === "dismissed") {
+                    //             setIsDateTimePickerVisible(false);
+                    //             return;
+                    //         }
+                    //         setIsDateTimePickerVisible(false);
+                    //         if (selectedDate) {
+                    //             props.onChangeValue(new Date(selectedDate.getTime()));
+                    //         }
+                    //     }}
+                    // />
+                )}
+                <PrimaryButton
+                    buttonStyle={[styles.dateTimeButtom, props.dateInputContainer, error ? {borderColor: Colors.error} : {}]}
+                    pressableStyle={styles.dateTimeButtonPressable}
+                    disableRipple={props.readOnly}
+                    onPress={() => setIsDateTimePickerVisible(true)}
+                >
+                    <Text
+                        style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>
+                        {props.value === undefined || props.value === null ? "Select " + props.label : formatTime(new Date(props.value), "hh:mm pp")}
+                    </Text>
+                    <MaterialCommunityIcons
+                        style={styles.dateTimeButtonIcon}
+                        name="clock-outline"
                         size={24}
                         color={Colors.grey600}
                     />

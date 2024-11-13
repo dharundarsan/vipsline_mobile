@@ -6,6 +6,25 @@ export const capitalizeFirstLetter = (string) => {
     return string[0].toUpperCase() + string.slice(1, string.length);
 }
 
+export function formatTime(date, format) {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert hours from 24-hour to 12-hour format for "hh:mm pp" format
+    const twelveHour = hours % 12 || 12;
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
+
+    if (format === "hh:mm pp") {
+        return `${twelveHour}:${formattedMinutes} ${period}`;
+    } else if (format === "hh:mm:ss") {
+        return `${hours.toString().padStart(2, '0')}:${formattedMinutes}:${formattedSeconds}`;
+    } else {
+        throw new Error("Unsupported format");
+    }
+}
 
 export const formatDate = (date, format) => {
     const months = [
@@ -38,7 +57,7 @@ export const formatDate = (date, format) => {
         case "yyyy-d-m":
             return `${day}-${month + 1}-${year}`;
         case "dd short-month year":
-            return `${day} ${months[month].slice(0,3)} ${year}`;
+            return `${day} ${months[month].slice(0, 3)} ${year}`;
         default:
             return `${day} ${months[month]} ${year}`;
     }
@@ -46,7 +65,7 @@ export const formatDate = (date, format) => {
 
 
 export function dateFormatter(date, monthType) {
-    if(date === undefined) return;
+    if (date === undefined) return;
     date = new Date(date);
     return date.toLocaleDateString('en-GB', {
         day: '2-digit',
@@ -56,7 +75,7 @@ export function dateFormatter(date, monthType) {
 }
 
 export const checkNullUndefined = (value) => {
-    if(value === undefined) return false;
+    if (value === undefined) return false;
     return value !== null;
 }
 
@@ -74,7 +93,11 @@ export const shadowStyling = StyleSheet.create({
 export const formatDateWithAddedMonths = (monthsToAdd) => {
     let currentDate = new Date();
     currentDate.setMonth(currentDate.getMonth() + parseInt(monthsToAdd));
-    const formattedDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(currentDate);
+    const formattedDate = new Intl.DateTimeFormat('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    }).format(currentDate);
     return formattedDate;
 }
 
@@ -83,8 +106,8 @@ export const showToast = (toastOptions) => {
         type: toastOptions.type,
         text1: toastOptions.text1,
         text2: toastOptions.text2,
-        text1Style:{fontSize:15},
-        text2Style:{fontSize:12}
+        text1Style: {fontSize: 15},
+        text2Style: {fontSize: 12}
     });
 }
 
@@ -93,7 +116,7 @@ export const formatNumber = (number) => {
 }
 
 export const checkAPIError = (response) => {
-    if(response.data.status_code > 399) {
+    if (response.data.status_code > 399) {
         throw response;
     }
 }
