@@ -55,12 +55,12 @@ export default function DashboardScreen() {
         renderItem={(item)=>{
           return(
           <TouchableOpacity style={styles.card} activeOpacity={0.4} onPress={() => {
-            setTimeout(() => {
-              setIsDashboardPage(false);
+            // setTimeout(() => {
+              // setIsDashboardPage(false);
               setTimeout(() => {
                 navigate.navigate(item.item.navigate);
               }, 50);
-            }, 5); 
+            // }, 5); 
           }}>
             <View style={styles.headerContainer}>
               <Image

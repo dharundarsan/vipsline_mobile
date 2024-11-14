@@ -327,7 +327,7 @@ const SalesDashboard = () => {
                   />
                 </View>
               </View>
-              <View style={{ marginVertical: "0%", paddingHorizontal: 10, rowGap: 10 }}>
+              <View style={{ marginTop: "5%", rowGap: 10 }}>
                 <ContentLoader
                   pRows={1}
                   pHeight={[35]}
@@ -369,7 +369,7 @@ const SalesDashboard = () => {
 
                 />
               </View>
-              <View style={{ marginVertical: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
+              <View style={{ marginVertical: "5%", flexDirection: "row"}}>
                 <ContentLoader
                   pRows={1}
                   pHeight={[300]}
