@@ -1,12 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Divider } from "react-native-paper";
-import { pieChartColorCode } from "../../data/DashboardSelection";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import { PieChart } from "react-native-gifted-charts";
 import { Dropdown } from "react-native-element-dropdown";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Row, Rows, Table, TableWrapper } from "react-native-table-component";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { TouchableOpacity } from "react-native";
@@ -21,9 +20,7 @@ import {
   formatDateToWeekDayDDMMMYYYY,
   formatDateYYYYMMDD,
   formatDateYYYYMMDDD,
-  getFirstDateOfCurrentMonth,
   getFirstDateOfCurrentMonthYYYYMMDD,
-  getLastDateOfCurrentMonth,
   getLastDateOfCurrentMonthYYYYMMMDD,
 } from "../../util/Helpers";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -31,15 +28,12 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const PieChartBox = (props) => {
   const dispatch = useDispatch();
-  const dateData = useSelector((state) => state.dashboardDetails.dateData);
 
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const getFirstMonth = getFirstDateOfCurrentMonthYYYYMMDD();
   const getLastMonth = getLastDateOfCurrentMonthYYYYMMMDD();
 
-  const [selectedValue, setSelectedValue] = useState(
-    props.dateArray === undefined ? "today" : ""
-  );
+  const [selectedValue, setSelectedValue] = useState(props.dateArray === undefined ? "today" : "thismonth");
 
   const todayDate = formatDateYYYYMMDD(0);
   const newDate = new Date();
@@ -50,14 +44,11 @@ const PieChartBox = (props) => {
     year: "numeric",
   });
 
-
-  
-
   const [fromDateVisibility, setFromDateVisibility] = useState(false);
   const [toDateVisibility, setToDateVisibility] = useState(false);
-  const [selectedFromCustomDate, setSelectedFromCustomDate] = useState("0");
-  const [selectedToCustomDate, setSelectedToCustomDate] = useState("0");
-  const [customFromDateData, setCustomFromDateData] = useState(newDate);
+  // const [selectedFromCustomDate, setSelectedFromCustomDate] = useState("0");
+  // const [selectedToCustomDate, setSelectedToCustomDate] = useState("0");
+  // const [customFromDateData, setCustomFromDateData] = useState(newDate);
   const [customTopServicesFromSelected, setCustomTopServicesFromSelected] = useState(formattedDate)
   const [customTopServicesToSelected, setCustomTopServicesToSelected] = useState(formattedDate);
   const [customTopProductFromSelected, setCustomTopProductFromSelected] = useState(formattedDate)
@@ -99,6 +90,8 @@ const PieChartBox = (props) => {
 
   const handleSelection = async (item) => {
     setSelectedValue(item.value);
+    console.log(item);
+    
     const currentDate = formatDateYYYYMMDD(0);
     if (props.pieDataArray[0]?.page === "salesPercent") {
       if (item.day !== undefined) {
@@ -113,6 +106,8 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "salesProduct") {
+      console.log(1);
+      
       if (item.day !== undefined) {
         if (item.day === -29) {
           setIsCustomRange(false)
@@ -134,9 +129,9 @@ const PieChartBox = (props) => {
       }
       else{
         const customDay1 = formatDateYYYYMMDD(0);
-        const customDay2 = formatDateYYYYMMDD(0);
-        setSelectedFromCustomDate(customDay1);
-        setSelectedToCustomDate(customDay2);
+        // const customDay2 = formatDateYYYYMMDD(0);
+        // setSelectedFromCustomDate(customDay1);
+        // setSelectedToCustomDate(customDay2);
         dispatch(loadTopRevenueProducts(customDay1, customDay2));
         setIsCustomRange(true)
       }
@@ -150,8 +145,8 @@ const PieChartBox = (props) => {
       } else if (item.label === "Custom range") {
         const customDay1 = formatDateToWeekDayDDMMMYYYY(0);
         const customDay2 = formatDateToWeekDayDDMMMYYYY(0);
-        setSelectedFromCustomDate(customDay1);
-        setSelectedToCustomDate(customDay2);
+        // setSelectedFromCustomDate(customDay1);
+        // setSelectedToCustomDate(customDay2);
         dispatch(loadRevenueByGender(customDay1, customDay2));
         setIsCustomRange(true);
       } else {
@@ -168,8 +163,8 @@ const PieChartBox = (props) => {
       } else if (item.label === "Custom range") {
         const customDay1 = formatDateToWeekDayDDMMMYYYY(0);
         const customDay2 = formatDateToWeekDayDDMMMYYYY(0);
-        setSelectedFromCustomDate(customDay1);
-        setSelectedToCustomDate(customDay2);
+        // setSelectedFromCustomDate(customDay1);
+        // setSelectedToCustomDate(customDay2);
         setIsCustomRange(true);
         dispatch(loadRevenueCountByGender(customDay1, customDay2));
       } else {
@@ -186,8 +181,8 @@ const PieChartBox = (props) => {
       } else if (item.label === "Custom range") {
         const customDay1 = formatDateYYYYMMDD(0);
         const customDay2 = formatDateYYYYMMDD(0);
-        setSelectedFromCustomDate(customDay1);
-        setSelectedToCustomDate(customDay2);
+        // setSelectedFromCustomDate(customDay1);
+        // setSelectedToCustomDate(customDay2);
         dispatch(loadRevenueByPrepaid(customDay1, customDay2));
         setIsCustomRange(true);
       } else {
@@ -285,7 +280,7 @@ const PieChartBox = (props) => {
             valueField="value"
             value={selectedValue}
             onChange={handleSelection}
-            placeholder="Today"
+            // placeholder="This month"
           />
         ) : null}
       </View>
@@ -313,7 +308,7 @@ const PieChartBox = (props) => {
             setCustomTopServicesFromDateData(date);
             setCustomTopServicesFromSelected(formatted)
           } else if(page === "salesProduct"){
-            setCustomTopProductsToDateData(date);
+            setCustomTopProductsFromDateData(date);
             setCustomTopProductFromSelected(formatted)
           } else return;
           // setCustomFromDateData(date);

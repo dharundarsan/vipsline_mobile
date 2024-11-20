@@ -1,6 +1,6 @@
 import PrimaryButton from "../../ui/PrimaryButton";
 import {FontAwesome6, Ionicons} from "@expo/vector-icons";
-import {Platform, Pressable, StyleSheet, Text, View} from "react-native";
+import {Platform, Pressable, ScrollView, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
@@ -155,7 +155,7 @@ const AddClientButton = (props) => {
                             <View style={styles.actionMenu}>
                                 {
                                     clientInfo.membershipDetails.length !== 0
-                                    || clientInfo.packageDetails.length !== 0
+                                    || clientInfo.packageDetails.length !== 0 || clientInfo.details.reward_balance !== 0
                                     || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0) 
                                         ? (
                                             isClientInfo ? (
@@ -223,13 +223,14 @@ const AddClientButton = (props) => {
                             </View>
                         </View>
                         {isClientInfo ?
-                            <View style={styles.clientDetailContainer}>
+                            <ScrollView  horizontal showsHorizontalScrollIndicator={false} >
+                                <View style={styles.clientDetailContainer}>
                                 {
                                     clientInfo.details.wallet_balance !== 0 &&
                                     clientInfo.details.wallet_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
                                                    pressableStyle={styles.activePlanPressable}>
-                                        <Text style={styles.activePlanText}>
+                                        <Text style={{fontSize:12}}>
                                             Bal <Text style={{color: Colors.highlight}}> -
                                             ₹{clientInfo.details.wallet_balance}</Text>
                                         </Text>
@@ -246,19 +247,30 @@ const AddClientButton = (props) => {
                                                    pressableStyle={styles.activePlanPressable}
                                                    onPress={() => setIsMembershipModalVisible(true)}
                                     >
-                                        <Feather name="user-check" size={17} color="black"/>
-                                        <Text> Membership</Text>
+                                        <Feather name="user-check" size={13} color="black"/>
+                                        <Text style={{fontSize:12}}> Membership</Text>
                                     </PrimaryButton>}
                                 {clientInfo.packageDetails.length !== 0 &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
                                                    pressableStyle={styles.activePlanPressable}
                                                    onPress={openRedeemPackageModalHandler}
                                     >
-                                        <MaterialCommunityIcons name="clipboard-list-outline" size={17} color="black"/>
-                                        <Text style={styles.activePlanText}> Package</Text>
+                                        <MaterialCommunityIcons name="clipboard-list-outline" size={13} color="black"/>
+                                        <Text style={{fontSize:12}}> Package</Text>
                                     </PrimaryButton>
                                 }
-                            </View>
+                                {
+                                    clientInfo.details.reward_balance !== 0 &&
+                                    clientInfo.details.reward_balance !== undefined &&
+                                    <PrimaryButton buttonStyle={styles.activePlan}
+                                                   pressableStyle={styles.activePlanPressable}>
+                                        <Text style={{fontSize:12}}>
+                                            Points <Text style={{color: Colors.highlight}}>{clientInfo.details.reward_balance}</Text>
+                                        </Text>
+                                    </PrimaryButton>
+                                }
+                                </View>
+                            </ScrollView>
                             : null
                         }
                     </View>
@@ -313,9 +325,12 @@ const styles = StyleSheet.create({
         flex: 0.40
     },
     clientDetailContainer: {
-        alignItems: "center",
+        // alignItems: "center",
+        // justifyContent: "space-around",
         flexDirection: "row",
-        justifyContent: "space-around",
+        gap:10,
+        marginTop:10,
+        paddingHorizontal:10
     },
     activePlan: {
         borderColor: Colors.grey200,

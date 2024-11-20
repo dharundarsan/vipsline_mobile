@@ -32,7 +32,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.business.vipsline"
+      "bundleIdentifier": "com.business.vipsline",
+      "newArchEnabled": true
     },
     "android": {
       "versionCode": 1,
@@ -40,6 +41,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "newArchEnabled": true,
       "package": "com.naveenakash.vipsline_mobile"
     },
     "web": {

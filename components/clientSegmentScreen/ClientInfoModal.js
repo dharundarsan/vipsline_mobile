@@ -21,6 +21,7 @@ import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../st
 import ContentLoader from "../../ui/ContentLoader";
 import { loadClientsFromDb } from "../../store/clientSlice";
 import Toast from "../../ui/Toast";
+import ClientRewardPoints from "./ClientRewardPoints";
 
 /**
  * ClientInfoModal Component
@@ -261,7 +262,11 @@ export default function clientInfoModal(props) {
                 details={details}
 
             />
-    } else {
+    } else if(clientMoreDetails === "rewardpoints"){
+        content = 
+            <ClientRewardPoints/>
+    }
+    else {
         content = <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>Coming Soon</Text></View>
     }
 

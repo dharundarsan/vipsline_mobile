@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../../constants/Colors";
 import { listData, pieChartColorCode, salesCardData, salesData } from "../../data/DashboardSelection";
@@ -8,23 +8,28 @@ import ListIconData from "./ListIconData";
 import { Divider } from "react-native-paper";
 import textTheme from "../../constants/TextTheme";
 import ServiceList from "./ServiceList";
-import { BarChart } from "react-native-gifted-charts";
 import { useDispatch, useSelector } from "react-redux";
-import { loadSalesDashboard, loadTopRevenueProducts, loadTopRevenueServices, updateLoadingState, updateDashBoardName, loadDailyAppointmentAnalyticsForBusiness } from "../../store/dashboardSlice";
-import { convertToTitleCase, formatDateDDMMYYYY, formatDateToWeekDayDDMMMYYYY, formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstAndLastDateOfCurrentMonthDDMMYYYY, getFirstDateOfCurrentMonth, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonth, getLastDateOfCurrentMonthYYYYMMMDD } from "../../util/Helpers";
+import { loadSalesDashboard, loadTopRevenueProducts, loadTopRevenueServices, updateDashBoardName, loadDailyAppointmentAnalyticsForBusiness } from "../../store/dashboardSlice";
+import { convertToTitleCase, formatDateDDMMYYYY, formatDateToWeekDayDDMMMYYYY, formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstAndLastDateOfCurrentMonthDDMMYYYY, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonthYYYYMMMDD } from "../../util/Helpers";
 import PieChartBox from "./PieChartBox";
 import { calculateTotalValue, processPieChartData } from "./PieData";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import LineChartBox from "./LineChartBox";
 import GroupedBarChart from "./GroupedBarChart";
-import ContentLoader, { Bullets, FacebookLoader, InstagramLoader } from "react-native-easy-content-loader";
+import { useFocusEffect } from "@react-navigation/native";
+import { useLocationContext } from "../../context/LocationContext";
+import SalesDashboardScreenLoader from "./SalesDashboardScreenLoader";
+import SalesDashboardDateLoader from "./SalesDashboardDateLoader";
 
 const SalesDashboard = () => {
   const dispatch = useDispatch();
-
+  const {getLocation} = useLocationContext()
+  useFocusEffect(useCallback(() => {
+    getLocation("Sales Dashboard");
+  }, []))
   const [selectedValue, setSelectedValue] = useState("today");
-  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState(formatDateDDMMYYYY().toString());
   const [isCustomRange, setIsCustomRange] = useState(false);
@@ -37,15 +42,6 @@ const SalesDashboard = () => {
   const [customFromPassData, setCustomFromPassData] = useState(formatDateYYYYMMDD(0));
   const [customToPassData, setCustomToPassData] = useState(formatDateYYYYMMDD(0));
   const [isDateDataLoading, setIsDateDataLoading] = useState(false);
-  // const [firstRowLoader, setFirstRowLoader] = useState(false)
-  // const [secondRowLoader, setSecondRowLoader] = useState(false)
-  // const [thirdRowLoader, setThirdRowLoader] = useState(false)
-  // const [fourthRowLoader, setFourthRowLoader] = useState(false)
-  // const [fifthRowLoader, setFifthRowLoader] = useState(false)
-  // const [sixthRowLoader, setSixthRowLoader] = useState(false)
-  // const [seventhRowLoader, setSeventhRowLoader] = useState(false)
-  // const [eightRowLoader, setEightRowLoader] = useState(false)
-  // const [nineRowLoader, setNinethRowLoader] = useState(false)
 
   const lastMonthDate = getLastDateOfCurrentMonthYYYYMMMDD();
   const firstMonthDate = getFirstDateOfCurrentMonthYYYYMMDD();
@@ -82,7 +78,7 @@ const SalesDashboard = () => {
     return {
       value: item.value,
       text: percentage <= 2.0 ? "" : `${percentage}%`,
-      color: pieChartColorCode[index]?.color || "#000", // Default color fallback
+      color: pieChartColorCode[index]?.color || "#000",
     };
   });
 
@@ -104,33 +100,6 @@ const SalesDashboard = () => {
   };
 
   const { revenue, count, month } = revenueDetails[0];
-  const maxRevenue = Math.max(...revenue);
-  const maxCount = Math.max(...count);
-  // const value = count.map((value) => ({ value: (value / maxCount) * maxRevenue }));
-
-  const normalizedCount = count.map((value) => (value / maxCount) * maxRevenue);
-  // const normalizedCount = count.map((value) => (value ));
-  // console.log("normalizedCount");
-  // console.log(normalizedCount);
-
-  const barData = month.flatMap((label, index) => {
-    if (normalizedCount[index] === NaN) return;
-    return [
-      {
-        value: revenue[index],
-        label,
-        frontColor: "#9B9BFF",
-        spacing: 2,
-        labelWidth: 40,
-        labelTextStyle: { color: "gray" },
-      },
-      {
-        value: normalizedCount[index],
-        // isSecondary:true,
-        frontColor: "#4A90E2",
-      },
-    ];
-  });
 
   const handleSelection = async (item) => {
     setIsDateDataLoading(true)
@@ -216,169 +185,14 @@ const SalesDashboard = () => {
     return roundedValue.toString().replace(/0+$/, '');
   }
 
-  function calculateLabelWidth(maxValue) {
-    const labelText = maxValue.toLocaleString();
-    const approximateCharWidth = 8;
-    return labelText.length * approximateCharWidth;
-  }
-
-  const maxRevenueWidth = Math.ceil(Math.max(...barData.map(item => item.value)));
-  const yAxisLabelWidth = calculateLabelWidth(maxRevenueWidth);
-  const barSections = parseInt(removeZero(roundUp(maxRevenue)))
-  const barMaxValue = roundUp(maxRevenue);
   const removeZeroLineSalesOverTime = removeZero(roundUp(maxTotalSalesValue)) || 10;
   const roundLineSalesOverTime = roundUp(maxTotalSalesValue)
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setFirstRowLoader(true)
-  //   }, 0);
-  //   setTimeout(() => {
-  //     setSecondRowLoader(true)
-  //   }, 1000);
-  //   setTimeout(() => {
-  //     setThirdRowLoader(true)
-  //   }, 2500);
-  //   setTimeout(() => {
-  //     setFourthRowLoader(true)
-  //   }, 4000);
-  //   setTimeout(() => {
-  //     setFifthRowLoader(true)
-  //   }, 5500);
-  //   setTimeout(() => {
-  //     setSixthRowLoader(true)
-  //   }, 7000);
-  //   setTimeout(() => {
-  //     setSeventhRowLoader(true)
-  //   }, 8500);
-  //   setTimeout(() => {
-  //     setEightRowLoader(true)
-  //   }, 1000);
-  //   setTimeout(() => {
-  //     setNinethRowLoader(true)
-  //   }, 1500);
-
-  // }, [])
-
 
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
       <View style={styles.container}>
         {
-          isPageLoading ?
-            <>
-              <View >
-                <View style={[styles.dateContainer, { columnGap: 0, width: "50%" }]}>
-                  <ContentLoader
-                    pRows={1}
-                    pHeight={[45]}
-                    pWidth={["100%"]}
-                    active
-                    title={false}
-
-                  />
-                  <ContentLoader
-                    pRows={1}
-                    pHeight={[45]}
-                    pWidth={["100%"]}
-                    active
-                    title={false}
-
-                  />
-                </View>
-                <View style={{ marginTop: "7%", flexDirection: "row", paddingHorizontal: 10 }}>
-                  <ContentLoader
-                    pRows={1}
-                    pHeight={[85]}
-                    pWidth={["100%"]}
-                    active
-                    title={false}
-                    containerStyles={{ width: '50%' }}
-
-                  />
-                  <ContentLoader
-                    pRows={1}
-                    pHeight={[85]}
-                    pWidth={["100%"]}
-                    active
-                    title={false}
-                    containerStyles={{ width: "50%" }}
-
-                  />
-                </View>
-                <View style={{ marginTop: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
-                  <ContentLoader
-                    pRows={1}
-                    pHeight={[85]}
-                    pWidth={["100%"]}
-                    active
-                    title={false}
-                    containerStyles={{ width: '50%' }}
-
-                  />
-                  <ContentLoader
-                    pRows={1}
-                    pHeight={[85]}
-                    pWidth={["100%"]}
-                    active
-                    title={false}
-                    containerStyles={{ width: "50%" }}
-
-                  />
-                </View>
-              </View>
-              <View style={{ marginTop: "5%", rowGap: 10 }}>
-                <ContentLoader
-                  pRows={1}
-                  pHeight={[35]}
-                  pWidth={["100%"]}
-                  active
-                  title={false}
-
-                />
-                <ContentLoader
-                  pRows={1}
-                  pHeight={[35]}
-                  pWidth={["100%"]}
-                  active
-                  title={false}
-
-                />
-                <ContentLoader
-                  pRows={1}
-                  pHeight={[35]}
-                  pWidth={["100%"]}
-                  active
-                  title={false}
-
-                />
-                <ContentLoader
-                  pRows={1}
-                  pHeight={[35]}
-                  pWidth={["100%"]}
-                  active
-                  title={false}
-
-                />
-                <ContentLoader
-                  pRows={1}
-                  pHeight={[35]}
-                  pWidth={["100%"]}
-                  active
-                  title={false}
-
-                />
-              </View>
-              <View style={{ marginVertical: "5%", flexDirection: "row"}}>
-                <ContentLoader
-                  pRows={1}
-                  pHeight={[300]}
-                  pWidth={["100%"]}
-                  active
-                  title={false}
-                />
-              </View>
-            </> :
+          isPageLoading ? <SalesDashboardScreenLoader/> :
             <>
               <View style={isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
                 <Dropdown
@@ -388,7 +202,7 @@ const SalesDashboard = () => {
                   valueField="value"
                   value={selectedValue}
                   onChange={handleSelection}
-                  placeholder="Today"
+                  // placeholder="Today"
                   disable={isLoading}
                 />
                 <DateTimePickerModal
@@ -488,119 +302,7 @@ const SalesDashboard = () => {
               </View>
               {
                 isDateDataLoading ?
-                  <>
-                    <View >
-                      <View style={[styles.dateContainer, { columnGap: 0, width: "50%" }]}>
-                        <ContentLoader
-                          pRows={1}
-                          pHeight={[45]}
-                          pWidth={["100%"]}
-                          active
-                          title={false}
-
-                        />
-                        <ContentLoader
-                          pRows={1}
-                          pHeight={[45]}
-                          pWidth={["100%"]}
-                          active
-                          title={false}
-
-                        />
-                      </View>
-                      <View style={{ marginTop: "7%", flexDirection: "row", paddingHorizontal: 10 }}>
-                        <ContentLoader
-                          pRows={1}
-                          pHeight={[85]}
-                          pWidth={["100%"]}
-                          active
-                          title={false}
-                          containerStyles={{ width: '50%' }}
-
-                        />
-                        <ContentLoader
-                          pRows={1}
-                          pHeight={[85]}
-                          pWidth={["100%"]}
-                          active
-                          title={false}
-                          containerStyles={{ width: "50%" }}
-
-                        />
-                      </View>
-                      <View style={{ marginTop: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
-                        <ContentLoader
-                          pRows={1}
-                          pHeight={[85]}
-                          pWidth={["100%"]}
-                          active
-                          title={false}
-                          containerStyles={{ width: '50%' }}
-
-                        />
-                        <ContentLoader
-                          pRows={1}
-                          pHeight={[85]}
-                          pWidth={["100%"]}
-                          active
-                          title={false}
-                          containerStyles={{ width: "50%" }}
-
-                        />
-                      </View>
-                    </View>
-                    <View style={{ marginVertical: "0%", paddingHorizontal: 10, rowGap: 10 }}>
-                      <ContentLoader
-                        pRows={1}
-                        pHeight={[35]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-
-                      />
-                      <ContentLoader
-                        pRows={1}
-                        pHeight={[35]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-
-                      />
-                      <ContentLoader
-                        pRows={1}
-                        pHeight={[35]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-
-                      />
-                      <ContentLoader
-                        pRows={1}
-                        pHeight={[35]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-
-                      />
-                      <ContentLoader
-                        pRows={1}
-                        pHeight={[35]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-
-                      />
-                    </View>
-                    <View style={{ marginVertical: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
-                      <ContentLoader
-                        pRows={1}
-                        pHeight={[300]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-                      />
-                    </View>
-                  </> :
+                  <SalesDashboardDateLoader/> :
                 <>
                 <View style={styles.statisticContainer}>
                 {salesCardData.map((item, index) => {
@@ -702,24 +404,7 @@ const SalesDashboard = () => {
           <Divider />
           <View style={styles.barchartContainer}>
             {
-              <BarChart
-                data={barData}
-                barWidth={10}
-                spacing={50}
-                // width={100}
-                yAxisTextNumberOfLines={100}
-                yAxisLabelWidth={yAxisLabelWidth} /* Optional: Set width for y-axis labels */
-                noOfSections={barSections || 1}
-                maxValue={barMaxValue}
-                xAxisColor={'black'}
-              // secondaryYAxis={{
-              //   noOfSections:6,
-              //   maxValue:300,
-
-              // }}
-
-              />
-              // <GroupedBarChart month={month} count={count} revenue={revenue} />
+              <GroupedBarChart month={month} count={count} revenue={revenue} />
             }
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
@@ -746,7 +431,7 @@ const SalesDashboard = () => {
           max={roundLineSalesOverTime}
           sections={removeZeroLineSalesOverTime}
           page="SalesOverTime"
-          key1={"SalesOverTime"}
+          // key1={"SalesOverTime"}
         />
         <LineChartBox
           title={"Appointments over time"}
@@ -755,7 +440,7 @@ const SalesDashboard = () => {
           xLabelArrayData={totalAppointmentOverTime.date}
           lineChartData={totalAppointmentsOverTimeData}
           page="AppointmentOverTime"
-          key1={"SalesOverTime"}
+          // key1={"SalesOverTime"}
           max={roundUp(maxAppointmentsOverTime)}
           sections={removeZero(roundUp(maxAppointmentsOverTime)) || 10}
         />
@@ -873,10 +558,11 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
   },
   barchartContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
     paddingVertical: 30,
-    overflow: "hidden",
+    paddingLeft:10,
+    // overflow: "scroll",
   },
   piechart: {
     justifyContent: "center",

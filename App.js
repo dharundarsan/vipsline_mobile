@@ -164,6 +164,7 @@ const CheckoutStack = ({route}) => {
             })}
             initialParams={route.params}
         />
+        <Stack.Screen component={SalesDashboard} name="SalesScreen" />
     </Stack.Navigator>
 };
 
@@ -287,9 +288,9 @@ const BackButton = () => {
     const {setIsDashboardPage} = useDataContext()
     return (
         <TouchableOpacity onPress={async() => {
-            setTimeout(() => {
-                setIsDashboardPage(true)
-            }, 40);
+            // setTimeout(() => {
+            //     setIsDashboardPage(true)
+            // }, 40);
             // setTimeout(() => {
                 // dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
                 // dispatch(loadTopRevenueServices(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
@@ -303,7 +304,7 @@ const BackButton = () => {
                     dispatch(loadResourceIdByUserInfo(username.username));
                     dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
                 }
-                navigation.goBack()
+                navigation.navigate("DashboardScreen")
             // }, 50);
         }} 
         style={{ paddingLeft: 10 }}>
@@ -323,29 +324,34 @@ const MainDrawerNavigator = (props) => {
         initialRouteName="DashboardScreen"
           screenOptions={({ route }) => ({
             headerShown: !isDashboardPage,
-            headerTitleAlign: 'center',
+            // headerTitleAlign: 'center',
+            // headerShown:false,
+            // animation:"ios"
           })}
         >
             <Stack.Screen name='DashboardScreen' 
             component={DashboardScreen}
-            options={{headerTitle:""}}
+            options={{headerTitle:"Dashboard"}}
             />
             <Stack.Screen
             name="SalesScreen"
             component={SalesDashboard}
             options={{
                 headerTitle: "Sales Dashboard",
-                headerLeft: () => <BackButton />,
-                animation: "ios",
+                headerTitleAlign:"center",
+                // headerLeft: () => <BackButton />,
+                // animation:'slide_from_right'
+                
             }}
+            
             />
             <Stack.Screen 
             name='StaffScreen' 
             component={StaffDashboard} 
             options={{
                 headerTitle:"Staff Dashboard",
-                headerLeft:()=><BackButton/>,
-                animation: "ios",
+                // headerLeft:()=><BackButton/>,
+                // animation:'slide_from_right'
             }}
             />
             <Stack.Screen 
@@ -353,8 +359,8 @@ const MainDrawerNavigator = (props) => {
             component={ClientDashboard} 
             options={{
                 headerTitle:"Client Dashboard",
-                headerLeft:()=><BackButton/>,
-                animation: "ios",
+                // headerLeft:()=><BackButton/>,
+                // animation:'slide_from_right'
             }}
             />
         </Stack.Navigator>
@@ -425,7 +431,6 @@ const MainDrawerNavigator = (props) => {
         }
     }, [currentLocation])
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
-    
     return (
         <>
             {!props.auth ? <AuthNavigator/> :
@@ -492,13 +497,16 @@ const MainDrawerNavigator = (props) => {
                             <Drawer.Screen
                                 name="Dashboard"
                                 component={DashboardStack}
-                                options={{
+                                options={({navigation,route})=>({
+                                    headerLeft:currentLocation !== "Dashboard" ? ()=> <BackButton/> : () =>  <CustomDrawerIcon navigation={navigation} />,
+                                    headerTitle:`${currentLocation}`,
                                     headerTitleAlign:"center",
+                                    swipeEnabled:currentLocation !== "Dashboard" ? false : true,
                                     headerShown:isDashboardPage,
                                     drawerIcon: () => <Image
                                         source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
                                         style={{ resizeMode: "contain" }} />
-                                }}
+                                })}
                             />
                             {/* <Drawer.Screen
                                 name="Appointments"

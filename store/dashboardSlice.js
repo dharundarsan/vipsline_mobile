@@ -17,19 +17,19 @@ const initialDashboardState = {
     avgBillValue: 0,
   },
   dateData: [
-    { label: "Today", value: "",day:0 },
-    { label: "Yesterday", value: "",day:-1 },
-    { label: "Last 7 days", value: "",day:-6 },
-    { label: "Last 30 days", value: "",day:-29 },
+    { label: "Today", value: "today",day:0 },
+    { label: "Yesterday", value: "yesterday",day:-1 },
+    { label: "Last 7 days", value: "last7days",day:-6 },
+    { label: "Last 30 days", value: "last30days",day:-29 },
     { label: "This month", value: "This month",day1:0,day2:0},
-    { label: "Custom range", value: "",day1: 0,day2: 0 },
+    { label: "Custom range", value: "Custom Range",day1: 0,day2: 0 },
   ],
   toggleDateData: [
-    { label: "This month", value: "" },
-    { label: "Today", value: "",day:0 },
-    { label: "Yesterday", value: "",day:-1 },
-    { label: "Last 7 days", value: "",day:-6 },
-    { label: "Last 30 days", value: "",day:-29 },
+    { label: "This month", value: "thismonth" },
+    { label: "Today", value: "today",day:0 },
+    { label: "Yesterday", value: "yesterday",day:-1 },
+    { label: "Last 7 days", value: "last7days",day:-6 },
+    { label: "Last 30 days", value: "last30days",day:-29 },
     { label: "Custom range", value: "Custom range" },
   ],
   listData: {
@@ -250,13 +250,11 @@ export const loadTopRevenueServices = (fromDate, toDate) => async(dispatch, getS
       },
     }
   ).then(res => {
-    console.log("Out");
     try{
       dispatch(updateTopRevenueService(res.data.data))
     }
     catch(e){
       // console.log("222");
-      console.log(res.data.data);
       console.log(e);
     }
     
@@ -584,9 +582,6 @@ export const loadStaffDashboardReport = (fromDate,toDate) => async(dispatch, get
 }
 export const loadDailyAppointmentAnalyticsForBusiness = (isCount,date) => async(dispatch, getState) =>{
   const { authDetails } = getState();
-  console.log(isCount);
-  console.log(date);
-  
   let authToken = "";
   try {
     // const value = await AsyncStorage.getItem('authKey');

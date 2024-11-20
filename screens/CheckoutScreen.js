@@ -1,13 +1,13 @@
-import {ActivityIndicator, Image, Platform, Pressable, StyleSheet, Text, View} from "react-native";
+import { ActivityIndicator, Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
 import Cart from "../components/checkoutScreen/Cart";
 import AddClientButton from "../components/checkoutScreen/AddClientButton";
-import {useFocusEffect, useNavigation} from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import title from "react-native-paper/src/components/Typography/v2/Title";
-import {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
@@ -22,10 +22,10 @@ import AddClientModal from "../components/checkoutScreen/AddClientModal";
 import {
     loadClientFiltersFromDb,
 } from "../store/clientFilterSlice";
-import {clearClientInfo, loadClientInfoFromDb} from "../store/clientInfoSlice";
-import {loadBusinessesListFromDb, loadBusinessNotificationDetails} from "../store/listOfBusinessSlice";
-import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
-import {loadStaffsFromDB} from "../store/staffSlice";
+import { clearClientInfo, loadClientInfoFromDb } from "../store/clientInfoSlice";
+import { loadBusinessesListFromDb, loadBusinessNotificationDetails } from "../store/listOfBusinessSlice";
+import { loadLoginUserDetailsFromDb } from "../store/loginUserSlice";
+import { loadStaffsFromDB } from "../store/staffSlice";
 import {
     clearCustomItems,
     clearLocalCart,
@@ -33,13 +33,13 @@ import {
     loadCartFromDB,
     modifyClientMembershipId
 } from "../store/cartSlice";
-import {loadBookingDetailsFromDb} from "../store/invoiceSlice";
+import { loadBookingDetailsFromDb } from "../store/invoiceSlice";
 import clearCartAPI from "../util/apis/clearCartAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocationContext } from "../context/LocationContext";
 import Toast from "../ui/Toast";
-import {updateToastRef} from "../store/toastSlice";
-import {loadBusinessDetail} from "../store/BusinessDetailSlice";
+import { updateToastRef } from "../store/toastSlice";
+import { loadBusinessDetail } from "../store/BusinessDetailSlice";
 
 const CheckoutScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -80,7 +80,7 @@ const CheckoutScreen = ({ navigation, route }) => {
                     dispatch(clearCustomItems());
                     dispatch(clearLocalCart());
                     dispatch(clearSalesNotes());
-                    dispatch(modifyClientMembershipId({type: "clear"}))
+                    dispatch(modifyClientMembershipId({ type: "clear" }))
                     await dispatch(loadServicesDataFromDb("women"));
                     await dispatch(loadServicesDataFromDb("men"));
                     await dispatch(loadServicesDataFromDb("kids"));
@@ -128,24 +128,24 @@ const CheckoutScreen = ({ navigation, route }) => {
 
 
     return (
-        isLoading ? <ActivityIndicator size={"large"} style={{flex: 1, backgroundColor: Colors.white}}/> :
+        isLoading ? <ActivityIndicator size={"large"} style={{ flex: 1, backgroundColor: Colors.white }} /> :
             <View style={[styles.checkoutScreen, {
                 paddingBottom: insets.bottom
             }]}>
-                <Toast ref={toastRef}/>
+                <Toast ref={toastRef} />
                 <AddClientModal setSearchClientQuery={setSearchClientQuery}
-                                searchClientQuery={searchClientQuery}
-                                closeModal={() => {
-                                    setIsAddClientModalVisible(false)
-                                }} isVisible={isAddClientModalVisible}/>
+                    searchClientQuery={searchClientQuery}
+                    closeModal={() => {
+                        setIsAddClientModalVisible(false)
+                    }} isVisible={isAddClientModalVisible} />
                 <AddClientButton setSearchClientQuery={setSearchClientQuery}
                     searchClientQuery={searchClientQuery}
                     onPress={() => {
                         setIsAddClientModalVisible(true)
                     }}
-                                 deleteClientToast={() => {
-                                     toastRef.current.show("Client deleted successfully.");
-                                 }}
+                    deleteClientToast={() => {
+                        toastRef.current.show("Client deleted successfully.");
+                    }}
                 />
                 <Cart
                     showToast={checkoutScreenToast}

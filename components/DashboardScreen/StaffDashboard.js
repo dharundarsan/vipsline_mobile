@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import { formatDateDDMMYYYY, formatDateToWeekDayDDMMMYYYY, formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstAndLastDateOfCurrentMonthDDMMYYYY, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonthYYYYMMMDD } from "../../util/Helpers";
 import { Dropdown } from "react-native-element-dropdown";
@@ -20,16 +20,20 @@ import StaffDetailsModel from "./StaffDetailsModel";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ContentLoader from "react-native-easy-content-loader";
+import { useFocusEffect } from "@react-navigation/native";
+import { useLocationContext } from "../../context/LocationContext";
 
 const StaffDashboard = () => {
   const dispatch = useDispatch();
+  const { getLocation } = useLocationContext();
+
   const todayDate = formatDateYYYYMMDD();
   const getLast7thDayDate = () => formatDateYYYYMMDD(-7);
   const getLast30thDayDate = () => formatDateYYYYMMDD(-30);
   const lastMonthDate = getLastDateOfCurrentMonthYYYYMMMDD();
   const firstMonthDate = getFirstDateOfCurrentMonthYYYYMMDD();
 
-  const [selectedValue, setSelectedValue] = useState(todayDate);
+  const [selectedValue, setSelectedValue] = useState("today");
 
   const dateData = useSelector((state) => state.dashboardDetails.dateData);
   const username = useSelector((state) => state.loginUser.details);
@@ -53,6 +57,9 @@ const StaffDashboard = () => {
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [isDateDataLoading, setIsDateDataLoading] = useState(false);
 
+  useFocusEffect(useCallback(() => {
+    getLocation("Staff Dashboard");
+  }, []))
 
   const servicesChartData = pieData.chart_series.map((value) => ({ value }));
   const servicesTotalValue = servicesChartData.reduce((sum, item) => sum + item.value, 0);
@@ -68,8 +75,6 @@ const StaffDashboard = () => {
   const togglePercentageData = togglePieData.map((item, index) => {
     // const percentage = ((item.value / totalValue) * 100).toFixed(1);
     const percentage = parseFloat(item.text) <= 3.0 ? "" : `${parseFloat(item.text)}%`;
-    console.log("item.value  " + pieData.chart_series[index]);
-
     return {
       value: pieData.chart_series[index],
       text: percentage,
@@ -236,7 +241,7 @@ const StaffDashboard = () => {
                 valueField="value"
                 value={selectedValue}
                 onChange={handleSelection}
-                placeholder="Today"
+                // placeholder="Today"
                 disable={isLoading}
               />
               <DateTimePickerModal

@@ -257,8 +257,7 @@ export default function EmailLogin() {
                 <Pressable
                     onPress={forgetPasswordOnPressHandler}
                 >
-                    <Text style={[textTheme.titleSmall, {color: Colors.highlight, fontWeight: "600"}]}>Forgot
-                        Password?</Text>
+                    <Text style={[textTheme.titleSmall, {color: Colors.highlight,fontWeight: "600"}]}>Forgot Password ?</Text>
                 </Pressable>
             </View>
             <PrimaryButton

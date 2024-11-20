@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
 import ListIconData from "./ListIconData";
@@ -21,9 +21,12 @@ import {
 } from "../../util/Helpers";
 import PieChartBox from "./PieChartBox";
 import ContentLoader from "react-native-easy-content-loader";
+import { useFocusEffect } from "@react-navigation/native";
+import { useLocationContext } from "../../context/LocationContext";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
+  const { getLocation } = useLocationContext();
 
   const [isPageLoading, setIsPageLoading] = useState(false);
 
@@ -111,6 +114,11 @@ const ClientDashboard = () => {
     }
     initialRender();
   }, []);
+
+  useFocusEffect(useCallback(() => {
+    getLocation("Client Dashboard");
+  }, []))
+
   const labelArray = useSelector((state) => state.dashboardDetails.toggleDateData);
 
   return (

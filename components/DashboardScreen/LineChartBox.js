@@ -81,10 +81,10 @@ const LineChartBox = (props) => {
                     maxValue={props.max}
                     style={{width:"100%"}}
                     noOfSections={props.sections}
-                    isAnimated
+                    // isAnimated
                     // isAnimated
                     // animateTogether
-                    animationDuration={2500}
+                    // animationDuration={2500}
                     // noOfSections={6}
                     // maxValue={yAxisLabels}
                     // maxValue={arr.sort((a, b) => b - a)[0]}
