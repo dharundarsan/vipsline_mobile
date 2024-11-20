@@ -1,17 +1,12 @@
-import {StyleSheet, View, Text} from "react-native";
+import {StyleSheet, View, Text, Pressable} from "react-native";
 import Colors from "../../constants/Colors";
+import LeadDetailsModal from "./LeadDetailsModal";
+import React, {useState} from "react";
+import getLeadStatusColor from "../../util/getLeadStatusColor";
 
-const getBadgeColor = (badge) => {
-    if (badge === "New") return {background: "#6950F31A", text: Colors.highlight}
-    if (badge === "Follow up") return {background: "#F7941D1A", text: Colors.orange}
-    if (badge === "Prospective") return {background: "#EF5DA81A", text: "#EF5DA8"}
-    if (badge === "Sales opportunity") return {background: "#0352321A", text: "#035232"}
-    if (badge === "Converted") return {background: "#22B3781A", text: "#22B378"}
-    if (badge === "Not interested") return {background: "#D1373F1A", text: "#D1373F"}
-    if (badge === "Unqualified") return {background: "#1019281A", text: "#10192899"}
-}
 
 const LeadCard = (props) => {
+    const [isLeadDetailsModalVisible, setIsLeadDetailsModalVisible] = useState(false);
 
     const styles = StyleSheet.create({
         leadCard: {
@@ -38,16 +33,17 @@ const LeadCard = (props) => {
         badgeContainer: {
             minWidth: 80,
             paddingHorizontal:10,
-            backgroundColor: getBadgeColor(props.status).background,
+            backgroundColor: getLeadStatusColor(props.status).background,
             alignItems: "center",
             borderRadius: 5,
         },
         badgeText: {
-            color: getBadgeColor(props.status).text,
+            color: getLeadStatusColor(props.status).text,
         }
     })
 
-    return <View style={styles.leadCard}>
+    return <Pressable onPress={() => {setIsLeadDetailsModalVisible(true)}} style={styles.leadCard}>
+        {isLeadDetailsModalVisible && <LeadDetailsModal isVisible={isLeadDetailsModalVisible}/>}
         <View style={styles.detailsContainer}>
             <Text style={[styles.nameText]}>{props.name}</Text>
             <Text style={[styles.phoneNoText]}>{props.phoneNo}</Text>
@@ -58,7 +54,7 @@ const LeadCard = (props) => {
         <View style={styles.badgeContainer}>
             <Text style={styles.badgeText}>{props.status}</Text>
         </View>
-    </View>
+    </Pressable>
 }
 
 export default LeadCard;

@@ -21,7 +21,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     decrementPageNumber,
     incrementPageNumber, resetPageNo, updateFetchingState,
-    updateMaxEntry
+    updateMaxEntry, updateSearchTerm
 } from "../store/leadManagementSlice";
 import {clientFilterNames} from "../util/chooseFilter";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
@@ -32,6 +32,7 @@ import CreateClientModal from "../components/checkoutScreen/CreateClientModal";
 import CreateLeadModal from "../components/LeadManagementScreen/CreateLeadModal";
 import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../store/cartSlice";
+import LeadDetailsModal from "../components/LeadManagementScreen/LeadDetailsModal";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -45,6 +46,7 @@ const LeadManagementScreen = () => {
     const dispatch = useDispatch();
     const [isCreateLeadModalVisible, setIsCreateClientModalVisible] = useState(false);
     const isFetching = useSelector(state => state.leads.isFetching);
+    const [isLeadExists, setIsLeadExists] = useState(totalCount !== 0);
     const options = [
         {label: '10', value: 10},
         {label: '25', value: 25},
@@ -59,6 +61,7 @@ const LeadManagementScreen = () => {
             await dispatch(loadLeadSourcesFromDb());
             await getLeadsAPI(0, 10, "");
             await dispatch(loadLeadsFromDb());
+            setIsLeadExists(totalCount !== 0);
             dispatch(updateFetchingState(false));
         }
         apiCalls();
@@ -173,7 +176,8 @@ const LeadManagementScreen = () => {
             </Modal>
         }
         {isFetching ?
-            <View style={{justifyContent: "center", alignItems: "center", flex: 1}}><ActivityIndicator size={"large"}/></View> : totalCount === 0 ?
+            <View style={{justifyContent: "center", alignItems: "center", flex: 1}}><ActivityIndicator size={"large"}/></View> :
+            totalCount === 0 && isLeadExists ?
                 <View style={styles.noLeadContainer}>
                     <Text style={[textTheme.titleMedium, {marginTop: 100}]}>Convert your lead into a Client</Text>
                     <Text style={[textTheme.bodyMedium, {
@@ -189,10 +193,15 @@ const LeadManagementScreen = () => {
                     }} width={"50%"}/>
                 </View> :
                 <View style={styles.content}>
-                    <ScrollView>
+                    <ScrollView fadingEdgeLength={100} style={{flex:1}}>
                         <View style={styles.searchBarAndFilterContainer}>
-                            <View style={{}}></View>
-                            <SearchBar filter placeholder={"Search by name email or mobile "}/>
+                            <SearchBar filter onChangeText={(text) => {
+                                dispatch(updateFetchingState(true))
+                                dispatch(resetPageNo())
+                                dispatch(updateSearchTerm(text));
+                                dispatch(loadLeadsFromDb());
+                                dispatch(updateFetchingState(false))
+                            }} placeholder={"Search by name email or mobile "}/>
                         </View>
                         <Divider/>
                         <View style={[styles.leadCountContainer]}>
@@ -201,7 +210,9 @@ const LeadManagementScreen = () => {
                                 style={{color: Colors.highlight}}>{totalCount}</Text></Text>
                         </View>
                         <Divider/>
-                        {leads.map(lead => (
+                        {totalCount === 0 ? <View style={{justifyContent:"center", alignItems:"center", flex:1, height:500}}>
+                            <Text style={{fontWeight:"bold"}}>No Leads Data</Text>
+                        </View> : leads.map(lead => (
                             <LeadCard
                                 followUp={lead.followup_date}
                                 name={lead.name}
@@ -209,7 +220,7 @@ const LeadManagementScreen = () => {
                                 phoneNo={lead.mobile}
                             />
                         ))}
-                        <View style={styles.pagination}>
+                        { totalCount < 10 ? null : <View style={styles.pagination}>
                             <PrimaryButton
                                 pressableStyle={styles.entryButton}
                                 buttonStyle={styles.entryButtonContainer}
@@ -240,7 +251,7 @@ const LeadManagementScreen = () => {
                                     <FontAwesome6 name="angle-right" size={24} color="black"/>
                                 </PrimaryButton>
                             </View>
-                        </View>
+                        </View>}
                     </ScrollView>
                 </View>
         }
@@ -267,7 +278,9 @@ const styles = StyleSheet.create({
     noLeadContainer: {
         alignItems: "center"
     },
-    content: {},
+    content: {
+        flex:1
+    },
     searchBarAndFilterContainer: {
         margin: 15
     },
