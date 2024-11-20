@@ -33,6 +33,7 @@ import CreateLeadModal from "../components/LeadManagementScreen/CreateLeadModal"
 import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../store/cartSlice";
 import LeadDetailsModal from "../components/LeadManagementScreen/LeadDetailsModal";
+import ContentLoader from "react-native-easy-content-loader";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -176,7 +177,15 @@ const LeadManagementScreen = () => {
             </Modal>
         }
         {isFetching ?
-            <View style={{justifyContent: "center", alignItems: "center", flex: 1}}><ActivityIndicator size={"large"}/></View> :
+            <View style={{justifyContent: "center", alignItems: "center", flex: 1}}>
+                <ContentLoader
+                    pRows={10}
+                    pHeight={[55, 45, 70, 70, 70, 70, 70, 70, 70, 70]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
+                />
+            </View> :
             totalCount === 0 && isLeadExists ?
                 <View style={styles.noLeadContainer}>
                     <Text style={[textTheme.titleMedium, {marginTop: 100}]}>Convert your lead into a Client</Text>
@@ -193,7 +202,7 @@ const LeadManagementScreen = () => {
                     }} width={"50%"}/>
                 </View> :
                 <View style={styles.content}>
-                    <ScrollView fadingEdgeLength={100} style={{flex:1}}>
+                    <ScrollView fadingEdgeLength={100} style={{flex: 1}}>
                         <View style={styles.searchBarAndFilterContainer}>
                             <SearchBar filter onChangeText={(text) => {
                                 dispatch(updateFetchingState(true))
@@ -210,17 +219,19 @@ const LeadManagementScreen = () => {
                                 style={{color: Colors.highlight}}>{totalCount}</Text></Text>
                         </View>
                         <Divider/>
-                        {totalCount === 0 ? <View style={{justifyContent:"center", alignItems:"center", flex:1, height:500}}>
-                            <Text style={{fontWeight:"bold"}}>No Leads Data</Text>
-                        </View> : leads.map(lead => (
-                            <LeadCard
-                                followUp={lead.followup_date}
-                                name={lead.name}
-                                status={lead.lead_status}
-                                phoneNo={lead.mobile}
-                            />
-                        ))}
-                        { totalCount < 10 ? null : <View style={styles.pagination}>
+                        {totalCount === 0 ?
+                            <View style={{justifyContent: "center", alignItems: "center", flex: 1, height: 500}}>
+                                <Text style={{fontWeight: "bold"}}>No Leads Data</Text>
+                            </View> : leads.map(lead => (
+                                <LeadCard
+                                    lead={lead}
+                                    followUp={lead.followup_date}
+                                    name={lead.name}
+                                    status={lead.lead_status}
+                                    phoneNo={lead.mobile}
+                                />
+                            ))}
+                        {totalCount < 10 ? null : <View style={styles.pagination}>
                             <PrimaryButton
                                 pressableStyle={styles.entryButton}
                                 buttonStyle={styles.entryButtonContainer}
@@ -279,7 +290,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     content: {
-        flex:1
+        flex: 1
     },
     searchBarAndFilterContainer: {
         margin: 15

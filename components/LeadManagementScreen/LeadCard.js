@@ -32,27 +32,33 @@ const LeadCard = (props) => {
         },
         badgeContainer: {
             minWidth: 80,
-            paddingHorizontal:10,
-            backgroundColor: getLeadStatusColor(props.status).background,
+            paddingHorizontal: 10,
+            backgroundColor: getLeadStatusColor(props.lead.lead_status).background,
             alignItems: "center",
             borderRadius: 5,
         },
         badgeText: {
-            color: getLeadStatusColor(props.status).text,
+            color: getLeadStatusColor(props.lead.lead_status).text,
         }
     })
 
-    return <Pressable onPress={() => {setIsLeadDetailsModalVisible(true)}} style={styles.leadCard}>
-        {isLeadDetailsModalVisible && <LeadDetailsModal isVisible={isLeadDetailsModalVisible}/>}
+    return <Pressable onPress={() => {
+        setIsLeadDetailsModalVisible(true)
+    }} style={styles.leadCard}>
+        {isLeadDetailsModalVisible && <LeadDetailsModal isVisible={isLeadDetailsModalVisible}
+                                                        lead={props.lead}
+                                                        onCloseModal={() => {
+                                                            setIsLeadDetailsModalVisible(false)
+                                                        }}/>}
         <View style={styles.detailsContainer}>
-            <Text style={[styles.nameText]}>{props.name}</Text>
-            <Text style={[styles.phoneNoText]}>{props.phoneNo}</Text>
+            <Text style={[styles.nameText]}>{props.lead.name}</Text>
+            <Text style={[styles.phoneNoText]}>{props.lead.mobile}</Text>
             <Text style={{color: Colors.grey600}}>Follow up:
-                <Text style={{color: Colors.black}}> {props.followUp}</Text>
+                <Text style={{color: Colors.black}}> {props.lead.followup_date}</Text>
             </Text>
         </View>
         <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>{props.status}</Text>
+            <Text style={styles.badgeText}>{props.lead.lead_status}</Text>
         </View>
     </Pressable>
 }
