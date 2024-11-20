@@ -46,9 +46,10 @@ const PaymentModal = (props) => {
 
 
     const clientInfo = useSelector(state => state.clientInfo.details);
+    const isZeroPayment = props.price === 0;
     const isPrepaidInCart = useSelector(state => state.cart.prepaid_wallet[0].wallet_amount) !== "";
     const isPrepaidAvailable = !isPrepaidInCart && clientInfo.wallet_status && clientInfo.wallet_balance !== undefined && clientInfo.wallet_balance !== 0;
-    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
+    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? isZeroPayment ? null : clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
     const [splitResponse, setSplitResponse] = useState([]);
@@ -56,7 +57,7 @@ const PaymentModal = (props) => {
     const [stopAPI, setStopAPI] = useState(false);
     const [isSplitPaymentDropdownVisible, setIsSplitPaymentDropdownVisible] = useState(false)
     const [recentlyChanged, setRecentlyChanged] = useState([]);
-    const [paymentOrder, setPaymentOrder] = useState(isPrepaidAvailable ? ["prepaid"] : [])
+    const [paymentOrder, setPaymentOrder] = useState(isPrepaidAvailable ? isZeroPayment ? null : ["prepaid"] : [])
     const [isError, setIsError] = useState(true);
     const [bodyData, setBodyData] = useState([])
     const [shownCount, setShownCount] = useState(0)
@@ -65,7 +66,6 @@ const PaymentModal = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isOptionsDropdownModalVisible, setIsOptionsDropdownModalVisible] = useState(false)
     const [isCancelSalesModalVisible, setIsCancelSalesModalVisible] = useState(false)
-    const isZeroPayment = props.price === 0;
 
 
     const [splitUpState, setSplitUpState] = useState([
@@ -545,8 +545,9 @@ const PaymentModal = (props) => {
                 </View>
                 {(isPrepaidAvailable) &&
                     <PrimaryButton
+                        disableRipple={isZeroPayment}
                         buttonStyle={[styles.paymentOptionButton, {marginBottom: 20}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
-                        onPress={() => {
+                        onPress={ isZeroPayment ? ()=>{} : () => {
 
                             if (clientInfo.wallet_balance < props.price) {
                                 setSelectedPaymentOption("split_payment")
@@ -559,10 +560,10 @@ const PaymentModal = (props) => {
                             <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
                                                     color={Colors.highlight}/>
                         </View> : null}
-                        <FontAwesome6 name="indian-rupee-sign" size={24} color={Colors.green}/>
+                        <FontAwesome6 name="indian-rupee-sign" size={24} color={ isZeroPayment ? Colors.grey400 : Colors.green}/>
                         <Text>Prepaid <Text
                             style={{
-                                color: Colors.highlight,
+                                color: isZeroPayment ? Colors.grey400 : Colors.highlight,
                                 fontWeight: "bold"
                             }}>₹ {clientInfo.wallet_balance}</Text>
                         </Text>

@@ -35,8 +35,12 @@ const calculateCartPriceAPI = async (data) => {
                     Authorization: `Bearer ${authToken}`
                 }
             })
+        if(response.data.status_code > 400){
+            throw response;
+        }
         return response.data.data;
     } catch (error) {
+        throw error;
     }
 }
 

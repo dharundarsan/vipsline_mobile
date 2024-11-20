@@ -16,6 +16,8 @@ const initial = {
     isFetchingSearchClient: false,
     totalSearchClients: 0,
 
+    appliedFilters: []
+
 }
 
 async function getBusinessId() {

@@ -4,8 +4,16 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import CustomDropdown from "../../ui/CustomDropdown";
+import CustomTextInput from "../../ui/CustomTextInput";
 
 export default function AdvancedFilters(props) {
+    function selectedOptions(options) {
+        props.selectedOptions(options)
+    }
+
+
+
+
     return <Modal style={{flex: 1}} visible={props.isVisible} animationType={"slide"}>
            <View style={styles.advancedFilters}>
                <View style={styles.header}>
@@ -32,7 +40,33 @@ export default function AdvancedFilters(props) {
                        container={styles.dropdownContainer}
                        borderColor={Colors.grey250}
                        checkBoxSize={30}
+                       selectedOptions={selectedOptions}
                    />
+
+                   <Text style={[textTheme.titleMedium, styles.lastVisitedText]}>
+                       Last visited date
+                   </Text>
+                   <View style={styles.filterDateContainer}>
+                       <CustomTextInput
+                          type={"date"}
+                          label={"From date"}
+                          labelTextStyle={[textTheme.titleMedium, styles.lastVisitedText]}
+                          dateInputContainer={styles.dateInputContainer}
+                          labelEnabled={false}
+                          container={{marginBottom: 16}}
+                          maximumDate={new Date(Date.now())}
+                       />
+                       <CustomTextInput
+                           type={"date"}
+                           label={"To date"}
+                           labelTextStyle={[textTheme.titleMedium, styles.lastVisitedText]}
+                           dateInputContainer={styles.dateInputContainer}
+                           labelEnabled={false}
+                           container={{marginBottom: 0}}
+                       />
+                   </View>
+
+
                </View>
            </View>
     </Modal>;
@@ -66,6 +100,21 @@ const styles = StyleSheet.create({
     },
     dropdownContainer: {
         paddingHorizontal: 16,
-        marginTop: 16
+        marginTop: 8
+    },
+    lastVisitedText: {
+        marginTop: 16,
+        marginLeft: 16
+    },
+    dateInputContainer: {
+        marginHorizontal: 12
+    },
+    filterDateContainer: {
+        borderWidth: 1,
+        marginHorizontal: 16,
+        borderColor: Colors.grey250,
+        marginTop: 8,
+        paddingVertical: 24,
+        borderRadius: 4
     }
 })

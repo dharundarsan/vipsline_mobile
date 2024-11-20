@@ -156,7 +156,7 @@ export default function Pagination(props) {
             }
             else if(upperCountAfter >= 1 && upperCountAfter >= maxEntry) {
                                 setLowerCount(lowerCountAfter);
-                setUpperCount(upperCountAfter);
+                setUpperCount(upperCountAfter - lowerCountAfter === maxEntry ? upperCountAfter : lowerCountAfter + maxEntry - 1);
                 dispatch(decrementPageNumber());
             }
         }
