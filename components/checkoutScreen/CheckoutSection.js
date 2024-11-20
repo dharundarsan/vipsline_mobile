@@ -79,7 +79,7 @@ const CheckoutSection = (props) => {
         service: 0, product: 0, package: 0, membership: 0, customItem: 0
     });
     const cartDetails = useSelector(state => state.cart.items);
-    console.log(JSON.stringify(calculatedPrice[0],null,3));
+    // console.log(JSON.stringify(calculatedPrice[0],null,3));
     
     useEffect(() => {
         if (calculatedPrice[0]?.service_discounts_in_price !== undefined &&

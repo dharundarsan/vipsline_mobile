@@ -432,7 +432,15 @@ export const cartSlice = createSlice({
                     }];
                     break;
                 case "add":
-                    state.prepaid_wallet = payload;
+                    console.clear()
+                    console.log("state.prepaid_wallet[0]")
+                    console.log(state.prepaid_wallet[0])
+                    console.log("payload[0]")
+                    console.log(payload[0])
+                    console.log("[{...state.prepaid_wallet[0], ...payload[0]}]")
+                    console.log([{...state.prepaid_wallet[0], ...payload[0]}])
+
+                    state.prepaid_wallet = [{...state.prepaid_wallet[0], ...payload[0]}];
                     break;
                 case "updateMobile":
                     if (state.prepaid_wallet.length > 0) {
@@ -446,6 +454,8 @@ export const cartSlice = createSlice({
                     }
                     break;
                 case "updateResourceId":
+                    console.log("payload")
+                    console.log(payload)
                     // if (state.prepaid_wallet.length > 0 && state.prepaid_wallet[0]?.source === "Add prepaid") {
                     if (state.prepaid_wallet.length > 0) {
                         // state.prepaid_wallet[0].source = "add_prepaid";
@@ -456,6 +466,7 @@ export const cartSlice = createSlice({
                     }
                     if (state.prepaid_wallet.length > 0 || state.editedCart.filter(item => item.gender === "prepaid").length > 0) {
                         // state.prepaid_wallet[0].resource_id = payload;
+                        console.log(payload)
                         state.prepaid_wallet = [{
                             ...state.prepaid_wallet[0],
                             resource_id: payload
