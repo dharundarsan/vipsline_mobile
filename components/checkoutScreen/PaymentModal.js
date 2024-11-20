@@ -57,7 +57,7 @@ const PaymentModal = (props) => {
     const [isSplitPaymentDropdownVisible, setIsSplitPaymentDropdownVisible] = useState(false)
     const [recentlyChanged, setRecentlyChanged] = useState([]);
     const [paymentOrder, setPaymentOrder] = useState(isPrepaidAvailable ? ["prepaid"] : [])
-    const [isError, setIsError] = useState(false);
+    const [isError, setIsError] = useState(true);
     const [bodyData, setBodyData] = useState([])
     const [shownCount, setShownCount] = useState(0)
     const invoiceDetails = useSelector(state => state.invoice.details);
@@ -773,7 +773,6 @@ const PaymentModal = (props) => {
                                if (isZeroPayment) {
                                    await checkoutBookingAPI(details, cartSliceState).then(response => {
                                        if (response.data === null || response.message === "Something went wrong") {
-                                           console.log(response)
                                            toastRef.current.show(response.other_message, 2000);
                                            return;
                                        } else {

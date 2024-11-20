@@ -26,14 +26,19 @@ const AvailablePackagesModal = (props) => {
             const activePackages = await getPackagesListOfClientAPI(clientId, businessId);
             setPackages(activePackages);
             setIsLoading(false);
+            if (activePackages.length === 1) {
+                setPackageModalData(activePackages[0])
+                setIsPackageModalVisible(true);
+            }
         }
 
         fetchPackages();
     }, [clientId, businessId]);
 
     return <Modal style={styles.availablePackagesModal} animationType={"slide"}
-            presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
+                  presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         {isPackageModalVisible && <PackageModal redeem={true}
+                                                singlePackage={packages.length === 1}
                                                 data={packageModalData}
                                                 isVisible={isPackageModalVisible}
                                                 onCloseModal={() => setIsPackageModalVisible(false)}

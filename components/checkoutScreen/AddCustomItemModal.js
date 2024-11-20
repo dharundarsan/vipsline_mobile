@@ -28,7 +28,7 @@ const AddCustomItemModal = (props) => {
         <KeyboardAvoidingView style={{ flex: 1,paddingBottom:insets.bottom }} keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}
         behavior="height">
             <View style={[styles.headingAndCloseContainer, shadowStyling]}>
-                <Text style={[textTheme.titleLarge, styles.heading]}>Edit Custom Item</Text>
+                <Text style={[textTheme.titleLarge, styles.heading]}>{props.edited ? "Edit Custom Item" : "Add Custom Item"} </Text>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     onPress={props.onCloseModal}

@@ -26,6 +26,7 @@ import PackageModal from "./PackageModal";
 import {clientSlice} from "../../store/clientSlice";
 import * as Haptics from "expo-haptics";
 import EditMembershipModal from "./EditMembershipModal";
+import {formatNumber} from "../../util/Helpers";
 
 const CartItem = (props) => {
     const dispatch = useDispatch();
@@ -37,7 +38,10 @@ const CartItem = (props) => {
     const [isEditPackageModalVisible, setIsEditPackageModalVisible] = useState(false);
     const editedCart = useSelector(state => state.cart.editedCart);
     const prepaidDetails = useSelector(state => state.cart.prepaid_wallet)
+    // const [discountSymbol, setDiscountSymbol] = useState(editedData ? editedData.type === "PERCENT" ? "%" : "₹" : "₹");
+    const discountSymbol= "₹";
     let editedData;
+
     if (props.data.gender === "membership") {
         editedData = editedCart.filter(item => item.id === props.data.membership_id)[0];
     } else {
@@ -46,10 +50,6 @@ const CartItem = (props) => {
     // const edited = editedData.some(item => props.data.item_id === item.item_id);
 
     const removeItemHandler = async () => {
-        4
-        4
-        4
-
         if (isLoading) return;
         dispatch(updateLoadingState(true));
         dispatch(await removeItemFromCart(props.data.item_id)).then((res) => {
@@ -65,6 +65,10 @@ const CartItem = (props) => {
     // useEffect(() => {
     //     setSelectedStaff(props.data.resource_id !== null ? props.staffs.filter((staff) => staff.id === props.data.resource_id)[0] : null);
     // }, [props.data]);
+
+    // useEffect(() => {
+    //     setDiscountSymbol(editedData ? editedData.type === "PERCENT" ? "%" : "₹" : "₹");
+    // }, [editedCart]);
 
     const styles = StyleSheet.create({
         scrollView: {
@@ -323,7 +327,7 @@ const CartItem = (props) => {
                         ? editedData.gender === "membership" || editedData.gender === "prepaid"
                             ? ""
                             : (editedData.disc_value !== 0
-                                ? `Discount ₹${editedData.disc_value.toFixed(2)}`
+                                ? `Discount ${discountSymbol}${formatNumber(editedData.disc_value)}`
                                 : "")
                         : (props.data.price - props.data.discounted_price !== 0 &&
                             props.data.gender !== "custom_item" &&
@@ -331,14 +335,14 @@ const CartItem = (props) => {
                             props.data.gender === "packages")
                             ? props.data.price - props.data.total_price === 0
                                 ? ""
-                                : `Discount ₹${(props.data.price - props.data.total_price).toFixed(2)}`
+                                : `Discount ${discountSymbol}${formatNumber(props.data.price - props.data.total_price)}`
                             : props.data.gender === "Women" || props.data.gender === "Men" || props.data.gender === "Kids" || props.data.gender === "General"
                                 ? (props.data.service_discount !== 0)
-                                    ? `Discount ₹${(props.data.service_discount).toFixed(2)}`
+                                    ? `Discount ${discountSymbol}${formatNumber(props.data.service_discount)}`
                                     : ""
                                 : props.data.gender === "Products"
                                     ? props.data.service_discount !== 0
-                                        ? `Discount ₹${(props.data.service_discount).toFixed(2)}`
+                                        ? `Discount ${discountSymbol}${formatNumber(props.data.service_discount)}`
                                         : ""
                                     : ""
                     }
