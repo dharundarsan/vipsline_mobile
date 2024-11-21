@@ -8,6 +8,7 @@ import staffReducer from "./staffSlice";
 import businessesReducer from "./listOfBusinessSlice";
 import loginUserReducer from "./loginUserSlice";
 import authReducer from "./authSlice";
+import dashboardReducer from './dashboardSlice';
 import invoiceReducer from "./invoiceSlice";
 import checkoutActionReducer from "./CheckoutActionSlice";
 import toastReducer from "./toastSlice";
@@ -32,6 +33,7 @@ const store = configureStore({
         toast: toastReducer,
         leads: leadManagementReducer,
         expenses: ExpensesReducer,
+        dashboardDetails:dashboardReducer
     },
 });
 
