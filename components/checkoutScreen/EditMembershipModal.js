@@ -30,7 +30,8 @@ const EditMembershipModal = (props) => {
     const dispatch = useDispatch();
     const editedCart = useSelector(state => state.cart.editedCart);
     const editedData = editedCart.filter(item => item.membership_id === props.data.membership_id)[0]
-    const [date, setDate] = useState(new Date(Date.now()).setHours(0, 0, 0, 0));
+    const appointmentDate = useSelector(state => state.cart.appointment_date);
+    const [date, setDate] = useState(new Date(appointmentDate).setHours(0, 0, 0, 0));
     const [validFromDate, setValidFromDate] = useState(editedData ? new Date(editedData.valid_from) : date);
     const [validUntilDate, setValidUntilDate] = useState(editedData ? new Date(editedData.valid_until) : date + (props.data.duration * 24 * 60 * 60 * 1000));
     const [membershipPrice, setMembershipPrice] = useState(editedData ? editedData.amount : props.data.price);
@@ -70,7 +71,8 @@ const EditMembershipModal = (props) => {
                 if (new Date(validFromDate).getTime() !== new Date(date).getTime() ||
                     new Date(validUntilDate).getTime() !== new Date(date + (props.data.duration * 24 * 60 * 60 * 1000)).getTime() ||
                     membershipPrice !== props.data.price ||
-                    membershipNumber !== "") {
+                    membershipNumber !== "" ||
+                    new Date(appointmentDate).getDate() !== new Date(Date.now()).getDate()) {
                     dispatch(addItemToEditedCart({
                         ...props.data,
                         gender: "membership",
@@ -99,14 +101,15 @@ const EditMembershipModal = (props) => {
         }
 
     }
-
+    console.log(props.data)
     return <>
         <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}
                presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
             <Toast ref={toastRef}/>
 
             <View style={styles.headingAndCloseContainer}>
-                <Text style={[textTheme.titleLarge, styles.heading]}>{props.data.name}</Text>
+                <Text
+                    style={[textTheme.titleLarge, styles.heading]}> {props.edited ? props.data.resource_category_name : props.data.name}</Text>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}
                     onPress={props.onCloseModal}

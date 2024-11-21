@@ -59,7 +59,7 @@ const AddCustomItemModal = (props) => {
                     }}
                     validator={(text) => {
                         if (text == 0) {
-                            return "First name is required"
+                            return "Item price is required"
                         }
                         else return true;
                     }}
@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndCloseContainer: {
-        // marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingHorizontal: 20,
         paddingVertical: 15,
     },
