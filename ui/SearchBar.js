@@ -33,7 +33,7 @@ const SearchBar = (props) => {
         </View>
         {props.filter ? <PrimaryButton
             buttonStyle={styles.filterButton}
-            onPress={() => null}
+            onPress={props.onPressFilter}
         >
             <SimpleLineIcons
                 name="equalizer"
