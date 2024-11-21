@@ -101,7 +101,6 @@ const PrepaidModal = (props) => {
                             source: "add_prepaid",
                             wallet_amount: parseFloat(prepaidAmount).toString(),
                             mobile: "",
-                            resource_id: "",
                         }]
                     }))
                     dispatch(addItemToEditedCart({
@@ -132,7 +131,6 @@ const PrepaidModal = (props) => {
                             source: "add_prepaid",
                             wallet_amount: parseFloat(prepaidAmount).toString(),
                             mobile: "",
-                            resource_id: "",
                         }]
                     }))
                     props.onCloseModal();
