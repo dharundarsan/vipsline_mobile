@@ -79,6 +79,7 @@ import {DataProvider, useDataContext} from './context/DataFlowContext';
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import AppointmentsScreen from "./screens/AppointmentsScreen";
 import LeadManagementScreen from "./screens/LeadManagementScreen";
+import Expenses from "./screens/Expenses";
 
 enableScreens();
 
@@ -602,9 +603,19 @@ const MainDrawerNavigator = (props) => {
                                                headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
                                                drawerIcon: () => <Image
                                                    source={{uri: Image.resolveAssetSource(logout_icon).uri}}
-                                                   width={25} height={25}
+                                                   width={25}
+                                                   height={25}
                                                    style={{resizeMode: "contain", tintColor: Colors.white}}/>
-                                           }}/>
+                            }}/>
+                            <Drawer.Screen name="Expenses" component={Expenses}
+                                           options={{
+                                               headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
+                                               drawerIcon: () => <Image
+                                                   source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
+                                                   width={25}
+                                                   height={25}
+                                                   style={{ resizeMode: "contain", tintColor: Colors.white }} />
+                            }} />
                         </Drawer.Navigator>
                         : <Drawer.Navigator initialRouteName="List Of Business"
                                             drawerContent={(props) => <CustomDrawer {...props} />}
