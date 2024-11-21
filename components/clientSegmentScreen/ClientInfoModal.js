@@ -280,12 +280,12 @@ export default function clientInfoModal(props) {
     } else if (clientMoreDetails === "billActivity") {
         content = <BillingActivity
             salesData={salesData}
-            clientid={details.id}
+            clientId={details.id}
         />
     } else if (clientMoreDetails === "appointments") {
         content = <Appointments
             salesData={salesData}
-            clientid={details.id}
+            clientId={details.id}
         />
     } else if (clientMoreDetails === "memberships") {
         content = checkNullUndefined(membershipData) && checkNullUndefined(membershipData.length) && membershipData.length > 0 ?

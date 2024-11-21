@@ -45,7 +45,7 @@ export default function Appointments(props) {
 
 
     useEffect(() => {
-        dispatch(loadAnalyticsClientDetailsFromDb(props.clientid))
+        dispatch(loadAnalyticsClientDetailsFromDb(props.clientId))
         dispatch(updateSalesMaxEntry(10));
         dispatch(updatePageNo(0));
     }, []);
@@ -84,7 +84,7 @@ export default function Appointments(props) {
             <ClientDetailsPagination
                 setIsModalVisible={setIsModalVisible}
                 totalCount={checkNullUndefined(salesData.upcoming_appointmentList.length) ? salesData.upcoming_appointmentList.length : 0}
-                clientId={props.clientid}
+                clientId={props.clientId}
             />
         }
 
