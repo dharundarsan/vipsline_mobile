@@ -56,6 +56,8 @@ export default function EntryModal(props) {
             visible={props.isModalVisible}
             animationType="fade"
             transparent={true}
+            presentationStyle={"formSheet"}
+            onRequestClose={props.setIsModalVisible(false)}
         >
             <TouchableOpacity activeOpacity={1}
                               style={{flex: 1, justifyContent: "center", backgroundColor: Colors.dim}}

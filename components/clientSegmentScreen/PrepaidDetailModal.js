@@ -72,7 +72,10 @@ export default function PrepaidDetailModal(props) {
     return (
         <Modal style={{ flex: 1 }}
                visible={props.isVisible}
-               animationType={"slide"}>
+               animationType={"slide"}
+               presentationStyle={"pageSheet"}
+               onRequestClose={props.closeModal}
+        >
             <View style={styles.PrepaidDetail}>
                 <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                     <Text style={[textTheme.titleLarge, styles.selectClientText]}>Prepaid History</Text>

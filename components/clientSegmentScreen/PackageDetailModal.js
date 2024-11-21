@@ -36,7 +36,7 @@ export default function PackageDetailModal(props) {
     }
 
 
-    return <Modal style={{flex: 1}} visible={props.visible} onCancel={props.closeModal} animationType={"slide"}>
+    return <Modal style={{flex: 1}} visible={props.visible} onCancel={props.closeModal} animationType={"slide"} presentationStyle={"formSheet"} onRequestClose={props.closeModal}>
         <View style={styles.packageDetails}>
             <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
                 <Text style={[textTheme.titleLarge, styles.selectClientText]}>Transformation Package</Text>

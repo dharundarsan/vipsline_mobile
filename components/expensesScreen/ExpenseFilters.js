@@ -1,15 +1,13 @@
-// ExpenseFilters.js
 import { Modal, StyleSheet, Text, View } from "react-native";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-
 import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
 import CustomTextInput from "../../ui/CustomTextInput";
 import DatePickerForwardBackward from "../../ui/DatePickerForwardBackward";
 import DateRangePicker from "./DateRangePicker";
-import { loadExpensesFromDb, updateFilters, updateOldCopy } from "../../store/ExpensesSlice";
+import {loadExpensesFromDb, updateCurrentCategoryId, updateFilters, updateOldCopy} from "../../store/ExpensesSlice";
 import {Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
 
@@ -18,18 +16,22 @@ export default function ExpenseFilters({ isVisible, onClose }) {
 
     const { category, range, fromDate, toDate, oldCopy } = useSelector(state => state.expenses);
 
+    const categories = useSelector(state => state.expenses.categories);
+    console.log((categories.find(item => item.name === category)?.id))
+
     useEffect(() => {
         dispatch(updateOldCopy({ fromDate, toDate, category, range }));
     }, []);
 
     const handleApply = async () => {
         dispatch(updateFilters({ fromDate, toDate, category, range }));
+        dispatch(updateCurrentCategoryId(categories.find(item => item.name === category).id))
         await dispatch(loadExpensesFromDb());
         onClose();
     };
 
     return (
-        <Modal style={{ flex: 1 }} visible={isVisible} animationType="slide">
+        <Modal style={{ flex: 1 }} visible={isVisible} animationType="slide" presentationStyle={"formSheet"} onRequestClose={onClose}>
             <View style={styles.advancedFilters}>
                 <View style={styles.header}>
                     <Text style={[styles.headerText, textTheme.titleLarge]}>Filters</Text>
@@ -47,7 +49,7 @@ export default function ExpenseFilters({ isVisible, onClose }) {
                     <CustomTextInput
                         label="Category"
                         type="dropdown"
-                        dropdownItems={["All expenses", "Daily"]}
+                        dropdownItems={["All expenses"].concat(( categories.map(item => item.name)))}
                         onChangeValue={(value) => dispatch(updateFilters({ category: value, range, fromDate, toDate }))}
                         value={category}
                     />

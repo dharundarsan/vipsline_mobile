@@ -3,7 +3,6 @@ import textTheme from "../constants/TextTheme";
 import PrimaryButton from "../ui/PrimaryButton";
 import React, {useCallback, useEffect, useState} from "react";
 import RecordExpenses from "../components/expensesScreen/RecordExpenses";
-import {Searchbar} from "react-native-paper";
 import SearchBar from "../ui/SearchBar";
 import Colors from "../constants/Colors";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
@@ -20,7 +19,6 @@ import ExpensesPagination from "../components/expensesScreen/ExpensesPagination"
 import EntryModal from "../components/expensesScreen/EntryModal";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import {useFocusEffect} from "@react-navigation/native";
-import addExpensesAPI from "../util/apis/addExpensesAPI";
 
 
 export default function Expenses() {
@@ -72,7 +70,7 @@ export default function Expenses() {
         <View style={{width: '100%', paddingVertical: 16}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16}}>
                 <Text style={[textTheme.titleSmall]}>
-                    {itemData.item.reference}
+                    {itemData.item.expense_sub_category}
                 </Text>
                 <Text style={[textTheme.titleSmall]}>
                     ₹ {itemData.item.amount}
@@ -120,6 +118,7 @@ export default function Expenses() {
                     setUpdateIsVisible(false);
                 }}
                 type={"update"}
+
 
             />
         }
@@ -248,7 +247,7 @@ const styles = StyleSheet.create({
         marginTop: 32
     },
     searchBar: {
-        backgroundColor: Colors.grey50,
+        backgroundColor: Colors.grey200,
         borderWidth: 0,
         paddingVertical: 6,
         paddingHorizontal: 8,

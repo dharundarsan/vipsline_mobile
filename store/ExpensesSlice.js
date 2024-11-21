@@ -3,6 +3,7 @@ import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
 import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
+import {act} from "react";
 
 const initial = {
     expenses: [],
@@ -20,7 +21,7 @@ const initial = {
     fromDate: moment().format("YYYY-MM-DD"),
     toDate: moment().format("YYYY-MM-DD"),
     query: "",
-    id: "",
+    categories: [],
     amount: 0,
     isExpensesExists: false,
     category: "All expenses",
@@ -31,9 +32,11 @@ const initial = {
         category: "",
         range: ""
     },
-    subId: "",
+    subId: [],
     currentExpensesId: "",
     currentExpense: {},
+    currentCategoryId: -1,
+    currentSubId: 0
 }
 
 async function getBusinessId() {
@@ -70,7 +73,8 @@ export const getExpenseCategoryId = () => async (dispatch, getState) => {
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        dispatch(updateExpenseId(response.data.data[0].id));
+        console.log(response.data.data)
+        dispatch(updateExpenseId(response.data.data));
 
     }
     catch (e) {
@@ -78,7 +82,7 @@ export const getExpenseCategoryId = () => async (dispatch, getState) => {
     }
 }
 
-export const getExpenseSubCategoryId = () => async (dispatch, getState) => {
+export const getExpenseSubCategoryId = (subId) => async (dispatch, getState) => {
     const { expenses } = getState();
     let authToken = ""
     try {
@@ -91,20 +95,18 @@ export const getExpenseSubCategoryId = () => async (dispatch, getState) => {
         console.log("auth token fetching error. (inside loadExpensesFilterFromDb)" + e);
     }
 
-
-
-
     try {
         const response1 = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/expense/getListofExpenseSubCategoryForBusiness", {
                 business_id: await getBusinessId(),
-                expense_cat_id: expenses.id
+                expense_cat_id: subId
             },
             {
                 headers: {
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        dispatch(updateExpenseSubCategoryId(response1.data.data[0].id));
+        console.log(response1.data.data)
+        dispatch(updateExpenseSubCategoryId(response1.data.data));
 
     }
     catch (e) {
@@ -116,6 +118,8 @@ export const getExpenseSubCategoryId = () => async (dispatch, getState) => {
 
 
 export const loadExpensesFromDb = () => async (dispatch, getState) => {
+
+
     let authToken = ""
     try {
         // const value = await AsyncStorage.getItem('authKey');
@@ -138,7 +142,7 @@ export const loadExpensesFromDb = () => async (dispatch, getState) => {
                 business_id: `${await getBusinessId()}`,
                 fromDate: expenses.fromDate,
                 toDate: expenses.toDate,
-                expense_cat_id: expenses.category === "Daily" ? expenses.id : -1,
+                expense_cat_id: expenses.currentCategoryId,
             },
             {
                 headers: {
@@ -179,7 +183,7 @@ export const loadSearchExpensesFromDb = (query) => async (dispatch, getState) =>
             {
                 business_id: `${await getBusinessId()}`,
                 query: query.trim(),
-                expense_cat_id: expenses.category === "Daily" ? expenses.id : -1,
+                expense_cat_id: expenses.currentCategoryId,
                 fromDate: expenses.fromDate,
                 toDate: expenses.toDate,
             },
@@ -271,7 +275,7 @@ export const ExpensesSlice = createSlice({
             state.searchClientMaxEntry = 10;
         },
         updateExpenseId(state, action) {
-            state.id = action.payload;
+            state.categories = action.payload;
         },
         updateExpenseAmount(state, action) {
             state.amount = action.payload;
@@ -299,6 +303,12 @@ export const ExpensesSlice = createSlice({
         },
         updateCurrentExpense(state, action) {
             state.currentExpense = action.payload;
+        },
+        updateCurrentCategoryId(state, action) {
+            state.currentCategoryId = action.payload;
+        },
+        updateCurrentSubCategoryId(state, action) {
+            state.currentSubId = action.payload;
         }
 
 
@@ -330,6 +340,8 @@ export const {
     updateExpenseSubCategoryId,
     updateCurrentExpensesId,
     updateCurrentExpense,
+    updateCurrentCategoryId,
+    updateCurrentSubCategoryId
 
 } = ExpensesSlice.actions;
 

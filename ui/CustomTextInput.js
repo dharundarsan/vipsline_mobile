@@ -9,6 +9,7 @@ import RNDateTimePicker from "@react-native-community/datetimepicker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {checkNullUndefined, formatDate} from "../util/Helpers";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
+import RequiredSymbol from "./RequiredSymbol";
 
 /**
  * CustomTextInput component for various types of text inputs, including text, email, phone number, date and dropdown.
@@ -303,7 +304,10 @@ const CustomTextInput = (props) => {
         <View style={[styles.commonContainer, props.flex !== undefined ? {flex: 1} : {}, props.container]}>
             {
                 !checkNullUndefined(props.labelEnabled) &&
-                <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}</Text>
+                <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}{
+                    checkNullUndefined(props.required) && props.required ?
+                    <RequiredSymbol/> :
+                ""}</Text>
             }
             {content}
             {error && <Text style={[textTheme.bodyMedium, styles.errorText, props.errorStyle]}>{errorMessage}</Text>}

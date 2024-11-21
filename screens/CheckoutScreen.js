@@ -98,7 +98,6 @@ const CheckoutScreen = ({ navigation, route }) => {
                     await dispatch(loadClientCountFromDb());
                     await dispatch(loadBusinessDetail());
                     await dispatch(getExpenseCategoryId());
-                    await dispatch(getExpenseSubCategoryId())
                     // dispatch(loadCartFromDB());
                     // dispatch(loadBookingDetailsFromDb());
                 }

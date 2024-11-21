@@ -29,6 +29,7 @@ export default async function addExpensesAPI(data, id, subId) {
 
     const api = process.env.EXPO_PUBLIC_API_URI + "/expense/addExpense";
     let response;
+    console.log(subId)
     try {
         response = await axios.post(api,
             {
@@ -46,6 +47,9 @@ export default async function addExpensesAPI(data, id, subId) {
                     'Authorization': `Bearer ${authToken}`
                 }
             })
+
+
+
     } catch (e) {
         return false
     }
