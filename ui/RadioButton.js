@@ -41,13 +41,10 @@ const styles = StyleSheet.create({
     },
 });
 
-const RadioButton = ({ options, value, onValueChange, onPress }) => {
+const RadioButton = ({ options, value, onPress }) => {
     const handlePress = (newValue) => {
         if (onPress) {
             onPress(newValue); // Call onPress regardless of selection change
-        }
-        if (value !== newValue) {
-            onValueChange(newValue); // Update value only if it changes
         }
     };
 

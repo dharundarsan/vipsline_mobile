@@ -1,7 +1,7 @@
-import { Modal, Text, View, StyleSheet, ScrollView, Platform, Linking } from "react-native";
+import {Modal, Text, View, StyleSheet, ScrollView, Platform, Linking} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
+import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
@@ -14,13 +14,18 @@ import ClientDetails from "./ClientDetails";
 import MoreOptionDropDownModal from "./MoreOptionDropDownModal";
 import UpdateClientModal from "./UpdateClientModal";
 import DeleteClient from "./DeleteClientModal";
-import { useDispatch, useSelector } from "react-redux";
-import { checkNullUndefined, dateFormatter } from "../../util/Helpers";
-import { clearClientInfo, loadClientInfoFromDb } from "../../store/clientInfoSlice";
-import { loadClientFiltersFromDb, loadSearchClientFiltersFromDb } from "../../store/clientFilterSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
+import {clearClientInfo, loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
-import { loadClientsFromDb } from "../../store/clientSlice";
+import {loadClientsFromDb} from "../../store/clientSlice";
 import Toast from "../../ui/Toast";
+import BillingActivity from "./BillingActivity";
+import Appointments from "./Appointments";
+import {MembershipDetails} from "./MembershipDetails";
+import {PackageDetails} from "./PackageDetails";
+import {PrepaidDetails} from "./PrepaidDetails";
 import ClientRewardPoints from "./ClientRewardPoints";
 
 /**
@@ -44,25 +49,28 @@ import ClientRewardPoints from "./ClientRewardPoints";
 
 
 const getCategoryTitle =
-{
-    "clientDetails": "Client details",
-    "billActivity": "Bill activity",
-    "appointments": "Appointments",
-    "memberships": "Memberships",
-    "packageSales": "Package sales",
-    "prepaidSales": "Prepaid sales",
-    "review": "Review",
-    "giftVoucher": "Gift Voucher",
-    "seeMoreStats": "Statistics"
-}
+    {
+        "clientDetails": "Client details",
+        "billActivity": "Bill activity",
+        "appointments": "Appointments",
+        "memberships": "Memberships",
+        "packageSales": "Package sales",
+        "prepaidSales": "Prepaid sales",
+        "review": "Review",
+        "giftVoucher": "Gift Voucher",
+        "seeMoreStats": "Statistics"
+    }
 
 
 export default function clientInfoModal(props) {
 
     const dispatch = useDispatch();
 
-    const analyticDetails = useSelector(state => state.clientInfo.analyticDetails);
-    const details = useSelector(state => state.clientInfo.details);
+    const analyticDetails = useSelector(state => state.clientInfo.analyticDetails || {});
+    const details = useSelector(state => state.clientInfo.details)|| {};
+    const salesData = useSelector(state => state.clientInfo.analyticDetails || {});
+    const membershipData = useSelector(state => state.clientInfo.membershipList || {});
+    const packageData = useSelector(state => state.clientInfo.packageList || {});
 
 
     const [totalSales, setTotalSales] = useState("");
@@ -81,7 +89,7 @@ export default function clientInfoModal(props) {
     useEffect(() => {
         setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
         setLastVisit(
-            analyticDetails.history_appointmentList !== undefined ?
+            analyticDetails.history_appointmentList !== undefined && analyticDetails.history_appointmentList.length !== undefined ?
                 analyticDetails.history_appointmentList.length !== 0 ?
                     dateFormatter(analyticDetails.history_appointmentList[0].appointment_date, 'short') :
                     "" : "");
@@ -117,8 +125,7 @@ export default function clientInfoModal(props) {
             // props.setVisible(false);
             props.editClientOption("edit");
             setEditClientModalVisibility(true);
-        }
-        else if (props.selectedOption === "deleteClient") {
+        } else if (props.selectedOption === "deleteClient") {
             setDeleteClientModalVisibility(true);
             props.setSelectedOption("");
             props.setModalVisibility(false);
@@ -130,25 +137,31 @@ export default function clientInfoModal(props) {
     function clientInfoCategoryPressHandler(id) {
         setClientMoreDetails(id);
     }
+
     function seeMoreStatisticsHandler() {
         setClientMoreDetails("seeMoreStats");
     }
+
     let content;
 
     if (clientMoreDetails === null) {
         content = <ScrollView style={{flex: 1, width: '100%'}} showsVerticalScrollIndicator={false}>
-            <MoreOptionDropDownModal
-                isVisible={props.modalVisibility}
-                onCloseModal={() => props.setModalVisibility(false)}
-                dropdownItems={[
-                    "Edit client",
-                    "Delete client",
-                ]}
-                setOption={props.setSelectedOption}
+            {
+                props.modalVisibility &&
+                <MoreOptionDropDownModal
+                    isVisible={props.modalVisibility}
+                    onCloseModal={() => props.setModalVisibility(false)}
+                    dropdownItems={[
+                        "Edit client",
+                        "Delete client",
+                    ]}
+                    setOption={props.setSelectedOption}
 
-            />
+                />
 
-            { editClientModalVisibility && <UpdateClientModal
+            }
+
+            {editClientModalVisibility && <UpdateClientModal
                 isVisible={editClientModalVisibility}
                 onCloseModal={() => {
                     dispatch(loadClientInfoFromDb(props.id))
@@ -186,7 +199,7 @@ export default function clientInfoModal(props) {
             />
             <View style={styles.modalContent}>
                 <ClientCard
-                    clientDetailsContainer={{width:"auto"}}
+                    clientDetailsContainer={{width: "auto"}}
                     name={details.name}
                     phone={details.mobile_1}
                     card={styles.clientDetailsContainer}
@@ -201,26 +214,27 @@ export default function clientInfoModal(props) {
                         onPress={() => {
                             props.setModalVisibility(true);
                         }}
-                        pressableStyle={[styles.pressable, { paddingHorizontal: 12 }]}
+                        pressableStyle={[styles.pressable, {paddingHorizontal: 12}]}
                     >
-                        <SimpleLineIcons name="options" size={24} color="black" />
+                        <SimpleLineIcons name="options" size={24} color="black"/>
                     </PrimaryButton>
                     <PrimaryButton buttonStyle={styles.callButton}
-                        onPress={() => {
-                            if (checkNullUndefined(details.mobile_1)) {
-                                Linking.openURL(`tel:${details.mobile_1}`)
-                            }
-                        }
-                        }
-                        pressableStyle={[styles.pressable, styles.pressableStyle]}>
-                        <View style={{ flexDirection: "row" }}>
-                            <Feather name="phone" size={18} color="black" />
-                            <Text style={[textTheme.bodyMedium, { marginLeft: 8 }]}>Call</Text>
+                                   onPress={() => {
+                                       if (checkNullUndefined(details.mobile_1)) {
+                                           Linking.openURL(`tel:${details.mobile_1}`)
+                                       }
+                                   }
+                                   }
+                                   pressableStyle={[styles.pressable, styles.pressableStyle]}>
+                        <View style={{flexDirection: "row"}}>
+                            <Feather name="phone" size={18} color="black"/>
+                            <Text style={[textTheme.bodyMedium, {marginLeft: 8}]}>Call</Text>
                         </View>
 
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>
-                        <Text style={[textTheme.bodyMedium, { color: Colors.white }]}>
+                    <PrimaryButton buttonStyle={styles.bookButton}
+                                   pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>
+                        <Text style={[textTheme.bodyMedium, {color: Colors.white}]}>
                             Book now
                         </Text>
                     </PrimaryButton>
@@ -236,13 +250,15 @@ export default function clientInfoModal(props) {
                 <View style={styles.clientInfoCategoryContainer}>
                     <ClientInfoCategories
                         onPress={clientInfoCategoryPressHandler}
+                        membershipCount={checkNullUndefined(membershipData.length) ? membershipData.length : 0}
+                        packageCount={checkNullUndefined(packageData.length) ? packageData.length : 0}
+                        prepaidCount={details.wallet_status ? 1 : 0}
                     />
                 </View>
             </View>
         </ScrollView>
 
-    }
-    else if (clientMoreDetails === "seeMoreStats") {
+    } else if (clientMoreDetails === "seeMoreStats") {
         content =
             <ClientStatistics
                 title={getCategoryTitle[clientMoreDetails]}
@@ -254,26 +270,57 @@ export default function clientInfoModal(props) {
                 noShows={noShows}
                 totalVisits={totalVisits}
             />
-    }
-    else if (clientMoreDetails === "clientDetails") {
+    } else if (clientMoreDetails === "clientDetails") {
         content =
             <ClientDetails
                 title={getCategoryTitle[clientMoreDetails]}
                 details={details}
 
             />
-    } else if(clientMoreDetails === "rewardpoints"){
-        content = 
-            <ClientRewardPoints/>
-    }
-    else {
-        content = <View style={{flex:1, justifyContent:"center", alignItems:"center"}}><Text style={textTheme.titleMedium}>Coming Soon</Text></View>
-    }
+    } else if (clientMoreDetails === "billActivity") {
+        content = <BillingActivity
+            salesData={salesData}
+            clientid={details.id}
+        />
+    } else if (clientMoreDetails === "appointments") {
+        content = <Appointments
+            salesData={salesData}
+            clientid={details.id}
+        />
+    } else if (clientMoreDetails === "memberships") {
+        content = checkNullUndefined(membershipData) && checkNullUndefined(membershipData.length) && membershipData.length > 0 ?
+            <MembershipDetails
+                membershipData={membershipData}
+            /> :
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
+                membership for this client</Text></View>
+    } else if (clientMoreDetails === "packageSales") {
+        content = checkNullUndefined(packageData) && checkNullUndefined(packageData.length) && packageData.length > 0 ?
+            <PackageDetails
+                pacakgeData={packageData}
+            /> :
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
+                package for this client</Text></View>
+    } else if (clientMoreDetails === "prepaidSales") {
+        content = checkNullUndefined(details) && checkNullUndefined(details.wallet_status) && details.wallet_status ?
+            <PrepaidDetails
+                details={details}/> :
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
+                Prepaid for this client</Text></View>
 
+    } else if (clientMoreDetails === "rewardpoints") {
+        content =
+            <ClientRewardPoints details={details} />
+    } else {
+        content =
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming
+                Soons</Text></View>
+    }
 
 
     return (
-        <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet" onRequestClose={props.onClose} >
+        <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet"
+               onRequestClose={props.onClose}>
             <Toast ref={toastRef}/>
 
 
@@ -287,7 +334,7 @@ export default function clientInfoModal(props) {
                                 setClientMoreDetails(null);
                             }}
                         >
-                            <AntDesign name="arrowleft" size={24} color="black" />
+                            <AntDesign name="arrowleft" size={24} color="black"/>
                         </PrimaryButton>
                 }
 
@@ -299,7 +346,7 @@ export default function clientInfoModal(props) {
                         setClientMoreDetails(null);
                     }}
                 >
-                    <Ionicons name="close" size={25} color="black" />
+                    <Ionicons name="close" size={25} color="black"/>
                 </PrimaryButton>
                 {
                     clientMoreDetails === null ?
@@ -319,7 +366,7 @@ export default function clientInfoModal(props) {
                 clientMoreDetails === null ?
                     null :
                     <>
-                        <Divider />
+                        <Divider/>
                     </>
             }
             {/*{*/}
@@ -329,32 +376,34 @@ export default function clientInfoModal(props) {
             <View style={{flex: 1, paddingHorizontal: 15, alignItems: 'center', width: '100%'}}>
 
 
-            {
-                Object.keys(details).length === 0 ?
-                <View style={{alignItems: 'center', width: "100%",}}>
-
                 {
-                    <View style={{height: '100%', width: '95%', alignItems: 'center',}}>
-                        <ContentLoader
-                            row={[1, 3, 1, 1, 1, 1, 1, 1, 1, 1]}
-                            size={[
-                                [{width: '35%'}],
-                                [{width: '30%'}, {width: '30%'}, {width: '30%'}],
-                                [{height: 160, marginTop: 50}],
-                                [null],
-                                [{marginTop: 0}],
-                                [{marginTop: 0}],
-                                [{marginTop: 0}],
-                                [{marginTop: 0}],
-                                [{marginTop: 0}],
-                                [{marginTop: 0}],
-                            ]
+                    // checkNullUndefined(details.length) &&
+                    details === undefined || analyticDetails === undefined || membershipData === undefined || packageData === undefined ||
+                    Object.keys(details).length === 0 ?
+                        <View style={{alignItems: 'center', width: "100%",}}>
+
+                            {
+                                <View style={{height: '100%', width: '95%', alignItems: 'center',}}>
+                                    <ContentLoader
+                                        row={[1, 3, 1, 1, 1, 1, 1, 1, 1, 1]}
+                                        size={[
+                                            [{width: '35%'}],
+                                            [{width: '30%'}, {width: '30%'}, {width: '30%'}],
+                                            [{height: 160, marginTop: 50}],
+                                            [null],
+                                            [{marginTop: 0}],
+                                            [{marginTop: 0}],
+                                            [{marginTop: 0}],
+                                            [{marginTop: 0}],
+                                            [{marginTop: 0}],
+                                            [{marginTop: 0}],
+                                        ]
+                                        }
+                                    />
+                                </View>
                             }
-                        />
-                    </View>
+                        </View> : content
                 }
-            </View> : content
-            }
             </View>
 
         </Modal>
@@ -446,8 +495,8 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
     },
     clientProfileCard: {
-        width:"70%",
-        justifyContent:"center",
+        width: "70%",
+        justifyContent: "center",
         paddingVertical: 0,
         paddingHorizontal: 0,
     },

@@ -79,6 +79,9 @@ import { DataProvider, useDataContext } from './context/DataFlowContext';
 import { formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonthYYYYMMMDD } from './util/Helpers';
 import { loadResourceIdByUserInfo, loadRevenueByGender, loadRevenueByPrepaid, loadRevenueCountByGender, loadSalesDashboard, loadStaffDashboardReport, loadTopRevenueProducts, loadTopRevenueServices } from './store/dashboardSlice';
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
+import AppointmentsScreen from "./screens/AppointmentsScreen";
+import LeadManagementScreen from "./screens/LeadManagementScreen";
+import Expenses from "./screens/Expenses";
 
 enableScreens();
 
@@ -315,7 +318,7 @@ const BackButton = () => {
                 }
                 navigation.navigate("DashboardScreen")
             // }, 50);
-        }} 
+        }}
         style={{ paddingLeft: 10 }}>
         <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
         </TouchableOpacity>
@@ -335,7 +338,7 @@ const MainDrawerNavigator = (props) => {
             headerShown: !isDashboardPage,
             // headerTitleAlign: 'center',
             // headerShown:false,
-            // animation:"ios"
+            animation:"ios"
           })}
         >
             <Stack.Screen name='DashboardScreen'
@@ -518,15 +521,15 @@ const MainDrawerNavigator = (props) => {
                                         style={{ resizeMode: "contain" }} />
                                 })}
                             />
-                            {/* <Drawer.Screen
-                                name="Appointments"
-                                component={CheckoutStack}
-                                options={{
-                                    drawerIcon: () => <Image
-                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
-                                        style={{ resizeMode: "contain" }} />
-                                }} 
-                            />  */}
+                            {/*<Drawer.Screen*/}
+                            {/*    name="Appointments"*/}
+                            {/*    component={AppointmentsScreen}*/}
+                            {/*    options={{*/}
+                            {/*        drawerIcon: () => <Image*/}
+                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
+                            {/*            style={{ resizeMode: "contain" }} />*/}
+                            {/*    }}*/}
+                            {/*/>*/}
                             <Drawer.Screen
                                 name="Checkout"
                                 component={CheckoutStack}
@@ -560,6 +563,17 @@ const MainDrawerNavigator = (props) => {
                                     headerTitleAlign: 'center',
                                 }}
                             />
+                            <Drawer.Screen name="Lead Management"
+                                           component={LeadManagementScreen}
+                                           options={{
+                                               drawerIcon: () => <Image
+                                                   source={{uri: Image.resolveAssetSource(marketing_icon).uri}}
+                                                   width={25}
+                                                   height={25}
+                                                   style={{resizeMode: "contain"}}/>,
+                                               headerTitle: 'Lead Management',
+                                               headerTitleAlign: 'center',
+                                           }}/>
                             {/*<Drawer.Screen name="Marketing" component={CheckoutStack} options={{*/}
                             {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}*/}
                             {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
@@ -614,9 +628,19 @@ const MainDrawerNavigator = (props) => {
                                                headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
                                                drawerIcon: () => <Image
                                                    source={{uri: Image.resolveAssetSource(logout_icon).uri}}
-                                                   width={25} height={25}
+                                                   width={25}
+                                                   height={25}
                                                    style={{resizeMode: "contain", tintColor: Colors.white}}/>
-                                           }}/>
+                            }}/>
+                            <Drawer.Screen name="Expenses" component={Expenses}
+                                           options={{
+                                               headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
+                                               drawerIcon: () => <Image
+                                                   source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
+                                                   width={25}
+                                                   height={25}
+                                                   style={{ resizeMode: "contain", tintColor: Colors.white }} />
+                            }} />
                         </Drawer.Navigator>
                         : <Drawer.Navigator initialRouteName="List Of Business"
                                             drawerContent={(props) => <CustomDrawer {...props} />}

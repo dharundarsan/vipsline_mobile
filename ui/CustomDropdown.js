@@ -1,39 +1,47 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import CustomCheckbox from './CustomCheckbox';
 import Divider from "./Divider";
 import { MaterialIcons } from "@expo/vector-icons";
 import textTheme from "../constants/TextTheme";
+import {useSelector} from "react-redux";
+import {checkNullUndefined} from "../util/Helpers";
+
 
 const CustomDropdown = (props) => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [selectedOptions, setSelectedOptions] = useState([]);
     const [dropdownWidth, setDropdownWidth] = useState(0); // Store dropdown width
     const dropdownButtonRef = useRef(); // Reference to the dropdown button
+
+
+
+
 
     const toggleDropdown = () => {
         setDropdownVisible(!dropdownVisible);
     };
 
     const toggleOption = (option) => {
-        if (selectedOptions.includes(option)) {
+        if (props.selectedOptions.includes(option)) {
             // Uncheck the option
-            const newSelectedOptions = selectedOptions.filter(opt => opt !== option);
-            setSelectedOptions(newSelectedOptions);
-            props.selectedOptions(newSelectedOptions);
+            const newSelectedOptions = props.selectedOptions.filter(opt => opt !== option);
+            props.setSelectedOptions(newSelectedOptions);
         } else {
             // Check the option
-            const newSelectedOptions = [...selectedOptions, option];
-            setSelectedOptions(newSelectedOptions);
-            props.selectedOptions(newSelectedOptions);
+            const newSelectedOptions = [...props.selectedOptions, option];
+            props.setSelectedOptions(newSelectedOptions);
         }
     };
+
+
 
     // Measure the dropdown button's width when it's rendered
     const onDropdownButtonLayout = (event) => {
         const { width } = event.nativeEvent.layout;
         setDropdownWidth(width); // Set dropdown container's width to match the button's width
     };
+
+
 
     return (
         <View style={[styles.container, props.container]}>
@@ -58,7 +66,7 @@ const CustomDropdown = (props) => {
                                 onPress={() => toggleOption(item)}
                             >
                                 <CustomCheckbox
-                                    isChecked={selectedOptions.includes(item)}
+                                    isChecked={props.selectedOptions.includes(item)}
                                     onPress={() => toggleOption(item)}
                                     borderColor={props.borderColor}
                                     highlightColor={props.highlightColor}

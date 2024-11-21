@@ -1,7 +1,8 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
 import * as SecureStore from 'expo-secure-store';
+import {formatDate} from "../util/Helpers";
 
 const initial = {
     clients: [],
@@ -16,7 +17,15 @@ const initial = {
     isFetchingSearchClient: false,
     totalSearchClients: 0,
 
-    appliedFilters: []
+    appliedFilters: {
+        fromDate: "",
+        toDate: "",
+        filter1: undefined,
+        filter2: undefined,
+        filter3:undefined,
+        filter4:undefined,
+        filter5: undefined,
+    },
 
 }
 
@@ -29,7 +38,7 @@ async function getBusinessId() {
             return value;
         }
     } catch (e) {
-            }
+    }
 }
 
 
@@ -45,7 +54,7 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
         console.log("auth token fetching error. (inside loadClientFilterFromDb)" + e);
     }
 
-    const { clientFilter } = getState();
+    const {clientFilter} = getState();
     if (clientFilter.isFetching) return;
 
     try {
@@ -54,11 +63,16 @@ export const loadClientFiltersFromDb = (pageSize, filter) => async (dispatch, ge
             `${process.env.EXPO_PUBLIC_API_URI}/client/getClientReportBySegmentForBusiness?pageNo=${clientFilter.pageNo}&pageSize=${pageSize}`,
             {
                 business_id: `${await getBusinessId()}`,
-                fromDate: "",
+                fromDate: clientFilter.appliedFilters.fromDate,
                 sortItem: "name",
                 sortOrder: "asc",
-                toDate: "",
+                toDate: clientFilter.appliedFilters.toDate,
                 type: filter,
+                filter1: clientFilter.appliedFilters.filter1,
+                filter2: clientFilter.appliedFilters.filter2,
+                filter3: clientFilter.appliedFilters.filter3,
+                filter4: clientFilter.appliedFilters.filter4,
+                filter5: clientFilter.appliedFilters.filter5,
             },
             {
                 headers: {
@@ -87,7 +101,7 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
         console.log("auth token fetching error. (inside clientFilterSlice loadSearchClientFilterFromDb)" + e);
     }
 
-    const { clientFilter } = getState();
+    const {clientFilter} = getState();
     if (clientFilter.isFetchingSearchClient) return;
 
     try {
@@ -117,8 +131,6 @@ export const loadSearchClientFiltersFromDb = (pageSize, filter, query) => async 
 }
 
 
-
-
 export const clientFilterSlice = createSlice({
     name: "clientFilter",
     initialState: initial,
@@ -133,15 +145,14 @@ export const clientFilterSlice = createSlice({
         updateFetchingState(state, action) {
             state.isFetching = action.payload;
         },
-        incrementPageNumber(state, action)  {
+        incrementPageNumber(state, action) {
             state.pageNo++;
         },
-        decrementPageNumber(state, action)  {
+        decrementPageNumber(state, action) {
             const page_no = state.pageNo - 1;
-            if(page_no < 0) {
+            if (page_no < 0) {
                 state.pageNo = 0;
-            }
-            else {
+            } else {
                 state.pageNo--;
             }
         },
@@ -164,12 +175,11 @@ export const clientFilterSlice = createSlice({
         incrementSearchClientPageNumber(state, action) {
             state.searchPageNo++;
         },
-        decrementSearchPageNumber(state, action)  {
+        decrementSearchPageNumber(state, action) {
             const page_no = state.searchPageNo - 1;
-            if(page_no < 0) {
+            if (page_no < 0) {
                 state.searchPageNo = 0;
-            }
-            else {
+            } else {
                 state.searchPageNo--;
             }
         },
@@ -182,7 +192,16 @@ export const clientFilterSlice = createSlice({
         resetMaxEntry(state, action) {
             state.maxEntry = 10;
             state.searchClientMaxEntry = 10;
+        },
+        updateAppliedFilters(state, action) {
+
+            state.appliedFilters = action.payload;
+        },
+        clearAppliedFilters(state, action) {
+
+            state.appliedFilters = initial.appliedFilters;
         }
+
 
     }
 });
@@ -193,7 +212,7 @@ export const {
     decrementPageNumber,
     incrementPageNumber,
     updateMaxEntry,
-    resetClientFilter ,
+    resetClientFilter,
     updateSearchClientFetchingState,
     updateSearchClientList,
     resetSearchClientFilter,
@@ -204,6 +223,8 @@ export const {
     updateSearchClientMaxEntry,
     updateAnalyticDetails,
     resetMaxEntry,
+    updateAppliedFilters,
+    clearAppliedFilters
 } = clientFilterSlice.actions;
 
 export default clientFilterSlice.reducer;

@@ -45,6 +45,9 @@ const Colors = {
     teal:'#4DB6AC',
     totalClients: "#b5dabf",
     transparent: "rgba(255,255,255,0)",
-    white: "#FFFFFF"
+    white: "#FFFFFF",
+    booked: "#96d4d7",
+    confirmed: "#d5c6f5",
+    inService: "#fac5dc"
 };
 export default Colors;

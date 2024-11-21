@@ -15,7 +15,6 @@ import ItemCount from "../../ui/ItemCount";
  * optional dividers and message counts.
  *
  * Props:
- * @param {Function} onPress - Function to be called when a category is pressed.
  *
  * State:
  * None
@@ -38,9 +37,11 @@ import ItemCount from "../../ui/ItemCount";
  * ```jsx
  * <ClientInfoCategories onPress={(id) => console.log(id)} />
  * ```
+ * @param props
  */
 
 
+export default function ClientInfoCategories(props) {
 
 
 const modalClientDetails = [
@@ -55,8 +56,6 @@ const modalClientDetails = [
     {id: "giftVoucher", title: "Gift Voucher", divider: true, msg: true, count: 0, thickness: 1},
 ];
 
-
-export default function ClientInfoCategories(props) {
     function renderItem(itemData) {
         return (
             <>

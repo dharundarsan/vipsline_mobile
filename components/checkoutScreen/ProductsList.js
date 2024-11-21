@@ -68,10 +68,10 @@ const ProductsList = (props) => {
     return (
         <View style={styles.commonSelectTemplate}>
             <View style={styles.headingAndSearchContainer}>
+                            <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
                 {
                     checkNullUndefined(productsData[0]) ?
                         <>
-                            <Text style={[textTheme.titleMedium, styles.headingText]}>Select Products</Text>
                             <SearchBar filter={false}
                                 onPressFilter={() => {
                                 }}
@@ -128,7 +128,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headingAndSearchContainer: {
-        padding: 15,
+        marginTop:15,
+        marginHorizontal:15,
     },
     headingText: {
         marginBottom: 10

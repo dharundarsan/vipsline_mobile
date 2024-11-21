@@ -1,9 +1,12 @@
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Colors from "../../constants/Colors";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateMaxEntry, updateSearchClientMaxEntry } from "../../store/clientFilterSlice";
-import RadioButton from "./../../ui/RadioButton";
+import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import Colors from "../../constants/Colors"
+// import {RadioButton} from "react-native-paper";
+import {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {updateMaxEntry, updateSearchClientMaxEntry} from "../../store/clientFilterSlice";
+import RadioButton from "./../../ui/RadioButton"
+import {updateSalesMaxEntry} from "../../store/clientInfoSlice";
+
 
 const modalHeight = 220;
 
@@ -56,6 +59,7 @@ export default function EntryModel(props) {
                                 props.setIsModalVisible(false);
                                 dispatch(updateMaxEntry(value));
                                 dispatch(updateSearchClientMaxEntry(value));
+                                dispatch(updateSalesMaxEntry(value))
                             }}
                         />
                     </View>
