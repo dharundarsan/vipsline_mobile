@@ -1,11 +1,9 @@
 import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import Colors from "../../constants/Colors"
-// import {RadioButton} from "react-native-paper";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {updateMaxEntry, updateSearchClientMaxEntry} from "../../store/clientFilterSlice";
 import RadioButton from "./../../ui/RadioButton"
-import {updateSalesMaxEntry} from "../../store/clientInfoSlice";
+import {updateMaxEntry} from "../../store/ExpensesSlice";
 
 
 /**
@@ -23,16 +21,16 @@ import {updateSalesMaxEntry} from "../../store/clientInfoSlice";
 
 const modalHeight = 180;
 
-export default function EntryModel(props) {
+export default function EntryModal(props) {
 
     const dispatch = useDispatch();
 
     const [checkedNumber, setCheckedNumber] = useState(10);
 
-    const normalMaxEntry = useSelector(state => state.clientFilter.maxEntry);
-    const searchMaxEntry = useSelector(state => state.clientFilter.searchMaxEntry);
+    const normalMaxEntry = useSelector(state => state.expenses.maxEntry);
+    const searchMaxEntry = useSelector(state => state.expenses.searchMaxEntry);
 
-    const [selectedOption, setSelectedOption] = useState(null);
+    const maxEntry = useSelector(state => state.expenses.maxEntry);
 
     const options = [
         {label: '10', value: 10},
@@ -41,13 +39,8 @@ export default function EntryModel(props) {
         {label: '100', value: 100},
     ];
 
-    // useEffect(() => {
-    //     console.log(selectedOption);
-    // }, [selectedOption]);
+    console.log(checkedNumber)
 
-    useEffect(() => {
-        setCheckedNumber(10);
-    }, [props.filterPressed]);
 
     useEffect(() => {
         if (props.query === "") {
@@ -63,6 +56,8 @@ export default function EntryModel(props) {
             visible={props.isModalVisible}
             animationType="fade"
             transparent={true}
+            presentationStyle={"formSheet"}
+            onRequestClose={props.setIsModalVisible(false)}
         >
             <TouchableOpacity activeOpacity={1}
                               style={{flex: 1, justifyContent: "center", backgroundColor: Colors.dim}}
@@ -79,8 +74,6 @@ export default function EntryModel(props) {
                                 setCheckedNumber(value)
                                 props.setIsModalVisible(false);
                                 dispatch(updateMaxEntry(value));
-                                dispatch(updateSearchClientMaxEntry(value));
-                                dispatch(updateSalesMaxEntry(value))
                             }}
                         />
                     </View>

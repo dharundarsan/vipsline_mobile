@@ -152,7 +152,7 @@ const AddClientModal = (props) => {
 
                                         props.closeModal();
                                         dispatch(loadClientInfoFromDb(item.id));
-                                        dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                        dispatch(loadAnalyticsClientDetailsFromDb(item.id));
                                         dispatch(updateClientId(item.id))
                                     }}
                                 />
@@ -178,7 +178,7 @@ const AddClientModal = (props) => {
                                     onPress={(clientId) => {
                                         props.closeModal();
                                         dispatch(loadClientInfoFromDb(item.id));
-                                        dispatch(loadAnalyticsClientDetailsFromDb(10, 0, item.id));
+                                        dispatch(loadAnalyticsClientDetailsFromDb(item.id));
                                         props.setSearchClientQuery("");
                                         dispatch(updateClientId(item.id))
                                     }}

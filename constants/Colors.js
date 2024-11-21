@@ -41,6 +41,9 @@ const Colors = {
     ripple: "rgba(0, 0, 0, 0.1)",
     totalClients: "#b5dabf",
     transparent: "rgba(255,255,255,0)",
-    white: "#FFFFFF"
+    white: "#FFFFFF",
+    booked: "#96d4d7",
+    confirmed: "#d5c6f5",
+    inService: "#fac5dc"
 };
 export default Colors;

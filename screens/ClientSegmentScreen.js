@@ -21,13 +21,18 @@ import {
     loadClientInfoFromDb,
     updateClientId
 } from "../store/clientInfoSlice";
-import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb, resetClientFilter} from "../store/clientFilterSlice";
+import {
+    loadClientFiltersFromDb,
+    loadSearchClientFiltersFromDb,
+    resetClientFilter,
+    updateAppliedFilters
+} from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
 import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
 import {clientFilterAPI} from "../util/apis/clientFilterAPI";
 import axios from "axios";
-import { checkNullUndefined } from "../util/Helpers";
+import {checkNullUndefined, convertAppliedFilters} from "../util/Helpers";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientModal";
 import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
@@ -98,9 +103,18 @@ export default function ClientSegmentScreen(props) {
 
     const [selectedFilters, setSelectedFilters] = useState([]);
 
+    const appliedFilterStore = useSelector(state => state.clientFilter.appliedFilters);
+
     const handleSelectionChange = (updatedFilters) => {
+
         setSelectedFilters(updatedFilters);
+
+        dispatch(updateAppliedFilters(convertAppliedFilters(appliedFilterStore.fromDate, appliedFilterStore.toDate, updatedFilters)));
     };
+
+    // useEffect(() => {
+    //     dispatch(updateAppliedFilters(convertAppliedFilters(appliedFilterStore.fromDate, appliedFilterStore.toDate, selectedFilters)));
+    // }, [selectedFilters]);
 
     const { getLocation,currentLocation } = useLocationContext();
     useFocusEffect(useCallback( ()=>{
@@ -115,8 +129,9 @@ export default function ClientSegmentScreen(props) {
     },[]))
 
     useEffect(() => {
-        setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
-    }, [allClientCountHelper]);
+        // setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
+        // setClientCount(currentFilterClientCount);
+    }, [filterPressed]);
 
 
     useFocusEffect(
@@ -128,13 +143,14 @@ export default function ClientSegmentScreen(props) {
 
     useEffect(() => {
         const clientCount = chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount);
-        setClientCount(clientCount);
+        // setClientCount(clientCount);
+        // setClientCount(currentFilterClientCount)
         setSearchQuery("");
 
         async function func() {
             setIsLoading(true)
             await dispatch(loadClientCountFromDb());
-            if (clientCount <= 10) {
+            if (currentFilterClientCount <= 10) {
                 await dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
             }
             setTimeout(() => {
@@ -147,12 +163,11 @@ export default function ClientSegmentScreen(props) {
 
     }, [filterPressed]);
 
+
     // useEffect(() => {
     //     // dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
     //     // setTimeout(() => {
     //         if(clientCount !== currentFilterClientCount) {
-    //             console.log(clientCount);
-    //             console.log(currentFilterClientCount);
     //             dispatch(loadClientFiltersFromDb(10, clientFilterNames(filterPressed)));
     //         }
     //     // }, 1000)
@@ -206,13 +221,14 @@ export default function ClientSegmentScreen(props) {
                 name={itemData.item.name}
                 phone={itemData.item.mobile}
                 email={itemData.item.email}
-                onPress={() => {
-                    if (searchQuery === "") {
-                        dispatch(loadAnalyticsClientDetailsFromDb(maxEntry, pageNo, itemData.item.id));
-                    } else {
-                        dispatch(loadAnalyticsClientDetailsFromDb(searchMaxEntry, searchPageNo, itemData.item.id));
-                    }
-                    dispatch(updateClientId(itemData.item.id === undefined ? "" : itemData.item.id));
+                onPress={async () => {
+                    // if (searchQuery === "") {
+                    //     dispatch(loadAnalyticsClientDetailsFromDb(itemData.item.id));
+                    // } else {
+                    //     dispatch(loadAnalyticsClientDetailsFromDb(itemData.item.id));
+                    // }
+                    dispatch(loadAnalyticsClientDetailsFromDb(itemData.item.id));
+                    dispatch(updateClientId(itemData.item.id));
                     setClientId(itemData.item.id);
                     dispatch(loadClientInfoFromDb(itemData.item.id));
                     clientInfoHandler();
@@ -249,6 +265,8 @@ export default function ClientSegmentScreen(props) {
     function clientSegmentToast(message, duration) {
         toastRef.current.show(message, duration);
     }
+
+
 
     return (
         <ScrollView style={styles.scrollView}>
@@ -334,9 +352,10 @@ export default function ClientSegmentScreen(props) {
                     <AdvancedFilters
                         isVisible={advancedFilterVisibility}
                         onClose={() => setAdvancedFiltersVisibility(false)}
-                        selectedOptions={(options) => {
-                            setSelectedFilters(options);
-                        }}
+                        selectedOptions={setSelectedFilters}
+                        filterPressed={filterPressed}
+                        setVisibility={setAdvancedFiltersVisibility}
+
                     />
                 }
 
@@ -382,7 +401,7 @@ export default function ClientSegmentScreen(props) {
 
                     <PrimaryButton
                         buttonStyle={styles.filterButton}
-                        onPress={() => null}
+                        onPress={() => setAdvancedFiltersVisibility(true)}
                     >
                         <SimpleLineIcons
                             name="equalizer"
@@ -397,6 +416,7 @@ export default function ClientSegmentScreen(props) {
                 <CustomTagFilter
                     options={selectedFilters}
                     onSelectionChange={handleSelectionChange}
+                    filter={clientFilterNames(filterPressed)}
                 />
 
                 <View style={styles.clientCount}>
@@ -404,7 +424,7 @@ export default function ClientSegmentScreen(props) {
                     <Text style={[textTheme.bodyMedium, styles.clientCountText]}>
                         Client count : {
                         searchQuery === "" ?
-                            clientCount :
+                            currentFilterClientCount :
                             searchClientTotalCount
                     }
                     </Text>
@@ -416,7 +436,7 @@ export default function ClientSegmentScreen(props) {
                     searchQuery === "" ?
                         <>
                             {
-                                clientCount === 0 ?
+                                currentFilterClientCount === 0 ?
                                     <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
                                         <Text style={[textTheme.titleSmall]}>
                                             No clients to display
@@ -445,11 +465,11 @@ export default function ClientSegmentScreen(props) {
                                 }
 
                                 {
-                                    clientCount > 10 ?
+                                    currentFilterClientCount > 10 ?
                                         <Pagination
                                             filterPressed={filterPressed}
                                             setIsModalVisible={setIsModalVisible}
-                                            totalCount={clientCount}
+                                            totalCount={currentFilterClientCount}
                                         /> : null
                                 }
                             </> :
