@@ -49,9 +49,9 @@ const modalClientDetails = [
     {id: "billActivity", title: "Bill activity", divider: true, msg: false, thickness: 1},
     {id: "rewardpoints", title: "Reward Points", divider: true, msg: false, thickness: 1},
     {id: "appointments", title: "Appointments", divider: true, msg: false, thickness: 1},
-    {id: "memberships", title: "Memberships", divider: true, msg: true, count: 0, thickness: 1},
-    {id: "packageSales", title: "Package sales", divider: true, msg: true, count: 0, thickness: 1},
-    {id: "prepaidSales", title: "Prepaid sales", divider: true, msg: true, count: 0, thickness: 1},
+    {id: "memberships", title: "Memberships", divider: true, msg: true, count: props.membershipCount, thickness: 1},
+    {id: "packageSales", title: "Package sales", divider: true, msg: true, count: props.packageCount, thickness: 1},
+    {id: "prepaidSales", title: "Prepaid sales", divider: true, msg: true, count: props.prepaidCount, thickness: 1},
     {id: "review", title: "Review", divider: true, msg: true, count: 0, thickness: 1},
     {id: "giftVoucher", title: "Gift Voucher", divider: true, msg: true, count: 0, thickness: 1},
 ];

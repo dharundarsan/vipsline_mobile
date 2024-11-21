@@ -35,12 +35,6 @@ export default function RecordExpenses(props) {
         return new Date(year, months.indexOf(month), day);
     }
 
-
-
-
-
-
-
     const [expenseData, setExpenseData] = useState({
         expenseDate: props.type === "add" ? null : parseDate((currentExpense.date.split(",")[0])),
         expenseAmountType: props.type === "add" ? "" : currentExpense.expense_category,
@@ -56,6 +50,7 @@ export default function RecordExpenses(props) {
             await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
         }
         f()
+        updateExpenseData("expenseType", "")
     }, [expenseData.expenseAmountType]);
 
     const [deleteExpenseVisibility, setDeleteExpenseVisibility] = useState(false);

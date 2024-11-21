@@ -389,6 +389,7 @@ export default function ClientSegmentScreen(props) {
 
                 <View style={styles.searchClientContainer}>
                         <SearchBar
+                            Bar
                             filter
                             onPressFilter={() => setAdvancedFiltersVisibility(true)}
                             placeholder={"Search by mobile number name"}

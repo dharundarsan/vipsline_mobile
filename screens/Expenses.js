@@ -59,7 +59,9 @@ export default function Expenses() {
             pressableStyle={styles.expensesCardPressable}
             onPress={() => {
                 setUpdateIsVisible(true)
-                dispatch(updateCurrentExpensesId(itemData.item.id));
+                dispatch(updateCurrentExpensesId(itemData.item.id))
+
+                ;
                 dispatch(updateCurrentExpense(
                     expenseItems.find((item) => item.id === itemData.item.id)
                 ))
@@ -148,21 +150,12 @@ export default function Expenses() {
                 <View>
                     <View style={styles.searchBarContainer}>
                         <SearchBar
+                            filter
+                            onPressFilter={() => setAdvancedFiltersVisibility(true)}
                             searchContainerStyle={styles.searchBar}
                             placeholder={"Search by name email or phone"}
                             onChangeText={setSearchQuery}
                         />
-                        <PrimaryButton
-                            buttonStyle={styles.filterButton}
-                            onPress={() => setAdvancedFiltersVisibility(true)}
-                        >
-                            <SimpleLineIcons
-                                name="equalizer"
-                                size={23}
-                                color={Colors.darkBlue}
-                                style={styles.filterIcon}
-                            />
-                        </PrimaryButton>
 
                     </View>
 
@@ -191,6 +184,7 @@ export default function Expenses() {
                                         <Text style={[textTheme.titleMedium]}>No Data</Text>
                                     </View>
                                 )}
+                                contentContainerStyle={styles.flatList}
                             /> :
                             <FlatList
                                 data={expenseItems}
@@ -247,7 +241,6 @@ const styles = StyleSheet.create({
         marginTop: 32
     },
     searchBar: {
-        backgroundColor: Colors.grey200,
         borderWidth: 0,
         paddingVertical: 6,
         paddingHorizontal: 8,
@@ -315,6 +308,10 @@ const styles = StyleSheet.create({
     },
     noDataContainer: {
         alignItems: 'center',
-        marginTop: 16
-    }
+        marginTop: 16,
+        justifyContent: 'center',
+
+        flex: 1
+    },
+
 })
