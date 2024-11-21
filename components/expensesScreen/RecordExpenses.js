@@ -28,14 +28,15 @@ export default function RecordExpenses(props) {
     const expenseTypeRef = useRef(null);
     const paymentModeRef = useRef(null);
 
-    console.log(currentExpense.date)
-    console.log(currentExpense.date)
-    console.log(moment(currentExpense.date));
 
-
+    function parseDate(dateStr) {
+        const [day, month, year] = dateStr.split(" ");
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return new Date(year, months.indexOf(month), day);
+    }
 
     const [expenseData, setExpenseData] = useState({
-        expenseDate: props.type === "add" ? null : moment(currentExpense.date).toDate(),
+        expenseDate: props.type === "add" ? null : parseDate((currentExpense.date.split(",")[0])),
         expenseAmountType: props.type === "add" ? "" : currentExpense.expense_category,
         expenseType: props.type === "add" ? "" : currentExpense.expense_sub_category,
         amount: props.type === "add" ? "" : currentExpense.amount+"",
@@ -49,6 +50,7 @@ export default function RecordExpenses(props) {
             await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
         }
         f()
+        updateExpenseData("expenseType", "")
     }, [expenseData.expenseAmountType]);
 
     const [deleteExpenseVisibility, setDeleteExpenseVisibility] = useState(false);
