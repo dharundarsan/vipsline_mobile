@@ -50,7 +50,10 @@ export default function RecordExpenses(props) {
             await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
         }
         f()
-        updateExpenseData("expenseType", "")
+        if(props.type === "add") {
+            updateExpenseData("expenseType", "")
+
+        }
     }, [expenseData.expenseAmountType]);
 
     const [deleteExpenseVisibility, setDeleteExpenseVisibility] = useState(false);

@@ -290,17 +290,17 @@ const LeadDetailsModal = (props) => {
                 </View>}
             </View>
         </View>}
-        {selectedTab === 1 && <ScrollView style={{flex: 1}}>
-            {isLoading ? <ContentLoader
-                pRows={5}
-                pHeight={[150, 150, 150, 150, 150]}
-                pWidth={["100%"]}
-                active
-                title={false}
-            /> : <View style={styles.enquiryNotesContent}>
-                {followUpDetails.map(followup => <EnquiryNoteCard followup={followup}/>)}
-            </View>}
-        </ScrollView>}
+        {/*{selectedTab === 1 && <ScrollView style={{flex: 1}}>*/}
+        {/*    {isLoading ? <ContentLoader*/}
+        {/*        pRows={5}*/}
+        {/*        pHeight={[150, 150, 150, 150, 150]}*/}
+        {/*        pWidth={["100%"]}*/}
+        {/*        active*/}
+        {/*        title={false}*/}
+        {/*    /> : <View style={styles.enquiryNotesContent}>*/}
+        {/*        {followUpDetails.map(followup => <EnquiryNoteCard followup={followup}/>)}*/}
+        {/*    </View>}*/}
+        {/*</ScrollView>}*/}
         {selectedTab === 1 && <PrimaryButton buttonStyle={styles.fab}
                                              onPress={() => {
                                              }}
