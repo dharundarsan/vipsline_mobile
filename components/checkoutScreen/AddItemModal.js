@@ -140,7 +140,7 @@ const AddItemModal = (props) => {
         },
         categoryListItemButton: {
             borderBottomColor: Colors.grey500,
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.5,
             backgroundColor: Colors.transparent,
             alignSelf: "auto",
         },
@@ -156,16 +156,16 @@ const AddItemModal = (props) => {
     let content;
     if (selectedCategory === null) {
         content = <View style={styles.modalContent}>
-            { isBackDateInvoiceNoteVisible && <View style={{
+            {isBackDateInvoiceNoteVisible && <View style={{
                 flexDirection: "row",
                 alignItems: "center",
                 backgroundColor: "rgba(253,253,150,.6)",
                 paddingVertical: 10,
                 justifyContent: "center",
-                gap: 10
+                gap: 3
             }}>
-                <AntDesign name="warning" size={28} color={Colors.orange}/>
-                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You are trying to raise the invoice on a
+                <AntDesign name="warning" size={22} color={Colors.orange}/>
+                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You're trying to raise the invoice on a
                     previous date</Text>
             </View>}
             <View style={styles.modalHeader}>
@@ -322,7 +322,7 @@ const AddItemModal = (props) => {
                 }
                 <View style={styles.newSaleTextContainer}>
                     <Text
-                        style={[textTheme.titleLarge, styles.newSaleText]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
+                        style={[textTheme.titleLarge, styles.newSaleText, {letterSpacing: -0.5}]}>{selectedCategory == null || selectedCategory === "customItem" ? "New Sale" : capitalizeFirstLetter(selectedCategory)}</Text>
                 </View>
                 <PrimaryButton
                     buttonStyle={styles.closeButton}

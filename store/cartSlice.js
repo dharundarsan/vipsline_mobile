@@ -76,7 +76,7 @@ export const addItemToCart = (data) => async (dispatch, getState) => {
         if (response.data.status_code > 400) {
             throw response;
         }
-        await dispatch(loadCartFromDB())
+        await dispatch(await loadCartFromDB())
 
     } catch (error) {
         //TODO
@@ -432,7 +432,7 @@ export const cartSlice = createSlice({
                     }];
                     break;
                 case "add":
-                    state.prepaid_wallet = payload;
+                    state.prepaid_wallet = [{...state.prepaid_wallet[0], ...payload[0]}];
                     break;
                 case "updateMobile":
                     if (state.prepaid_wallet.length > 0) {

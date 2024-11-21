@@ -76,17 +76,22 @@ const CheckoutSection = (props) => {
     const chargesAmount = useSelector(state => state.cart.chargesData);
 
     const [discountCategory, setDiscountCategory] = useState({
-        service: 0, product: 0, package: 0,
+        service: 0, product: 0, package: 0, membership: 0, customItem: 0
     });
     const cartDetails = useSelector(state => state.cart.items);
+    
     useEffect(() => {
         if (calculatedPrice[0]?.service_discounts_in_price !== undefined &&
             calculatedPrice[0]?.product_discounts_in_price !== undefined &&
+            calculatedPrice[0]?.member_discounts_in_price !== undefined &&
+            calculatedPrice[0]?.custom_discounts_in_price !== undefined &&
             calculatedPrice[0]?.package_discounts_in_price !== undefined) {
             setDiscountCategory({
                 service: calculatedPrice[0].service_discounts_in_price,
                 product: calculatedPrice[0].product_discounts_in_price,
                 package: calculatedPrice[0].package_discounts_in_price,
+                membership: calculatedPrice[0].member_discounts_in_price,
+                customItem: calculatedPrice[0].custom_discounts_in_price
             });
         }
     }, [calculatedPrice, cartDetails]);
@@ -149,7 +154,7 @@ const CheckoutSection = (props) => {
     const [data, setData] = useState([{}])
 
     useEffect(() => {
-        dispatch(updateDiscount(cart.additionalDiscounts));
+        dispatch(updateDiscount([]));
     }, [])
 
     function openModal(title, value) {
@@ -410,6 +415,8 @@ const CheckoutSection = (props) => {
                                     <Text>Product Discount: ₹{discountCategory.product}</Text> : null}
                                 {discountCategory.package !== 0 ?
                                     <Text>Package Discount: ₹{discountCategory.package}</Text> : null}
+                                {discountCategory.membership !== 0 ?
+                                <Text>Membership Discount: ₹{discountCategory.membership}</Text> : null}
                                 {checkNullUndefined(customDiscount) && checkNullUndefined(customDiscount[0]) && checkNullUndefined(customDiscount[0].amount) ?
                                     <Text>Custom
                                         Discount: {customDiscount[0].type === "PERCENTAGE" ? `${customDiscount[0].amount}%` : `₹${customDiscount[0].amount}`}</Text> : null}

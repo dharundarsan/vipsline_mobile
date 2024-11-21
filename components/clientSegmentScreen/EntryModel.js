@@ -8,42 +8,21 @@ import RadioButton from "./../../ui/RadioButton"
 import {updateSalesMaxEntry} from "../../store/clientInfoSlice";
 
 
-/**
- * EntryModel Component
- *
- * This component displays a modal with radio buttons that allow users to select the maximum number of entries (10, 25, 50, 100) to be displayed. The selected value updates the state and Redux store.
- *
- * Props:
- * @param {boolean} isModalVisible - Controls the visibility of the modal.
- * @param {function} setIsModalVisible - Function to close the modal.
- * @param {boolean} filterPressed - Trigger to reset the selection to the default value.
- * @param {string} query - The search query to determine whether to use normalMaxEntry or searchMaxEntry.
- */
-
-
-const modalHeight = 180;
+const modalHeight = 220;
 
 export default function EntryModel(props) {
-
     const dispatch = useDispatch();
-
     const [checkedNumber, setCheckedNumber] = useState(10);
-
     const normalMaxEntry = useSelector(state => state.clientFilter.maxEntry);
     const searchMaxEntry = useSelector(state => state.clientFilter.searchMaxEntry);
-
     const [selectedOption, setSelectedOption] = useState(null);
 
     const options = [
-        {label: '10', value: 10},
-        {label: '25', value: 25},
-        {label: '50', value: 50},
-        {label: '100', value: 100},
+        { label: '10', value: 10 },
+        { label: '25', value: 25 },
+        { label: '50', value: 50 },
+        { label: '100', value: 100 },
     ];
-
-    // useEffect(() => {
-    //     console.log(selectedOption);
-    // }, [selectedOption]);
 
     useEffect(() => {
         setCheckedNumber(10);
@@ -59,24 +38,24 @@ export default function EntryModel(props) {
 
     return (
         <Modal
-            style={{alignItems: 'center', justifyContent: 'center'}}
             visible={props.isModalVisible}
             animationType="fade"
             transparent={true}
         >
-            <TouchableOpacity activeOpacity={1}
-                              style={{flex: 1, justifyContent: "center", backgroundColor: Colors.dim}}
-                              onPress={() => {
-                                  props.setIsModalVisible(false);
-                              }}>
-
-                <View style={styles.model}>
+            <TouchableOpacity
+                activeOpacity={1}
+                style={styles.overlay}
+                onPress={() => props.setIsModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <Text style={styles.modalTitle}>Select Max Count</Text>
                     <View style={styles.innerContainer}>
                         <RadioButton
                             options={options}
                             value={checkedNumber}
+                            onValueChange={setSelectedOption}
                             onPress={(value) => {
-                                setCheckedNumber(value)
+                                setCheckedNumber(value);
                                 props.setIsModalVisible(false);
                                 dispatch(updateMaxEntry(value));
                                 dispatch(updateSearchClientMaxEntry(value));
@@ -84,7 +63,6 @@ export default function EntryModel(props) {
                             }}
                         />
                     </View>
-
                 </View>
             </TouchableOpacity>
         </Modal>
@@ -92,22 +70,32 @@ export default function EntryModel(props) {
 }
 
 const styles = StyleSheet.create({
-    model: {
-        justifyContent: "center",
-        alignItems: "center",
-        width: '70%',
-        height: modalHeight,
-        backgroundColor: Colors.grey200,
-        borderRadius: 24,
-        margin: 'auto',
-        borderWidth: 1.5,
-        overflow: 'hidden'
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '80%',
+        backgroundColor: Colors.white,
+        borderRadius: 16,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: Colors.primary,
+        marginBottom: 10,
     },
     innerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
         width: '100%',
-        justifyContent: 'space-around',
-
+        paddingVertical: 15,
     },
-})
+});
