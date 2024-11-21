@@ -338,7 +338,7 @@ const MainDrawerNavigator = (props) => {
             headerShown: !isDashboardPage,
             // headerTitleAlign: 'center',
             // headerShown:false,
-            // animation:"ios"
+            animation:"ios"
           })}
         >
             <Stack.Screen name='DashboardScreen'
