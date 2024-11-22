@@ -62,8 +62,9 @@ const SalesDashboard = () => {
   const totalSalesOverTimeDropdown = useSelector((state) => state.dashboardDetails.lineChartData);
   const totalAppointmentOverTime = useSelector((state) => state.dashboardDetails.totalAppointmentOverTime);
 
+  const billItemTotalValue = calculateTotalValue(billItemDetails[0].series);
+  
   const servicesTotalValue = calculateTotalValue(topRevenueDetails[0].chart_series);
-
   const productsTotalValue = calculateTotalValue(topProductDetails[0].chart_series);
 
   const data = billItemDetails[0].series.map((value) => ({ value })) || [];
@@ -394,6 +395,7 @@ const SalesDashboard = () => {
 
 
         <PieChartBox
+          totalCenterValue={billItemTotalValue}
           title={"Bill Items"}
           labelArray={billItemDetails[0].labels}
           pieDataArray={percentageBillData}
