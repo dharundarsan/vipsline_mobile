@@ -90,7 +90,6 @@ const PieChartBox = (props) => {
 
   const handleSelection = async (item) => {
     setSelectedValue(item.value);
-    console.log(item);
     
     const currentDate = formatDateYYYYMMDD(0);
     if (props.pieDataArray[0]?.page === "salesPercent") {
@@ -106,7 +105,6 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "salesProduct") {
-      console.log(1);
       
       if (item.day !== undefined) {
         if (item.day === -29) {
@@ -129,7 +127,7 @@ const PieChartBox = (props) => {
       }
       else{
         const customDay1 = formatDateYYYYMMDD(0);
-        // const customDay2 = formatDateYYYYMMDD(0);
+        const customDay2 = formatDateYYYYMMDD(0);
         // setSelectedFromCustomDate(customDay1);
         // setSelectedToCustomDate(customDay2);
         dispatch(loadTopRevenueProducts(customDay1, customDay2));
@@ -502,8 +500,8 @@ const PieChartBox = (props) => {
                   : [{ color: "#357AF6", text: "0%", value: 1 }]
               }
               donut
-              strokeWidth={0.5}
-              strokeColor="white"
+              // strokeWidth={0.5}
+              // strokeColor="white"
               radius={150}
               isAnimated
               animationDuration={5000}
@@ -540,8 +538,8 @@ const PieChartBox = (props) => {
               }
               radius={150}
               innerRadius={55}
-              strokeWidth={0.5}
-              strokeColor="white"
+              // strokeWidth={0.5}
+              // strokeColor="white"
               showText
               textColor="white"
               textSize={14}

@@ -13,35 +13,23 @@ const CustomDropdown = (props) => {
     const [dropdownWidth, setDropdownWidth] = useState(0); // Store dropdown width
     const dropdownButtonRef = useRef(); // Reference to the dropdown button
 
-
-
-
-
     const toggleDropdown = () => {
         setDropdownVisible(!dropdownVisible);
     };
 
     const toggleOption = (option) => {
         if (props.selectedOptions.includes(option)) {
-            // Uncheck the option
             const newSelectedOptions = props.selectedOptions.filter(opt => opt !== option);
             props.setSelectedOptions(newSelectedOptions);
         } else {
-            // Check the option
             const newSelectedOptions = [...props.selectedOptions, option];
             props.setSelectedOptions(newSelectedOptions);
         }
     };
-
-
-
-    // Measure the dropdown button's width when it's rendered
     const onDropdownButtonLayout = (event) => {
         const { width } = event.nativeEvent.layout;
-        setDropdownWidth(width); // Set dropdown container's width to match the button's width
+        setDropdownWidth(width);
     };
-
-
 
     return (
         <View style={[styles.container, props.container]}>
@@ -98,8 +86,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     dropdownContainer: {
-        position: 'absolute', // Makes the dropdown overlay
-        top: '100%',  // Positions the dropdown just below the button
+        // position: 'absolute', // Makes the dropdown overlay
+        // top: '100%',  // Positions the dropdown just below the button
         zIndex: 999,  // Brings the dropdown to the front
         marginTop: 10,
         borderWidth: 1,

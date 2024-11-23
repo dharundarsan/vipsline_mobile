@@ -259,7 +259,7 @@ const AddClientButton = (props) => {
                                         <Text style={{fontSize:12}}> Package</Text>
                                     </PrimaryButton>
                                 }
-                                {
+                                {/* {
                                     clientInfo.details.reward_balance !== 0 &&
                                     clientInfo.details.reward_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
@@ -268,7 +268,7 @@ const AddClientButton = (props) => {
                                             Points <Text style={{color: Colors.highlight}}>{clientInfo.details.reward_balance}</Text>
                                         </Text>
                                     </PrimaryButton>
-                                }
+                                } */}
                                 </View>
                             </ScrollView>
                             : null

@@ -249,7 +249,6 @@ export default function RecordExpenses(props) {
                         onPress={async () => {
                             const subId = subIds.find(item => item.name === expenseData.expenseType).id
                             const catId = categories.find(item => item.name === expenseData.expenseAmountType).id
-                            console.log("hi")
                             const isDateEntered = dateRef.current();
                             const isExpenseAmountEntered = amountTypeRef.current();
                             const isExpenseTypeEntered = expenseTypeRef.current();
@@ -270,7 +269,6 @@ export default function RecordExpenses(props) {
                                     dispatch(loadExpensesFromDb());
                                     props.closeModal()
                                 }
-                                console.log(res)
                             }
                             else {
                                 const res = await editExpensesAPI(expenseData, catId, subId, currentExpenseId);
