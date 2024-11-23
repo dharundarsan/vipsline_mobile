@@ -30,7 +30,8 @@ export const loadLoginUserDetailsFromDb = () => async (dispatch) => {
                 }
             }
         );
-        dispatch(updateUserDetails(response.data.data));
+        console.log(response.data)
+        dispatch(updateUserDetails(response.data.data[0]));
 
     }
     catch (e) {
@@ -43,7 +44,7 @@ export const loginUser = createSlice({
     initialState: initialClientState,
     reducers: {
         updateUserDetails(state, action) {
-            state.details = action.payload[0];
+            state.details = action.payload;
         },
     }
 });

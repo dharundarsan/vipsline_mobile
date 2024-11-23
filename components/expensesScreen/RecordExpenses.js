@@ -47,13 +47,9 @@ export default function RecordExpenses(props) {
 
     useEffect(() => {
         async function f() {
-            await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
+            // await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
         }
-        f()
-        if(props.type === "add") {
-            updateExpenseData("expenseType", "")
-
-        }
+        f();
     }, [expenseData.expenseAmountType]);
 
     const [deleteExpenseVisibility, setDeleteExpenseVisibility] = useState(false);
@@ -135,7 +131,11 @@ export default function RecordExpenses(props) {
                         type={"dropdown"}
                         dropdownItems={categories.map(item => item.name)}
                         value={expenseData.expenseAmountType}
-                        onChangeValue={(value) => updateExpenseData("expenseAmountType", value)}
+                        onChangeValue={async (value) => {
+                            updateExpenseData("expenseAmountType", value);
+                            await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === value).id));
+                            updateExpenseData("expenseType", "");
+                        }}
                         required
                         onSave={(callback) => {
                             amountTypeRef.current = callback
@@ -247,8 +247,6 @@ export default function RecordExpenses(props) {
                         buttonStyle={styles.saveButton}
                         pressableStyle={styles.saveButtonPressable}
                         onPress={async () => {
-                            const subId = subIds.find(item => item.name === expenseData.expenseType).id
-                            const catId = categories.find(item => item.name === expenseData.expenseAmountType).id
                             const isDateEntered = dateRef.current();
                             const isExpenseAmountEntered = amountTypeRef.current();
                             const isExpenseTypeEntered = expenseTypeRef.current();
@@ -262,6 +260,9 @@ export default function RecordExpenses(props) {
                                 !isPaymentModeEntered) {
                                 return ;
                             }
+
+                            const subId = subIds.find(item => item.name === expenseData.expenseType).id
+                            const catId = categories.find(item => item.name === expenseData.expenseAmountType).id
 
                             if(props.type === "add") {
                                 const res = await addExpensesAPI(expenseData, catId, subId);
