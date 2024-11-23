@@ -4,6 +4,7 @@ import Colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
 import PrimaryButton from "./PrimaryButton";
 import React from "react";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 
 /**
  * SearchBar component for reusable Search Bar with custom text and press handling.
@@ -20,17 +21,26 @@ import React from "react";
 
 const SearchBar = (props) => {
     return <View style={[styles.searchContainer, props.searchContainerStyle]}>
-        <Ionicons name="search-sharp" style={styles.searchLogo} size={20} color={Colors.grey500}/>
-        <TextInput style={[textTheme.bodyMedium, styles.searchTextInput]}
-                   placeholder={props.placeholder}
-                   onChangeText={props.onChangeText}
-                   placeholderTextColor={Colors.grey400}
-                   cursorColor={Colors.black}
-                   value={props.value}
-        />
-        {props.filter ? <PrimaryButton onPress={props.onFilterPress} buttonStyle={styles.searchFilterButton}
-                                       pressableStyle={styles.searchFilterPressable}>
-            <Ionicons name="filter" size={20} color={Colors.grey500}/>
+        <View style={styles.logoAndInputContainer}>
+            <Ionicons name="search-sharp" style={styles.searchLogo} size={20} color={Colors.grey500}/>
+            <TextInput style={[textTheme.bodyMedium, styles.searchTextInput]}
+                       placeholder={props.placeholder}
+                       onChangeText={props.onChangeText}
+                       placeholderTextColor={Colors.grey400}
+                       cursorColor={Colors.black}
+                       value={props.value}
+            />
+        </View>
+        {props.filter ? <PrimaryButton
+            buttonStyle={styles.filterButton}
+            onPress={props.onPressFilter}
+        >
+            <SimpleLineIcons
+                name="equalizer"
+                size={18}
+                color={Colors.darkBlue}
+                style={styles.filterIcon}
+            />
         </PrimaryButton> : null}
     </View>
 }
@@ -39,26 +49,32 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: "row",
         backgroundColor: Colors.background,
-        borderRadius: 20,
-        borderColor: Colors.grey500,
-        borderWidth: 1
+    },
+    logoAndInputContainer:{
+        backgroundColor: "#F8F8FB",
+        flexDirection: "row",
+        alignItems: "center",
+        borderRadius:20,
+        flex:1,
+        marginRight:12,
     },
     searchLogo: {
         paddingVertical: 9,
-        paddingLeft: 9,
+        paddingLeft: 18,
+        // borderRadius: 20,
+        // borderColor: Colors.grey500,
+        // borderWidth: 1
     },
     searchTextInput: {
         fontSize: 15,
         marginLeft: 10,
         flex: 1,
     },
-    searchFilterButton: {
-        borderLeftColor: Colors.grey500,
-        borderLeftWidth: 1,
-        backgroundColor: Colors.transparent,
-        borderRadius: 0,
-        borderBottomRightRadius: 20,
-        borderTopRightRadius: 20,
+    filterButton: {
+        backgroundColor: Colors.white,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: Colors.grey250,
     },
     searchFilterPressable: {
         paddingHorizontal: 9,
@@ -66,4 +82,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default  SearchBar;
+export default SearchBar;

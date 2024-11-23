@@ -14,6 +14,7 @@ import {checkNullUndefined} from "../../util/Helpers";
 export default function BillingActivity(props) {
     const dispatch = useDispatch();
 
+
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const salesData = useSelector(state => state.clientInfo.analyticDetails);
@@ -28,7 +29,7 @@ export default function BillingActivity(props) {
 
 
     useEffect(() => {
-        dispatch(loadAnalyticsClientDetailsFromDb(props.clientid))
+        dispatch(loadAnalyticsClientDetailsFromDb(props.clientId))
         dispatch(updateSalesMaxEntry(10));
         dispatch(updatePageNo(0));
     }, []);

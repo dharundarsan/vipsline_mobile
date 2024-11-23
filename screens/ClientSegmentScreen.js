@@ -388,29 +388,17 @@ export default function ClientSegmentScreen(props) {
 
 
                 <View style={styles.searchClientContainer}>
-                    <View style={styles.textInputContainer}>
                         <SearchBar
-                            placeholder={"search by mobile number name"}
+                            Bar
+                            filter
+                            onPressFilter={() => setAdvancedFiltersVisibility(true)}
+                            placeholder={"Search by mobile number name"}
                             searchContainerStyle={[textTheme.bodyMedium, styles.searchBarContainer]}
                             onChangeText={(text) => {
                                 setSearchQuery(text);
                             }}
                             value={searchQuery}
                         />
-                    </View>
-
-                    <PrimaryButton
-                        buttonStyle={styles.filterButton}
-                        onPress={() => setAdvancedFiltersVisibility(true)}
-                    >
-                        <SimpleLineIcons
-                            name="equalizer"
-                            size={24}
-                            color={Colors.darkBlue}
-                            style={styles.filterIcon}
-                        />
-                    </PrimaryButton>
-
                 </View>
 
                 <CustomTagFilter
@@ -538,7 +526,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     searchClientContainer: {
-        marginTop: 20,
+        marginVertical: 20,
+        marginHorizontal:12,
         flexDirection: 'row',
         justifyContent: 'space-evenly'
     },
@@ -584,16 +573,6 @@ const styles = StyleSheet.create({
     textInputContainer: {
         width: '80%',
         marginVertical: 15,
-    },
-
-    filterIcon: {},
-    filterButton: {
-        backgroundColor: Colors.white,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: Colors.grey250,
-        marginVertical: 15,
-        marginRight: 8,
     },
     menuImage: {
         width: 24,
