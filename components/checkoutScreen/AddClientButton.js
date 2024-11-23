@@ -155,7 +155,8 @@ const AddClientButton = (props) => {
                             <View style={styles.actionMenu}>
                                 {
                                     clientInfo.membershipDetails.length !== 0
-                                    || clientInfo.packageDetails.length !== 0 || clientInfo.details.reward_balance !== 0
+                                    || clientInfo.packageDetails.length !== 0 
+                                    // || clientInfo.details.reward_balance !== 0
                                     || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0) 
                                         ? (
                                             isClientInfo ? (
