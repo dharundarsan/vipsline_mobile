@@ -133,6 +133,8 @@ const LeadDetailsModal = (props) => {
             borderRadius: 8,
         },
         leadProfileHeader: {
+            borderTopLeftRadius: 8,
+            borderTopRightRadius:8,
             flexDirection: "row",
             backgroundColor: "#F8F8FB",
             borderBottomColor: "#D5D7DA",
@@ -140,7 +142,8 @@ const LeadDetailsModal = (props) => {
             paddingHorizontal: 20,
             paddingVertical: 5,
             alignItems: "center",
-            justifyContent: "space-between"
+            justifyContent: "space-between",
+            height:50,
         },
         detailsContainer: {
             padding: 20,
@@ -205,18 +208,18 @@ const LeadDetailsModal = (props) => {
             <View style={styles.leadProfileContainer}>
                 <View style={styles.leadProfileHeader}>
                     <Text style={textTheme.titleMedium}>Lead Profile</Text>
-                    <PrimaryButton
-                        pressableStyle={{
-                            paddingHorizontal: 10,
-                            paddingVertical: 10
-                        }}
-                        buttonStyle={{
-                            backgroundColor: "white", borderColor: "#D5D7DA",
-                            borderWidth: 1,
-                            borderRadius: 8,
-                        }}>
-                        <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
-                    </PrimaryButton>
+                    {/*<PrimaryButton*/}
+                    {/*    pressableStyle={{*/}
+                    {/*        paddingHorizontal: 10,*/}
+                    {/*        paddingVertical: 10*/}
+                    {/*    }}*/}
+                    {/*    buttonStyle={{*/}
+                    {/*        backgroundColor: "white", borderColor: "#D5D7DA",*/}
+                    {/*        borderWidth: 1,*/}
+                    {/*        borderRadius: 8,*/}
+                    {/*    }}>*/}
+                    {/*    <Feather name="edit-2" size={15} color="black"/>*/}
+                    {/*</PrimaryButton>*/}
                 </View>
                 {isLoading ? <View>
                     <ContentLoader
