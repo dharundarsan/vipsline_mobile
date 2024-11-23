@@ -2,10 +2,12 @@ import {StyleSheet, Text, View} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Feather, MaterialCommunityIcons} from "@expo/vector-icons";
-import React from "react";
+import React, {useState} from "react";
 import getLeadStatusColor from "../../util/getLeadStatusColor";
+import EnquiryNotesModal from "./EnquiryNotesModal";
 
 const enquiryNoteCard = (props) => {
+    const [isEditEnquiryNotesModalVisible, setIsEditEnquiryNotesModalVisible] = useState(false)
     const styles = StyleSheet.create({
         enquiryNoteCard: {
             borderColor: "#D5D7DA",
@@ -25,6 +27,7 @@ const enquiryNoteCard = (props) => {
             paddingVertical: 20,
             paddingHorizontal: 25,
         },
+        editButtonIcon: {},
         badgeContainer: {
             minWidth: 80,
             paddingHorizontal: 10,
@@ -37,8 +40,16 @@ const enquiryNoteCard = (props) => {
             fontWeight: "500",
         }
     })
-    return <View>
+    return <View style={{marginBottom: 25}}>
         <View style={styles.enquiryNoteCard}>
+            {isEditEnquiryNotesModalVisible && <EnquiryNotesModal refreshLeadsData={props.refreshLeadsData}
+                                                                  edit={true}
+                                                                  lead={props.lead}
+                                                                  isVisible={isEditEnquiryNotesModalVisible}
+                                                                  onCloseModal={() => {
+                                                                      setIsEditEnquiryNotesModalVisible(false)
+                                                                  }}
+                                                                  data={props.followup}/>}
             <View style={styles.enquiryNoteHeader}>
                 <View style={{flexDirection: "row", alignItems: "center", gap: 15,}}>
                     <Text style={textTheme.titleMedium}>{props.followup.notes_date}</Text>
@@ -55,8 +66,11 @@ const enquiryNoteCard = (props) => {
                         backgroundColor: "white", borderColor: "#D5D7DA",
                         borderWidth: 1,
                         borderRadius: 8,
+                    }}
+                    onPress={() => {
+                        setIsEditEnquiryNotesModalVisible(true)
                     }}>
-                    <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
+                    <Feather style={styles.editButtonIcon} name="edit-2" size={15} color="black"/>
                 </PrimaryButton>
             </View>
             <View style={styles.enquiryNoteContent}>

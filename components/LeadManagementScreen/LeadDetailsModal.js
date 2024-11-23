@@ -7,7 +7,7 @@ import {
     Modal,
     TouchableOpacity,
     ActivityIndicator,
-    KeyboardAvoidingView, Pressable
+    KeyboardAvoidingView, Pressable, FlatList
 } from "react-native";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
@@ -38,6 +38,7 @@ import getLeadDetailsAPI from "../../util/apis/getLeadDetailsAPI";
 import ContentLoader from "react-native-easy-content-loader";
 import EnquiryNoteCard from "./EnquiryNoteCard";
 import getFollowUpDetailsAPI from "../../util/apis/getFollowUpDetailsAPI";
+import EnquiryNotesModal from "./EnquiryNotesModal";
 
 const LeadDetailsModal = (props) => {
     const dispatch = useDispatch();
@@ -46,6 +47,7 @@ const LeadDetailsModal = (props) => {
     const [followUpDetails, setFollowUpDetails] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const leadSources = useSelector(state => state.leads.leadSources);
+    const [isEnquiryNotesModalVisible, setIsEnquiryNotesModalVisible] = useState(false);
 
     const styles = StyleSheet.create({
         leadDetailsModal: {
@@ -145,21 +147,23 @@ const LeadDetailsModal = (props) => {
         }
     })
 
+    const apiCalls = async () => {
+        setIsLoading(true)
+        let response = await getLeadDetailsAPI(props.lead.lead_id, props.lead.lead_source);
+        setLeadProfile(response.data.data[0]);
+        response = await getFollowUpDetailsAPI(props.lead.lead_id);
+        setFollowUpDetails(response.data.data)
+        setIsLoading(false)
+    }
     useEffect(() => {
-        const apiCalls = async () => {
-            setIsLoading(true)
-            let response = await getLeadDetailsAPI(props.lead.lead_id, props.lead.lead_source);
-            setLeadProfile(response.data.data[0]);
-            response = await getFollowUpDetailsAPI(props.lead.lead_id);
-            setFollowUpDetails(response.data.data)
-            setIsLoading(false)
-        }
         apiCalls()
     }, []);
 
     const validateField = (value, fallback = "Not added") => (value ? value : fallback);
 
-    return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"} presentationStyle={"pageSheet"}>
+
+    return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"}
+                  presentationStyle={"pageSheet"}>
         <View style={styles.header}>
             <View style={styles.headerLeadContainer}>
                 <View style={styles.headerLeadProfile}>
@@ -298,11 +302,16 @@ const LeadDetailsModal = (props) => {
                 active
                 title={false}
             /> : <View style={styles.enquiryNotesContent}>
-                {followUpDetails.map(followup => <EnquiryNoteCard followup={followup}/>)}
+                {isEnquiryNotesModalVisible &&
+                    <EnquiryNotesModal refreshLeadsData={apiCalls} isVisible={isEnquiryNotesModalVisible} lead={props.lead} onCloseModal={() => {
+                        setIsEnquiryNotesModalVisible(false)
+                    }}/>}
+                <FlatList scrollEnabled={false} data={followUpDetails} renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls} followup={item}/>}/>
             </View>}
         </ScrollView>}
         {selectedTab === 1 && <PrimaryButton buttonStyle={styles.fab}
                                              onPress={() => {
+                                                 setIsEnquiryNotesModalVisible(true);
                                              }}
                                              pressableStyle={{flex: 1}}>
             <MaterialIcons name="sticky-note-2" size={24} color="white"/>
