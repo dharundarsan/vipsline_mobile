@@ -948,7 +948,6 @@ const PaymentModal = (props) => {
                                 //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
                                 // autoClose: 1500,
                                 // });
-                                console.log(response)
                                 toastRef.current.show(response.other_message, 2000);
 
                                 return;

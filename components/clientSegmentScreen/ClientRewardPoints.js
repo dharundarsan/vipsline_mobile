@@ -1,58 +1,93 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import TextTheme from '../../constants/TextTheme'
 import { useDispatch, useSelector } from 'react-redux'
-import { getRewardHistory, getRewardPointBalance } from '../../store/clientInfoSlice'
+import { decrementRewardPageNumber, getRewardHistory, getRewardPointBalance, incrementRewardPageNumber, resetRewardPageNo, updateRewardMaxEntry } from '../../store/clientInfoSlice'
 import { Divider } from 'react-native-paper'
 import Colors from '../../constants/Colors'
 import { dateFormatter } from '../../util/Helpers'
+import CustomPagination from '../common/CustomPagination'
+import EntryPicker from '../common/EntryPicker'
 
 const ClientRewardPoints = (props) => {
     // console.log(JSON.stringify(props.details,null,3));
     const dispatch = useDispatch();
 
+    const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
+
     const rewardDetails = useSelector(state => state.clientInfo.customerRewardDetails);
     const rewardPoints = useSelector(state => state.clientInfo.rewardPointBalance);
-
+    const maxEntry = useSelector(state => state.clientInfo.rewardsMaxEntry);
+    const rewardsTotalSize = useSelector(state => state.clientInfo.rewardsTotalSize);
+    const isRewardFetching = useSelector(state => state.clientInfo.rewardsIsFetching);
     useEffect(() => {
-        dispatch(getRewardHistory(props.details.id));
-        dispatch(getRewardPointBalance(props.details.id))
+        async function initialCall() {
+            await dispatch(resetRewardPageNo())
+            await dispatch(getRewardHistory(props.details.id, 10));
+            await dispatch(getRewardPointBalance(props.details.id))
+            await dispatch(updateRewardMaxEntry(10));    
+        }
+        initialCall()
     }, [])
-    // console.log(rewardDetails.customerRewardList);
-    console.log(rewardDetails);
 
     return (
-        <View style={styles.wrapper}>
-            <View style={styles.container}>
-                <Text style={TextTheme.titleMedium}>Reward Points</Text>
-                {
-                    rewardDetails?.status_code === undefined ?
-                        <View style={styles.boxContainer}>
-                            <View style={{ paddingHorizontal: 20, paddingVertical: 10, }}>
-                                <Text style={TextTheme.titleSmall}>Points Available: {rewardPoints}</Text>
+        <>
+            <ScrollView style={styles.wrapper} scrollEnabled={false}>
+                <View style={styles.container}>
+                    {
+                        isEntryModalVisible &&
+                        <EntryPicker
+                            setIsModalVisible={setIsEntryModalVisible}
+                            onPress={(number) => {
+                                dispatch(updateRewardMaxEntry(number));
+                                setIsEntryModalVisible(false);
+                            }}
+                            maxEntry={maxEntry}
+                            isVisible={isEntryModalVisible}
+
+                        />}
+                    <Text style={TextTheme.titleMedium}>Reward Points</Text>
+                    {
+                        rewardDetails?.status_code === undefined ?
+                            <View style={styles.boxContainer}>
+                                <View style={{ paddingHorizontal: 20, paddingVertical: 10, }}>
+                                    <Text style={TextTheme.titleSmall}>Points Available: {rewardPoints}</Text>
+                                </View>
+                                <Divider />
+                                <FlatList
+                                    scrollEnabled={false}
+                                    data={rewardDetails?.customerRewardList}
+                                    renderItem={({ item }) => {
+                                        const date = dateFormatter(item.date, "short");
+                                        return (
+                                            <>
+                                                <View style={styles.transactionContainer}>
+                                                    <Text style={[item.transaction_type === "Earned" ? styles.transactionTypeEarned : styles.transactionTypeRedeemed, TextTheme.bodySmall]}>{item.transaction_type}</Text>
+                                                    <Text style={TextTheme.bodySmall}>{[item.points]} Points</Text>
+                                                    <Text style={TextTheme.bodySmall}>{date}</Text>
+                                                </View>
+                                            </>
+                                        )
+                                    }}
+                                    ItemSeparatorComponent={() => <Divider />}
+                                />
                             </View>
-                            <Divider />
-                            <FlatList
-                                data={rewardDetails?.customerRewardList}
-                                renderItem={({ item }) => {
-                                    const date = dateFormatter(item.date, "short");
-                                    return (
-                                        <>
-                                            <View style={styles.transactionContainer}>
-                                                <Text style={[item.transaction_type === "Earned" ? styles.transactionTypeEarned : styles.transactionTypeRedeemed,TextTheme.bodySmall]}>{item.transaction_type}</Text>
-                                                <Text style={TextTheme.bodySmall}>{[item.points]} Points</Text>
-                                                <Text style={TextTheme.bodySmall}>{date}</Text>
-                                            </View>
-                                        </>
-                                    )
-                                }}
-                                ItemSeparatorComponent={() => <Divider />}
-                            />
-                        </View>
-                        : <Text style={[styles.notFound, TextTheme.titleSmall]}>No Data Found</Text>
-                }
-            </View>
-        </View>
+                            : <Text style={[styles.notFound, TextTheme.titleSmall]}>No Data Found</Text>
+                    }
+                </View>
+            </ScrollView>
+            <CustomPagination
+                setIsModalVisible={setIsEntryModalVisible}
+                maxEntry={maxEntry}
+                incrementPageNumber={() => dispatch(incrementRewardPageNumber())}
+                decrementPageNumber={() => dispatch(decrementRewardPageNumber())}
+                refreshOnChange={async() => await dispatch(getRewardHistory(props.details.id, maxEntry))}
+                currentCount={rewardDetails?.customerRewardList.length}
+                totalCount={rewardsTotalSize}
+                resetPageNo={()=>dispatch(resetRewardPageNo())}
+                isFetching={isRewardFetching}
+            />
+        </>
     )
 }
 
@@ -97,7 +132,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         overflow: 'hidden'
     },
-    transactionTypeRedeemed:{
+    transactionTypeRedeemed: {
         paddingVertical: 1,
         paddingHorizontal: 10,
         backgroundColor: '#D1373F33',

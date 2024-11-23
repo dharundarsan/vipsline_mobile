@@ -10,7 +10,6 @@ import { Divider } from "react-native-paper";
 import * as Haptics from "expo-haptics";
 
 const StaffDetailsModel = (props) => {
-  console.log(props);
   
   const mappedStaffDetails = staffDetails.map((detail) => {
     return {
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   container: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingVertical: 20,
     justifyContent: "space-between",
     flexDirection: "row",
