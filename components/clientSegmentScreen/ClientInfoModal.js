@@ -280,12 +280,12 @@ export default function clientInfoModal(props) {
     } else if (clientMoreDetails === "billActivity") {
         content = <BillingActivity
             salesData={salesData}
-            clientid={details.id}
+            clientId={details.id}
         />
     } else if (clientMoreDetails === "appointments") {
         content = <Appointments
             salesData={salesData}
-            clientid={details.id}
+            clientId={details.id}
         />
     } else if (clientMoreDetails === "memberships") {
         content = checkNullUndefined(membershipData) && checkNullUndefined(membershipData.length) && membershipData.length > 0 ?
@@ -308,10 +308,12 @@ export default function clientInfoModal(props) {
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
                 Prepaid for this client</Text></View>
 
-    } else if (clientMoreDetails === "rewardpoints") {
-        content =
-            <ClientRewardPoints details={details} />
-    } else {
+    } 
+    // else if (clientMoreDetails === "rewardpoints") {
+    //     content =
+    //         <ClientRewardPoints details={details} />
+    // } 
+    else {
         content =
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming
                 Soons</Text></View>

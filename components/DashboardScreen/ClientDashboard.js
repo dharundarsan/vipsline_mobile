@@ -137,7 +137,6 @@ const ClientDashboard = () => {
                 pWidth={["100%"]}
                 active
                 title={false}
-
               />
               <ContentLoader
                 pRows={1}

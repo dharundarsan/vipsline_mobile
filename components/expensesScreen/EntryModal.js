@@ -39,8 +39,6 @@ export default function EntryModal(props) {
         {label: '100', value: 100},
     ];
 
-    console.log(checkedNumber)
-
 
     useEffect(() => {
         if (props.query === "") {

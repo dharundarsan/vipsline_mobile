@@ -338,7 +338,7 @@ const MainDrawerNavigator = (props) => {
             headerShown: !isDashboardPage,
             // headerTitleAlign: 'center',
             // headerShown:false,
-            animation:"ios"
+            // animation:"ios"
           })}
         >
             <Stack.Screen name='DashboardScreen'
@@ -352,7 +352,7 @@ const MainDrawerNavigator = (props) => {
                 headerTitle: "Sales Dashboard",
                 headerTitleAlign:"center",
                 // headerLeft: () => <BackButton />,
-                // animation:'slide_from_right'
+                // animation:'ios_from_right'
 
             }}
 
@@ -363,7 +363,7 @@ const MainDrawerNavigator = (props) => {
             options={{
                 headerTitle:"Staff Dashboard",
                 // headerLeft:()=><BackButton/>,
-                // animation:'slide_from_right'
+                // animation:'ios_from_right'
             }}
             />
             <Stack.Screen
@@ -372,7 +372,7 @@ const MainDrawerNavigator = (props) => {
             options={{
                 headerTitle:"Client Dashboard",
                 // headerLeft:()=><BackButton/>,
-                // animation:'slide_from_right'
+                // animation:'ios_from_right'
             }}
             />
         </Stack.Navigator>
@@ -578,10 +578,15 @@ const MainDrawerNavigator = (props) => {
                             {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}*/}
                             {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
                             {/*}}/>*/}
-                            {/*<Drawer.Screen name="Expenses" component={CheckoutStack} options={{*/}
-                            {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}*/}
-                            {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
-                            {/*}} />*/}
+                            <Drawer.Screen name="Expenses" component={Expenses}
+                                           options={{
+                                               headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
+                                               drawerIcon: () => <Image
+                                                   source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
+                                                   width={25}
+                                                   height={25}
+                                                   style={{ resizeMode: "contain", tintColor: Colors.white }} />
+                                           }} />
                             {/*<Drawer.Screen*/}
                             {/*    name="Reports"*/}
                             {/*    component={CheckoutStack}*/}
@@ -632,15 +637,7 @@ const MainDrawerNavigator = (props) => {
                                                    height={25}
                                                    style={{resizeMode: "contain", tintColor: Colors.white}}/>
                             }}/>
-                            <Drawer.Screen name="Expenses" component={Expenses}
-                                           options={{
-                                               headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
-                                               drawerIcon: () => <Image
-                                                   source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
-                                                   width={25}
-                                                   height={25}
-                                                   style={{ resizeMode: "contain", tintColor: Colors.white }} />
-                            }} />
+
                         </Drawer.Navigator>
                         : <Drawer.Navigator initialRouteName="List Of Business"
                                             drawerContent={(props) => <CustomDrawer {...props} />}
