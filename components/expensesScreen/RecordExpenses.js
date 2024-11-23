@@ -47,9 +47,9 @@ export default function RecordExpenses(props) {
 
     useEffect(() => {
         async function f() {
-            await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
+            await dispatch(getExpenseSubCategoryId(category === "All expenses" ? -1 : categories.find(item => item.name === expenseData.expenseAmountType).id));
         }
-        f()
+        f();
         updateExpenseData("expenseType", "")
     }, [expenseData.expenseAmountType]);
 
