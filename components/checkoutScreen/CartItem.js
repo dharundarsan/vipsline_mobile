@@ -234,10 +234,12 @@ const CartItem = (props) => {
                                                         data={props.data}/>}
 
             <DropdownModal isVisible={isStaffDropdownModalVisible}
-                           onCloseModal={() => setIsStaffDropdownModalVisible(false)} dropdownItems={props.staffs}
-                           object={true} objectName={"name"} selectedValue={selectedStaff}
+                           onCloseModal={() => setIsStaffDropdownModalVisible(false)}
+                           dropdownItems={props.staffs}
+                           object={true}
+                           objectName={"name"}
+                           selectedValue={selectedStaff}
                            onChangeValue={(value) => {
-
                                dispatch(updateCartItemStaff([{item_id: props.data.item_id, resource_id: value.id}]));
                                if (props.data.gender === "custom_item") {
                                    dispatch(updateStaffInCustomItemsCart({

@@ -11,7 +11,7 @@ const Divider = (props) => {
 const styles = StyleSheet.create({
     divider: {
         // paddingVertical:1,
-        borderBottomWidth: 1,
+        borderBottomWidth: 0.5,
         width: '100%',
         borderBottomColor: Colors.grey250,
     },
