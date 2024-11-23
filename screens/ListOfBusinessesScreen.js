@@ -41,10 +41,12 @@ import Toast from "../ui/Toast";
 
 export default function ListOfBusinessesScreen({navigation}) {
     const listOfBusinesses = useSelector(state => state.businesses.listOfBusinesses);
-    const name = useSelector(state => state.loginUser.details).name;
+    const details = useSelector(state => state.loginUser.details);
     const dispatch = useDispatch();
     const {getLocation, currentLocation, reload, setReload} = useLocationContext();
     const toastRef = useRef();
+
+    console.log(details)
 
     useFocusEffect(useCallback(() => {
         getLocation("List of Business");
@@ -147,7 +149,7 @@ export default function ListOfBusinessesScreen({navigation}) {
                     <Divider/>
                     <View style={styles.body}>
                         <Text style={[textTheme.titleMedium]}>
-                            Hi, {name}!
+                            Hi, !
                         </Text>
                         <Text style={[textTheme.bodyMedium, styles.descriptionText]}>
                             You are a part of the following business. Go to the business which you wish to access now
