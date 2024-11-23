@@ -34,6 +34,7 @@ import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../store/cartSlice";
 import LeadDetailsModal from "../components/LeadManagementScreen/LeadDetailsModal";
 import ContentLoader from "react-native-easy-content-loader";
+import EnquiryNotesModal from "../components/LeadManagementScreen/EnquiryNotesModal";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);

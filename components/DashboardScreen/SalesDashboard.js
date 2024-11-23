@@ -155,14 +155,16 @@ const SalesDashboard = () => {
   }
 
   useEffect(() => {
+    let firstMonth = firstMonthDate;
+    let lastMonth = lastMonthDate;
+
     async function initialCall() {
-      setIsPageLoading(true);
       await dispatch(updateDashBoardName("Sales"))
       await dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
       await dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
-      await dispatch(loadTopRevenueProducts(firstMonthDate, lastMonthDate));
-      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false, "currentmonth"))
       await dispatch(loadDailyAppointmentAnalyticsForBusiness(true, "currentmonth"))
+      await dispatch(loadTopRevenueProducts(firstMonth, lastMonth));
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false, "currentmonth"))
       setIsPageLoading(false);
     }
     initialCall();
@@ -182,12 +184,16 @@ const SalesDashboard = () => {
   }
 
   function removeZero(roundedValue) {
+    const valueStr = roundedValue.toString();
+    if (valueStr.includes('e')) {
+      return valueStr.split('e')[0];
+    }
     return roundedValue.toString().replace(/0+$/, '');
   }
 
   const removeZeroLineSalesOverTime = removeZero(roundUp(maxTotalSalesValue)) || 10;
   const roundLineSalesOverTime = roundUp(maxTotalSalesValue)
-
+  
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
       <View style={styles.container}>

@@ -67,7 +67,7 @@ export default function clientInfoModal(props) {
     const dispatch = useDispatch();
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails || {});
-    const details = useSelector(state => state.clientInfo.details || {});
+    const details = useSelector(state => state.clientInfo.details)|| {};
     const salesData = useSelector(state => state.clientInfo.analyticDetails || {});
     const membershipData = useSelector(state => state.clientInfo.membershipList || {});
     const packageData = useSelector(state => state.clientInfo.packageList || {});
@@ -310,7 +310,7 @@ export default function clientInfoModal(props) {
 
     } else if (clientMoreDetails === "rewardpoints") {
         content =
-            <ClientRewardPoints/>
+            <ClientRewardPoints details={details} />
     } else {
         content =
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming

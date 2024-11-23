@@ -7,7 +7,7 @@ import {
     Modal,
     TouchableOpacity,
     ActivityIndicator,
-    KeyboardAvoidingView, Pressable
+    KeyboardAvoidingView, Pressable, FlatList
 } from "react-native";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
@@ -34,10 +34,20 @@ import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../../store/cartSlice";
 import {shadowStyling} from "../../util/Helpers";
 import ClientCard from "../clientSegmentScreen/ClientCard";
+import getLeadDetailsAPI from "../../util/apis/getLeadDetailsAPI";
+import ContentLoader from "react-native-easy-content-loader";
+import EnquiryNoteCard from "./EnquiryNoteCard";
+import getFollowUpDetailsAPI from "../../util/apis/getFollowUpDetailsAPI";
+import EnquiryNotesModal from "./EnquiryNotesModal";
 
 const LeadDetailsModal = (props) => {
     const dispatch = useDispatch();
     const [selectedTab, setSelectedTab] = useState(0);
+    const [leadProfile, setLeadProfile] = useState(null);
+    const [followUpDetails, setFollowUpDetails] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const leadSources = useSelector(state => state.leads.leadSources);
+    const [isEnquiryNotesModalVisible, setIsEnquiryNotesModalVisible] = useState(false);
 
     const styles = StyleSheet.create({
         leadDetailsModal: {
@@ -93,7 +103,9 @@ const LeadDetailsModal = (props) => {
         },
         tab: {
             width: "50%",
-            alignItems: "center"
+            height: "100%",
+            alignItems: "center",
+            justifyContent: "center"
         },
         tabIndicator: {
             width: "50%",
@@ -104,14 +116,54 @@ const LeadDetailsModal = (props) => {
             bottom: 0,
             backgroundColor: Colors.highlight
         },
-        modalContent: {
+        leadProfileContent: {
+            flex: 1,
+            paddingHorizontal: 25,
+            paddingVertical: 25,
+        },
+        enquiryNotesContent: {
             flex: 1,
             paddingHorizontal: 20,
+            paddingVertical: 30,
+            gap: 30,
         },
+        leadProfileContainer: {
+            borderColor: "#D5D7DA",
+            borderWidth: 1,
+            borderRadius: 8,
+        },
+        leadProfileHeader: {
+            flexDirection: "row",
+            backgroundColor: "#F8F8FB",
+            borderBottomColor: "#D5D7DA",
+            borderBottomWidth: 1,
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            alignItems: "center",
+            justifyContent: "space-between"
+        },
+        detailsContainer: {
+            padding: 20,
+        }
     })
 
+    const apiCalls = async () => {
+        setIsLoading(true)
+        let response = await getLeadDetailsAPI(props.lead.lead_id, props.lead.lead_source);
+        setLeadProfile(response.data.data[0]);
+        response = await getFollowUpDetailsAPI(props.lead.lead_id);
+        setFollowUpDetails(response.data.data)
+        setIsLoading(false)
+    }
+    useEffect(() => {
+        apiCalls()
+    }, []);
 
-    return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"}>
+    const validateField = (value, fallback = "Not added") => (value ? value : fallback);
+
+
+    return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"}
+                  presentationStyle={"pageSheet"}>
         <View style={styles.header}>
             <View style={styles.headerLeadContainer}>
                 <View style={styles.headerLeadProfile}>
@@ -149,12 +201,121 @@ const LeadDetailsModal = (props) => {
             <View style={styles.tabIndicator}/>
         </View>
         <Divider/>
-        <PrimaryButton buttonStyle={styles.fab}
-                       onPress={() => {
-                       }}
-                       pressableStyle={{flex: 1}}>
+        {selectedTab === 0 && <View style={styles.leadProfileContent}>
+            <View style={styles.leadProfileContainer}>
+                <View style={styles.leadProfileHeader}>
+                    <Text style={textTheme.titleMedium}>Lead Profile</Text>
+                    <PrimaryButton
+                        pressableStyle={{
+                            paddingHorizontal: 10,
+                            paddingVertical: 10
+                        }}
+                        buttonStyle={{
+                            backgroundColor: "white", borderColor: "#D5D7DA",
+                            borderWidth: 1,
+                            borderRadius: 8,
+                        }}>
+                        <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
+                    </PrimaryButton>
+                </View>
+                {isLoading ? <View>
+                    <ContentLoader
+                        pRows={9}
+                        pHeight={[55, 55, 55, 55, 55, 55, 55, 55, 55]}
+                        pWidth={["100%"]}
+                        active
+                        title={false}
+                    />
+                </View> : <View style={styles.detailsContainer}>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Phone
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.mobile)}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Email
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.email)}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Gender
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.gender)}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Lead Source
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(
+                            leadSources.find((source) => source.id === leadProfile?.lead_source)?.name
+                        )}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Campaign
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.lead_campaign_name)}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Lead Owner
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.lead_owner)}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Address
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.address)}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Location
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.location)}
+                    </Text>
+                    <Text/>
+                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                        Pincode
+                    </Text>
+                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                        {validateField(leadProfile?.pincode)}
+                    </Text>
+                </View>}
+            </View>
+        </View>}
+        {selectedTab === 1 && <ScrollView style={{flex: 1}}>
+            {isLoading ? <ContentLoader
+                pRows={5}
+                pHeight={[150, 150, 150, 150, 150]}
+                pWidth={["100%"]}
+                active
+                title={false}
+            /> : <View style={styles.enquiryNotesContent}>
+                {isEnquiryNotesModalVisible &&
+                    <EnquiryNotesModal refreshLeadsData={apiCalls} isVisible={isEnquiryNotesModalVisible} lead={props.lead} onCloseModal={() => {
+                        setIsEnquiryNotesModalVisible(false)
+                    }}/>}
+                <FlatList scrollEnabled={false} data={followUpDetails} renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls} followup={item}/>}/>
+            </View>}
+        </ScrollView>}
+        {selectedTab === 1 && <PrimaryButton buttonStyle={styles.fab}
+                                             onPress={() => {
+                                                 setIsEnquiryNotesModalVisible(true);
+                                             }}
+                                             pressableStyle={{flex: 1}}>
             <MaterialIcons name="sticky-note-2" size={24} color="white"/>
-        </PrimaryButton>
+        </PrimaryButton>}
     </Modal>
 }
 

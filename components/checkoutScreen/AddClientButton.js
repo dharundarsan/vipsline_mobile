@@ -317,19 +317,21 @@ const styles = StyleSheet.create({
     },
     clientCard: {
         flex: 0.60,
+        marginBottom:-10
     },
     actionMenu: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
-        flex: 0.40
+        flex: 0.40,
+        marginBottom:-10
     },
     clientDetailContainer: {
         // alignItems: "center",
         // justifyContent: "space-around",
         flexDirection: "row",
         gap:10,
-        marginTop:10,
+        marginTop:15,
         paddingHorizontal:10
     },
     activePlan: {
