@@ -7,7 +7,7 @@ import {
     Modal,
     TouchableOpacity,
     ActivityIndicator,
-    KeyboardAvoidingView, Pressable
+    KeyboardAvoidingView, Pressable, FlatList
 } from "react-native";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
@@ -38,6 +38,7 @@ import getLeadDetailsAPI from "../../util/apis/getLeadDetailsAPI";
 import ContentLoader from "react-native-easy-content-loader";
 import EnquiryNoteCard from "./EnquiryNoteCard";
 import getFollowUpDetailsAPI from "../../util/apis/getFollowUpDetailsAPI";
+import EnquiryNotesModal from "./EnquiryNotesModal";
 
 const LeadDetailsModal = (props) => {
     const dispatch = useDispatch();
@@ -46,6 +47,7 @@ const LeadDetailsModal = (props) => {
     const [followUpDetails, setFollowUpDetails] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const leadSources = useSelector(state => state.leads.leadSources);
+    const [isEnquiryNotesModalVisible, setIsEnquiryNotesModalVisible] = useState(false);
 
     const styles = StyleSheet.create({
         leadDetailsModal: {
@@ -131,6 +133,8 @@ const LeadDetailsModal = (props) => {
             borderRadius: 8,
         },
         leadProfileHeader: {
+            borderTopLeftRadius: 8,
+            borderTopRightRadius:8,
             flexDirection: "row",
             backgroundColor: "#F8F8FB",
             borderBottomColor: "#D5D7DA",
@@ -138,28 +142,31 @@ const LeadDetailsModal = (props) => {
             paddingHorizontal: 20,
             paddingVertical: 5,
             alignItems: "center",
-            justifyContent: "space-between"
+            justifyContent: "space-between",
+            height:50,
         },
         detailsContainer: {
             padding: 20,
         }
     })
 
+    const apiCalls = async () => {
+        setIsLoading(true)
+        let response = await getLeadDetailsAPI(props.lead.lead_id, props.lead.lead_source);
+        setLeadProfile(response.data.data[0]);
+        response = await getFollowUpDetailsAPI(props.lead.lead_id);
+        setFollowUpDetails(response.data.data)
+        setIsLoading(false)
+    }
     useEffect(() => {
-        const apiCalls = async () => {
-            setIsLoading(true)
-            let response = await getLeadDetailsAPI(props.lead.lead_id, props.lead.lead_source);
-            setLeadProfile(response.data.data[0]);
-            response = await getFollowUpDetailsAPI(props.lead.lead_id);
-            setFollowUpDetails(response.data.data)
-            setIsLoading(false)
-        }
         apiCalls()
     }, []);
 
     const validateField = (value, fallback = "Not added") => (value ? value : fallback);
 
-    return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"} presentationStyle={"pageSheet"}>
+
+    return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"}
+                  presentationStyle={"pageSheet"}>
         <View style={styles.header}>
             <View style={styles.headerLeadContainer}>
                 <View style={styles.headerLeadProfile}>
@@ -201,18 +208,18 @@ const LeadDetailsModal = (props) => {
             <View style={styles.leadProfileContainer}>
                 <View style={styles.leadProfileHeader}>
                     <Text style={textTheme.titleMedium}>Lead Profile</Text>
-                    <PrimaryButton
-                        pressableStyle={{
-                            paddingHorizontal: 10,
-                            paddingVertical: 10
-                        }}
-                        buttonStyle={{
-                            backgroundColor: "white", borderColor: "#D5D7DA",
-                            borderWidth: 1,
-                            borderRadius: 8,
-                        }}>
-                        <Feather style={styles.editAmountIcon} name="edit-2" size={15} color="black"/>
-                    </PrimaryButton>
+                    {/*<PrimaryButton*/}
+                    {/*    pressableStyle={{*/}
+                    {/*        paddingHorizontal: 10,*/}
+                    {/*        paddingVertical: 10*/}
+                    {/*    }}*/}
+                    {/*    buttonStyle={{*/}
+                    {/*        backgroundColor: "white", borderColor: "#D5D7DA",*/}
+                    {/*        borderWidth: 1,*/}
+                    {/*        borderRadius: 8,*/}
+                    {/*    }}>*/}
+                    {/*    <Feather name="edit-2" size={15} color="black"/>*/}
+                    {/*</PrimaryButton>*/}
                 </View>
                 {isLoading ? <View>
                     <ContentLoader
@@ -290,19 +297,24 @@ const LeadDetailsModal = (props) => {
                 </View>}
             </View>
         </View>}
-        {/*{selectedTab === 1 && <ScrollView style={{flex: 1}}>*/}
-        {/*    {isLoading ? <ContentLoader*/}
-        {/*        pRows={5}*/}
-        {/*        pHeight={[150, 150, 150, 150, 150]}*/}
-        {/*        pWidth={["100%"]}*/}
-        {/*        active*/}
-        {/*        title={false}*/}
-        {/*    /> : <View style={styles.enquiryNotesContent}>*/}
-        {/*        {followUpDetails.map(followup => <EnquiryNoteCard followup={followup}/>)}*/}
-        {/*    </View>}*/}
-        {/*</ScrollView>}*/}
+        {selectedTab === 1 && <ScrollView style={{flex: 1}}>
+            {isLoading ? <ContentLoader
+                pRows={5}
+                pHeight={[150, 150, 150, 150, 150]}
+                pWidth={["100%"]}
+                active
+                title={false}
+            /> : <View style={styles.enquiryNotesContent}>
+                {isEnquiryNotesModalVisible &&
+                    <EnquiryNotesModal refreshLeadsData={apiCalls} isVisible={isEnquiryNotesModalVisible} lead={props.lead} onCloseModal={() => {
+                        setIsEnquiryNotesModalVisible(false)
+                    }}/>}
+                <FlatList scrollEnabled={false} data={followUpDetails} renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls} followup={item}/>}/>
+            </View>}
+        </ScrollView>}
         {selectedTab === 1 && <PrimaryButton buttonStyle={styles.fab}
                                              onPress={() => {
+                                                 setIsEnquiryNotesModalVisible(true);
                                              }}
                                              pressableStyle={{flex: 1}}>
             <MaterialIcons name="sticky-note-2" size={24} color="white"/>

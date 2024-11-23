@@ -73,7 +73,6 @@ export const getExpenseCategoryId = () => async (dispatch, getState) => {
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        console.log(response.data.data)
         dispatch(updateExpenseId(response.data.data));
 
     }
@@ -105,7 +104,6 @@ export const getExpenseSubCategoryId = (subId) => async (dispatch, getState) => 
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        console.log(response1.data.data)
         dispatch(updateExpenseSubCategoryId(response1.data.data));
 
     }
