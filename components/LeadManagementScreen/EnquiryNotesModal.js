@@ -32,17 +32,32 @@ const EnquiryNotesModal = (props) => {
         const leadStatusValid = leadStatusRef.current()
         const nextFollowUpDateValid = nextFollowUpDateRef.current()
         const nextFollowUpTimeValid = nextFollowUpTimeRef.current()
-        if (!leadStatusValid && !nextFollowUpDateValid && !nextFollowUpTimeValid) {
+        console.log(leadStatusValid);
+        console.log(nextFollowUpTimeValid);
+        console.log(nextFollowUpDateValid);
+        
+        if (!leadStatusValid || !nextFollowUpDateValid || !nextFollowUpTimeValid) {
             return;
         }
 
-        await addEnquiryNotesAPI(
-            nextFollowUpTime,
-            nextFollowUpDate,
-            props.lead.lead_id,
-            staffs.filter(staff => staff.name === props.lead.lead_owner)[0].id,
-            leadStatus,
-            notes)
+        if(props.lead.lead_owner){
+            await addEnquiryNotesAPI(
+                nextFollowUpTime,
+                nextFollowUpDate,
+                props.lead.lead_id,
+                staffs.filter(staff => staff.name === props.lead.lead_owner)[0].id,
+                leadStatus,
+                notes)
+        } else {
+            await addEnquiryNotesAPI(
+                nextFollowUpTime,
+                nextFollowUpDate,
+                props.lead.lead_id,
+                "",
+                leadStatus,
+                notes)
+        }
+
 
         props.refreshLeadsData();
         props.onCloseModal();
@@ -52,17 +67,28 @@ const EnquiryNotesModal = (props) => {
         const leadStatusValid = leadStatusRef.current()
         const nextFollowUpDateValid = nextFollowUpDateRef.current()
         const nextFollowUpTimeValid = nextFollowUpTimeRef.current()
-        if (!leadStatusValid && !nextFollowUpDateValid && !nextFollowUpTimeValid) {
+        if (!leadStatusValid || !nextFollowUpDateValid || !nextFollowUpTimeValid) {
             return;
         }
-        await editEnquiryNotesAPI(new Date(nextFollowUpTime),
+        if(props.lead.lead_owner){
+            await editEnquiryNotesAPI(new Date(nextFollowUpTime),
+                new Date(nextFollowUpDate),
+                props.lead.lead_id,
+                staffs.filter(staff => staff.name === props.lead.lead_owner)[0].id,
+                leadStatus,
+                notes,
+                props.data.lead_followup_id,
+            )
+        } else {
+            await editEnquiryNotesAPI(new Date(nextFollowUpTime),
             new Date(nextFollowUpDate),
             props.lead.lead_id,
-            staffs.filter(staff => staff.name === props.lead.lead_owner)[0].id,
+            "",
             leadStatus,
             notes,
             props.data.lead_followup_id,
         )
+        }
 
         props.refreshLeadsData();
         props.onCloseModal();
