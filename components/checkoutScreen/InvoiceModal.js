@@ -161,8 +161,6 @@ const InvoiceModal = (props) => {
     }
 
 
-    console.log(JSON.stringify(details, null, 2));
-
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}
         // presentationStyle="pageSheet" onRequestClose={()=>{
@@ -673,6 +671,7 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingVertical: 28,
         alignItems: "center",
+        flex:1,
     },
     heading: {
         fontWeight: 500

@@ -1,9 +1,10 @@
-import {View, Text, StyleSheet, Modal, Pressable, Platform, TouchableOpacity, KeyboardAvoidingView} from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, Platform, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import Colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
 import PrimaryButton from "./PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import CustomTextInput from "./CustomTextInput";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 /**
@@ -60,7 +61,7 @@ export default function BottomModal(props) {
             elevation: 4,             // Shadow strength
             backgroundColor: '#fff',  // Background color
             shadowColor: '#000',      // Shadow color
-            shadowOffset: {width: 0, height: 10}, // Offset for bottom shadow
+            shadowOffset: { width: 0, height: 10 }, // Offset for bottom shadow
             shadowOpacity: 0.1,       // Opacity (optional for cross-platform)
             shadowRadius: 3.84,       // Blur radius (optional for cross-platform)
             borderBottomWidth: 0.5,     // Helps define a stronger bottom line
@@ -115,24 +116,28 @@ export default function BottomModal(props) {
 
 
     })
-
-
+    const insets = useSafeAreaInsets();
     return (
         <Modal
             visible={props.visible}
             transparent={true}
-            style={{flex: 1, position: "relative", borderWidth: 1}}
+            style={{
+                flex: 1
+                // , position: "relative", borderWidth: 1
+            }}
             animationType={"fade"}
         >
-            <Pressable style={{flex: 1}} onPress={props.onCloseModal}/>
 
             <KeyboardAvoidingView
-                behavior="position"
+                keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}
+                behavior={Platform.OS === "ios" ? "height" : ""}
                 style={{
-                    // maxHeight: "80%", backgroundColor: Colors.white,
-                    // paddingBottom: insets.bottom
-                }}
-            >
+                    // backgroundColor: Colors.white,
+                    // paddingBottom: Platform.OS === "ios" ? insets.bottom : 0,
+                    // maxHeight: "100%",
+                    flex: 1
+                }}>
+                <Pressable style={{ flex: 1 }} onPress={props.onCloseModal} />
                 <TouchableOpacity
                     style={styles.modalContent}
                     activeOpacity={1}
@@ -143,13 +148,13 @@ export default function BottomModal(props) {
                         </Text>
                         <Pressable
                             onPress={props.onCloseModal}
-                            android_ripple={{color: Colors.ripple}}
-                            style={({pressed}) =>
+                            android_ripple={{ color: Colors.ripple }}
+                            style={({ pressed }) =>
                                 pressed && Platform.OS === "ios" ?
-                                    [styles.closeButton, {opacity: 0.4}] :
+                                    [styles.closeButton, { opacity: 0.4 }] :
                                     styles.closeButton}
                         >
-                            <Ionicons name="close" size={30} color="black"/>
+                            <Ionicons name="close" size={30} color="black" />
                         </Pressable>
                     </View>
                     <View style={styles.textInputContainer}>
