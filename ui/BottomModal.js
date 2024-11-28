@@ -4,6 +4,7 @@ import textTheme from "../constants/TextTheme";
 import PrimaryButton from "./PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
 import CustomTextInput from "./CustomTextInput";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 /**
@@ -115,24 +116,27 @@ export default function BottomModal(props) {
 
 
     })
-
-
+    const insets = useSafeAreaInsets();
     return (
         <Modal
             visible={props.visible}
             transparent={true}
-            style={{flex: 1, position: "relative", borderWidth: 1}}
+            style={{flex: 1
+                // , position: "relative", borderWidth: 1
+            }}
             animationType={"fade"}
         >
-            <Pressable style={{flex: 1}} onPress={props.onCloseModal}/>
-
+            
             <KeyboardAvoidingView
-                behavior="position"
-                style={{
-                    // maxHeight: "80%", backgroundColor: Colors.white,
-                    // paddingBottom: insets.bottom
-                }}
-            >
+        //   keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}
+          behavior={Platform.OS==="ios" ? "height" : ""}
+          style={{
+            // backgroundColor: Colors.white,
+            // paddingBottom: Platform.OS === "ios" ? insets.bottom : 0,
+            // maxHeight: "100%",
+            flex:1
+          }}>
+                <Pressable style={{flex: 1}} onPress={props.onCloseModal}/>
                 <TouchableOpacity
                     style={styles.modalContent}
                     activeOpacity={1}

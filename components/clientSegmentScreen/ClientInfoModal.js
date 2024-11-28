@@ -218,11 +218,11 @@ export default function clientInfoModal(props) {
                         </View>
 
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>
+                    {/* <PrimaryButton buttonStyle={styles.bookButton} pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>
                         <Text style={[textTheme.bodyMedium, { color: Colors.white }]}>
                             Book now
                         </Text>
-                    </PrimaryButton>
+                    </PrimaryButton> */}
                 </View>
 
                 <ClientSaleInfo

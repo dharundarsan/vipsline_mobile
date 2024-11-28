@@ -1,4 +1,4 @@
-import {Modal, Platform, ScrollView, StyleSheet, Text, View} from "react-native";
+import {KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, View} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
@@ -161,8 +161,6 @@ const InvoiceModal = (props) => {
     }
 
 
-    console.log(JSON.stringify(details, null, 2));
-
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}
         // presentationStyle="pageSheet" onRequestClose={()=>{
@@ -185,9 +183,9 @@ const InvoiceModal = (props) => {
         {/*                           // card: "#b73737",*/}
         {/*                       }]}>*/}
 
+        <KeyboardAvoidingView style={{ flex: 1}} behavior="position" keyboardVerticalOffset={Platform.OS === "ios" ? 34 : 0}>
 
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
-
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -197,8 +195,8 @@ const InvoiceModal = (props) => {
                 dropdownItems={[
                     "SMS",
                     "Email",
-                    "Thermal Print",
-                    "A4 Print",
+                    // "Thermal Print",
+                    // "A4 Print",
                     "Cancel Invoice"
                 ]}
                 iconImage={[
@@ -385,14 +383,14 @@ styles.heading]}>Invoice</Text>*/}
                                 props.onCloseModal();
                             }}
                         />
-                        <PrimaryButton
+                        {/* <PrimaryButton
                             onPress={() => setOptionModalVisibility(true)}
                             buttonStyle={styles.backToCheckoutOptionsButton}>
                             <MaterialIcons name="keyboard-arrow-down"
                                            size={24}
                                            color={Colors.background}
                             />
-                        </PrimaryButton>
+                        </PrimaryButton> */}
                     </View>
                     {
                         !isCancelled ?
@@ -660,6 +658,7 @@ styles.heading]}>Invoice</Text>*/}
             {/*<Toast ref={toastRef} />*/}
         </ScrollView>
         {/*</AlertNotificationRoot>*/}
+        </KeyboardAvoidingView>
 
 
     </Modal>
@@ -673,6 +672,7 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === "ios" ? 50 : 0,
         paddingVertical: 28,
         alignItems: "center",
+        flex:1,
     },
     heading: {
         fontWeight: 500
@@ -698,8 +698,8 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     backToCheckoutButton: {
-        borderTopRightRadius: 0,
-        borderBottomRightRadius: 0,
+        // borderTopRightRadius: 0,
+        // borderBottomRightRadius: 0,
         flex: 4,
 
     },

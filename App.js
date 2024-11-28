@@ -141,10 +141,10 @@ export default function App() {
             {/*    onAction={handleUserActivity}  // Callback when user becomes inactive*/}
             {/*    style={{ flex: 1 }}*/}
             {/*>*/}
-            {/*<SafeAreaView style={styles.safeAreaView}>*/}
+            {/* <SafeAreaView style={styles.safeAreaView}> */}
 
             <AppNavigator auth={isAuth} setAuth={setIsAuth}/>
-            {/*</SafeAreaView>*/}
+            {/* </SafeAreaView> */}
             {/*</UserInactivity>*/}
         </Provider>
     );
