@@ -392,7 +392,7 @@ export default function ClientSegmentScreen(props) {
                             Bar
                             filter
                             onPressFilter={() => setAdvancedFiltersVisibility(true)}
-                            placeholder={"Search by mobile number name"}
+                            placeholder={"Search by name email or mobile"}
                             searchContainerStyle={[textTheme.bodyMedium, styles.searchBarContainer]}
                             onChangeText={(text) => {
                                 setSearchQuery(text);
