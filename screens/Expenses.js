@@ -80,7 +80,7 @@ export default function Expenses() {
             </View>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16}}>
                 <Text style={[textTheme.titleSmall, {color: Colors.grey500}]}>
-                    {dateFormatter(itemData.item.date, 'short')}
+                    {itemData.item.date.split(",")[0]}
                 </Text>
                 <Text style={[textTheme.titleSmall, {color: Colors.grey500}]}>
                     {itemData.item.payment_mode}
@@ -93,14 +93,14 @@ export default function Expenses() {
 
 
     return <View style={styles.expense}>
-        {
-            isModalVisible &&
+
             <EntryModal
                 isModalVisible={isModalVisible}
-                setIsModalVisible={setIsModalVisible}
+                onClose={() => {
+                    setIsModalVisible(false)
+                }}
                 query={searchQuery}
             />
-        }
         {
             isVisible &&
             <RecordExpenses
@@ -153,7 +153,7 @@ export default function Expenses() {
                             filter
                             onPressFilter={() => setAdvancedFiltersVisibility(true)}
                             searchContainerStyle={styles.searchBar}
-                            placeholder={"Search by name email or phone"}
+                            placeholder={"Search by name email or mobile"}
                             onChangeText={setSearchQuery}
                         />
 
@@ -205,7 +205,7 @@ export default function Expenses() {
                             onPress={() => setIsVisible(true)}
                         >
                             <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
-                                <Text style={[textTheme.titleMedium, {color: Colors.white}]}>Add</Text>
+                                {/*<Text style={[textTheme.titleMedium, {color: Colors.white}]}>Add</Text>*/}
                                 <FontAwesome6 name="plus" size={24} color="white" />
                             </View>
                         </PrimaryButton>
@@ -295,22 +295,23 @@ const styles = StyleSheet.create({
     },
     addButtonContainer: {
         position:'absolute',
-        right: "5%",
-        bottom: "20%",
+        right: "8%",
+        bottom: "15%",
 
     },
     addButton: {
         backgroundColor: Colors.highlight,
+        borderRadius: 12
 
     },
     addButtonPressable: {
-        paddingVertical: 18
+        paddingVertical: 12,
+        paddingHorizontal: 14,
     },
     noDataContainer: {
         alignItems: 'center',
         marginTop: 16,
         justifyContent: 'center',
-
         flex: 1
     },
 

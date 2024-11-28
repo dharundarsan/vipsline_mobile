@@ -243,7 +243,7 @@ const CustomTextInput = (props) => {
                 <PrimaryButton
                     buttonStyle={styles.dropdownButton}
                     pressableStyle={styles.dropdownButtonPressable}
-                    onPress={() => setIsDropdownModalVisible(true)}
+                    onPress={() => props.dropdownOnPress !== undefined ? props.dropdownOnPress ? setIsDropdownModalVisible(true) : setIsDropdownModalVisible(false) : setIsDropdownModalVisible(true)}
                 >
 
                     {props.object ? <Text style={[textTheme.bodyLarge]}>

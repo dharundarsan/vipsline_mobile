@@ -108,7 +108,7 @@ const SalesDashboard = () => {
     if (item.day1 === undefined) {
       setIsCustomRange(false);
 
-      if (item.label !== "This month" && item.value !== "Custom range") {
+      if (item.label !== "Current month" && item.value !== "Custom range") {
         // dispatch(updateLoadingState(true));
         setDate(
           item.day !== -6 && item.day !== -29
@@ -123,7 +123,7 @@ const SalesDashboard = () => {
           )
         );
       }
-    } else if (item.label === "This month") {
+    } else if (item.label === "Current month") {
       setIsCustomRange(false);
       setIsLoading(true);
       setDate(firstDateDDMMYYYY + " - " + lastDateDDMMYYYY);
@@ -399,6 +399,7 @@ const SalesDashboard = () => {
           title={"Bill Items"}
           labelArray={billItemDetails[0].labels}
           pieDataArray={percentageBillData}
+          dropdownKey={"vipslinebillitem_1"}
         />
         <View style={styles.commonContainer}>
           <Text
@@ -437,7 +438,7 @@ const SalesDashboard = () => {
           xLabelArrayData={totalSalesOverTime.date}
           lineChartData={totalSalesOverTimeData}
           max={roundLineSalesOverTime}
-          sections={removeZeroLineSalesOverTime}
+          sections={removeZeroLineSalesOverTime === "1" ? 10 : removeZeroLineSalesOverTime}
           page="SalesOverTime"
           // key1={"SalesOverTime"}
         />
@@ -464,6 +465,7 @@ const SalesDashboard = () => {
           toggleTitle={"Top 10 Revenue Services"}
           dateArray={labelArray}
           showPie={togglePercentageData.length !== 0}
+          dropdownKey={"vipslinetopservices_1"}
         />
         <PieChartBox
           title={"Top Products"}
@@ -477,6 +479,7 @@ const SalesDashboard = () => {
           toggleTitle={"Top 10 Revenue Products"}
           dateArray={labelArray}
           showPie={toggleProductData.length !== 0}
+          dropdownKey={"vipslinetopproducts_1"}
         />
       </View>
     </ScrollView>

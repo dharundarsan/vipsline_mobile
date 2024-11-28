@@ -21,11 +21,11 @@ const initialDashboardState = {
     { label: "Yesterday", value: "yesterday",day:-1 },
     { label: "Last 7 days", value: "last7days",day:-6 },
     { label: "Last 30 days", value: "last30days",day:-29 },
-    { label: "This month", value: "This month",day1:0,day2:0},
+    { label: "Current month", value: "Current month",day1:0,day2:0},
     { label: "Custom range", value: "Custom Range",day1: 0,day2: 0 },
   ],
   toggleDateData: [
-    { label: "This month", value: "thismonth" },
+    { label: "Current month", value: "thismonth" },
     { label: "Today", value: "today",day:0 },
     { label: "Yesterday", value: "yesterday",day:-1 },
     { label: "Last 7 days", value: "last7days",day:-6 },
@@ -161,7 +161,7 @@ const initialDashboardState = {
     count:[1]
   },
   lineChartData:[
-    { label: "This month", value: "currentmonth" },
+    { label: "Current month", value: "currentmonth" },
     { label: "Last 7 days", value: "last7days" },
     { label: "Last 30 days", value: "last30days" },
     { label: "Last 3 months", value: "last3months" },

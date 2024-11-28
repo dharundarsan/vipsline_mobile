@@ -215,8 +215,7 @@ export const ExpensesSlice = createSlice({
         updateExpensesList(state, action) {
             state.expenses = [...action.payload];
         },
-        resetExpensesFilter(state, action) {
-            state.expenses = [];
+        resetExpensesPageNo(state, action) {
             state.pageNo = 0;
         },
         updateFetchingState(state, action) {
@@ -339,7 +338,8 @@ export const {
     updateCurrentExpensesId,
     updateCurrentExpense,
     updateCurrentCategoryId,
-    updateCurrentSubCategoryId
+    updateCurrentSubCategoryId,
+    resetExpensesPageNo
 
 } = ExpensesSlice.actions;
 

@@ -46,7 +46,7 @@ export default function ListOfBusinessesScreen({navigation}) {
     const {getLocation, currentLocation, reload, setReload} = useLocationContext();
     const toastRef = useRef();
 
-    console.log(details)
+
 
     useFocusEffect(useCallback(() => {
         getLocation("List of Business");
