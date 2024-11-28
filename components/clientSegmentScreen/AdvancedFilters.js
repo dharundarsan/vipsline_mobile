@@ -123,6 +123,9 @@ export default function AdvancedFilters(props) {
                               if(isNewClient) {
                                   return "From Date is Required"
                               }
+                              else if(toDate !== null) {
+                                  return "From Date is Required"
+                              }
                           }}
                           onSave={(callback) => {
                               fromDateRef.current = callback;
@@ -146,6 +149,9 @@ export default function AdvancedFilters(props) {
                            minimumDate={fromDate === null ? undefined : fromDate}
                            validator={(text) => {
                                if(isNewClient) {
+                                   return "To Date is Required"
+                               }
+                               else if(fromDate !== null) {
                                    return "To Date is Required"
                                }
                            }}
@@ -193,6 +199,7 @@ export default function AdvancedFilters(props) {
 
 
                         if((isNewClient) && (fromDate === null || toDate === null)) return;
+                        if(!((fromDate === null && toDate === null) || (fromDate !== null && toDate !== null))) return;
 
                         props.setVisibility(false);
                         const _appliedFilters = convertAppliedFilters(fromDate, toDate, selectedOptions);

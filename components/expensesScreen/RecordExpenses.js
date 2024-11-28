@@ -8,7 +8,12 @@ import Colors from "../../constants/Colors";
 import CustomTextInput from "../../ui/CustomTextInput";
 import addExpensesAPI from "../../util/apis/addExpensesAPI";
 import {useDispatch, useSelector} from "react-redux";
-import {getExpenseSubCategoryId, loadExpensesFromDb} from "../../store/ExpensesSlice";
+import {
+    getExpenseSubCategoryId,
+    loadExpensesFromDb,
+    resetExpensesPageNo,
+    updateMaxEntry
+} from "../../store/ExpensesSlice";
 import moment from "moment";
 import editExpensesAPI from "../../util/apis/editExpensesAPI";
 import DeleteExpenseModal from "./DeleteExpenseModal";
@@ -36,7 +41,7 @@ export default function RecordExpenses(props) {
     }
 
     const [expenseData, setExpenseData] = useState({
-        expenseDate: props.type === "add" ? null : parseDate((currentExpense.date.split(",")[0])),
+        expenseDate: props.type === "add" ? new Date() : parseDate((currentExpense.date.split(",")[0])),
         expenseAmountType: props.type === "add" ? "" : currentExpense.expense_category,
         expenseType: props.type === "add" ? "" : currentExpense.expense_sub_category,
         amount: props.type === "add" ? "" : currentExpense.amount+"",
@@ -47,10 +52,9 @@ export default function RecordExpenses(props) {
 
     useEffect(() => {
         async function f() {
-            await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
+            // await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
         }
-        f()
-        updateExpenseData("expenseType", "")
+        f();
     }, [expenseData.expenseAmountType]);
 
     const [deleteExpenseVisibility, setDeleteExpenseVisibility] = useState(false);
@@ -86,6 +90,10 @@ export default function RecordExpenses(props) {
                     content={"Do you want to delete this expense ?"}
                     oncloseAfterDelete={() => {
                         props.closeModal();
+                        dispatch(loadExpensesFromDb())
+                        dispatch(updateMaxEntry(10))
+                        dispatch(resetExpensesPageNo());
+
                     }}
                 />
             }
@@ -132,14 +140,18 @@ export default function RecordExpenses(props) {
                         type={"dropdown"}
                         dropdownItems={categories.map(item => item.name)}
                         value={expenseData.expenseAmountType}
-                        onChangeValue={(value) => updateExpenseData("expenseAmountType", value)}
+                        onChangeValue={async (value) => {
+                            updateExpenseData("expenseAmountType", value);
+                            await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === value).id));
+                            updateExpenseData("expenseType", "");
+                        }}
                         required
                         onSave={(callback) => {
-                            amountTypeRef.current = callback
+                            amountTypeRef.current = callback;
                         }}
                         validator={(text) => {
                             if(text === null || text === "") {
-                                return "Expense amount is required";
+                                return "Expense account is required";
                             }
                             else {
                                 return true
@@ -165,6 +177,7 @@ export default function RecordExpenses(props) {
                                 return true
                             }
                         }}
+                        dropdownOnPress={expenseData.expenseAmountType !== ""}
                     />
                     <CustomTextInput
                         label={"Amount"}
@@ -200,7 +213,7 @@ export default function RecordExpenses(props) {
                         onChangeValue={(value) => updateExpenseData("paymentMode", value)}
                         required
                         onSave={(callback) => {
-                            paymentModeRef.current = callback
+                            paymentModeRef.current = callback;
                         }}
                         validator={(text) => {
                             if(text === null || text === "") {
@@ -244,8 +257,7 @@ export default function RecordExpenses(props) {
                         buttonStyle={styles.saveButton}
                         pressableStyle={styles.saveButtonPressable}
                         onPress={async () => {
-                            const subId = subIds.find(item => item.name === expenseData.expenseType).id
-                            const catId = categories.find(item => item.name === expenseData.expenseAmountType).id
+
                             console.log("hi")
                             const isDateEntered = dateRef.current();
                             const isExpenseAmountEntered = amountTypeRef.current();
@@ -260,6 +272,9 @@ export default function RecordExpenses(props) {
                                 !isPaymentModeEntered) {
                                 return ;
                             }
+
+                            const subId = subIds.find(item => item.name === expenseData.expenseType).id
+                            const catId = categories.find(item => item.name === expenseData.expenseAmountType).id
 
                             if(props.type === "add") {
                                 const res = await addExpensesAPI(expenseData, catId, subId);

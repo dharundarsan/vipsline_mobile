@@ -73,7 +73,6 @@ export const getExpenseCategoryId = () => async (dispatch, getState) => {
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        console.log(response.data.data)
         dispatch(updateExpenseId(response.data.data));
 
     }
@@ -105,7 +104,6 @@ export const getExpenseSubCategoryId = (subId) => async (dispatch, getState) => 
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        console.log(response1.data.data)
         dispatch(updateExpenseSubCategoryId(response1.data.data));
 
     }
@@ -217,8 +215,7 @@ export const ExpensesSlice = createSlice({
         updateExpensesList(state, action) {
             state.expenses = [...action.payload];
         },
-        resetExpensesFilter(state, action) {
-            state.expenses = [];
+        resetExpensesPageNo(state, action) {
             state.pageNo = 0;
         },
         updateFetchingState(state, action) {
@@ -341,7 +338,8 @@ export const {
     updateCurrentExpensesId,
     updateCurrentExpense,
     updateCurrentCategoryId,
-    updateCurrentSubCategoryId
+    updateCurrentSubCategoryId,
+    resetExpensesPageNo
 
 } = ExpensesSlice.actions;
 

@@ -39,7 +39,6 @@ export default function EntryModal(props) {
         {label: '100', value: 100},
     ];
 
-    console.log(checkedNumber)
 
 
     useEffect(() => {
@@ -56,13 +55,15 @@ export default function EntryModal(props) {
             visible={props.isModalVisible}
             animationType="fade"
             transparent={true}
-            presentationStyle={"formSheet"}
-            onRequestClose={props.setIsModalVisible(false)}
+            onRequestClose={props.onClose}
         >
+            <View style={{flex: 1}}>
+
+
             <TouchableOpacity activeOpacity={1}
                               style={{flex: 1, justifyContent: "center", backgroundColor: Colors.dim}}
                               onPress={() => {
-                                  props.setIsModalVisible(false);
+                                  props.onClose();
                               }}>
 
                 <View style={styles.model}>
@@ -72,7 +73,7 @@ export default function EntryModal(props) {
                             value={checkedNumber}
                             onPress={(value) => {
                                 setCheckedNumber(value)
-                                props.setIsModalVisible(false);
+                                props.onClose();
                                 dispatch(updateMaxEntry(value));
                             }}
                         />
@@ -80,6 +81,7 @@ export default function EntryModal(props) {
 
                 </View>
             </TouchableOpacity>
+            </View>
         </Modal>
     );
 }
