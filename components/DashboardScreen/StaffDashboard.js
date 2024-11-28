@@ -101,7 +101,7 @@ const StaffDashboard = () => {
       );
       await dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(item.day), formatDateYYYYMMDD(0)));
     }
-    else if (item.value === "This month") {
+    else if (item.value === "Current month") {
       setIsCustomRange(false);
       setIsLoading(true);
       const { firstDateDDMMYYYY, lastDateDDMMYYYY } =
