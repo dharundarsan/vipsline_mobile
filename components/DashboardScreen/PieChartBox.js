@@ -96,7 +96,7 @@ const PieChartBox = (props) => {
       if (item.day !== undefined) {
         setIsCustomRange(false);
         dispatch(loadTopRevenueServices(formatDateYYYYMMDD(item.day),formatDateYYYYMMDD(0)));
-      } else if(item.day !== undefined || item.label === "This month") {
+      } else if(item.day !== undefined || item.label === "Current month") {
         setIsCustomRange(false);
         dispatch(loadTopRevenueServices(getFirstMonth, getLastMonth));
       }
@@ -121,7 +121,7 @@ const PieChartBox = (props) => {
             )
           );
         }
-      } else if (item.day !== undefined || item.label === "This month") {
+      } else if (item.day !== undefined || item.label === "Current month") {
         setIsCustomRange(false)
         dispatch(loadTopRevenueProducts(getFirstMonth, getLastMonth));
       }
@@ -135,7 +135,7 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "clientGender") {
-      if (item.label !== "This month" && item.label !== "Custom range") {
+      if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
         dispatch(
           loadRevenueByGender(formatDateYYYYMMDD(item.day), currentDate)
@@ -153,7 +153,7 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "clientCount") {
-      if (item.label !== "This month" && item.label !== "Custom range") {
+      if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
         dispatch(
           loadRevenueCountByGender(formatDateYYYYMMDD(item.day), currentDate)
@@ -171,7 +171,7 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "clientRedemption") {
-      if (item.label !== "This month" && item.label !== "Custom range") {
+      if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
         dispatch(
           loadRevenueByPrepaid(formatDateYYYYMMDD(item.day), currentDate)
@@ -278,7 +278,9 @@ const PieChartBox = (props) => {
             valueField="value"
             value={selectedValue}
             onChange={handleSelection}
-            // placeholder="This month"
+            // placeholder="Current month"
+            inverted={false}
+            key={props.dropdownKey}
           />
         ) : null}
       </View>

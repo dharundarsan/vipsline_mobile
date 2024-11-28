@@ -201,7 +201,7 @@ export const clientPieColorCode = [
   { color: "#6950F3",title:"Male"},
   { color: "#EF5DA8",title:"Female"},
   { color: "#BAA3EB",title:"Others"},
-  { color: "#E9ECF8",title:"No Data"},
+  { color: "#999999",title:"No Data"},
 ]
 
 export const trophyIcon = [

@@ -23,6 +23,7 @@ import PieChartBox from "./PieChartBox";
 import ContentLoader from "react-native-easy-content-loader";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocationContext } from "../../context/LocationContext";
+import { calculateTotalValue } from "./PieData";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ const ClientDashboard = () => {
       return {
         page: "clientGender",
         value: item,
-        color: clientPieColorCode[index]?.color || "#E9ECF8",
+        color: clientPieColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
       };
     }
@@ -53,7 +54,7 @@ const ClientDashboard = () => {
       {
         page: "clientGender",
         value: 1,
-        color: clientPieColorCode[0]?.color || "#E9ECF8",
+        color: clientPieColorCode[0]?.color || "#999999",
         text: "error",
       },
     ];
@@ -64,7 +65,7 @@ const ClientDashboard = () => {
       return {
         page: "clientCount",
         value: item,
-        color: clientPieColorCode[index]?.color || "#E9ECF8",
+        color: clientPieColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
       };
     }) || [
@@ -82,13 +83,13 @@ const ClientDashboard = () => {
       return {
         page: "clientRedemption",
         value: item,
-        color: clientPieColorCode[index]?.color || "#E9ECF8",
+        color: clientPieColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
       };
     }) || [{
       page: "clientRedemption",
       value: 1,
-      color: clientPieColorCode[0]?.color || "#E9ECF8",
+      color: clientPieColorCode[0]?.color || "#999999",
       text: "error",
     }];
 
@@ -118,7 +119,8 @@ const ClientDashboard = () => {
   useFocusEffect(useCallback(() => {
     getLocation("Client Dashboard");
   }, []))
-
+  const prepaidVsRedemptionTotalValue = calculateTotalValue(revenuePrepaidData[0].chart_series);
+  
   const labelArray = useSelector((state) => state.dashboardDetails.toggleDateData);
 
   return (
@@ -190,6 +192,7 @@ const ClientDashboard = () => {
           labelArray={revenuePrepaidData[0]?.label_list || []}
           pieDataArray={convertRevenuePrepaidData}
           toggleDateDropdown
+          totalCenterValue={prepaidVsRedemptionTotalValue}
         />
       </View>
     </ScrollView>

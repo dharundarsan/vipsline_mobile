@@ -43,11 +43,12 @@ import EnquiryNotesModal from "./EnquiryNotesModal";
 const LeadDetailsModal = (props) => {
     const dispatch = useDispatch();
     const [selectedTab, setSelectedTab] = useState(0);
-    const [leadProfile, setLeadProfile] = useState(null);
+    const [leadProfile, setLeadProfile] = useState([]);
     const [followUpDetails, setFollowUpDetails] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const leadSources = useSelector(state => state.leads.leadSources);
     const [isEnquiryNotesModalVisible, setIsEnquiryNotesModalVisible] = useState(false);
+    const [isEditLeadModalVisible, setIsEditLeadModalVisible] = useState(false);
 
     const styles = StyleSheet.create({
         leadDetailsModal: {
@@ -134,7 +135,7 @@ const LeadDetailsModal = (props) => {
         },
         leadProfileHeader: {
             borderTopLeftRadius: 8,
-            borderTopRightRadius:8,
+            borderTopRightRadius: 8,
             flexDirection: "row",
             backgroundColor: "#F8F8FB",
             borderBottomColor: "#D5D7DA",
@@ -143,7 +144,7 @@ const LeadDetailsModal = (props) => {
             paddingVertical: 5,
             alignItems: "center",
             justifyContent: "space-between",
-            height:50,
+            height: 50,
         },
         detailsContainer: {
             padding: 20,
@@ -164,9 +165,15 @@ const LeadDetailsModal = (props) => {
 
     const validateField = (value, fallback = "Not added") => (value ? value : fallback);
 
-
     return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"}
                   presentationStyle={"pageSheet"}>
+        {isEditLeadModalVisible && <CreateLeadModal
+            isVisible={isEditLeadModalVisible}
+            onCloseModal={() => setIsEditLeadModalVisible(false)}
+            refreshData={apiCalls}
+            edit={true}
+            data={{...leadProfile, ...props.lead}}
+        />}
         <View style={styles.header}>
             <View style={styles.headerLeadContainer}>
                 <View style={styles.headerLeadProfile}>
@@ -208,18 +215,21 @@ const LeadDetailsModal = (props) => {
             <View style={styles.leadProfileContainer}>
                 <View style={styles.leadProfileHeader}>
                     <Text style={textTheme.titleMedium}>Lead Profile</Text>
-                    {/*<PrimaryButton*/}
-                    {/*    pressableStyle={{*/}
-                    {/*        paddingHorizontal: 10,*/}
-                    {/*        paddingVertical: 10*/}
-                    {/*    }}*/}
-                    {/*    buttonStyle={{*/}
-                    {/*        backgroundColor: "white", borderColor: "#D5D7DA",*/}
-                    {/*        borderWidth: 1,*/}
-                    {/*        borderRadius: 8,*/}
-                    {/*    }}>*/}
-                    {/*    <Feather name="edit-2" size={15} color="black"/>*/}
-                    {/*</PrimaryButton>*/}
+                    <PrimaryButton
+                        pressableStyle={{
+                            paddingHorizontal: 10,
+                            paddingVertical: 10
+                        }}
+                        onPress={() => {
+                            setIsEditLeadModalVisible(true);
+                        }}
+                        buttonStyle={{
+                            backgroundColor: "white", borderColor: "#D5D7DA",
+                            borderWidth: 1,
+                            borderRadius: 8,
+                        }}>
+                        <Feather name="edit-2" size={15} color="black"/>
+                    </PrimaryButton>
                 </View>
                 {isLoading ? <View>
                     <ContentLoader
@@ -255,9 +265,7 @@ const LeadDetailsModal = (props) => {
                         Lead Source
                     </Text>
                     <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(
-                            leadSources.find((source) => source.id === leadProfile?.lead_source)?.name
-                        )}
+                        {validateField(leadSources.filter(source => source.id.toString() === (leadProfile?.lead_source?.toString()))[0]?.name)}
                     </Text>
                     <Text/>
                     <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
@@ -306,10 +314,13 @@ const LeadDetailsModal = (props) => {
                 title={false}
             /> : <View style={styles.enquiryNotesContent}>
                 {isEnquiryNotesModalVisible &&
-                    <EnquiryNotesModal refreshLeadsData={apiCalls} isVisible={isEnquiryNotesModalVisible} lead={props.lead} onCloseModal={() => {
+                    <EnquiryNotesModal refreshLeadsData={apiCalls} isVisible={isEnquiryNotesModalVisible}
+                                       lead={props.lead} onCloseModal={() => {
                         setIsEnquiryNotesModalVisible(false)
                     }}/>}
-                <FlatList scrollEnabled={false} data={followUpDetails} renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls} followup={item}/>}/>
+                <FlatList scrollEnabled={false} data={followUpDetails}
+                          renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls}
+                                                                   followup={item}/>}/>
             </View>}
         </ScrollView>}
         {selectedTab === 1 && <PrimaryButton buttonStyle={styles.fab}
