@@ -1,4 +1,4 @@
-import {Modal, Platform, ScrollView, StyleSheet, Text, View} from "react-native";
+import {KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, View} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
@@ -183,9 +183,9 @@ const InvoiceModal = (props) => {
         {/*                           // card: "#b73737",*/}
         {/*                       }]}>*/}
 
+        <KeyboardAvoidingView style={{ flex: 1}} behavior="position" keyboardVerticalOffset={Platform.OS === "ios" ? 34 : 0}>
 
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
-
 
             <DropdownModal
                 isVisible={actionModalVisibility}
@@ -658,6 +658,7 @@ styles.heading]}>Invoice</Text>*/}
             {/*<Toast ref={toastRef} />*/}
         </ScrollView>
         {/*</AlertNotificationRoot>*/}
+        </KeyboardAvoidingView>
 
 
     </Modal>

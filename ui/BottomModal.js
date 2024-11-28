@@ -128,8 +128,8 @@ export default function BottomModal(props) {
         >
             
             <KeyboardAvoidingView
-          keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}
-        //   behavior={Platform.OS==="ios" ? "position" : ""}
+        //   keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}
+          behavior={Platform.OS==="ios" ? "height" : ""}
           style={{
             // backgroundColor: Colors.white,
             // paddingBottom: Platform.OS === "ios" ? insets.bottom : 0,
