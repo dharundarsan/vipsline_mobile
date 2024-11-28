@@ -37,6 +37,7 @@ SplashScreen.preventAutoHideAsync();
 // Drawer icon imports
 import calender_icon from "./assets/icons/drawerIcons/calendar.png";
 import catalogue_icon from "./assets/icons/drawerIcons/catalogue.png";
+import lead_management_icon from "./assets/icons/drawerIcons/lead_management.png";
 import add_businesses_icon from "./assets/icons/drawerIcons/add_businesses.png";
 import checkout_icon from "./assets/icons/drawerIcons/checkout.png";
 import clients_icon from "./assets/icons/drawerIcons/clients.png";
@@ -82,6 +83,7 @@ import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import AppointmentsScreen from "./screens/AppointmentsScreen";
 import LeadManagementScreen from "./screens/LeadManagementScreen";
 import Expenses from "./screens/Expenses";
+import PrimaryButton from './ui/PrimaryButton';
 
 enableScreens();
 
@@ -299,30 +301,54 @@ const BackButton = () => {
     const page = useSelector((state) => state.dashboardDetails.dashboardName)
     const {setIsDashboardPage} = useDataContext()
     return (
-        <TouchableOpacity onPress={async() => {
-            // setTimeout(() => {
-            //     setIsDashboardPage(true)
-            // }, 40);
-            // setTimeout(() => {
-                // dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
-                // dispatch(loadTopRevenueServices(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
-                // dispatch(loadTopRevenueProducts(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
-                if(page === "Client"){
-                    dispatch(loadRevenueByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
-                    dispatch(loadRevenueCountByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
-                    dispatch(loadRevenueByPrepaid(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
-                }
-                else if(page === "Staff"){
-                    dispatch(loadResourceIdByUserInfo(username.username));
-                    dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
-                }
-                navigation.navigate("DashboardScreen")
-            // }, 50);
-        }}
-        style={{ paddingLeft: 10 }}>
-        <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
-        </TouchableOpacity>
+        <TouchableOpacity
+        style={{left:15}}
+                        onPress={async() => {
+                            // setTimeout(() => {
+                            //     setIsDashboardPage(true)
+                            // }, 40);
+                            // setTimeout(() => {
+                                // dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+                                // dispatch(loadTopRevenueServices(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+                                // dispatch(loadTopRevenueProducts(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+                                if(page === "Client"){
+                                    dispatch(loadRevenueByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                                    dispatch(loadRevenueCountByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                                    dispatch(loadRevenueByPrepaid(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                                }
+                                else if(page === "Staff"){
+                                    dispatch(loadResourceIdByUserInfo(username.username));
+                                    dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+                                }
+                                navigation.navigate("DashboardScreen")}}
+                    >
+                        <AntDesign name="arrowleft" size={24} color="black"/>
+                    </TouchableOpacity>
+        // <TouchableOpacity onPress={async() => {
+        //     // setTimeout(() => {
+        //     //     setIsDashboardPage(true)
+        //     // }, 40);
+        //     // setTimeout(() => {
+        //         // dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+        //         // dispatch(loadTopRevenueServices(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+        //         // dispatch(loadTopRevenueProducts(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+        //         if(page === "Client"){
+        //             dispatch(loadRevenueByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+        //             dispatch(loadRevenueCountByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+        //             dispatch(loadRevenueByPrepaid(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+        //         }
+        //         else if(page === "Staff"){
+        //             dispatch(loadResourceIdByUserInfo(username.username));
+        //             dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+        //         }
+        //         navigation.navigate("DashboardScreen")
+        //     // }, 50);
+        // }}
+        // style={{ paddingLeft: 10 }}>
+        // <Text style={{ color: '#007bff', fontSize: 18 }}>Back</Text>
+        // </TouchableOpacity>
     );
+
 };
 
 const MainDrawerNavigator = (props) => {
@@ -338,7 +364,7 @@ const MainDrawerNavigator = (props) => {
             headerShown: !isDashboardPage,
             // headerTitleAlign: 'center',
             // headerShown:false,
-            animation:"ios"
+            // animation:"ios"
           })}
         >
             <Stack.Screen name='DashboardScreen'
@@ -567,7 +593,7 @@ const MainDrawerNavigator = (props) => {
                                            component={LeadManagementScreen}
                                            options={{
                                                drawerIcon: () => <Image
-                                                   source={{uri: Image.resolveAssetSource(marketing_icon).uri}}
+                                                   source={{uri: Image.resolveAssetSource(lead_management_icon).uri}}
                                                    width={25}
                                                    height={25}
                                                    style={{resizeMode: "contain"}}/>,

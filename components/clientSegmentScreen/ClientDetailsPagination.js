@@ -48,9 +48,6 @@ export default function ClientDetailsPagination(props) {
     const [upperCount, setUpperCount] = useState(10);
     const [lowerCount, setLowerCount] = useState(1);
 
-    console.log("porps.totalCount");
-
-    console.log(upperCount)
 
     useEffect(() => {
         dispatch(loadAnalyticsClientDetailsFromDb(props.clientId));

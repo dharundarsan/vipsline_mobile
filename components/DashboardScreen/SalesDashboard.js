@@ -62,8 +62,9 @@ const SalesDashboard = () => {
   const totalSalesOverTimeDropdown = useSelector((state) => state.dashboardDetails.lineChartData);
   const totalAppointmentOverTime = useSelector((state) => state.dashboardDetails.totalAppointmentOverTime);
 
+  const billItemTotalValue = calculateTotalValue(billItemDetails[0].series);
+  
   const servicesTotalValue = calculateTotalValue(topRevenueDetails[0].chart_series);
-
   const productsTotalValue = calculateTotalValue(topProductDetails[0].chart_series);
 
   const data = billItemDetails[0].series.map((value) => ({ value })) || [];
@@ -107,7 +108,7 @@ const SalesDashboard = () => {
     if (item.day1 === undefined) {
       setIsCustomRange(false);
 
-      if (item.label !== "This month" && item.value !== "Custom range") {
+      if (item.label !== "Current month" && item.value !== "Custom range") {
         // dispatch(updateLoadingState(true));
         setDate(
           item.day !== -6 && item.day !== -29
@@ -122,7 +123,7 @@ const SalesDashboard = () => {
           )
         );
       }
-    } else if (item.label === "This month") {
+    } else if (item.label === "Current month") {
       setIsCustomRange(false);
       setIsLoading(true);
       setDate(firstDateDDMMYYYY + " - " + lastDateDDMMYYYY);
@@ -155,14 +156,16 @@ const SalesDashboard = () => {
   }
 
   useEffect(() => {
+    let firstMonth = firstMonthDate;
+    let lastMonth = lastMonthDate;
+
     async function initialCall() {
-      setIsPageLoading(true);
       await dispatch(updateDashBoardName("Sales"))
       await dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
       await dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
-      await dispatch(loadTopRevenueProducts(firstMonthDate, lastMonthDate));
-      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false, "currentmonth"))
       await dispatch(loadDailyAppointmentAnalyticsForBusiness(true, "currentmonth"))
+      await dispatch(loadTopRevenueProducts(firstMonth, lastMonth));
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false, "currentmonth"))
       setIsPageLoading(false);
     }
     initialCall();
@@ -182,12 +185,16 @@ const SalesDashboard = () => {
   }
 
   function removeZero(roundedValue) {
+    const valueStr = roundedValue.toString();
+    if (valueStr.includes('e')) {
+      return valueStr.split('e')[0];
+    }
     return roundedValue.toString().replace(/0+$/, '');
   }
 
   const removeZeroLineSalesOverTime = removeZero(roundUp(maxTotalSalesValue)) || 10;
   const roundLineSalesOverTime = roundUp(maxTotalSalesValue)
-
+  
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
       <View style={styles.container}>
@@ -388,9 +395,11 @@ const SalesDashboard = () => {
 
 
         <PieChartBox
+          totalCenterValue={billItemTotalValue}
           title={"Bill Items"}
           labelArray={billItemDetails[0].labels}
           pieDataArray={percentageBillData}
+          dropdownKey={"vipslinebillitem_1"}
         />
         <View style={styles.commonContainer}>
           <Text
@@ -429,7 +438,7 @@ const SalesDashboard = () => {
           xLabelArrayData={totalSalesOverTime.date}
           lineChartData={totalSalesOverTimeData}
           max={roundLineSalesOverTime}
-          sections={removeZeroLineSalesOverTime}
+          sections={removeZeroLineSalesOverTime === "1" ? 10 : removeZeroLineSalesOverTime}
           page="SalesOverTime"
           // key1={"SalesOverTime"}
         />
@@ -456,6 +465,7 @@ const SalesDashboard = () => {
           toggleTitle={"Top 10 Revenue Services"}
           dateArray={labelArray}
           showPie={togglePercentageData.length !== 0}
+          dropdownKey={"vipslinetopservices_1"}
         />
         <PieChartBox
           title={"Top Products"}
@@ -469,6 +479,7 @@ const SalesDashboard = () => {
           toggleTitle={"Top 10 Revenue Products"}
           dateArray={labelArray}
           showPie={toggleProductData.length !== 0}
+          dropdownKey={"vipslinetopproducts_1"}
         />
       </View>
     </ScrollView>

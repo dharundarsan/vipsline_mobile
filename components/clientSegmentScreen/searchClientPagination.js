@@ -64,11 +64,9 @@ export default function SearchClientPagination(props) {
         setLowerCount(1);
         setUpperCount(10 > getTotalCount ? getTotalCount : 10);
         props.setSearchClientTotalCount(getTotalCount);
-        console.log(getTotalCount);
 
     }, [props.filterPressed]);
 
-    console.log(props.filterPressed);
 
     useEffect(() => {
         if(getTotalCount > 10) {

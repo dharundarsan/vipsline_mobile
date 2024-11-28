@@ -60,12 +60,6 @@ const ServicesList = React.memo((props) => {
 
     }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
 
-    useEffect(() => {
-        console.log(filteredKidsServicesData.length)
-        console.log(filteredMenServicesData.length)
-        console.log(filteredWomenServicesData.length)
-        console.log(filteredGeneralServicesData.length)
-    });
 
     return (
         isFetching ?

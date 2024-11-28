@@ -20,7 +20,6 @@ const MembershipsAndPackagesList = (props) => {
     const [filteredData, setFilteredData] = useState(data);
 
     const searchData = (searchValue) => {
-        console.log(searchValue)
         const lowerCaseFilterValue = searchValue.toLowerCase();
         setFilteredData(data.filter(item => {
             if (props.category === "memberships")

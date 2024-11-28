@@ -30,7 +30,7 @@ const LineChartBox = (props) => {
     // const yAxisLabels = Array.from({ length: 6 }, (_, i) =>
     // Math.round((maxValue / 5) * i).toString()
     // );
-    const dropdownWidth = screenWidth * 0.35;
+    const dropdownWidth = screenWidth * 0.45;
     return (
         <View style={styles.commonContainer}>
             <View
@@ -59,9 +59,10 @@ const LineChartBox = (props) => {
                     valueField="value"
                     value={selectedValue}
                     onChange={handleSelection}
-                    placeholder="This month"
+                    placeholder="Current month"
                     disable={isLoading}
-                />
+                    inverted={false}
+                    />
                 ) : null}
             </View>
             <Divider/>
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
   dropdown: {
     // width: "40%",
     color: Colors.highlight,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
   },
   lineChartContainer:{
     overflow:'hidden',

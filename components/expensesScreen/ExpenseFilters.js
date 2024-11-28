@@ -17,7 +17,6 @@ export default function ExpenseFilters({ isVisible, onClose }) {
     const { category, range, fromDate, toDate, oldCopy } = useSelector(state => state.expenses);
 
     const categories = useSelector(state => state.expenses.categories);
-    console.log((categories.find(item => item.name === category)?.id))
 
     useEffect(() => {
         dispatch(updateOldCopy({ fromDate, toDate, category, range }));

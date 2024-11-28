@@ -75,8 +75,6 @@ const CheckoutScreen = ({ navigation, route }) => {
                 setIsLoading(true)
                 setShowDrawerIcon(false);
                 if (businessId !== "") {
-
-
                     await clearCartAPI();
                     dispatch(clearCustomItems());
                     dispatch(clearLocalCart());

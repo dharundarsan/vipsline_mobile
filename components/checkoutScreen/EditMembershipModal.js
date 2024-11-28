@@ -101,7 +101,6 @@ const EditMembershipModal = (props) => {
         }
 
     }
-    console.log(props.data)
     return <>
         <Modal visible={props.isVisible} style={styles.editMembershipModal} animationType={"slide"}
                presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>

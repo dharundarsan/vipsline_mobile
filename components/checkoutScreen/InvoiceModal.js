@@ -161,7 +161,6 @@ const InvoiceModal = (props) => {
     }
 
 
-    console.log(JSON.stringify(details, null, 2));
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}

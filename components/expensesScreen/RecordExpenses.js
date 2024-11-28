@@ -257,8 +257,6 @@ export default function RecordExpenses(props) {
                         buttonStyle={styles.saveButton}
                         pressableStyle={styles.saveButtonPressable}
                         onPress={async () => {
-
-                            console.log("hi")
                             const isDateEntered = dateRef.current();
                             const isExpenseAmountEntered = amountTypeRef.current();
                             const isExpenseTypeEntered = expenseTypeRef.current();
@@ -282,7 +280,6 @@ export default function RecordExpenses(props) {
                                     dispatch(loadExpensesFromDb());
                                     props.closeModal()
                                 }
-                                console.log(res)
                             }
                             else {
                                 const res = await editExpensesAPI(expenseData, catId, subId, currentExpenseId);
