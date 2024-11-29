@@ -1,8 +1,8 @@
-import {Text, TextInput, View, StyleSheet, ActivityIndicator, KeyboardAvoidingView} from "react-native";
+import { Text, TextInput, View, StyleSheet, ActivityIndicator, KeyboardAvoidingView } from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
-import {useNavigation} from "@react-navigation/native";
-import {useState} from "react";
+import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 import axios from "axios";
 import textTheme from "../../constants/TextTheme";
 
@@ -40,7 +40,12 @@ export default function MobileOtp() {
                 platform: platform,
                 userName: mobileNumber
             })
-            responseUserMessage = response.data.message;
+            if (response.data.message === "user found") {
+                responseUserMessage = response.data.message;
+            }
+            else {
+                responseUserMessage = "error"
+            }
 
         } catch (error) {
         }
@@ -50,28 +55,35 @@ export default function MobileOtp() {
 
     async function sendOtp() {
         setIsLoading(true);
-        if (await findUser() === "user found") {
-            try {
-                const response = await axios.post(
-                    BaseURL + "/user/sendOtp",
-                    {
-                        userName: mobileNumber,
-                        platform: platform,
-                    })
-                navigation.navigate('VerificationCodeScreen',
-                    {
-                        mobileNumber: mobileNumber
-                    });
-                setIsUserFound(true);
-                setIsUserTyping(true);
-            } catch (error) {
-            }
+        if (mobileNumber.trim().length !== 0) {
+            if (await findUser() === "user found") {
+                try {
+                    const response = await axios.post(
+                        BaseURL + "/user/sendOtp",
+                        {
+                            userName: mobileNumber,
+                            platform: platform,
+                        })
+                    // console.log(response.data);
 
-        } else {
+                    navigation.navigate('VerificationCodeScreen',
+                        {
+                            mobileNumber: mobileNumber
+                        });
+                    setIsUserFound(true);
+                    setIsUserTyping(true);
+                } catch (error) {
+                }
+
+            } else {
+                setIsUserFound(false);
+                setIsUserTyping(false);
+            }
+        }
+        else {
             setIsUserFound(false);
             setIsUserTyping(false);
         }
-
         setIsLoading(false);
 
     }
@@ -85,15 +97,15 @@ export default function MobileOtp() {
             borderWidth: 2,
             paddingVertical: 8,
             borderColor:
-            isUserTyping ?
-                Colors.highlight :
-                isFocussed ?
-                    isUserFound ?
-                        Colors.highlight :
-                        Colors.error :
-                    !isUserFound ?
-                        Colors.error :
-                        Colors.grey400,
+                isUserTyping ?
+                    Colors.highlight :
+                    isFocussed ?
+                        isUserFound ?
+                            Colors.highlight :
+                            Colors.error :
+                        !isUserFound ?
+                            Colors.error :
+                            Colors.grey400,
             borderRadius: 6,
             paddingHorizontal: 12,
         },
@@ -112,7 +124,7 @@ export default function MobileOtp() {
 
     return (
         <View style={styles.mobileOtpContainer}>
-            <View style={{marginTop: 30, marginBottom: 8, width: '82%',}}>
+            <View style={{ marginTop: 30, marginBottom: 8, width: '82%', }}>
                 <Text style={[textTheme.titleSmall]}>Mobile number</Text>
             </View>
             <View style={styles.mobileNumberContainer}>
@@ -136,12 +148,12 @@ export default function MobileOtp() {
                     isUserTyping ?
                         <Text></Text> :
                         mobileNumber.trim().length === 0 && isSendOtpPressed ?
-                            <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number is required</Text> :
-                        !isUserFound ?
-                            <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Incorrect Mobile number</Text> :
-                        // isSendOtpPressed ?
-                        //     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number is required</Text> :
-                            <Text> </Text>
+                            <Text style={[textTheme.titleSmall, { color: Colors.error }]}>Mobile number is required</Text> :
+                            !isUserFound ?
+                                <Text style={[textTheme.titleSmall, { color: Colors.error }]}>Incorrect Mobile number</Text> :
+                                // isSendOtpPressed ?
+                                //     <Text style={[textTheme.titleSmall, {color: Colors.error}]}>Mobile number is required</Text> :
+                                <Text> </Text>
                 }
                 <PrimaryButton
                     buttonStyle={styles.sendOtpButton}
@@ -152,8 +164,8 @@ export default function MobileOtp() {
                 >
                     {
                         !isLoading ?
-                            <Text style={[textTheme.titleSmall, {color: Colors.onHighlight}]}>Send OTP</Text> :
-                            <ActivityIndicator color={Colors.onHighlight}/>
+                            <Text style={[textTheme.titleSmall, { color: Colors.onHighlight }]}>Send OTP</Text> :
+                            <ActivityIndicator color={Colors.onHighlight} />
                     }
 
                 </PrimaryButton>

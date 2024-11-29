@@ -59,13 +59,7 @@ const ServicesList = React.memo((props) => {
         setFilteredGeneralServicesData(filteredGeneral);
 
     }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
-
-    useEffect(() => {
-        console.log(filteredKidsServicesData.length)
-        console.log(filteredMenServicesData.length)
-        console.log(filteredWomenServicesData.length)
-        console.log(filteredGeneralServicesData.length)
-    });
+    
 
     return (
         isFetching ?
@@ -77,6 +71,7 @@ const ServicesList = React.memo((props) => {
                 <ActivityIndicator color={Colors.darkBlue} size={"large"}/>
             </View>
             : <View style={styles.commonSelectTemplate}>
+            {(servicesData.general.length !== 0 || servicesData.kids.length !== 0 ||servicesData.men.length !== 0 ||servicesData.women.length !== 0 ) &&
                 <View style={styles.headingAndSearchContainer}>
                     <View style={styles.headingAndSearchContainer}>
                         <SearchBar filter={false}
@@ -86,6 +81,8 @@ const ServicesList = React.memo((props) => {
                                    placeholder={"Search by service name or prices"}/>
                     </View>
                 </View>
+
+            }
                 {filteredGeneralServicesData.length === 0 && filteredKidsServicesData.length === 0 &&
                 filteredWomenServicesData.length === 0 && filteredMenServicesData.length === 0 &&
                 filteredKidsServicesData.length === 0 ?

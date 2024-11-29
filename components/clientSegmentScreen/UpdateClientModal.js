@@ -228,7 +228,7 @@ const UpdateClientModal = ((props) => {
                         placeholder="Enter email address"
                         value={clientData.email}
                         onChangeText={(value) => handleChange("email", value)}
-                        validator={(text) => !checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
+                        validator={(text) => checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
                         // onSave={(callback) => {
                             // emailRef.current = callback;
                         // }}

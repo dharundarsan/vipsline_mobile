@@ -217,7 +217,7 @@ const CreateClientModal = (props) => {
                         placeholder="Enter email address"
                         value={email}
                         onChangeText={setEmail}
-                        validator={(text) =>  (text === null || text === undefined || text.trim() === "") ? true : !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Phone number is Invalid" : true}
+                        validator={(text) =>  (text === null || text === undefined || text.trim() === "") ? true : !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email Address is Invalid" : true}
                     />
                     <CustomTextInput
                         type="dropdown"
