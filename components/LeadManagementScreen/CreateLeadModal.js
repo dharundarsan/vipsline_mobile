@@ -40,6 +40,7 @@ const CreateLeadModal = (props) => {
     const dispatch = useDispatch();
 
     const firstNameRef = useRef(null);
+    const emailRef = useRef(null);
     const phoneNoRef = useRef(null);
     const followUpTimeRef = useRef(null);
     const followUpDateRef = useRef(null)
@@ -62,6 +63,12 @@ const CreateLeadModal = (props) => {
         const followUpDateValid = followUpDateRef.current();
         if (!firstNameValid || !phoneNoValid || !followUpDateValid || !followUpTimeValid) {
             return;
+        }
+        if (!(email === undefined || email === null || email === "")) {
+            const emailIsValid = emailRef.current();
+            if(!emailIsValid){
+                return;
+            }
         }
         try {
             await createLeadAPI({
@@ -95,6 +102,12 @@ const CreateLeadModal = (props) => {
         const phoneNoValid = phoneNoRef.current();
         if (!firstNameValid || !phoneNoValid) {
             return;
+        }
+        if (!(email === undefined || email === null || email === "")) {
+            const emailIsValid = emailRef.current();
+            if(!emailIsValid){
+                return;
+            }
         }
         await editLeadAPI({
             address: address,
@@ -165,7 +178,8 @@ const CreateLeadModal = (props) => {
                                  value={phoneNo[1]}
                                  onChangeText={setPhoneNo}
                                  validator={(text) => {
-                                     if (text === null || text === undefined || text.length !== 10) return "Phone number is invalid";
+                                     if (text === null || text === undefined || text.trim() === "") return "Phone number is required";
+                                     else if (text.length !== 10) return "Phone number is invalid";
                                      else return true;
                                  }}
                                  onSave={(callback) => {
@@ -176,6 +190,10 @@ const CreateLeadModal = (props) => {
                                  labelTextStyle={{fontWeight: "700"}}
                                  label={"Email"}
                                  value={email}
+                                 validator={(text) => (text === null || text === undefined || text.trim() === "") ? true : !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is Invalid" : true}
+                                 onSave={(callback) => {
+                                     emailRef.current = callback;
+                                 }}
                                  onChangeText={setEmail}
                                  type={"email"}/>
                 {(view === "all" || props.edit) && <>
@@ -252,19 +270,19 @@ const CreateLeadModal = (props) => {
                     />
                     <CustomTextInput
                         labelTextStyle={{fontWeight: "700"}}
-                        type="multiLine"
-                        label="Enquiry Details"
-                        placeholder="Enter Client's Enquiry Details"
-                        value={enquiryDetails}
-                        onChangeText={setEnquiryDetails}
-                    />
-                    <CustomTextInput
-                        labelTextStyle={{fontWeight: "700"}}
                         type="dropdown"
                         label="Lead Status"
                         value={leadStatus}
                         onChangeValue={setLeadStatus}
                         dropdownItems={useSelector(state => state.leads.leadStatuses).map(status => status.name)}
+                    />
+                    <CustomTextInput
+                        labelTextStyle={{fontWeight: "700"}}
+                        type="multiLine"
+                        label="Enquiry Details"
+                        placeholder="Enter Client's Enquiry Details"
+                        value={enquiryDetails}
+                        onChangeText={setEnquiryDetails}
                     />
                     <CustomTextInput
                         labelTextStyle={{fontWeight: "700"}}

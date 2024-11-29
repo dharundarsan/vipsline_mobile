@@ -185,7 +185,7 @@ const EnquiryNotesModal = (props) => {
                     labelTextStyle={{fontWeight: "700"}}
                     type="multiLine"
                     label="Notes"
-                    placeholder="Enter Notes"
+                    placeholder="Enter Enquiry Notes"
                     value={notes}
                     onChangeText={setNotes}
                 />
@@ -194,6 +194,7 @@ const EnquiryNotesModal = (props) => {
                 <CustomTextInput
                     labelTextStyle={{fontWeight: "700"}}
                     type="date"
+                    minimumDate={new Date()}
                     readOnly={leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted"}
                     label="Next follow-up date"
                     value={nextFollowUpDate === null || nextFollowUpDate === undefined ? null : new Date(nextFollowUpDate)}
