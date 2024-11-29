@@ -30,6 +30,7 @@ import {
 } from "../../store/cartSlice";
 import * as Haptics from "expo-haptics";
 import Toast from "../../ui/Toast";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 // import {ALERT_TYPE, AlertNotificationRoot, Toast} from "react-native-alert-notification";
 
 
@@ -159,7 +160,7 @@ const InvoiceModal = (props) => {
     const textStyle2 = {
         textAlign: "center"
     }
-
+    const insets = useSafeAreaInsets();
 
     return <Modal style={styles.invoiceModal} animationType={"slide"}
                   visible={props.isVisible}
@@ -183,7 +184,7 @@ const InvoiceModal = (props) => {
         {/*                           // card: "#b73737",*/}
         {/*                       }]}>*/}
 
-        <KeyboardAvoidingView style={{ flex: 1}} behavior="position" keyboardVerticalOffset={Platform.OS === "ios" ? 34 : 0}>
+        <KeyboardAvoidingView style={{ flex: 1}} behavior="padding" keyboardVerticalOffset={Platform.OS === "ios" ? insets.bottom : 0}>
 
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
 
@@ -666,7 +667,9 @@ styles.heading]}>Invoice</Text>*/}
 
 const styles = StyleSheet.create({
     invoiceModal: {
-        flex: 1
+        flex: 1,
+        height:'100%',
+        backgroundColor:'black'
     },
     headingAndCloseContainer: {
         marginTop: Platform.OS === "ios" ? 50 : 0,

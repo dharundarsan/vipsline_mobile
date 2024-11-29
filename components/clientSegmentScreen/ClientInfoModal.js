@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     },
     optionsContainer: {
         flexDirection: "row",
-        width: "95%",
+        width: "55%",
         justifyContent: "space-around",
     },
     updateOrDeleteOption: {
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.grey250,
     },
     callButton: {
-        width: '30%',
+        width: '60%',
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
