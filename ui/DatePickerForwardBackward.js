@@ -8,12 +8,13 @@ import moment from "moment";
 import PrimaryButton from "./PrimaryButton";
 import Colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
-import { updateFilters } from "../store/ExpensesSlice";
+import {updateCustomRangeStartEndDate, updateFilters} from "../store/ExpensesSlice";
 
 const format = 'ddd DD MMM YYYY';
 
 function formatDateRange(view, fromDate, toDate = fromDate) {
     let startDate, endDate, format = 'ddd DD MMM YYYY';
+
     switch (view) {
         case 'Month':
             startDate = moment(fromDate).startOf('month');
@@ -33,7 +34,7 @@ function formatDateRange(view, fromDate, toDate = fromDate) {
     return `${startDate.format(format)} - ${endDate.format(format)}`;
 }
 
-export default function DatePickerForwardBackward({ label, type, fromDate, toDate, category, range }) {
+export default function DatePickerForwardBackward({ label, type, fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate }) {
     const dispatch = useDispatch();
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [forwardVisibility, setForwardVisibility] = useState(false);
@@ -44,16 +45,46 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
 
     useEffect(() => {
         if(type === "Today") {
-
+            dispatch(updateFilters({
+                category,
+                range,
+                fromDate: moment().format("YYYY-MM-DD"),
+                toDate: moment().format("YYYY-MM-DD"),
+                customRangeStartDate: "",
+                customRangeEndDate: ""
+            }))
         }
-        else {
+        else if(type === "Week") {
+            dispatch(updateFilters({
+                category,
+                range,
+                fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+                toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+                customRangeStartDate: "",
+                customRangeEndDate: ""
+            }))
+        }
+        else if(type === "Month") {
+            dispatch(updateFilters({
+                category,
+                range,
+                fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+                toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+                customRangeStartDate: "",
+                customRangeEndDate: ""
+            }))
+        }
+        else if(type === "Year") {
             dispatch(updateFilters({
                 category,
                 range,
                 fromDate: moment(formatDateRange(type, fromDate, toDate).split(" - ")[0].trim()).format("YYYY-MM-DD"),
                 toDate: moment(formatDateRange(type, fromDate, toDate).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+                customRangeStartDate: "",
+                customRangeEndDate: ""
             }))
         }
+        dispatch(updateCustomRangeStartEndDate({startDate: "", endDate: ""}));
     }, [type]);
 
     useEffect(() => {
@@ -82,7 +113,9 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
             fromDate: moment(date).format("YYYY-MM-DD"),
             toDate: moment(date).format("YYYY-MM-DD"),
             category,
-            range
+            range,
+            customRangeStartDate: "",
+            customRangeEndDate: ""
         }));
         hideDatePicker();
     };
@@ -90,7 +123,7 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
     const changeDate = (increment = true) => {
         const newDate = moment(fromDate)[increment ? 'add' : 'subtract'](1, "days").format("YYYY-MM-DD");
 
-        dispatch(updateFilters({ fromDate: newDate, toDate: newDate, category, range }));
+        dispatch(updateFilters({ fromDate: newDate, toDate: newDate, category, range, customRangeStartDate, customRangeEndDate }));
     };
 
     return (
@@ -115,6 +148,8 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
                             category,
                             fromDate: moment(new Date(fromDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD"),
                             toDate: moment(new Date(toDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                            customRangeStartDate,
+                            customRangeEndDate
                         }));
 
                     }
@@ -144,6 +179,8 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
                             category,
                             fromDate: moment(new Date(fromDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD"),
                             toDate: moment(new Date(toDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                            customRangeStartDate,
+                            customRangeEndDate
                         }));
                     }
                 }}>
