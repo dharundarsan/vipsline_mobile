@@ -26,18 +26,36 @@ const EnquiryNotesModal = (props) => {
     const nextFollowUpDateRef = useRef(null);
     const nextFollowUpTimeRef = useRef(null);
 
+    useEffect(() => {
+        if (leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted") {
+            setNextFollowUpTime(null)
+            setNextFollowUpDate(null);
+        } else {
+            setNextFollowUpTime(props.edit ? props.data.time ? moment(props.data.time, "hh:mm A") : null : null)
+            setNextFollowUpDate(props.edit ? props.data.date ? moment(props.data.date, "DD MMM YYYY").toDate() : null : null);
+        }
+    }, [leadStatus]);
+
     const staffs = useSelector((state) => state.staff.staffs);
     const addEnquiryNote = async () => {
         const leadStatusValid = leadStatusRef.current()
-        const nextFollowUpDateValid = nextFollowUpDateRef.current()
-        const nextFollowUpTimeValid = nextFollowUpTimeRef.current()
-        console.log(leadStatusValid);
-        console.log(nextFollowUpTimeValid);
-        console.log(nextFollowUpDateValid);
+        let nextFollowUpDateValid;
+        let nextFollowUpTimeValid;
+        if (!(leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted")) {
+            nextFollowUpDateValid = nextFollowUpDateRef.current()
+            nextFollowUpTimeValid = nextFollowUpTimeRef.current()
+        }
 
-        if (!leadStatusValid || !nextFollowUpDateValid || !nextFollowUpTimeValid) {
+        if (!leadStatusValid) {
             return;
         }
+
+        if (!(leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted")) {
+            if (!nextFollowUpDateValid || !nextFollowUpTimeValid) {
+                return;
+            }
+        }
+
 
         if (props.lead.lead_owner) {
             await addEnquiryNotesAPI(
@@ -61,17 +79,22 @@ const EnquiryNotesModal = (props) => {
         props.refreshLeadsData();
         props.onCloseModal();
     }
-    useEffect(() => {
-        console.log(formatDate(new Date(nextFollowUpDate), "yyyy-mm-dd"))
-        console.log(formatTime(new Date(nextFollowUpTime), "hh:mm:ss"))
-    }, [nextFollowUpTime, nextFollowUpDate]);
 
     const editEnquiryNote = async () => {
         const leadStatusValid = leadStatusRef.current()
-        const nextFollowUpDateValid = nextFollowUpDateRef.current()
-        const nextFollowUpTimeValid = nextFollowUpTimeRef.current()
-        if (!leadStatusValid || !nextFollowUpDateValid || !nextFollowUpTimeValid) {
+        let nextFollowUpDateValid;
+        let nextFollowUpTimeValid;
+        if (!(leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted")) {
+            nextFollowUpDateValid = nextFollowUpDateRef.current()
+            nextFollowUpTimeValid = nextFollowUpTimeRef.current()
+        }
+        if (!leadStatusValid) {
             return;
+        }
+        if (!(leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted")) {
+            if (!nextFollowUpDateValid || !nextFollowUpTimeValid) {
+                return;
+            }
         }
         if (props.lead.lead_owner) {
             await editEnquiryNotesAPI(
@@ -171,6 +194,7 @@ const EnquiryNotesModal = (props) => {
                 <CustomTextInput
                     labelTextStyle={{fontWeight: "700"}}
                     type="date"
+                    readOnly={leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted"}
                     label="Next follow-up date"
                     value={nextFollowUpDate === null || nextFollowUpDate === undefined ? null : new Date(nextFollowUpDate)}
                     validator={(date) => {
@@ -187,6 +211,7 @@ const EnquiryNotesModal = (props) => {
                 <CustomTextInput
                     labelTextStyle={{fontWeight: "700"}}
                     type="time"
+                    readOnly={leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted"}
                     label="Next follow-up time"
                     value={nextFollowUpTime === null || nextFollowUpTime === undefined ? null : new Date(nextFollowUpTime)}
                     onChangeValue={(value) => {

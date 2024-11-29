@@ -292,7 +292,7 @@ const CustomTextInput = (props) => {
                     buttonStyle={[styles.dateTimeButtom, props.dateInputContainer, error ? {borderColor: Colors.error} : {}]}
                     pressableStyle={styles.dateTimeButtonPressable}
                     disableRipple={props.readOnly}
-                    onPress={() => setIsDateTimePickerVisible(true)}
+                    onPress={ props.readOnly ? () => {} : () => setIsDateTimePickerVisible(true)}
                 >
                     <Text
                         style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>
@@ -342,7 +342,7 @@ const CustomTextInput = (props) => {
                     buttonStyle={[styles.dateTimeButtom, props.dateInputContainer, error ? {borderColor: Colors.error} : {}]}
                     pressableStyle={styles.dateTimeButtonPressable}
                     disableRipple={props.readOnly}
-                    onPress={() => setIsDateTimePickerVisible(true)}
+                    onPress={props.readOnly ? () => {} : () => setIsDateTimePickerVisible(true)}
                 >
                     <Text
                         style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>
