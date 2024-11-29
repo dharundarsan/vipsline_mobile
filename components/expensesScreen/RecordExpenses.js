@@ -1,4 +1,4 @@
-import { Modal, Text, View, StyleSheet, ScrollView } from "react-native";
+import {Modal, Text, View, StyleSheet, ScrollView, ActivityIndicator} from "react-native";
 import { shadowStyling} from "../../util/Helpers";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
@@ -17,6 +17,7 @@ import {
 import moment from "moment";
 import editExpensesAPI from "../../util/apis/editExpensesAPI";
 import DeleteExpenseModal from "./DeleteExpenseModal";
+import colors from "../../constants/Colors";
 
 export default function RecordExpenses(props) {
     const dispatch = useDispatch();
@@ -26,6 +27,8 @@ export default function RecordExpenses(props) {
     const category = useSelector(state => state.expenses.category);
     const currentCategoryId = useSelector(state => state.expenses.currentCategoryId);
     const currentSubId = useSelector(state => state.expenses.currentSubId);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const dateRef = useRef(null);
     const amountRef = useRef(null);
@@ -252,44 +255,62 @@ export default function RecordExpenses(props) {
                             <AntDesign name="delete" size={24} color="black" />
                         </PrimaryButton>
                     )}
-                    <PrimaryButton
-                        label={props.type === "add" ? "Save Expense" : "Update Expense"}
-                        buttonStyle={styles.saveButton}
-                        pressableStyle={styles.saveButtonPressable}
-                        onPress={async () => {
-                            const isDateEntered = dateRef.current();
-                            const isExpenseAmountEntered = amountTypeRef.current();
-                            const isExpenseTypeEntered = expenseTypeRef.current();
-                            const isAmountEntered = amountRef.current();
-                            const isPaymentModeEntered = paymentModeRef.current();
+                    {
+                        isLoading ?
+                            <PrimaryButton
+                                buttonStyle={styles.saveButton}
+                                pressableStyle={styles.saveButtonPressable}
+                            >
+                                <ActivityIndicator color={colors.white}/>
+                            </PrimaryButton> :
+                            <PrimaryButton
+                                label={props.type === "add" ? "Save Expense" : "Update Expense"}
+                                buttonStyle={styles.saveButton}
+                                pressableStyle={styles.saveButtonPressable}
+                                onPress={async () => {
+                                    setIsLoading(true);
+                                    const isDateEntered = dateRef.current();
+                                    const isExpenseAmountEntered = amountTypeRef.current();
+                                    const isExpenseTypeEntered = expenseTypeRef.current();
+                                    const isAmountEntered = amountRef.current();
+                                    const isPaymentModeEntered = paymentModeRef.current();
 
-                            if(!isDateEntered ||
-                                !isExpenseAmountEntered ||
-                                !isExpenseTypeEntered ||
-                                !isAmountEntered ||
-                                !isPaymentModeEntered) {
-                                return ;
-                            }
+                                    if(!isDateEntered ||
+                                        !isExpenseAmountEntered ||
+                                        !isExpenseTypeEntered ||
+                                        !isAmountEntered ||
+                                        !isPaymentModeEntered) {
+                                        return ;
+                                    }
 
-                            const subId = subIds.find(item => item.name === expenseData.expenseType).id
-                            const catId = categories.find(item => item.name === expenseData.expenseAmountType).id
+                                    await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id)).then( async res => {
+                                            const subId = res.id;
+                                            const catId = await categories.find(item => item.name === expenseData.expenseAmountType).id
 
-                            if(props.type === "add") {
-                                const res = await addExpensesAPI(expenseData, catId, subId);
-                                if(res) {
-                                    dispatch(loadExpensesFromDb());
-                                    props.closeModal()
-                                }
-                            }
-                            else {
-                                const res = await editExpensesAPI(expenseData, catId, subId, currentExpenseId);
-                                if(res) {
-                                    dispatch(loadExpensesFromDb());
-                                    props.closeModal()
-                                }
-                            }
-                        }}
-                    />
+
+                                            if(props.type === "add") {
+                                                const res = await addExpensesAPI(expenseData, catId, subId);
+                                                if(res) {
+                                                    dispatch(loadExpensesFromDb());
+                                                    props.closeModal();
+                                                }
+                                            }
+                                            else {
+                                                const res = await editExpensesAPI(expenseData, catId, subId, currentExpenseId);
+                                                if(res) {
+                                                    dispatch(loadExpensesFromDb());
+                                                    props.closeModal()
+                                                }
+                                            }
+                                        }
+
+                                    );
+
+                                    setIsLoading(false);
+                                }}
+                            />
+                    }
+
                 </View>
             </View>
         </Modal>
