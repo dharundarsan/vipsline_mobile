@@ -380,7 +380,7 @@ export default function ClientSegmentScreen(props) {
                         />
                     </View>
 
-                    <PrimaryButton
+                    {/* <PrimaryButton
                         buttonStyle={styles.filterButton}
                         onPress={() => null}
                     >
@@ -390,7 +390,7 @@ export default function ClientSegmentScreen(props) {
                             color={Colors.darkBlue}
                             style={styles.filterIcon}
                         />
-                    </PrimaryButton>
+                    </PrimaryButton> */}
 
                 </View>
 
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
         width: '75%'
     },
     textInputContainer: {
-        width: '80%',
+        width: '95%',
         marginVertical: 15,
     },
 
