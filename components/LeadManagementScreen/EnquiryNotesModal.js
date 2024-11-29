@@ -1,9 +1,9 @@
 import {KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
+import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import {formatDate, formatTime, shadowStyling} from "../../util/Helpers";
 import {Divider} from "react-native-paper";
 import CustomTextInput from "../../ui/CustomTextInput";
@@ -15,7 +15,6 @@ import moment from "moment";
 import editEnquiryNotesAPI from "../../util/apis/editEnquiryNotesAPI";
 
 const EnquiryNotesModal = (props) => {
-    console.log(props.data)
     const leadStatuses = useSelector(state => state.leads.leadStatuses)
     const [date, setDate] = useState(props.edit ? moment(props.data.notes_date, "DD MMM YYYY").toDate() : new Date());
     const [leadStatus, setLeadStatus] = useState(props.edit ? props.data.lead_status : null);
@@ -35,12 +34,12 @@ const EnquiryNotesModal = (props) => {
         console.log(leadStatusValid);
         console.log(nextFollowUpTimeValid);
         console.log(nextFollowUpDateValid);
-        
+
         if (!leadStatusValid || !nextFollowUpDateValid || !nextFollowUpTimeValid) {
             return;
         }
 
-        if(props.lead.lead_owner){
+        if (props.lead.lead_owner) {
             await addEnquiryNotesAPI(
                 nextFollowUpTime,
                 nextFollowUpDate,
@@ -62,6 +61,10 @@ const EnquiryNotesModal = (props) => {
         props.refreshLeadsData();
         props.onCloseModal();
     }
+    useEffect(() => {
+        console.log(formatDate(new Date(nextFollowUpDate), "yyyy-mm-dd"))
+        console.log(formatTime(new Date(nextFollowUpTime), "hh:mm:ss"))
+    }, [nextFollowUpTime, nextFollowUpDate]);
 
     const editEnquiryNote = async () => {
         const leadStatusValid = leadStatusRef.current()
@@ -70,9 +73,10 @@ const EnquiryNotesModal = (props) => {
         if (!leadStatusValid || !nextFollowUpDateValid || !nextFollowUpTimeValid) {
             return;
         }
-        if(props.lead.lead_owner){
-            await editEnquiryNotesAPI(new Date(nextFollowUpTime),
+        if (props.lead.lead_owner) {
+            await editEnquiryNotesAPI(
                 new Date(nextFollowUpDate),
+                new Date(nextFollowUpTime),
                 props.lead.lead_id,
                 staffs.filter(staff => staff.name === props.lead.lead_owner)[0].id,
                 leadStatus,
@@ -80,18 +84,23 @@ const EnquiryNotesModal = (props) => {
                 props.data.lead_followup_id,
             )
         } else {
-            await editEnquiryNotesAPI(new Date(nextFollowUpTime),
-            new Date(nextFollowUpDate),
-            props.lead.lead_id,
-            "",
-            leadStatus,
-            notes,
-            props.data.lead_followup_id,
-        )
+            await editEnquiryNotesAPI(
+                new Date(nextFollowUpDate),
+                new Date(nextFollowUpTime),
+                props.lead.lead_id,
+                "",
+                leadStatus,
+                notes,
+                props.data.lead_followup_id,
+            )
         }
 
         props.refreshLeadsData();
         props.onCloseModal();
+    }
+
+    const deleteEnquiryNote = () => {
+
     }
 
     return <Modal style={styles.enquiryNotesModal}
@@ -194,7 +203,13 @@ const EnquiryNotesModal = (props) => {
             </View>
         </ScrollView>
         <View style={styles.saveButtonContainer}>
-            <PrimaryButton onPress={props.edit ? editEnquiryNote : addEnquiryNote} label={"Save"}/>
+            {/*<PrimaryButton onPress={props.edit ? editEnquiryNote : addEnquiryNote}*/}
+            {/*               buttonStyle={{backgroundColor: "white", borderWidth: 1, borderColor: Colors.grey400}}*/}
+            {/*               pressableStyle={{paddingHorizontal: 8, paddingVertical: 8}}>*/}
+            {/*    <MaterialIcons name="delete-outline" size={28} color={Colors.error}/>*/}
+            {/*</PrimaryButton>*/}
+            <PrimaryButton onPress={props.edit ? editEnquiryNote : addEnquiryNote} buttonStyle={{flex: 1}}
+                           label={"Save"}/>
         </View>
 
     </Modal>
@@ -248,9 +263,11 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
     },
     saveButtonContainer: {
+        flexDirection: "row",
+        gap: 20,
         borderColor: Colors.grey400,
         borderTopWidth: 1,
-        paddingHorizontal: 30,
+        paddingHorizontal: 20,
         paddingTop: 20,
         marginBottom: 20,
 
