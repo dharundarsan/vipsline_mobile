@@ -1,19 +1,19 @@
-import {View, Text, StyleSheet, Image, FlatList, ScrollView, Platform} from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Platform } from "react-native";
 import PrimaryButton from "../ui/PrimaryButton";
 import Colors from "../constants/Colors";
-import Divider from "../ui/Divider";
-import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
-import appliedFilter, {chooseFilterCount, clientFilterNames} from "../util/chooseFilter";
+// import Divider from "../ui/Divider";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import appliedFilter, { chooseFilterCount, clientFilterNames } from "../util/chooseFilter";
 import clientFilterDescriptionData from "../data/clientFilterDescriptionData";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import ClientFiltersCategories from "../components/clientSegmentScreen/ClientFiltersCategories";
 import ClientCard from "../components/clientSegmentScreen/ClientCard";
 import SearchBar from "../ui/SearchBar";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddClient from "../components/clientSegmentScreen/AddClient";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
 import Pagination from "../components/clientSegmentScreen/Pagination";
-import {Bullets} from "react-native-easy-content-loader";
+import { Bullets } from "react-native-easy-content-loader";
 import ClientInfoModal from "../components/clientSegmentScreen/ClientInfoModal";
 import {
     clearClientInfo,
@@ -28,11 +28,11 @@ import {
     updateAppliedFilters
 } from "../store/clientFilterSlice";
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
-import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
+import { clearClientsList, loadClientCountFromDb, loadClientsFromDb } from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
-import {clientFilterAPI} from "../util/apis/clientFilterAPI";
+import { clientFilterAPI } from "../util/apis/clientFilterAPI";
 import axios from "axios";
-import {checkNullUndefined, convertAppliedFilters} from "../util/Helpers";
+import { checkNullUndefined, convertAppliedFilters } from "../util/Helpers";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import UpdateClientModal from "../components/clientSegmentScreen/UpdateClientModal";
 import MoreOptionDropDownModal from "../components/clientSegmentScreen/MoreOptionDropDownModal";
@@ -40,6 +40,7 @@ import { useLocationContext } from "../context/LocationContext";
 import Toast from "../ui/Toast";
 import AdvancedFilters from "../components/clientSegmentScreen/AdvancedFilters";
 import CustomTagFilter from "../ui/CustomTagFilter";
+import { Divider } from "react-native-paper";
 
 
 export default function ClientSegmentScreen(props) {
@@ -116,9 +117,9 @@ export default function ClientSegmentScreen(props) {
     //     dispatch(updateAppliedFilters(convertAppliedFilters(appliedFilterStore.fromDate, appliedFilterStore.toDate, selectedFilters)));
     // }, [selectedFilters]);
 
-    const { getLocation,currentLocation } = useLocationContext();
-    useFocusEffect(useCallback( ()=>{
-         dispatch(loadClientFiltersFromDb(10, "All"));
+    const { getLocation, currentLocation } = useLocationContext();
+    useFocusEffect(useCallback(() => {
+        dispatch(loadClientFiltersFromDb(10, "All"));
         getLocation("Clients");
         dispatch(clearClientInfo())
 
@@ -126,7 +127,7 @@ export default function ClientSegmentScreen(props) {
         //     dispatch(clearClientInfo());
         // }
 
-    },[]))
+    }, []))
 
     useEffect(() => {
         // setClientCount(chooseFilterCount(filterPressed, allClientCount, activeClientCount, inActiveClientCount, churnClientCount, leadsClientCount));
@@ -234,7 +235,7 @@ export default function ClientSegmentScreen(props) {
                     clientInfoHandler();
                     clientNamePhoneHandler(itemData.item.name, itemData.item.mobile);
                 }}
-                divider={true}
+            // divider={true}
             />
         );
     }
@@ -359,10 +360,10 @@ export default function ClientSegmentScreen(props) {
                     />
                 }
 
-                <AddClient/>
+                <AddClient />
 
-                <Divider color={Colors.grey250}/>
-                <Toast ref={toastRef}/>
+                <Divider color={Colors.grey250} />
+                <Toast ref={toastRef} />
 
                 <View style={styles.clientFilterContainer}>
                     <ClientFiltersCategories
@@ -375,7 +376,7 @@ export default function ClientSegmentScreen(props) {
                 </View>
 
                 <View style={styles.currentFilter}>
-                    <View style={styles.descBullet}/>
+                    <View style={styles.descBullet} />
                     <Text
                         style={[textTheme.titleSmall, styles.descText]}
                     >
@@ -388,17 +389,17 @@ export default function ClientSegmentScreen(props) {
 
 
                 <View style={styles.searchClientContainer}>
-                        <SearchBar
-                            Bar
-                            filter
-                            onPressFilter={() => setAdvancedFiltersVisibility(true)}
-                            placeholder={"Search by name email or mobile"}
-                            searchContainerStyle={[textTheme.bodyMedium, styles.searchBarContainer]}
-                            onChangeText={(text) => {
-                                setSearchQuery(text);
-                            }}
-                            value={searchQuery}
-                        />
+                    <SearchBar
+                        Bar
+                        filter
+                        onPressFilter={() => setAdvancedFiltersVisibility(true)}
+                        placeholder={"Search by name email or mobile"}
+                        searchContainerStyle={[textTheme.bodyMedium, styles.searchBarContainer]}
+                        onChangeText={(text) => {
+                            setSearchQuery(text);
+                        }}
+                        value={searchQuery}
+                    />
                 </View>
 
                 <CustomTagFilter
@@ -408,13 +409,13 @@ export default function ClientSegmentScreen(props) {
                 />
 
                 <View style={styles.clientCount}>
-                    <Image source={require("../assets/icons/menu.png")} style={styles.menuImage}/>
+                    <Image source={require("../assets/icons/menu.png")} style={styles.menuImage} />
                     <Text style={[textTheme.bodyMedium, styles.clientCountText]}>
                         Client count : {
-                        searchQuery === "" ?
-                            currentFilterClientCount :
-                            searchClientTotalCount
-                    }
+                            searchQuery === "" ?
+                                currentFilterClientCount :
+                                searchClientTotalCount
+                        }
                     </Text>
                 </View>
 
@@ -425,17 +426,17 @@ export default function ClientSegmentScreen(props) {
                         <>
                             {
                                 currentFilterClientCount === 0 ?
-                                    <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                                    <View style={{ justifyContent: "center", alignItems: "center", marginTop: 32 }}>
                                         <Text style={[textTheme.titleSmall]}>
                                             No clients to display
                                         </Text>
                                     </View> :
-                                !isFetching ?
-                                    <FlatList
-                                        data={filterClientsList}
-                                        renderItem={renderItem}
-                                        scrollEnabled={false}
-
+                                    !isFetching ?
+                                        <FlatList
+                                            data={filterClientsList}
+                                            renderItem={renderItem}
+                                            scrollEnabled={false}
+                                            ItemSeparatorComponent={<Divider />}
                                         /> :
                                         <Bullets
                                             tHeight={35}
@@ -448,61 +449,66 @@ export default function ClientSegmentScreen(props) {
                                                 borderBottomWidth: 1,
                                                 borderBottomColor: Colors.grey250
                                             }}
-                                            avatarStyles={{marginLeft: 16}}
+                                            avatarStyles={{ marginLeft: 16 }}
                                         />
-                                }
+                            }
 
-                                {
-                                    currentFilterClientCount > 10 ?
+                            {
+                                currentFilterClientCount > 10 ?
+                                    <>
+                                    {!isFetching && 
+                                        <Divider />
+                                    }
                                         <Pagination
                                             filterPressed={filterPressed}
                                             setIsModalVisible={setIsModalVisible}
                                             totalCount={currentFilterClientCount}
-                                        /> : null
-                                }
-                            </> :
+                                        /></>
+                                    : null
+                            }
+                        </> :
 
                         <>
                             {
                                 searchClientTotalCount === 0 ?
-                                    <View style={{justifyContent: "center", alignItems: "center", marginTop: 32}}>
+                                    <View style={{ justifyContent: "center", alignItems: "center", marginTop: 32 }}>
                                         <Text style={[textTheme.titleSmall]}>
                                             No clients to display
                                         </Text>
                                     </View> :
-                                !isSearchClientFetching ?
-                                    <FlatList
-                                        data={searchClientList}
-                                        scrollEnabled={false}
-                                        renderItem={renderItem}
-                                    /> :
-                                    <Bullets
-                                        tHeight={35}
-                                        tWidth={"75%"}
-                                        listSize={maxEntry}
-                                        aSize={35}
-                                        animationDuration={500}
-                                        containerStyles={{
-                                            paddingVertical: 16,
-                                            borderBottomWidth: 1,
-                                            borderBottomColor: Colors.grey250
-                                        }}
-                                        avatarStyles={{ marginLeft: 16 }}
-                                    />
+                                    !isSearchClientFetching ?
+                                        <FlatList
+                                            data={searchClientList}
+                                            scrollEnabled={false}
+                                            renderItem={renderItem}
+                                        /> :
+                                        <Bullets
+                                            tHeight={35}
+                                            tWidth={"75%"}
+                                            listSize={maxEntry}
+                                            aSize={35}
+                                            animationDuration={500}
+                                            containerStyles={{
+                                                paddingVertical: 16,
+                                                borderBottomWidth: 1,
+                                                borderBottomColor: Colors.grey250
+                                            }}
+                                            avatarStyles={{ marginLeft: 16 }}
+                                        />
 
-                                }
+                            }
 
-                                {
-                                    <SearchClientPagination
-                                        filterPressed={filterPressed}
-                                        setIsModalVisible={setIsModalVisible}
-                                        query={searchQuery}
-                                        setSearchClientTotalCount={setSearchClientTotalCount}
-                                    />
+                            {
+                                <SearchClientPagination
+                                    filterPressed={filterPressed}
+                                    setIsModalVisible={setIsModalVisible}
+                                    query={searchQuery}
+                                    setSearchClientTotalCount={setSearchClientTotalCount}
+                                />
 
-                                }
+                            }
 
-                            </>
+                        </>
                 }
             </View>
         </ScrollView>
@@ -527,7 +533,7 @@ const styles = StyleSheet.create({
     },
     searchClientContainer: {
         marginVertical: 20,
-        marginHorizontal:12,
+        marginHorizontal: 12,
         flexDirection: 'row',
         justifyContent: 'space-evenly'
     },

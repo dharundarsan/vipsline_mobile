@@ -28,6 +28,10 @@ import * as Haptics from "expo-haptics";
 
 const AddClientButton = (props) => {
     const clientInfo = useSelector(state => state.clientInfo);
+    const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
+
+    // console.log(JSON.stringify(businessDetails.data[0].rewardsEnabled));
+    
     const [isClientInfo, setIsClientInfo] = useState(false)
     const [isVisibileModal, setIsVisibleModal] = useState(false)
     const [filterPressed, setFilterPressed] = useState("")
@@ -156,7 +160,7 @@ const AddClientButton = (props) => {
                                 {
                                     clientInfo.membershipDetails.length !== 0
                                     || clientInfo.packageDetails.length !== 0 
-                                    // || clientInfo.details.reward_balance !== 0
+                                    || (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.details.reward_balance !== 0)
                                     || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0) 
                                         ? (
                                             isClientInfo ? (
@@ -260,16 +264,16 @@ const AddClientButton = (props) => {
                                         <Text style={{fontSize:12}}> Package</Text>
                                     </PrimaryButton>
                                 }
-                                {/* {
+                                {
                                     clientInfo.details.reward_balance !== 0 &&
                                     clientInfo.details.reward_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
                                                    pressableStyle={styles.activePlanPressable}>
                                         <Text style={{fontSize:12}}>
-                                            Points <Text style={{color: Colors.highlight}}>{clientInfo.details.reward_balance}</Text>
+                                            Points <Text style={{color: Colors.highlight}}>{clientInfo.rewardPointBalance}</Text>
                                         </Text>
                                     </PrimaryButton>
-                                } */}
+                                }
                                 </View>
                             </ScrollView>
                             : null
