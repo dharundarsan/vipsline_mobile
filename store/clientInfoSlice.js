@@ -15,11 +15,20 @@ const initialClientInfoState = {
     prepaidDetails: [],
     prepaidCount: 0,
     clientId: "",
-
+    customerRewardDetails:{
+        customerRewardList:[],
+        count:0
+    },
+    rewardPointBalance:0,
     totalSales: 0,
     pageNo: 0,
     maxEntry: 10,
 
+    rewardsList: [],
+    rewardsPageNo: 0,
+    rewardsMaxEntry: 10,
+    rewardsIsFetching: false,
+    rewardsTotalSize: 0,
 };
 
 async function getBusinessId() {
@@ -230,6 +239,71 @@ export const packageHistoryDetails = (package_id) => async (dispatch, getState) 
     dispatch(updatePackageHistoryDetails(response.data.data[0]));
 }
 
+export const getRewardHistory = (clientId,pageSize) => async(dispatch, getState) =>{
+    const {clientInfo} = getState();
+    let authToken = ""
+    try {
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside clientInfoSlice loadClientInfoFromDb)" + e);
+    }
+    dispatch(updateRewardFetching(true))
+    await axios.post(
+        `${process.env.EXPO_PUBLIC_API_URI}/rewards/getRewardTransactionHistoryByClientId?pageNo=${clientInfo.rewardsPageNo}&pageSize=${pageSize}`,
+        {
+            business_id: await getBusinessId(),
+            client_id: clientId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        }
+    ).then(res => {
+        dispatch(updateCustomerRewards(res.data.data[0]));
+        dispatch(updateRewardTotalSize(res.data.data[0]));
+        dispatch(updateRewardFetching(false))
+    })
+    .catch(err => {
+        dispatch(updateCustomerRewards(res.data.data[0]))
+        console.log("Error In getRewardHistory")
+        dispatch(updateRewardFetching(false))
+    }
+    );
+}
+export const getRewardPointBalance = (clientId) => async(dispatch, getState) =>{
+    let authToken = ""
+    try {
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside clientInfoSlice loadClientInfoFromDb)" + e);
+    }
+    await axios.post(
+        `${process.env.EXPO_PUBLIC_API_URI}/rewards/getCreditBalanceByClientId`,
+        {
+            business_id: await getBusinessId(),
+            client_id: clientId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        }
+    ).then(res => dispatch(updateRewardsPointBalance(res.data.data[0])))
+    .catch(err => {
+        console.log("Error In getRewardHistory")
+    }
+    );
+}
+
 export const clientInfoSlice = createSlice({
     name: "clientInfo",
     initialState: initialClientInfoState,
@@ -284,6 +358,35 @@ export const clientInfoSlice = createSlice({
         },
         updatePackageHistoryDetails(state, action) {
             state.packageHistory = action.payload;
+        },
+        updateCustomerRewards(state,action) {
+            state.customerRewardDetails = action.payload
+        },
+        updateRewardsPointBalance(state,action) {
+            state.rewardPointBalance = action.payload.rewards_balance
+        },
+        updateRewardTotalSize(state,action) {
+            state.rewardsTotalSize = action.payload.count
+        },
+        incrementRewardPageNumber(state, action) {
+            state.rewardsPageNo++;
+        },
+        decrementRewardPageNumber(state, action) {
+            const page_no = state.rewardsPageNo - 1;
+            if (page_no < 0) {
+                state.rewardsPageNo = 0;
+            } else {
+                state.rewardsPageNo--;
+            }
+        },
+        updateRewardMaxEntry(state, action) {
+            state.rewardsMaxEntry = action.payload;
+        },
+        resetRewardPageNo(state) {
+            state.rewardsPageNo = 0;
+        },
+        updateRewardFetching(state,action){
+            state.rewardsIsFetching = action.payload;
         }
     }
 });
@@ -303,6 +406,14 @@ export const {
     updatePrepaidDetails,
     updatePrepaidCount,
     updatePackageHistoryDetails,
+    updateCustomerRewards,
+    updateRewardsPointBalance,
+    updateRewardTotalSize,
+    incrementRewardPageNumber,
+    decrementRewardPageNumber,
+    updateRewardMaxEntry,
+    resetRewardPageNo,
+    updateRewardFetching,
 } = clientInfoSlice.actions;
 
 export default clientInfoSlice.reducer;

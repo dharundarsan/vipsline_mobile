@@ -27,20 +27,24 @@ const DateRangePicker = (props) => {
 
     const handleConfirmStartDate = (date) => {
         dispatch(updateFilters({
-            fromDate: moment(date).format("YYYY-MM-DD"),
-            toDate: props.toDate,
+            customRangeStartDate: moment(date).format("YYYY-MM-DD"),
+            customRangeEndDate: props.toDate,
             category: props.category,
-            range: props.range
+            range: props.range,
+            fromDate: "",
+            toDate: ""
         }))
         hideStartDatePicker();
     };
 
     const handleConfirmEndDate = (date) => {
         dispatch(updateFilters({
-            fromDate: props.fromDate,
-            toDate: moment(date).format("YYYY-MM-DD"),
+            customRangeStartDate: props.fromDate,
+            customRangeEndDate: moment(date).format("YYYY-MM-DD"),
             category: props.category,
-            range: props.range
+            range: props.range,
+            fromDate: "",
+            toDate: ""
         }))
         hideEndDatePicker();
     };
@@ -52,7 +56,7 @@ const DateRangePicker = (props) => {
                 {/* Start Date */}
                 <Pressable style={styles.dateButton} onPress={showStartDatePicker} android_ripple={{color: Colors.ripple}}>
                     <Text style={[textTheme.bodyLarge, {flex: 1, textAlign: 'center'}]}>
-                        {props.fromDate ? moment(props.fromDate).format('ddd, DD MMM YYYY') : 'Select Start Date'}
+                        {props.fromDate !== "" ? moment(props.fromDate).format('ddd, DD MMM YYYY') : 'Select Start Date'}
                     </Text>
                     <Feather name="calendar" size={24} color="grey" style={styles.calenderIcon}/>
                 </Pressable>
@@ -62,7 +66,7 @@ const DateRangePicker = (props) => {
                 {/* End Date */}
                 <Pressable style={styles.dateButton} onPress={showEndDatePicker} android_ripple={{color: Colors.ripple}}>
                     <Text style={[textTheme.bodyLarge, {flex: 1, textAlign: 'center'}]}>
-                        {props.toDate ? moment(props.toDate).format('ddd DD MMM YYYY') : 'Select End Date'}
+                        {props.toDate !== "" ? moment(props.toDate).format('ddd DD MMM YYYY') : 'Select End Date'}
                     </Text>
                     <Feather name="calendar" size={24} color="grey" style={styles.calenderIcon}/>
                 </Pressable>
@@ -74,7 +78,7 @@ const DateRangePicker = (props) => {
                 mode="date"
                 onConfirm={handleConfirmStartDate}
                 onCancel={hideStartDatePicker}
-                date={new Date(props.fromDate)}
+                // date={props.fromDate === "" ? new Date() : new Date(props.fromDate)}
             />
 
             {/* End Date Picker */}
@@ -83,7 +87,7 @@ const DateRangePicker = (props) => {
                 mode="date"
                 onConfirm={handleConfirmEndDate}
                 onCancel={hideEndDatePicker}
-                date={new Date(props.toDate)}
+                // date={props.toDate === "" ? new Date() : new Date(props.toDate)}
             />
         </View>
     );

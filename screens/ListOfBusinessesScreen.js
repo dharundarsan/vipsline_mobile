@@ -149,7 +149,7 @@ export default function ListOfBusinessesScreen({navigation}) {
                     <Divider/>
                     <View style={styles.body}>
                         <Text style={[textTheme.titleMedium]}>
-                            Hi, !
+                            Hi, {details.name}!
                         </Text>
                         <Text style={[textTheme.bodyMedium, styles.descriptionText]}>
                             You are a part of the following business. Go to the business which you wish to access now

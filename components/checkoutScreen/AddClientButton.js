@@ -155,7 +155,8 @@ const AddClientButton = (props) => {
                             <View style={styles.actionMenu}>
                                 {
                                     clientInfo.membershipDetails.length !== 0
-                                    || clientInfo.packageDetails.length !== 0 || clientInfo.details.reward_balance !== 0
+                                    || clientInfo.packageDetails.length !== 0 
+                                    // || clientInfo.details.reward_balance !== 0
                                     || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0) 
                                         ? (
                                             isClientInfo ? (
@@ -259,7 +260,7 @@ const AddClientButton = (props) => {
                                         <Text style={{fontSize:12}}> Package</Text>
                                     </PrimaryButton>
                                 }
-                                {
+                                {/* {
                                     clientInfo.details.reward_balance !== 0 &&
                                     clientInfo.details.reward_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
@@ -268,7 +269,7 @@ const AddClientButton = (props) => {
                                             Points <Text style={{color: Colors.highlight}}>{clientInfo.details.reward_balance}</Text>
                                         </Text>
                                     </PrimaryButton>
-                                }
+                                } */}
                                 </View>
                             </ScrollView>
                             : null
@@ -317,19 +318,21 @@ const styles = StyleSheet.create({
     },
     clientCard: {
         flex: 0.60,
+        marginBottom:-10
     },
     actionMenu: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
-        flex: 0.40
+        flex: 0.40,
+        marginBottom:-10
     },
     clientDetailContainer: {
         // alignItems: "center",
         // justifyContent: "space-around",
         flexDirection: "row",
         gap:10,
-        marginTop:10,
+        marginTop:15,
         paddingHorizontal:10
     },
     activePlan: {

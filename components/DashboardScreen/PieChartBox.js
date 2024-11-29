@@ -90,14 +90,13 @@ const PieChartBox = (props) => {
 
   const handleSelection = async (item) => {
     setSelectedValue(item.value);
-    console.log(item);
     
     const currentDate = formatDateYYYYMMDD(0);
     if (props.pieDataArray[0]?.page === "salesPercent") {
       if (item.day !== undefined) {
         setIsCustomRange(false);
         dispatch(loadTopRevenueServices(formatDateYYYYMMDD(item.day),formatDateYYYYMMDD(0)));
-      } else if(item.day !== undefined || item.label === "This month") {
+      } else if(item.day !== undefined || item.label === "Current month") {
         setIsCustomRange(false);
         dispatch(loadTopRevenueServices(getFirstMonth, getLastMonth));
       }
@@ -106,7 +105,6 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "salesProduct") {
-      console.log(1);
       
       if (item.day !== undefined) {
         if (item.day === -29) {
@@ -123,13 +121,13 @@ const PieChartBox = (props) => {
             )
           );
         }
-      } else if (item.day !== undefined || item.label === "This month") {
+      } else if (item.day !== undefined || item.label === "Current month") {
         setIsCustomRange(false)
         dispatch(loadTopRevenueProducts(getFirstMonth, getLastMonth));
       }
       else{
         const customDay1 = formatDateYYYYMMDD(0);
-        // const customDay2 = formatDateYYYYMMDD(0);
+        const customDay2 = formatDateYYYYMMDD(0);
         // setSelectedFromCustomDate(customDay1);
         // setSelectedToCustomDate(customDay2);
         dispatch(loadTopRevenueProducts(customDay1, customDay2));
@@ -137,7 +135,7 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "clientGender") {
-      if (item.label !== "This month" && item.label !== "Custom range") {
+      if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
         dispatch(
           loadRevenueByGender(formatDateYYYYMMDD(item.day), currentDate)
@@ -155,7 +153,7 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "clientCount") {
-      if (item.label !== "This month" && item.label !== "Custom range") {
+      if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
         dispatch(
           loadRevenueCountByGender(formatDateYYYYMMDD(item.day), currentDate)
@@ -173,7 +171,7 @@ const PieChartBox = (props) => {
       }
     } 
     else if (props.pieDataArray[0]?.page === "clientRedemption") {
-      if (item.label !== "This month" && item.label !== "Custom range") {
+      if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
         dispatch(
           loadRevenueByPrepaid(formatDateYYYYMMDD(item.day), currentDate)
@@ -280,7 +278,9 @@ const PieChartBox = (props) => {
             valueField="value"
             value={selectedValue}
             onChange={handleSelection}
-            // placeholder="This month"
+            // placeholder="Current month"
+            inverted={false}
+            key={props.dropdownKey}
           />
         ) : null}
       </View>
@@ -502,8 +502,8 @@ const PieChartBox = (props) => {
                   : [{ color: "#357AF6", text: "0%", value: 1 }]
               }
               donut
-              strokeWidth={0.5}
-              strokeColor="white"
+              // strokeWidth={0.5}
+              // strokeColor="white"
               radius={150}
               isAnimated
               animationDuration={5000}
@@ -540,8 +540,8 @@ const PieChartBox = (props) => {
               }
               radius={150}
               innerRadius={55}
-              strokeWidth={0.5}
-              strokeColor="white"
+              // strokeWidth={0.5}
+              // strokeColor="white"
               showText
               textColor="white"
               textSize={14}

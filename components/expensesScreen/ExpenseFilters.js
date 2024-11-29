@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, View } from "react-native";
+import {ActivityIndicator, Modal, StyleSheet, Text, View} from "react-native";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
@@ -7,27 +7,42 @@ import Colors from "../../constants/Colors";
 import CustomTextInput from "../../ui/CustomTextInput";
 import DatePickerForwardBackward from "../../ui/DatePickerForwardBackward";
 import DateRangePicker from "./DateRangePicker";
-import {loadExpensesFromDb, updateCurrentCategoryId, updateFilters, updateOldCopy} from "../../store/ExpensesSlice";
+import {
+    loadExpensesFromDb,
+    updateCurrentCategoryId,
+    updateCustomRangeStartEndDate,
+    updateFilters,
+    updateOldCopy
+} from "../../store/ExpensesSlice";
 import {Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
+import colors from "../../constants/Colors";
 
-export default function ExpenseFilters({ isVisible, onClose }) {
+export default function ExpenseFilters({ isVisible, onClose, setLoading, loading }) {
     const dispatch = useDispatch();
 
     const { category, range, fromDate, toDate, oldCopy } = useSelector(state => state.expenses);
+    const customRangeStartDate = useSelector(state => state.expenses.customRangeStartDate);
+    const customRangeEndDate =   useSelector(state => state.expenses.customRangeEndDate);
+
+
 
     const categories = useSelector(state => state.expenses.categories);
-    console.log((categories.find(item => item.name === category)?.id))
 
     useEffect(() => {
-        dispatch(updateOldCopy({ fromDate, toDate, category, range }));
+        dispatch(updateOldCopy({ fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate }));
     }, []);
 
+
+
     const handleApply = async () => {
-        dispatch(updateFilters({ fromDate, toDate, category, range }));
+        setLoading(true);
+        dispatch(updateFilters({ fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate }));
         dispatch(updateCurrentCategoryId(category === "All expenses" ? -1 : categories.find(item => item.name === category).id))
         await dispatch(loadExpensesFromDb());
+        setLoading(false);
         onClose();
+
     };
 
     return (
@@ -50,18 +65,18 @@ export default function ExpenseFilters({ isVisible, onClose }) {
                         label="Category"
                         type="dropdown"
                         dropdownItems={["All expenses"].concat(( categories.map(item => item.name)))}
-                        onChangeValue={(value) => dispatch(updateFilters({ category: value, range, fromDate, toDate }))}
+                        onChangeValue={(value) => dispatch(updateFilters({ category: value, range, fromDate, toDate, customRangeStartDate, customRangeEndDate }))}
                         value={category}
                     />
                     <CustomTextInput
                         label="Select Range"
                         type="dropdown"
                         dropdownItems={["Today", "Week", "Month", "Year", "Custom range"]}
-                        onChangeValue={(value) => dispatch(updateFilters({ range: value, category, fromDate, toDate }))}
+                        onChangeValue={(value) => dispatch(updateFilters({ range: value, category, fromDate, toDate, customRangeStartDate, customRangeEndDate }))}
                         value={range}
                     />
                     {range === "Custom range" ? (
-                        <DateRangePicker category={category} range={range} fromDate={fromDate} toDate={toDate} />
+                        <DateRangePicker category={category} range={range} fromDate={customRangeStartDate} toDate={customRangeEndDate} />
                     ) : (
                         <DatePickerForwardBackward
                             label="Date"
@@ -70,6 +85,8 @@ export default function ExpenseFilters({ isVisible, onClose }) {
                             toDate={toDate}
                             category={category}
                             range={range}
+                            customRangeStartDate={customRangeStartDate}
+                            customRangeEndDate={customRangeEndDate}
                         />
                     )}
                 </View>
@@ -79,9 +96,16 @@ export default function ExpenseFilters({ isVisible, onClose }) {
                     label="Clear filters"
                     buttonStyle={styles.clearButton}
                     textStyle={[textTheme.titleMedium, {color: Colors.highlight}]}
-                    onPress={() => dispatch(updateFilters({ fromDate: moment().format("YYYY-MM-DD"), toDate: moment().format("YYYY-MM-DD"), category: "All expenses", range: "Today" }))}
+                    onPress={() => dispatch(updateFilters({ fromDate: moment().format("YYYY-MM-DD"), toDate: moment().format("YYYY-MM-DD"), category: "All expenses", range: "Today", customRangeStartDate: "", customRangeEndDate: ""}))}
                 />
-                <PrimaryButton label="Apply" buttonStyle={styles.applyButton} onPress={handleApply} />
+                {
+                    loading ?
+                        <PrimaryButton buttonStyle={styles.applyButton}>
+                            <ActivityIndicator color={colors.white}/>
+                        </PrimaryButton> :
+                        <PrimaryButton label="Apply" buttonStyle={styles.applyButton} onPress={handleApply} />
+
+                }
             </View>
         </Modal>
     );

@@ -34,6 +34,7 @@ import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../store/cartSlice";
 import LeadDetailsModal from "../components/LeadManagementScreen/LeadDetailsModal";
 import ContentLoader from "react-native-easy-content-loader";
+import EnquiryNotesModal from "../components/LeadManagementScreen/EnquiryNotesModal";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -48,6 +49,8 @@ const LeadManagementScreen = () => {
     const [isCreateLeadModalVisible, setIsCreateClientModalVisible] = useState(false);
     const isFetching = useSelector(state => state.leads.isFetching);
     const [isLeadExists, setIsLeadExists] = useState(totalCount !== 0);
+    const businessId = useSelector(state => state.authDetails.businessId);
+
     const options = [
         {label: '10', value: 10},
         {label: '25', value: 25},
@@ -66,7 +69,7 @@ const LeadManagementScreen = () => {
             dispatch(updateFetchingState(false));
         }
         apiCalls();
-    }, []);
+    }, [businessId]);
 
     useEffect(() => {
         if (lowerCount === 1) {
@@ -160,15 +163,13 @@ const LeadManagementScreen = () => {
                             <RadioButton
                                 options={options}
                                 value={maxEntry}
-                                onValueChange={(value) => {
+                                onPress={(value) => {
+                                    setIsPaginationModalVisible(false);
                                     dispatch(resetPageNo());
                                     dispatch(updateMaxEntry(value));
                                     setLowerCount(1)
                                     setUpperCount(value)
                                     dispatch(loadLeadsFromDb())
-                                }}
-                                onPress={(value) => {
-                                    setIsPaginationModalVisible(false)
                                 }}
                             />
                         </View>

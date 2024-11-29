@@ -4,37 +4,57 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import CustomTextInput from "../../ui/CustomTextInput";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import createLeadAPI from "../../util/apis/createLeadAPI";
 import {formatDate, formatTime} from "../../util/Helpers";
+import moment from "moment";
+import editLeadAPI from "../../util/apis/editLeadAPI";
+import {loadLeadsFromDb} from "../../store/leadManagementSlice";
 
 const CreateLeadModal = (props) => {
-    const [firstName, setFirstName] = useState("")
-    const [lastName, setLastName] = useState("")
-    const [phoneNo, setPhoneNo] = useState(["+91", ""]);
-    const [email, setEmail] = useState("");
-    const [leadDate, setLeadDate] = useState(new Date())
-    const [nextFollowUpDate, setNextFollowUpDate] = useState()
+    const leadSources = useSelector(state => state.leads.leadSources);
+    const staffs = useSelector((state) => state.staff.staffs);
+
+    const [firstName, setFirstName] = useState(props.edit ? props.data.fname : "")
+    const [lastName, setLastName] = useState(props.edit ? props.data.lname : "")
+    const [phoneNo, setPhoneNo] = useState(props.edit ? ["+91", props.data.mobile] : ["+91", ""]);
+    const [email, setEmail] = useState(props.edit ? props.data.email : "");
+    const [leadDate, setLeadDate] = useState(props.edit ? moment(props.data.lead_date, "DD MMM, YYYY").toDate() : new Date())
+    const [nextFollowUpDate, setNextFollowUpDate] = useState(props.edit ? moment(props.data.followup_date, "DD MMM, YYYY").toDate() : null)
     const [enquiryDetails, setEnquiryDetails] = useState("")
     const [leadStatus, setLeadStatus] = useState("New")
     const [followUpTime, setFollowUpTime] = useState();
-    const [gender, setGender] = useState("");
-    const [leadSource, setLeadSource] = useState("")
+    const [gender, setGender] = useState(props.edit ? props.data.gender : "");
+    const [leadSource, setLeadSource] = useState(props.edit ? leadSources.filter(source => source.id.toString() === (props.data?.lead_source?.toString()))[0]?.name : "")
     const [leadCampaign, setLeadCampaign] = useState("")
-    const [leadOwner, setLeadOwner] = useState("")
-    const [address, setAddress] = useState("")
-    const [location, setLocation] = useState("")
-    const [pincode, setPincode] = useState("")
+    const [leadOwner, setLeadOwner] = useState(props.edit ? staffs.filter(staff => staff.name === props.data.lead_owner)[0] : "")
+    const [address, setAddress] = useState(props.edit ? props.data.address : "")
+    const [location, setLocation] = useState(props.edit ? props.data.location : "")
+    const [pincode, setPincode] = useState(props.edit ? props.data.pincode : "")
     const [view, setView] = useState("smart");
-    const staffs = useSelector((state) => state.staff.staffs);
+    const dispatch = useDispatch();
 
     const firstNameRef = useRef(null);
     const phoneNoRef = useRef(null);
     const followUpTimeRef = useRef(null);
     const followUpDateRef = useRef(null)
 
+    // useEffect(() => {
+    //     setFirstName(props.data.fname)
+    //     setLastName(props.data.lname)
+    //     setPhoneNo(["+91", props.data.mobile])
+    //     setEmail(props.data.email)
+    //     setLeadDate(moment(props.data.lead_date, "DD MMM, YYYY").toDate())
+    //     setNextFollowUpDate(moment(props.data.followup_date, "DD MMM, YYYY").toDate())
+    //     setGender(props.data.gender)
+    //     setLeadSource(leadSources.filter(source => source.id.toString() === (props.data?.lead_source?.toString()))[0]?.name)
+    //     setLeadOwner(staffs.filter(staff => staff.name === props.data.lead_owner)[0])
+    //     setAddress(props.data.address)
+    //     setLocation(props.data.location)
+    //     setPincode(props.data.pincode)
+    // }, [props.isVisible, props.data]);
 
     const handleSave = async () => {
         const firstNameValid = firstNameRef.current();
@@ -62,13 +82,41 @@ const CreateLeadModal = (props) => {
             pincode: pincode,
             resource_id: staffs.filter(staff => leadOwner.name === staff.name)[0].id,
         })
+
+        await dispatch(loadLeadsFromDb());
+        props.onCloseModal();
+    }
+
+    const handleEdit = async () => {
+        const firstNameValid = firstNameRef.current();
+        const phoneNoValid = phoneNoRef.current();
+        if (!firstNameValid && !phoneNoValid) {
+            return;
+        }
+        await editLeadAPI({
+            address: address,
+            email: email ? email : "",
+            fname: firstName,
+            gender: gender,
+            lead_campaign_source_id: 0,
+            leads_id: props.data.lead_id,
+            leads_source: leadSources.filter(source => source.name === leadSource)[0].id,
+            lname: lastName,
+            location: location,
+            mobile: phoneNo[1],
+            pincode: pincode,
+            resource_id: staffs.filter(staff => leadOwner.name === staff.name)[0].id,
+        })
+        await dispatch(loadLeadsFromDb());
+        props.refreshData();
+        props.onCloseModal();
     }
 
 
     return <Modal style={styles.createLeadModal} visible={props.isVisible} animationType={"slide"}
                   presentationStyle={"pageSheet"}>
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>Create Lead</Text>
+            <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Lead" : "Create Lead"}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}
@@ -124,7 +172,7 @@ const CreateLeadModal = (props) => {
                                  value={email}
                                  onChangeText={setEmail}
                                  type={"email"}/>
-                {view === "all" && <>
+                {(view === "all" || props.edit) && <>
                     <CustomTextInput type="dropdown"
                                      label="Gender"
                                      labelTextStyle={{fontWeight: "700"}}
@@ -180,78 +228,80 @@ const CreateLeadModal = (props) => {
                         onChangeText={setPincode}
                     />
                 </>}
-                <View style={styles.sectionTitleContainer}><Text style={styles.sectionTitleText}>Lead Follow-up
-                    Details</Text></View>
-                <CustomTextInput
-                    labelTextStyle={{fontWeight: "700"}}
-                    type="date"
-                    label="Lead Date"
-                    value={leadDate === null || leadDate === undefined ? null : new Date(leadDate)}
-                    onChangeValue={(value) => {
-                        setLeadDate(value)
-                    }}
-                />
-                <CustomTextInput
-                    labelTextStyle={{fontWeight: "700"}}
-                    type="multiLine"
-                    label="Enquiry Details"
-                    placeholder="Enter Client's Enquiry Details"
-                    value={enquiryDetails}
-                    onChangeText={setEnquiryDetails}
-                />
-                <CustomTextInput
-                    labelTextStyle={{fontWeight: "700"}}
-                    type="dropdown"
-                    label="Lead Status"
-                    value={leadStatus}
-                    onChangeValue={setLeadStatus}
-                    dropdownItems={useSelector(state => state.leads.leadStatuses).map(status => status.name)}
-                />
-                <CustomTextInput
-                    labelTextStyle={{fontWeight: "700"}}
-                    type="date"
-                    minimumDate={new Date()}
-                    label="Next Follow up Date"
-                    value={nextFollowUpDate === null || nextFollowUpDate === undefined ? null : new Date(nextFollowUpDate)}
-                    onChangeValue={(value) => {
-                        setNextFollowUpDate(value);
-                    }}
-                    validator={(date) => {
-                        if (date === null || date === undefined) return "Follow Date is required";
-                        else return true;
-                    }}
-                    onSave={(callback) => {
-                        followUpDateRef.current = callback;
-                    }}
-                />
-                <CustomTextInput
-                    labelTextStyle={{fontWeight: "700"}}
-                    type="time"
-                    label="Follow up time"
-                    value={followUpTime}
-                    onChangeValue={setFollowUpTime}
-                    validator={(date) => {
-                        if (date === null || date === undefined) return "Follow up time is required";
-                        else return true;
-                    }}
-                    onSave={(callback) => {
-                        followUpTimeRef.current = callback;
-                    }}
-                />
-                <Pressable style={styles.fieldToggle} onPress={() => {
-                    setView(prev => {
-                        if (prev === "smart") return "all"
-                        else return "smart"
-                    })
-                }}>
-                    <Text
-                        style={styles.fieldToggleText}>{view === "smart" ? "Show all fields" : "Switch to smart view"}</Text>
-                </Pressable>
+                {!props.edit && <>
+                    <View style={styles.sectionTitleContainer}><Text style={styles.sectionTitleText}>Lead Follow-up
+                        Details</Text></View>
+                    <CustomTextInput
+                        labelTextStyle={{fontWeight: "700"}}
+                        type="date"
+                        label="Lead Date"
+                        value={leadDate === null || leadDate === undefined ? null : new Date(leadDate)}
+                        onChangeValue={(value) => {
+                            setLeadDate(value)
+                        }}
+                    />
+                    <CustomTextInput
+                        labelTextStyle={{fontWeight: "700"}}
+                        type="multiLine"
+                        label="Enquiry Details"
+                        placeholder="Enter Client's Enquiry Details"
+                        value={enquiryDetails}
+                        onChangeText={setEnquiryDetails}
+                    />
+                    <CustomTextInput
+                        labelTextStyle={{fontWeight: "700"}}
+                        type="dropdown"
+                        label="Lead Status"
+                        value={leadStatus}
+                        onChangeValue={setLeadStatus}
+                        dropdownItems={useSelector(state => state.leads.leadStatuses).map(status => status.name)}
+                    />
+                    <CustomTextInput
+                        labelTextStyle={{fontWeight: "700"}}
+                        type="date"
+                        minimumDate={new Date()}
+                        label="Next Follow up Date"
+                        value={nextFollowUpDate === null || nextFollowUpDate === undefined ? null : new Date(nextFollowUpDate)}
+                        onChangeValue={(value) => {
+                            setNextFollowUpDate(value);
+                        }}
+                        validator={(date) => {
+                            if (date === null || date === undefined) return "Follow Date is required";
+                            else return true;
+                        }}
+                        onSave={(callback) => {
+                            followUpDateRef.current = callback;
+                        }}
+                    />
+                    <CustomTextInput
+                        labelTextStyle={{fontWeight: "700"}}
+                        type="time"
+                        label="Follow up time"
+                        value={followUpTime}
+                        onChangeValue={setFollowUpTime}
+                        validator={(date) => {
+                            if (date === null || date === undefined) return "Follow up time is required";
+                            else return true;
+                        }}
+                        onSave={(callback) => {
+                            followUpTimeRef.current = callback;
+                        }}
+                    />
+                    <Pressable style={styles.fieldToggle} onPress={() => {
+                        setView(prev => {
+                            if (prev === "smart") return "all"
+                            else return "smart"
+                        })
+                    }}>
+                        <Text
+                            style={styles.fieldToggleText}>{view === "smart" ? "Show all fields" : "Switch to smart view"}</Text>
+                    </Pressable>
+                </>}
             </View>
         </ScrollView>
         <KeyboardAvoidingView>
             <View style={styles.saveButtonContainer}>
-                <PrimaryButton onPress={handleSave} label="Save"/>
+                <PrimaryButton onPress={props.edit ? handleEdit : handleSave} label="Save"/>
             </View>
         </KeyboardAvoidingView>
     </Modal>
