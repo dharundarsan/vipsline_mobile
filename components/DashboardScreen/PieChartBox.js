@@ -6,7 +6,7 @@ import TextTheme from "../../constants/TextTheme";
 import { PieChart } from "react-native-gifted-charts";
 import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch } from "react-redux";
-import { Row, Rows, Table, TableWrapper } from "react-native-table-component";
+import { Cell, Row, Rows, Table, TableWrapper } from "react-native-table-component";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { TouchableOpacity } from "react-native";
 import {
@@ -77,7 +77,7 @@ const PieChartBox = (props) => {
   const [customTopServicesToPassData, setCustomTopServicesToPassData] = useState(todayDate)
   const [customTopProductsToPassData, setCustomTopProductsToPassData] = useState(todayDate)
   const [customToClientGenderPassData, setCustomToClientGenderPassData] = useState(todayDate);
-  const [customToClientRedemptionPassData,setCustomToClientRedemptionPassData] = useState(todayDate);
+  const [customToClientRedemptionPassData, setCustomToClientRedemptionPassData] = useState(todayDate);
   const [customToClientCountPassData, setCustomToClientCountPassData] = useState(todayDate);
   const [page, setPage] = useState(props.pieDataArray[0]?.page);
   const [isCustomRange, setIsCustomRange] = useState(false);
@@ -90,22 +90,22 @@ const PieChartBox = (props) => {
 
   const handleSelection = async (item) => {
     setSelectedValue(item.value);
-    
+
     const currentDate = formatDateYYYYMMDD(0);
     if (props.pieDataArray[0]?.page === "salesPercent") {
       if (item.day !== undefined) {
         setIsCustomRange(false);
-        dispatch(loadTopRevenueServices(formatDateYYYYMMDD(item.day),formatDateYYYYMMDD(0)));
-      } else if(item.day !== undefined || item.label === "Current month") {
+        dispatch(loadTopRevenueServices(formatDateYYYYMMDD(item.day), formatDateYYYYMMDD(0)));
+      } else if (item.day !== undefined || item.label === "Current month") {
         setIsCustomRange(false);
         dispatch(loadTopRevenueServices(getFirstMonth, getLastMonth));
       }
-      else{
+      else {
         setIsCustomRange(true);
       }
-    } 
+    }
     else if (props.pieDataArray[0]?.page === "salesProduct") {
-      
+
       if (item.day !== undefined) {
         if (item.day === -29) {
           setIsCustomRange(false)
@@ -125,7 +125,7 @@ const PieChartBox = (props) => {
         setIsCustomRange(false)
         dispatch(loadTopRevenueProducts(getFirstMonth, getLastMonth));
       }
-      else{
+      else {
         const customDay1 = formatDateYYYYMMDD(0);
         const customDay2 = formatDateYYYYMMDD(0);
         // setSelectedFromCustomDate(customDay1);
@@ -133,7 +133,7 @@ const PieChartBox = (props) => {
         dispatch(loadTopRevenueProducts(customDay1, customDay2));
         setIsCustomRange(true)
       }
-    } 
+    }
     else if (props.pieDataArray[0]?.page === "clientGender") {
       if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
@@ -151,7 +151,7 @@ const PieChartBox = (props) => {
         setIsCustomRange(false);
         dispatch(loadRevenueByGender(getFirstMonth, getLastMonth));
       }
-    } 
+    }
     else if (props.pieDataArray[0]?.page === "clientCount") {
       if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
@@ -169,7 +169,7 @@ const PieChartBox = (props) => {
         setIsCustomRange(false);
         dispatch(loadRevenueCountByGender(getFirstMonth, getLastMonth));
       }
-    } 
+    }
     else if (props.pieDataArray[0]?.page === "clientRedemption") {
       if (item.label !== "Current month" && item.label !== "Custom range") {
         setIsCustomRange(false);
@@ -190,7 +190,7 @@ const PieChartBox = (props) => {
     }
   };
 
-  const handleCustomDate = async (type, date, page,originalDate) => {
+  const handleCustomDate = async (type, date, page, originalDate) => {
     if (type === 1) {
       if (page === "clientGender") {
         setCustomFromClientGenderPassData(date);
@@ -201,19 +201,19 @@ const PieChartBox = (props) => {
           loadRevenueCountByGender(date, customToClientGenderPassData)
         );
       } else if (page === "clientRedemption") {
-        
+
         setCustomFromClientRedemptionPassData(date);
         await dispatch(
           loadRevenueByPrepaid(date, customToClientRedemptionPassData)
         );
-      } else if(page === "salesPercent"){
+      } else if (page === "salesPercent") {
         // setCustomTopServicesFromDateData(originalDate);
         setCustomTopServicesFromPassData(date);
-        await dispatch(loadTopRevenueServices(date,customTopServicesToPassData))
-      } else if(page === "salesProduct"){
+        await dispatch(loadTopRevenueServices(date, customTopServicesToPassData))
+      } else if (page === "salesProduct") {
         // setCustomTopProductsFromDateData(originalDate);
         setCustomTopProductsFromPassData(date);
-        await dispatch(loadTopRevenueProducts(date,customTopProductsToPassData));
+        await dispatch(loadTopRevenueProducts(date, customTopProductsToPassData));
       }
       // setCustomFromPassData(date);
       // await dispatch(loadSalesDashboard(date, customToPassData));
@@ -231,12 +231,12 @@ const PieChartBox = (props) => {
         await dispatch(
           loadRevenueByPrepaid(customFromClientRedemptionPassData, date)
         );
-      } else if(page === "salesPercent"){
+      } else if (page === "salesPercent") {
         setCustomTopServicesToPassData(date);
-        await dispatch(loadTopRevenueServices(customTopServicesFromPassData,date));
-      } else if(page === "salesProduct"){
+        await dispatch(loadTopRevenueServices(customTopServicesFromPassData, date));
+      } else if (page === "salesProduct") {
         setCustomTopProductsToPassData(date);
-        await dispatch(loadTopRevenueProducts(customTopProductsFromPassData,date));
+        await dispatch(loadTopRevenueProducts(customTopProductsFromPassData, date));
       }
       // setCustomToPassData(date);
       // await dispatch(loadSalesDashboard(customFromPassData, date));
@@ -267,8 +267,8 @@ const PieChartBox = (props) => {
           {props.title}
         </Text>
         {props.toggleDateDropdown ? (
-          <Dropdown 
-            dropdownPosition = {props?.labelArray?.[0] !== "" &&props?.pieDataArray[0]?.text !== "0%" &&props.pieDataArray.length !== 0 ? "auto" : "top"}
+          <Dropdown
+            dropdownPosition={props?.labelArray?.[0] !== "" && props?.pieDataArray[0]?.text !== "0%" && props.pieDataArray.length !== 0 ? "auto" : "top"}
             iconColor="#6950F3"
             style={styles.dropdown}
             data={props.dateArray}
@@ -303,11 +303,11 @@ const PieChartBox = (props) => {
           } else if (page === "clientRedemption") {
             setCustomFromRedemptionDateData(date);
             setCustomClientFromRedemption(formatted);
-          } else if(page === "salesPercent"){
+          } else if (page === "salesPercent") {
             // setCustomTopServicesToDateData(date);
             setCustomTopServicesFromDateData(date);
             setCustomTopServicesFromSelected(formatted)
-          } else if(page === "salesProduct"){
+          } else if (page === "salesProduct") {
             setCustomTopProductsFromDateData(date);
             setCustomTopProductFromSelected(formatted)
           } else return;
@@ -326,27 +326,27 @@ const PieChartBox = (props) => {
           props.pieDataArray[0]?.page === "clientGender"
             ? customFromGenderDateData
             : props.pieDataArray[0]?.page === "clientCount"
-            ? customFromCountDateData
-            : props.pieDataArray[0]?.page === "clientRedemption"
-            ? customFromRedemptionDateData
-            : props.pieDataArray[0]?.page === "salesPercent"
-            ? customTopServicesFromDateData
-            : props.pieDataArray[0]?.page === "salesProduct"
-            ? customTopProductsFromDateData
-            : new Date()
+              ? customFromCountDateData
+              : props.pieDataArray[0]?.page === "clientRedemption"
+                ? customFromRedemptionDateData
+                : props.pieDataArray[0]?.page === "salesPercent"
+                  ? customTopServicesFromDateData
+                  : props.pieDataArray[0]?.page === "salesProduct"
+                    ? customTopProductsFromDateData
+                    : new Date()
         }
         maximumDate={
           props.pieDataArray[0]?.page === "clientGender"
             ? customToGenderDateData
             : props.pieDataArray[0]?.page === "clientCount"
-            ? customToCountDateData
-            : props.pieDataArray[0]?.page === "clientRedemption"
-            ? customToRedemptionDateData
-            : props.pieDataArray[0]?.page === "salesPercent"
-            ? customTopServicesToDateData
-            : props.pieDataArray[0]?.page === "salesPercent"
-            ? customTopProductsToDateData
-            : new Date()
+              ? customToCountDateData
+              : props.pieDataArray[0]?.page === "clientRedemption"
+                ? customToRedemptionDateData
+                : props.pieDataArray[0]?.page === "salesPercent"
+                  ? customTopServicesToDateData
+                  : props.pieDataArray[0]?.page === "salesPercent"
+                    ? customTopProductsToDateData
+                    : new Date()
         }
         themeVariant="light"
         onCancel={() => setFromDateVisibility(false)}
@@ -370,13 +370,13 @@ const PieChartBox = (props) => {
           } else if (page === "clientRedemption") {
             setCustomToRedemptionDateData(date);
             setCustomClientToRedemption(formatted);
-          }  else if(page === "salesPercent"){
+          } else if (page === "salesPercent") {
             setCustomTopServicesToDateData(date);
             setCustomTopServicesToSelected(formatted)
-          } else if(page === "salesProduct"){
+          } else if (page === "salesProduct") {
             setCustomTopProductsToDateData(date);
             setCustomTopProductToSelected(formatted)
-          }else return;
+          } else return;
           handleCustomDate(
             2,
             formatDateYYYYMMDDD(date),
@@ -390,27 +390,27 @@ const PieChartBox = (props) => {
           props.pieDataArray[0]?.page === "clientGender"
             ? customToGenderDateData
             : props.pieDataArray[0]?.page === "clientCount"
-            ? customToCountDateData
-            : props.pieDataArray[0]?.page === "clientRedemption"
-            ? customToRedemptionDateData
-            : props.pieDataArray[0]?.page === "salesPercent"
-            ? customTopServicesToDateData
-            : props.pieDataArray[0]?.page === "salesProduct"
-            ? customTopProductsToDateData
-            : new Date()
+              ? customToCountDateData
+              : props.pieDataArray[0]?.page === "clientRedemption"
+                ? customToRedemptionDateData
+                : props.pieDataArray[0]?.page === "salesPercent"
+                  ? customTopServicesToDateData
+                  : props.pieDataArray[0]?.page === "salesProduct"
+                    ? customTopProductsToDateData
+                    : new Date()
         }
         minimumDate={
           props.pieDataArray[0]?.page === "clientGender"
-          ? customFromGenderDateData
-          : props.pieDataArray[0]?.page === "clientCount"
-          ? customFromCountDateData
-          : props.pieDataArray[0]?.page === "clientRedemption"
-          ? customFromRedemptionDateData
-          : props.pieDataArray[0]?.page === "salesPercent"
-          ? customTopServicesFromDateData
-          : props.pieDataArray[0]?.page === "salesProduct"
-          ? customTopProductsFromDateData
-          : new Date()
+            ? customFromGenderDateData
+            : props.pieDataArray[0]?.page === "clientCount"
+              ? customFromCountDateData
+              : props.pieDataArray[0]?.page === "clientRedemption"
+                ? customFromRedemptionDateData
+                : props.pieDataArray[0]?.page === "salesPercent"
+                  ? customTopServicesFromDateData
+                  : props.pieDataArray[0]?.page === "salesProduct"
+                    ? customTopProductsFromDateData
+                    : new Date()
         }
         themeVariant="light"
         onCancel={() => setToDateVisibility(false)}
@@ -435,17 +435,17 @@ const PieChartBox = (props) => {
               >
                 {props.pieDataArray[0]?.page === "clientGender"
                   ? (
-                      customClientFromGenderSelected || new Date()
-                    )
+                    customClientFromGenderSelected || new Date()
+                  )
                   : props.pieDataArray[0]?.page === "clientCount"
-                  ? (customClientFromCountSelected || new Date())
-                  : props.pieDataArray[0]?.page === "clientRedemption"
-                  ? (customClientFromRedemption || new Date())
-                  : props.pieDataArray[0]?.page === "salesPercent"
-                  ? (customTopServicesFromSelected|| new Date())
-                  : props.pieDataArray[0]?.page === "salesProduct"
-                  ? (customTopProductFromSelected || new Date())
-                  : ""}
+                    ? (customClientFromCountSelected || new Date())
+                    : props.pieDataArray[0]?.page === "clientRedemption"
+                      ? (customClientFromRedemption || new Date())
+                      : props.pieDataArray[0]?.page === "salesPercent"
+                        ? (customTopServicesFromSelected || new Date())
+                        : props.pieDataArray[0]?.page === "salesProduct"
+                          ? (customTopProductFromSelected || new Date())
+                          : ""}
               </Text>
               <MaterialCommunityIcons
                 name="calendar-month-outline"
@@ -471,14 +471,14 @@ const PieChartBox = (props) => {
                 {props.pieDataArray[0]?.page === "clientGender"
                   ? (customClientToGenderSelected || new Date())
                   : props.pieDataArray[0]?.page === "clientCount"
-                  ? (customClientToCountSelected || new Date())
-                  : props.pieDataArray[0]?.page === "clientRedemption"
-                  ? (customClientToRedemption || new Date())
-                  : props.pieDataArray[0]?.page === "salesPercent"
-                  ? (customTopServicesToSelected || new Date())
-                  : props.pieDataArray[0]?.page === "salesProduct"
-                  ? (customTopProductToSelected || new Date())
-                  : new Date().toDateString()}
+                    ? (customClientToCountSelected || new Date())
+                    : props.pieDataArray[0]?.page === "clientRedemption"
+                      ? (customClientToRedemption || new Date())
+                      : props.pieDataArray[0]?.page === "salesPercent"
+                        ? (customTopServicesToSelected || new Date())
+                        : props.pieDataArray[0]?.page === "salesProduct"
+                          ? (customTopProductToSelected || new Date())
+                          : new Date().toDateString()}
               </Text>
               <MaterialCommunityIcons
                 name="calendar-month-outline"
@@ -491,8 +491,8 @@ const PieChartBox = (props) => {
       </View>
       <Divider />
       {props?.labelArray?.[0] !== "" &&
-      props?.pieDataArray[0]?.text !== "0%" &&
-      props.pieDataArray.length !== 0 ? (
+        props?.pieDataArray[0]?.text !== "0%" &&
+        props.pieDataArray.length !== 0 ? (
         <View style={styles.piechartContainer}>
           {props.totalCenterValue !== undefined ? (
             <PieChart
@@ -595,24 +595,70 @@ const PieChartBox = (props) => {
           ) : null}
           {dropdownVisible ? (
             <View style={styles.tableContainer}>
+              <Table style={styles.tableHeaderContainer}>
+                <Row
+                  data={props.tableHeader}
+                  flexArr={[2, 1, 1, 1]}
+                  style={[styles.headerData, props.tableHeaderStyles]}
+                  textStyle={[TextTheme.titleSmall, { textAlign: "center" }]}
+                />
+                {tableData1.map((rowData, rowIndex) => (
+                  <TableWrapper key={rowIndex} style={{ flexDirection: "row" }}>
+                    {rowData.map((cellData, cellIndex) => (
+                      <View
+                        key={cellIndex}
+                        style={{
+                          flex: cellIndex === 0 ? 2 : 1,
+                          flexDirection: "column",
+                        }}
+                      >
+                        <Cell
+                          data={cellData || ""}
+                          style={[
+                            styles.rowData,
+                            { flex: cellIndex === 0 ? 2 : 1 },
+                          ]}
+                          textStyle={[
+                            TextTheme.bodySmall,
+                            {
+                              textAlign: cellIndex === 0 ? "left" : "center",
+                              paddingLeft: cellIndex === 0 ? 25 : 0,
+                            },
+                          ]}
+                        />
+                        {cellIndex <= rowData.length - 1 && (
+                          <Divider />
+                        )}
+                      </View>
+                    ))}
+                  </TableWrapper>
+                ))}
+
+              </Table>
+            </View>
+          ) : null}
+          {/* {dropdownVisible ? (
+            <View style={styles.tableContainer}>
               <TableWrapper>
                 <Table style={styles.tableHeaderContainer}>
                   <Row
-                    data={["Top Services", "Count", "Value", "%"]}
-                    style={styles.headerData}
+                    data={props.tableHeader}
+                    style={[styles.headerData, props.tableHeaderStyles]}
                     textStyle={[TextTheme.titleSmall, { textAlign: "center" }]}
                     flexArr={[2, 1, 1, 1]}
                   />
                   <Rows
                     data={tableData1}
                     flexArr={[2, 1, 1, 1]}
-                    textStyle={[TextTheme.bodySmall, { textAlign: "center" }]}
+                    textStyle={[TextTheme.bodySmall, { textAlign: "center" }, props.rowDataStyles]}
                     style={styles.rowData}
                   />
                 </Table>
               </TableWrapper>
             </View>
-          ) : null}
+          ) : null} */}
+
+
         </View>
       ) : (
         <View style={{ paddingVertical: 20, alignSelf: "center" }}>
@@ -713,8 +759,8 @@ const styles = StyleSheet.create({
   },
   rowData: {
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.grey250,
+    // borderBottomWidth: 1,
+    // borderBottomColor: Colors.grey250,
     overflow: "hidden",
   },
   customDateBox: {
