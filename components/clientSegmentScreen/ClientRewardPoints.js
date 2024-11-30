@@ -25,14 +25,14 @@ const ClientRewardPoints = (props) => {
             await dispatch(resetRewardPageNo())
             await dispatch(getRewardHistory(props.details.id, 10));
             await dispatch(getRewardPointBalance(props.details.id))
-            await dispatch(updateRewardMaxEntry(10));    
+            await dispatch(updateRewardMaxEntry(10));
         }
         initialCall()
     }, [])
 
     return (
         <>
-            <ScrollView style={styles.wrapper} scrollEnabled={false}>
+            <ScrollView style={styles.wrapper} scrollEnabled={true} showsVerticalScrollIndicator={false}>
                 <View style={styles.container}>
                     {
                         isEntryModalVisible &&
@@ -76,17 +76,19 @@ const ClientRewardPoints = (props) => {
                     }
                 </View>
             </ScrollView>
-            <CustomPagination
-                setIsModalVisible={setIsEntryModalVisible}
-                maxEntry={maxEntry}
-                incrementPageNumber={() => dispatch(incrementRewardPageNumber())}
-                decrementPageNumber={() => dispatch(decrementRewardPageNumber())}
-                refreshOnChange={async() => await dispatch(getRewardHistory(props.details.id, maxEntry))}
-                currentCount={rewardDetails?.customerRewardList.length}
-                totalCount={rewardsTotalSize}
-                resetPageNo={()=>dispatch(resetRewardPageNo())}
-                isFetching={isRewardFetching}
-            />
+            <View style={{width:'100%'}}>
+                <CustomPagination
+                    setIsModalVisible={setIsEntryModalVisible}
+                    maxEntry={maxEntry}
+                    incrementPageNumber={() => dispatch(incrementRewardPageNumber())}
+                    decrementPageNumber={() => dispatch(decrementRewardPageNumber())}
+                    refreshOnChange={async () => await dispatch(getRewardHistory(props.details.id, maxEntry))}
+                    currentCount={rewardDetails?.customerRewardList.length}
+                    totalCount={rewardsTotalSize}
+                    resetPageNo={() => dispatch(resetRewardPageNo())}
+                    isFetching={isRewardFetching}
+                />
+            </View>
         </>
     )
 }
