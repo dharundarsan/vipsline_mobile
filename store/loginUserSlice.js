@@ -30,7 +30,6 @@ export const loadLoginUserDetailsFromDb = () => async (dispatch) => {
                 }
             }
         );
-        console.log(response.data)
         dispatch(updateUserDetails(response.data.data[0]));
 
     }

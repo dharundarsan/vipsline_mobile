@@ -29,6 +29,7 @@ export default function Expenses() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [updateIsVisible, setUpdateIsVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const totalExpensesCount = useSelector(state => state.expenses.totalExpenses);
     const totalExpensesAmount = useSelector(state => state.expenses.amount);
@@ -129,6 +130,8 @@ export default function Expenses() {
             <ExpenseFilters
                 isVisible={advancedFiltersVisibility}
                 onClose={() => setAdvancedFiltersVisibility(false)}
+                setLoading={setIsLoading}
+                loading={isLoading}
 
             />
         }
@@ -153,7 +156,7 @@ export default function Expenses() {
                             filter
                             onPressFilter={() => setAdvancedFiltersVisibility(true)}
                             searchContainerStyle={styles.searchBar}
-                            placeholder={"Search by name email or mobile"}
+                            placeholder={"Search expense"}
                             onChangeText={setSearchQuery}
                         />
 

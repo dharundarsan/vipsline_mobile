@@ -19,7 +19,7 @@ import {updateMaxEntry} from "../../store/ExpensesSlice";
  */
 
 
-const modalHeight = 180;
+const modalHeight = 240;
 
 export default function EntryModal(props) {
 
@@ -67,6 +67,9 @@ export default function EntryModal(props) {
                               }}>
 
                 <View style={styles.model}>
+
+                    <Text style={{marginBottom: 8, fontSize: 18, fontWeight: '700'}}>Select max entry</Text>
+
                     <View style={styles.innerContainer}>
                         <RadioButton
                             options={options}
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: '70%',
         height: modalHeight,
-        backgroundColor: Colors.grey200,
+        backgroundColor: Colors.white,
         borderRadius: 24,
         margin: 'auto',
         borderWidth: 1.5,
