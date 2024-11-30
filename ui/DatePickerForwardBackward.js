@@ -35,6 +35,9 @@ function formatDateRange(view, fromDate, toDate = fromDate) {
 }
 
 export default function DatePickerForwardBackward({ label, type, fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate }) {
+
+
+
     const dispatch = useDispatch();
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [forwardVisibility, setForwardVisibility] = useState(false);
@@ -78,8 +81,8 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
             dispatch(updateFilters({
                 category,
                 range,
-                fromDate: moment(formatDateRange(type, fromDate, toDate).split(" - ")[0].trim()).format("YYYY-MM-DD"),
-                toDate: moment(formatDateRange(type, fromDate, toDate).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+                fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+                toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
                 customRangeStartDate: "",
                 customRangeEndDate: ""
             }))

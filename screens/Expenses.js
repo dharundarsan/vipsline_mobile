@@ -19,6 +19,7 @@ import ExpensesPagination from "../components/expensesScreen/ExpensesPagination"
 import EntryModal from "../components/expensesScreen/EntryModal";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import {useFocusEffect} from "@react-navigation/native";
+import SearchExpensesPagination from "../components/expensesScreen/SearchExpensesPagination";
 
 
 export default function Expenses() {
@@ -30,6 +31,7 @@ export default function Expenses() {
     const [searchQuery, setSearchQuery] = useState("");
     const [updateIsVisible, setUpdateIsVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [clientDeleted, setClientDeleted] = useState(0);
 
     const totalExpensesCount = useSelector(state => state.expenses.totalExpenses);
     const totalExpensesAmount = useSelector(state => state.expenses.amount);
@@ -110,6 +112,7 @@ export default function Expenses() {
                     setIsVisible(false);
                 }}
                 type={"add"}
+                setClientDetected={setClientDeleted}
 
             />
         }
@@ -121,6 +124,7 @@ export default function Expenses() {
                     setUpdateIsVisible(false);
                 }}
                 type={"update"}
+                setClientDetected={setClientDeleted}
 
 
             />
@@ -217,8 +221,8 @@ export default function Expenses() {
                         totalExpensesCount > 10 && searchQuery === "" ?
                             <ExpensesPagination
                             setIsModalVisible={setIsModalVisible}
-                            filter={"Daily"}
                             totalCount={totalExpensesCount}
+                            clientDeleted={clientDeleted}
                             /> :
                             <></>
                     }

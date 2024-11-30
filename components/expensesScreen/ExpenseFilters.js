@@ -1,5 +1,5 @@
 import {ActivityIndicator, Modal, StyleSheet, Text, View} from "react-native";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import PrimaryButton from "../../ui/PrimaryButton";
@@ -25,6 +25,13 @@ export default function ExpenseFilters({ isVisible, onClose, setLoading, loading
     const customRangeStartDate = useSelector(state => state.expenses.customRangeStartDate);
     const customRangeEndDate =   useSelector(state => state.expenses.customRangeEndDate);
 
+    const [startDateRangeIsValid, setStartDateRangeIsValid] = useState(true);
+    const [endDateRangeIsValid, setEndDateRangeIsValid] = useState(true);
+
+    useEffect(() => {
+        setStartDateRangeIsValid(true);
+        setEndDateRangeIsValid(true);
+    }, [range]);
 
 
     const categories = useSelector(state => state.expenses.categories);
@@ -40,6 +47,29 @@ export default function ExpenseFilters({ isVisible, onClose, setLoading, loading
         dispatch(updateFilters({ fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate }));
         dispatch(updateCurrentCategoryId(category === "All expenses" ? -1 : categories.find(item => item.name === category).id))
         await dispatch(loadExpensesFromDb());
+        if(range === "Custom range") {
+            if(customRangeEndDate === "" && customRangeStartDate === "") {
+                setEndDateRangeIsValid(false);
+                setStartDateRangeIsValid(false);
+                setLoading(false)
+                return
+            }
+            if(customRangeStartDate === "") {
+                setStartDateRangeIsValid(false);
+                setLoading(false)
+                return
+            }
+            if(customRangeEndDate === "") {
+                setEndDateRangeIsValid(false);
+                setLoading(false)
+                return
+            }
+            if(customRangeStartDate !== "" && customRangeEndDate !== "") {
+                setStartDateRangeIsValid(true)
+                setEndDateRangeIsValid(true);
+                setLoading(false);
+            }
+        }
         setLoading(false);
         onClose();
 
@@ -76,7 +106,14 @@ export default function ExpenseFilters({ isVisible, onClose, setLoading, loading
                         value={range}
                     />
                     {range === "Custom range" ? (
-                        <DateRangePicker category={category} range={range} fromDate={customRangeStartDate} toDate={customRangeEndDate} />
+                        <DateRangePicker
+                            category={category}
+                            range={range}
+                            fromDate={customRangeStartDate}
+                            toDate={customRangeEndDate}
+                            startDateRangeIsValid={startDateRangeIsValid}
+                            endDateRangeIsValid={endDateRangeIsValid}
+                        />
                     ) : (
                         <DatePickerForwardBackward
                             label="Date"
@@ -96,7 +133,17 @@ export default function ExpenseFilters({ isVisible, onClose, setLoading, loading
                     label="Clear filters"
                     buttonStyle={styles.clearButton}
                     textStyle={[textTheme.titleMedium, {color: Colors.highlight}]}
-                    onPress={() => dispatch(updateFilters({ fromDate: moment().format("YYYY-MM-DD"), toDate: moment().format("YYYY-MM-DD"), category: "All expenses", range: "Today", customRangeStartDate: "", customRangeEndDate: ""}))}
+                    onPress={() => {
+                        dispatch(updateFilters({
+                            fromDate: moment().format("YYYY-MM-DD"),
+                            toDate: moment().format("YYYY-MM-DD"),
+                            category: "All expenses",
+                            range: "Today",
+                            customRangeStartDate: "",
+                            customRangeEndDate: ""
+                        }));
+                        dispatch(loadExpensesFromDb());
+                    }}
                 />
                 {
                     loading ?
@@ -110,9 +157,6 @@ export default function ExpenseFilters({ isVisible, onClose, setLoading, loading
         </Modal>
     );
 }
-
-
-
 
 const styles = StyleSheet.create({
     advancedFilters: {

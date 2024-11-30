@@ -29,7 +29,7 @@ import {loadExpensesFromDb, decrementPageNumber, incrementPageNumber,} from "../
  */
 
 
-export default function ExpensesPagination(props) {
+export default function SearchExpensesPagination(props) {
     const dispatch = useDispatch();
 
 
