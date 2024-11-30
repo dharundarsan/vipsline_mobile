@@ -6,8 +6,8 @@ const addEnquiryNotesAPI = async (followUpDate, followUpTime, leadId, leadOwner,
     try {
         const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/leads/addFollowupDetails", {
             business_id: await SecureStore.getItemAsync('businessId'),
-            followup_date: formatDate(followUpDate, "yyyy-mm-dd"),
-            followup_time: formatTime(followUpTime, "hh:mm:ss"),
+            followup_date: followUpDate ? formatDate(followUpDate, "yyyy-mm-dd") : null,
+            followup_time: followUpTime ? formatTime(followUpTime, "hh:mm:ss") : null,
             lead_id: leadId,
             lead_owner: leadOwner,
             lead_status: leadStatus,

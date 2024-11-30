@@ -4,7 +4,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {useDispatch, useSelector} from "react-redux";
 import createLeadAPI from "../../util/apis/createLeadAPI";
@@ -12,10 +12,13 @@ import {formatDate, formatTime} from "../../util/Helpers";
 import moment from "moment";
 import editLeadAPI from "../../util/apis/editLeadAPI";
 import {loadLeadsFromDb} from "../../store/leadManagementSlice";
+import Toast from "../../ui/Toast";
+import getLeadCampaignsAPI from "../../util/apis/getLeadCampaignsAPI";
 
 const CreateLeadModal = (props) => {
     const leadSources = useSelector(state => state.leads.leadSources);
     const staffs = useSelector((state) => state.staff.staffs);
+    const [campaignList, setCampaignList] = useState([])
 
     const [firstName, setFirstName] = useState(props.edit ? props.data.fname : "")
     const [lastName, setLastName] = useState(props.edit ? props.data.lname : "")
@@ -27,9 +30,9 @@ const CreateLeadModal = (props) => {
     const [leadStatus, setLeadStatus] = useState("New")
     const [followUpTime, setFollowUpTime] = useState();
     const [gender, setGender] = useState(props.edit ? props.data.gender : "");
-    const [leadSource, setLeadSource] = useState(props.edit ? leadSources.filter(source => source.id.toString() === (props.data?.lead_source?.toString()))[0]?.name : "")
-    const [leadCampaign, setLeadCampaign] = useState("")
-    const [leadOwner, setLeadOwner] = useState(props.edit ? staffs.filter(staff => staff.name === props.data.lead_owner)[0] : "")
+    const [leadSource, setLeadSource] = useState(props.edit ? (props.data.lead_source === "" || props.data.lead_source === null) ? "" : leadSources.filter(source => source.id.toString() === (props.data?.lead_source?.toString()))[0] : "")
+    const [leadCampaign, setLeadCampaign] = useState(props.edit ? (props.data.lead_campaign_id === "" || props.data.lead_campaign_id === null) ? "" : campaignList.filter(campaign => campaign.lead_campaign_source_id === props.data.lead_campaign_id)[0] : "");
+    const [leadOwner, setLeadOwner] = useState(props.edit ? (props.data.lead_owner === "" || props.data.lead_owner === null) ? "" : staffs.filter(staff => staff.name === props.data.lead_owner)[0] : "")
     const [address, setAddress] = useState(props.edit ? props.data.address : "")
     const [location, setLocation] = useState(props.edit ? props.data.location : "")
     const [pincode, setPincode] = useState(props.edit ? props.data.pincode : "")
@@ -37,75 +40,88 @@ const CreateLeadModal = (props) => {
     const dispatch = useDispatch();
 
     const firstNameRef = useRef(null);
+    const emailRef = useRef(null);
     const phoneNoRef = useRef(null);
     const followUpTimeRef = useRef(null);
     const followUpDateRef = useRef(null)
 
-    // useEffect(() => {
-    //     setFirstName(props.data.fname)
-    //     setLastName(props.data.lname)
-    //     setPhoneNo(["+91", props.data.mobile])
-    //     setEmail(props.data.email)
-    //     setLeadDate(moment(props.data.lead_date, "DD MMM, YYYY").toDate())
-    //     setNextFollowUpDate(moment(props.data.followup_date, "DD MMM, YYYY").toDate())
-    //     setGender(props.data.gender)
-    //     setLeadSource(leadSources.filter(source => source.id.toString() === (props.data?.lead_source?.toString()))[0]?.name)
-    //     setLeadOwner(staffs.filter(staff => staff.name === props.data.lead_owner)[0])
-    //     setAddress(props.data.address)
-    //     setLocation(props.data.location)
-    //     setPincode(props.data.pincode)
-    // }, [props.isVisible, props.data]);
+
+    useLayoutEffect(() => {
+        setLeadCampaign("");
+        const api = async () => {
+            const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "") ? 0 : leadSource.id)
+            setCampaignList(response.data.data);
+            setLeadCampaign(props.edit ? (props.data.lead_campaign_id === "" || props.data.lead_campaign_id === null) ? "" : response.data.data.filter(campaign => campaign.lead_campaign_source_id === props.data.lead_campaign_id)[0] : "")
+        }
+        api();
+    }, [leadSource]);
 
     const handleSave = async () => {
         const firstNameValid = firstNameRef.current();
         const phoneNoValid = phoneNoRef.current();
         const followUpTimeValid = followUpTimeRef.current();
         const followUpDateValid = followUpDateRef.current();
-        if (!firstNameValid && !phoneNoValid && !followUpDateValid && !followUpTimeValid) {
+        if (!firstNameValid || !phoneNoValid || !followUpDateValid || !followUpTimeValid) {
             return;
         }
-        await createLeadAPI({
-            address: address,
-            email: email,
-            fname: firstName,
-            followup_date: formatDate(nextFollowUpDate, "yyyy-mm-dd"),
-            followup_time: formatTime(followUpTime, "hh:mm:ss"),
-            gender: gender,
-            lead_campaign_source_id: 0,
-            lead_owner: "",
-            lead_status: leadStatus,
-            leads_source: leadSource,
-            lname: lastName,
-            location: location,
-            mobile: phoneNo[1],
-            notes: enquiryDetails,
-            pincode: pincode,
-            resource_id: staffs.filter(staff => leadOwner.name === staff.name)[0].id,
-        })
+        if (!(email === undefined || email === null || email === "")) {
+            const emailIsValid = emailRef.current();
+            if(!emailIsValid){
+                return;
+            }
+        }
+        try {
+            await createLeadAPI({
+                address: address,
+                email: email,
+                fname: firstName,
+                followup_date: formatDate(nextFollowUpDate, "yyyy-mm-dd"),
+                followup_time: formatTime(followUpTime, "hh:mm:ss"),
+                gender: gender,
+                lead_campaign_source_id: (leadCampaign === null || leadCampaign === "") ? 0 : leadCampaign.lead_campaign_source_id,
+                lead_owner: "",
+                lead_status: leadStatus,
+                leads_source: (leadCampaign === undefined || leadSource === null || leadSource === "") ? "" : leadSource.name,
+                lname: lastName,
+                location: location,
+                mobile: phoneNo[1],
+                notes: enquiryDetails,
+                pincode: pincode,
+                resource_id: leadOwner === null || leadOwner === "" ? "" : leadOwner.id,
+            })
+            await dispatch(loadLeadsFromDb());
+            props.onCloseModal();
+        } catch (e) {
+            toastRef.current.show(e.data.other_message);
+        }
 
-        await dispatch(loadLeadsFromDb());
-        props.onCloseModal();
     }
 
     const handleEdit = async () => {
         const firstNameValid = firstNameRef.current();
         const phoneNoValid = phoneNoRef.current();
-        if (!firstNameValid && !phoneNoValid) {
+        if (!firstNameValid || !phoneNoValid) {
             return;
+        }
+        if (!(email === undefined || email === null || email === "")) {
+            const emailIsValid = emailRef.current();
+            if(!emailIsValid){
+                return;
+            }
         }
         await editLeadAPI({
             address: address,
             email: email ? email : "",
             fname: firstName,
             gender: gender,
-            lead_campaign_source_id: 0,
+            lead_campaign_source_id: (leadCampaign === undefined || leadCampaign === null || leadCampaign === "") ? 0 : leadCampaign.lead_campaign_source_id,
             leads_id: props.data.lead_id,
-            leads_source: leadSources.filter(source => source.name === leadSource)[0].id,
+            leads_source: (leadSource === null || leadSource === "") ? "" : leadSource.id,
             lname: lastName,
             location: location,
             mobile: phoneNo[1],
             pincode: pincode,
-            resource_id: staffs.filter(staff => leadOwner.name === staff.name)[0].id,
+            resource_id: (leadOwner === null || leadOwner === "") ? "" : staffs.filter(staff => leadOwner.name === staff.name)[0].id,
         })
         await dispatch(loadLeadsFromDb());
         props.refreshData();
@@ -113,8 +129,11 @@ const CreateLeadModal = (props) => {
     }
 
 
+    const toastRef = useRef(null);
+
     return <Modal style={styles.createLeadModal} visible={props.isVisible} animationType={"slide"}
                   presentationStyle={"pageSheet"}>
+        <Toast ref={toastRef}/>
         <View style={styles.closeAndHeadingContainer}>
             <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Lead" : "Create Lead"}</Text>
             <PrimaryButton
@@ -159,7 +178,8 @@ const CreateLeadModal = (props) => {
                                  value={phoneNo[1]}
                                  onChangeText={setPhoneNo}
                                  validator={(text) => {
-                                     if (text === null || text === undefined || text.length !== 10) return "Phone number is invalid";
+                                     if (text === null || text === undefined || text.trim() === "") return "Phone number is required";
+                                     else if (text.length !== 10) return "Phone number is invalid";
                                      else return true;
                                  }}
                                  onSave={(callback) => {
@@ -170,6 +190,10 @@ const CreateLeadModal = (props) => {
                                  labelTextStyle={{fontWeight: "700"}}
                                  label={"Email"}
                                  value={email}
+                                 validator={(text) => (text === null || text === undefined || text.trim() === "") ? true : !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Email is Invalid" : true}
+                                 onSave={(callback) => {
+                                     emailRef.current = callback;
+                                 }}
                                  onChangeText={setEmail}
                                  type={"email"}/>
                 {(view === "all" || props.edit) && <>
@@ -183,14 +207,18 @@ const CreateLeadModal = (props) => {
                                      label="Lead Source"
                                      labelTextStyle={{fontWeight: "700"}}
                                      value={leadSource}
+                                     object
+                                     objectName={"name"}
                                      onChangeValue={setLeadSource}
-                                     dropdownItems={["Walk-in", "Referral", "Facebook", "Website", "Phone enquiry", "Walk-in", "Google", "Instagram", "Others"]}/>
+                                     dropdownItems={leadSources}/>
                     <CustomTextInput type="dropdown"
                                      label="Campaign"
                                      labelTextStyle={{fontWeight: "700"}}
                                      value={leadCampaign}
                                      onChangeValue={setLeadCampaign}
-                                     dropdownItems={[]}/>
+                                     object
+                                     objectName={"name"}
+                                     dropdownItems={campaignList}/>
                     <CustomTextInput type="dropdown"
                                      label="Lead Owner"
                                      labelTextStyle={{fontWeight: "700"}}
@@ -242,19 +270,19 @@ const CreateLeadModal = (props) => {
                     />
                     <CustomTextInput
                         labelTextStyle={{fontWeight: "700"}}
-                        type="multiLine"
-                        label="Enquiry Details"
-                        placeholder="Enter Client's Enquiry Details"
-                        value={enquiryDetails}
-                        onChangeText={setEnquiryDetails}
-                    />
-                    <CustomTextInput
-                        labelTextStyle={{fontWeight: "700"}}
                         type="dropdown"
                         label="Lead Status"
                         value={leadStatus}
                         onChangeValue={setLeadStatus}
                         dropdownItems={useSelector(state => state.leads.leadStatuses).map(status => status.name)}
+                    />
+                    <CustomTextInput
+                        labelTextStyle={{fontWeight: "700"}}
+                        type="multiLine"
+                        label="Enquiry Details"
+                        placeholder="Enter Client's Enquiry Details"
+                        value={enquiryDetails}
+                        onChangeText={setEnquiryDetails}
                     />
                     <CustomTextInput
                         labelTextStyle={{fontWeight: "700"}}
