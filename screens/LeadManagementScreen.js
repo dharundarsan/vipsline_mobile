@@ -48,7 +48,8 @@ const LeadManagementScreen = () => {
     const dispatch = useDispatch();
     const [isCreateLeadModalVisible, setIsCreateClientModalVisible] = useState(false);
     const isFetching = useSelector(state => state.leads.isFetching);
-    const [isLeadExists, setIsLeadExists] = useState(totalCount !== 0);
+    const [isLeadExists, setIsLeadExists] = useState(false);
+    // const [isLeadExists, setIsLeadExists] = useState(false);
     const businessId = useSelector(state => state.authDetails.businessId);
 
     const options = [
@@ -61,11 +62,13 @@ const LeadManagementScreen = () => {
     useEffect(() => {
         const apiCalls = async () => {
             dispatch(updateFetchingState(true));
+            dispatch(updateSearchTerm(""));
             await dispatch(loadLeadStatusesFromDb());
             await dispatch(loadLeadSourcesFromDb());
-            await getLeadsAPI(0, 10, "");
+            // await getLeadsAPI(0, 10, "");
             await dispatch(loadLeadsFromDb());
-            setIsLeadExists(totalCount !== 0);
+            // setIsLeadExists(totalCount > 0);
+            setIsLeadExists(false);
             dispatch(updateFetchingState(false));
         }
         apiCalls();
@@ -187,7 +190,7 @@ const LeadManagementScreen = () => {
                     title={false}
                 />
             </View> :
-            totalCount === 0 && isLeadExists ?
+            (totalCount === 0 && !isLeadExists) ?
                 <View style={styles.noLeadContainer}>
                     <Text style={[textTheme.titleMedium, {marginTop: 100}]}>Convert your lead into a Client</Text>
                     <Text style={[textTheme.bodyMedium, {
@@ -206,9 +209,9 @@ const LeadManagementScreen = () => {
                     <ScrollView fadingEdgeLength={100} style={{flex: 1}}>
                         <View style={styles.searchBarAndFilterContainer}>
                             <SearchBar filter onChangeText={(text) => {
-                                dispatch(updateFetchingState(true))
                                 dispatch(resetPageNo())
                                 dispatch(updateSearchTerm(text));
+                                dispatch(updateFetchingState(true))
                                 dispatch(loadLeadsFromDb());
                                 dispatch(updateFetchingState(false))
                             }} placeholder={"Search by name email or mobile "}/>
