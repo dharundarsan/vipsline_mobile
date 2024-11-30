@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
         // borderWidth: 1
     },
     searchTextInput: {
-        fontSize: 15,
         marginLeft: 10,
         flex: 1,
     },
