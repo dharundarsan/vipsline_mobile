@@ -99,7 +99,11 @@ const StaffDashboard = () => {
           ? formatDateDDMMYYYY(item.day)
           : `${formatDateDDMMYYYY(item.day)} - ${formatDateDDMMYYYY(0)}`
       );
-      await dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(item.day), formatDateYYYYMMDD(0)));
+      await dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(item.day), 
+            item.day !== -6 && item.day !== -29
+            ? formatDateYYYYMMDD(item.day)
+            : formatDateYYYYMMDD(0)
+    ));
     }
     else if (item.value === "Current month") {
       setIsCustomRange(false);
@@ -378,7 +382,7 @@ const StaffDashboard = () => {
                 <Text style={TextTheme.titleMedium}>Top Performer</Text>
               </View>
               <Divider />
-              <View style={{ alignItems: "center", paddingVertical: 20 }}>
+              <View style={{ alignItems: "center", paddingVertical: 10 }}>
                 {topPerformer[0]?.name !== undefined && topPerformer[0].name !== "" > 0 ? (
                   topPerformer.map((item, index) => {
                     return (
@@ -388,17 +392,17 @@ const StaffDashboard = () => {
                           width: "50%",
                           justifyContent: "space-between",
                           alignItems: "center",
-                          paddingVertical: 20,
+                          paddingVertical: 10,
                         }}
                       >
                         <Image
                           source={trophyIcon[index].icon}
-                          style={{ width: 50, height: 50 }}
+                          style={{ width: 40, height: 40 }}
                         />
-                        <View style={{ width: '80%', alignItems: 'flex-end' }}>
+                        <View style={{ width: '80%', alignItems: 'center'}}>
                           <View style={{ alignItems: 'center' }}>
-                            <Text style={TextTheme.bodyLarge}>{item.name}</Text>
-                            <Text style={TextTheme.bodyLarge}>
+                            <Text style={TextTheme.bodyMedium}>{item.name}</Text>
+                            <Text style={TextTheme.bodyMedium}>
                               {"₹ " + pieData.chart_series[index]}
                             </Text>
                           </View>

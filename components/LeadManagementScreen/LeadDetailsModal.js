@@ -211,100 +211,104 @@ const LeadDetailsModal = (props) => {
             <View style={styles.tabIndicator}/>
         </View>
         <Divider/>
-        {selectedTab === 0 && <View style={styles.leadProfileContent}>
-            <View style={styles.leadProfileContainer}>
-                <View style={styles.leadProfileHeader}>
-                    <Text style={textTheme.titleMedium}>Lead Profile</Text>
-                    <PrimaryButton
-                        pressableStyle={{
-                            paddingHorizontal: 10,
-                            paddingVertical: 10
-                        }}
-                        onPress={() => {
-                            setIsEditLeadModalVisible(true);
-                        }}
-                        buttonStyle={{
-                            backgroundColor: "white", borderColor: "#D5D7DA",
-                            borderWidth: 1,
-                            borderRadius: 8,
-                        }}>
-                        <Feather name="edit-2" size={15} color="black"/>
-                    </PrimaryButton>
+
+        {selectedTab === 0 && <ScrollView>
+            <View style={styles.leadProfileContent}>
+                <View style={styles.leadProfileContainer}>
+                    <View style={styles.leadProfileHeader}>
+                        <Text style={textTheme.titleMedium}>Lead Profile</Text>
+                        <PrimaryButton
+                            pressableStyle={{
+                                paddingHorizontal: 10,
+                                paddingVertical: 10
+                            }}
+                            onPress={() => {
+                                setIsEditLeadModalVisible(true);
+                            }}
+                            buttonStyle={{
+                                backgroundColor: "white", borderColor: "#D5D7DA",
+                                borderWidth: 1,
+                                borderRadius: 8,
+                            }}>
+                            <Feather name="edit-2" size={15} color="black"/>
+                        </PrimaryButton>
+                    </View>
+                    {isLoading ? <View>
+                            <ContentLoader
+                                pRows={9}
+                                pHeight={[55, 55, 55, 55, 55, 55, 55, 55, 55]}
+                                pWidth={["100%"]}
+                                active
+                                title={false}
+                            />
+                        </View> :
+                        <View style={styles.detailsContainer}>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Phone
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.mobile)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Email
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.email)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Gender
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.gender)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Lead Source
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadSources.filter(source => source.id.toString() === (leadProfile?.lead_source?.toString()))[0]?.name)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Campaign
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.lead_campaign_name)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Lead Owner
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.lead_owner)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Address
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.address)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Location
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.location)}
+                            </Text>
+                            <Text/>
+                            <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
+                                Pincode
+                            </Text>
+                            <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
+                                {validateField(leadProfile?.pincode)}
+                            </Text>
+                        </View>}
                 </View>
-                {isLoading ? <View>
-                    <ContentLoader
-                        pRows={9}
-                        pHeight={[55, 55, 55, 55, 55, 55, 55, 55, 55]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-                    />
-                </View> : <View style={styles.detailsContainer}>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Phone
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.mobile)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Email
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.email)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Gender
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.gender)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Lead Source
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadSources.filter(source => source.id.toString() === (leadProfile?.lead_source?.toString()))[0]?.name)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Campaign
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.lead_campaign_name)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Lead Owner
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.lead_owner)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Address
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.address)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Location
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.location)}
-                    </Text>
-                    <Text/>
-                    <Text style={[textTheme.bodyMedium, {color: Colors.grey700, fontWeight: "700"}]}>
-                        Pincode
-                    </Text>
-                    <Text style={[textTheme.bodyMedium, {fontWeight: "bold", fontSize: 15}]}>
-                        {validateField(leadProfile?.pincode)}
-                    </Text>
-                </View>}
             </View>
-        </View>}
+        </ScrollView>}
         {selectedTab === 1 && <ScrollView style={{flex: 1}}>
             {isLoading ? <ContentLoader
                 pRows={5}

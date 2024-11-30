@@ -4,19 +4,20 @@ import {Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
 import React, {useCallback, useEffect, useState, useRef} from "react";
 import Colors from "../../constants/Colors";
-import Divider from "../../ui/Divider";
+// import Divider from "../../ui/Divider";
 import SearchBar from "../../ui/SearchBar";
 import Feather from '@expo/vector-icons/Feather';
 import {useSelector, useDispatch} from "react-redux";
 import ClientCard from "../clientSegmentScreen/ClientCard";
 import {loadClientsFromDb} from "../../store/clientSlice";
 import CreateClientModal from "./CreateClientModal";
-import {loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
+import {getRewardPointBalance, loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb, updateClientId} from "../../store/clientInfoSlice";
 import axios from "axios";
 import {shadowStyling} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
 import * as SecureStore from 'expo-secure-store';
 import Toast from "react-native-toast-message";
+import { Divider } from "react-native-paper";
 
 const AddClientModal = (props) => {
     // const pageNo = useSelector(state => state.client.pageNo);
@@ -140,13 +141,14 @@ const AddClientModal = (props) => {
                             data={clientsList}
                             keyExtractor={(item) => item.id.toString()}
                             // onEndReachedThreshold={0.7}
+                            ItemSeparatorComponent={<Divider />}
                             renderItem={({item}) => (
                                 <ClientCard
                                     clientId={item.id}
                                     name={item.name}
                                     phone={item.mobile_1}
                                     email={item.username}
-                                    divider={true}
+                                    // divider={true}
                                     onPress={(clientId) => {
 
 
@@ -154,6 +156,7 @@ const AddClientModal = (props) => {
                                         dispatch(loadClientInfoFromDb(item.id));
                                         dispatch(loadAnalyticsClientDetailsFromDb(item.id));
                                         dispatch(updateClientId(item.id))
+                                        dispatch(getRewardPointBalance(clientId));
                                     }}
                                 />
                             )}

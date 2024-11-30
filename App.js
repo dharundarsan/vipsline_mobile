@@ -611,7 +611,8 @@ const MainDrawerNavigator = (props) => {
                                                    source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
                                                    width={25}
                                                    height={25}
-                                                   style={{ resizeMode: "contain", tintColor: Colors.white }} />
+                                                   style={{ resizeMode: "contain", tintColor: Colors.white }} />,
+                                               headerTitleAlign: 'center',
                                            }} />
                             {/*<Drawer.Screen*/}
                             {/*    name="Reports"*/}

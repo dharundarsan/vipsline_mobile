@@ -21,7 +21,7 @@ const initialDashboardState = {
     { label: "Yesterday", value: "yesterday",day:-1 },
     { label: "Last 7 days", value: "last7days",day:-6 },
     { label: "Last 30 days", value: "last30days",day:-29 },
-    { label: "Current month", value: "Current month",day1:0,day2:0},
+    { label: "This month", value: "Current month",day1:0,day2:0},
     { label: "Custom range", value: "Custom Range",day1: 0,day2: 0 },
   ],
   toggleDateData: [

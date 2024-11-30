@@ -30,13 +30,17 @@ const initial = {
         fromDate: "",
         toDate: "",
         category: "",
-        range: ""
+        range: "",
+        customRangeStartDate: "",
+        customRangeEndDate: ""
     },
     subId: [],
     currentExpensesId: "",
     currentExpense: {},
     currentCategoryId: -1,
-    currentSubId: 0
+    currentSubId: 0,
+    customRangeStartDate: "",
+    customRangeEndDate: ""
 }
 
 async function getBusinessId() {
@@ -104,8 +108,9 @@ export const getExpenseSubCategoryId = (subId) => async (dispatch, getState) => 
                     Authorization: `Bearer ${authToken}`
                 }
             })
-        dispatch(updateExpenseSubCategoryId(response1.data.data));
 
+        dispatch(updateExpenseSubCategoryId(response1.data.data));
+        return response1.data.data[0]
     }
     catch (e) {
         console.log(e + " error occurred in getting the expense sub category Id")
@@ -138,8 +143,8 @@ export const loadExpensesFromDb = () => async (dispatch, getState) => {
             `${process.env.EXPO_PUBLIC_API_URI}/expense/getListofExpenseForBusiness?pageSize=${expenses.maxEntry}&pageNo=${expenses.pageNo}`,
             {
                 business_id: `${await getBusinessId()}`,
-                fromDate: expenses.fromDate,
-                toDate: expenses.toDate,
+                fromDate: expenses.range === "Custom range" ? expenses.customRangeStartDate : expenses.fromDate,
+                toDate: expenses.range === "Custom range" ? expenses.customRangeEndDate : expenses.toDate,
                 expense_cat_id: expenses.currentCategoryId,
             },
             {
@@ -149,7 +154,7 @@ export const loadExpensesFromDb = () => async (dispatch, getState) => {
             }
         );
         dispatch(updateTotalExpensesCount(response.data.data[0].overall_count));
-        dispatch(updateExpenseAmount(response.data.data[0].overall_expense));
+        dispatch(updateExpenseAmount(response.data.data[0].total_expense));
         dispatch(updateExpensesList(response.data.data[0].expense_details));
         dispatch(updateIsExpensesExists(response.data.data[0].isExpenseExists));
         dispatch(updateFetchingState(false));
@@ -215,8 +220,7 @@ export const ExpensesSlice = createSlice({
         updateExpensesList(state, action) {
             state.expenses = [...action.payload];
         },
-        resetExpensesFilter(state, action) {
-            state.expenses = [];
+        resetExpensesPageNo(state, action) {
             state.pageNo = 0;
         },
         updateFetchingState(state, action) {
@@ -286,12 +290,16 @@ export const ExpensesSlice = createSlice({
             state.toDate = action.payload.toDate;
             state.category = action.payload.category;
             state.range = action.payload.range;
+            state.customRangeStartDate = action.payload.customRangeStartDate;
+            state.customRangeEndDate = action.payload.customRangeEndDate;
         },
         updateOldCopy(state, action) {
             state.oldCopy.fromDate = action.payload.fromDate;
             state.oldCopy.toDate = action.payload.toDate;
             state.oldCopy.category = action.payload.category;
             state.oldCopy.range = action.payload.range;
+            state.customRangeStartDate = action.payload.customRangeStartDate;
+            state.customRangeEndDate = action.payload.customRangeEndDate;
         },
         updateExpenseSubCategoryId(state, action) {
             state.subId = action.payload;
@@ -307,7 +315,12 @@ export const ExpensesSlice = createSlice({
         },
         updateCurrentSubCategoryId(state, action) {
             state.currentSubId = action.payload;
+        },
+        updateCustomRangeStartEndDate(state, action) {
+            state.customRangeStartEndDate = action.payload.startDate;
+            state.customRangeEndDate = action.payload.endDate;
         }
+
 
 
     }
@@ -339,7 +352,9 @@ export const {
     updateCurrentExpensesId,
     updateCurrentExpense,
     updateCurrentCategoryId,
-    updateCurrentSubCategoryId
+    updateCurrentSubCategoryId,
+    resetExpensesPageNo,
+    updateCustomRangeStartEndDate
 
 } = ExpensesSlice.actions;
 
