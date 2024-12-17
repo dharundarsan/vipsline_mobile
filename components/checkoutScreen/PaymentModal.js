@@ -153,7 +153,7 @@ const PaymentModal = (props) => {
                         mode: "digital payments",
                         shown: false,
                         amount: 0,
-                        name: "Digial payment"
+                        name: "Digital payment"
                     },
                 ])
             } else {
@@ -177,7 +177,7 @@ const PaymentModal = (props) => {
                         mode: "digital payments",
                         shown: false,
                         amount: 0,
-                        name: "Digial payment"
+                        name: "Digital payment"
                     },
                 ])
             }
@@ -197,7 +197,7 @@ const PaymentModal = (props) => {
                     mode: "digital payments",
                     shown: false,
                     amount: 0,
-                    name: "Digial payment"
+                    name: "Digital payment"
                 },
             ])
         }
@@ -409,7 +409,7 @@ const PaymentModal = (props) => {
 
                     setIsSplitPaymentDropdownVisible(false)
                 }}
-                dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
+                dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment"] : ["Cash", "Credit / Debit card", "Digital payment"]}
                 onChangeValue={(value) => {
 
                     setAddedSplitPayment(value)

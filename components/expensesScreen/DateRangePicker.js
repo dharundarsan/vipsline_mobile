@@ -85,6 +85,7 @@ const DateRangePicker = (props) => {
                 onConfirm={handleConfirmStartDate}
                 onCancel={hideStartDatePicker}
                 // date={props.fromDate === "" ? new Date() : new Date(props.fromDate)}
+                maximumDate={new Date()}
 
             />
 
@@ -94,6 +95,7 @@ const DateRangePicker = (props) => {
                 onConfirm={handleConfirmEndDate}
                 onCancel={hideEndDatePicker}
                 // date={props.toDate === "" ? new Date() : new Date(props.toDate)}
+                maximumDate={new Date()}
             />
         </View>
     );
