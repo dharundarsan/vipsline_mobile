@@ -1,4 +1,4 @@
-import {Modal, Text, View, StyleSheet, ScrollView, Platform, Linking} from "react-native";
+import {Modal, Text, View, StyleSheet, ScrollView, Platform, Linking, Image} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
@@ -84,7 +84,6 @@ export default function clientInfoModal(props) {
     const [name, setName] = useState("");
 
     const toastRef = useRef(null)
-
 
     useEffect(() => {
         setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
@@ -232,12 +231,12 @@ export default function clientInfoModal(props) {
                         </View>
 
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.bookButton}
-                                   pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>
-                        <Text style={[textTheme.bodyMedium, {color: Colors.white}]}>
-                            Book now
-                        </Text>
-                    </PrimaryButton>
+                    {/*<PrimaryButton buttonStyle={styles.bookButton}*/}
+                    {/*               pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>*/}
+                    {/*    <Text style={[textTheme.bodyMedium, {color: Colors.white}]}>*/}
+                    {/*        Book now*/}
+                    {/*    </Text>*/}
+                    {/*</PrimaryButton>*/}
                 </View>
 
                 <ClientSaleInfo
@@ -278,41 +277,62 @@ export default function clientInfoModal(props) {
 
             />
     } else if (clientMoreDetails === "billActivity") {
-        content = <BillingActivity
+        content = checkNullUndefined(salesData) && checkNullUndefined(salesData.history_appointmentList.length) && salesData.history_appointmentList.length > 0 ?
+            <BillingActivity
             salesData={salesData}
             clientId={details.id}
-        />
+            /> :
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight} style={{height: 30, width: 30, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Sales</Text>
+                <Text style={textTheme.bodyMedium}>The client has no upcoming or past sales</Text>
+            </View>
     } else if (clientMoreDetails === "appointments") {
-        content = <Appointments
-            salesData={salesData}
-            clientId={details.id}
-        />
+        content = checkNullUndefined(salesData) && checkNullUndefined(salesData.upcoming_appointmentList.length) && salesData.upcoming_appointmentList.length > 0 ?
+            <Appointments
+                salesData={salesData}
+                clientId={details.id}
+            /> :
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight} style={{height: 30, width: 30, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Appointments</Text>
+                <Text style={textTheme.bodyMedium}>The client has no upcoming Appointments</Text>
+            </View>
     } else if (clientMoreDetails === "memberships") {
         content = checkNullUndefined(membershipData) && checkNullUndefined(membershipData.length) && membershipData.length > 0 ?
             <MembershipDetails
                 membershipData={membershipData}
             /> :
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
-                membership for this client</Text></View>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/membership.png")} tintColor={Colors.highlight} style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Membership</Text>
+                <Text style={textTheme.bodyMedium}>This client doesn’t have any active memberships</Text>
+            </View>
     } else if (clientMoreDetails === "packageSales") {
         content = checkNullUndefined(packageData) && checkNullUndefined(packageData.length) && packageData.length > 0 ?
             <PackageDetails
                 pacakgeData={packageData}
             /> :
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
-                package for this client</Text></View>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/package.png")} tintColor={Colors.highlight} style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Package</Text>
+                <Text style={textTheme.bodyMedium}>This client doesn’t have any package.</Text>
+            </View>
     } else if (clientMoreDetails === "prepaidSales") {
         content = checkNullUndefined(details) && checkNullUndefined(details.wallet_status) && details.wallet_status ?
             <PrepaidDetails
                 details={details}/> :
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
-                Prepaid for this client</Text></View>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/prepaid.png")} tintColor={Colors.highlight} style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Prepaid</Text>
+                <Text style={textTheme.bodyMedium}>This client doesn’t have any prepaid.</Text>
+            </View>
 
     } 
-    else if (clientMoreDetails === "rewardpoints") {
-        content =
-            <ClientRewardPoints details={details} />
-    } 
+    // else if (clientMoreDetails === "rewardpoints") {
+    //     content =
+    //         <ClientRewardPoints details={details} />
+    // }
     else {
         content =
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming
@@ -459,7 +479,8 @@ const styles = StyleSheet.create({
     optionsContainer: {
         flexDirection: "row",
         width: "95%",
-        justifyContent: "space-around",
+        justifyContent: "center",
+        gap: 32
     },
     updateOrDeleteOption: {
         backgroundColor: Colors.white,
