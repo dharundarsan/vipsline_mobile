@@ -2,7 +2,7 @@ import {KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, Vi
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
+import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import CustomTextInput from "../../ui/CustomTextInput";
@@ -14,6 +14,10 @@ import editLeadAPI from "../../util/apis/editLeadAPI";
 import {loadLeadsFromDb} from "../../store/leadManagementSlice";
 import Toast from "../../ui/Toast";
 import getLeadCampaignsAPI from "../../util/apis/getLeadCampaignsAPI";
+import deleteLeadAPI from "../../util/apis/deleteLeadAPI";
+import {useNavigation} from "@react-navigation/native";
+import {updateNavigationState} from "../../store/NavigationSlice";
+import MiniActionTextModal from "../checkoutScreen/MiniActionTextModal";
 
 const CreateLeadModal = (props) => {
     const leadSources = useSelector(state => state.leads.leadSources);
@@ -45,6 +49,8 @@ const CreateLeadModal = (props) => {
     const followUpTimeRef = useRef(null);
     const followUpDateRef = useRef(null)
     const scrollViewRef = useRef(null);
+
+    const navigation = useNavigation();
 
 
     useLayoutEffect(() => {
@@ -142,6 +148,7 @@ const CreateLeadModal = (props) => {
     return <Modal style={styles.createLeadModal} visible={props.isVisible} animationType={"slide"}
                   presentationStyle={"pageSheet"}>
         <Toast ref={toastRef}/>
+
         <View style={styles.closeAndHeadingContainer}>
             <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Lead" : "Create Lead"}</Text>
             <PrimaryButton
@@ -341,7 +348,19 @@ const CreateLeadModal = (props) => {
         </ScrollView>
         <KeyboardAvoidingView>
             <View style={styles.saveButtonContainer}>
-                <PrimaryButton onPress={props.edit ? handleEdit : handleSave} label="Save"/>
+                {props.edit ? <PrimaryButton onPress={async () => {
+                    await deleteLeadAPI(props.data.lead_id);
+                    await dispatch(loadLeadsFromDb());
+                    props.refreshData();
+                    props.onCloseModal();
+                    dispatch(updateNavigationState("Lead Management Screen"));
+                    navigation.goBack();
+                }}
+                                buttonStyle={{backgroundColor: "white", borderWidth: 1, borderColor: Colors.grey400}}
+                                pressableStyle={{paddingHorizontal: 8, paddingVertical: 8}}>
+                    <MaterialIcons name="delete-outline" size={28} color={Colors.error}/>
+                </PrimaryButton> : null}
+                <PrimaryButton onPress={props.edit ? handleEdit : handleSave} label="Save" buttonStyle={{flex:1}}/>
             </View>
         </KeyboardAvoidingView>
     </Modal>
@@ -380,7 +399,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginHorizontal: -20,
         backgroundColor: "#F8F8FB",
-        paddingVertical: 5,
+        paddingVertical: 10,
         paddingHorizontal: 13,
     },
     sectionTitleText: {
@@ -404,6 +423,8 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         borderTopWidth: 1,
         borderTopColor: Colors.grey300,
+        flexDirection:"row",
+        gap:12,
     }
 
 })

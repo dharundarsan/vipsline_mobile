@@ -35,6 +35,8 @@ import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../store/
 import LeadDetailsModal from "../components/LeadManagementScreen/LeadDetailsModal";
 import ContentLoader from "react-native-easy-content-loader";
 import EnquiryNotesModal from "../components/LeadManagementScreen/EnquiryNotesModal";
+import {updateNavigationState} from "../store/NavigationSlice";
+import LeadAdvancedFiltersModal from "../components/LeadManagementScreen/LeadAdvancedFiltersModal";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -51,6 +53,7 @@ const LeadManagementScreen = () => {
     const [doesLeadExist, setDoesLeadExist] = useState(false);
     const isFetching = useSelector(state => state.leads.isFetching);
     const businessId = useSelector(state => state.authDetails.businessId);
+    const [isAdvancedFiltersModalVisible, setIsAdvancedFiltersModalVisible] = useState(false);
 
     const options = [
         {label: '10', value: 10},
@@ -58,6 +61,10 @@ const LeadManagementScreen = () => {
         {label: '50', value: 50},
         {label: '100', value: 100},
     ];
+
+    useEffect(() => {
+        dispatch(updateNavigationState("Lead Management Screen"));
+    }, []);
 
     useLayoutEffect(() => {
         const apiCalls = async () => {
@@ -141,9 +148,10 @@ const LeadManagementScreen = () => {
     return <View style={styles.leadManagementScreen}>
         {isCreateLeadModalVisible && <CreateLeadModal isVisible={isCreateLeadModalVisible}
                                                       onCloseModal={() => setIsCreateClientModalVisible(false)}/>}
+        {isAdvancedFiltersModalVisible ? <LeadAdvancedFiltersModal onCloseModal={()=>{setIsAdvancedFiltersModalVisible(false)}} isVisible={isAdvancedFiltersModalVisible}/> : null}
         {!(totalCount === 0 && !doesLeadExist) ? <PrimaryButton buttonStyle={styles.fab}
-                        onPress={() => setIsCreateClientModalVisible(true)}
-                        pressableStyle={{flex: 1}}>
+                                                                onPress={() => setIsCreateClientModalVisible(true)}
+                                                                pressableStyle={{flex: 1}}>
             <Feather name="plus" size={24}
                      color={Colors.white}/>
         </PrimaryButton> : <></>}
@@ -207,7 +215,11 @@ const LeadManagementScreen = () => {
                 <View style={styles.content}>
                     <ScrollView fadingEdgeLength={100} style={{flex: 1}}>
                         <View style={styles.searchBarAndFilterContainer}>
-                            <SearchBar filter onChangeText={async (text) => {
+                            <SearchBar
+                                filter
+                                onPressFilter={() => {
+                                setIsAdvancedFiltersModalVisible(true);
+                            }} onChangeText={async (text) => {
                                 dispatch(updateFetchingState(true))
                                 dispatch(resetPageNo())
                                 dispatch(updateSearchTerm(text));
