@@ -10,11 +10,11 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import {CommonActions, NavigationContainer, useNavigation} from '@react-navigation/native';
+import {CommonActions, NavigationContainer, useNavigation, useNavigationState} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {AntDesign, FontAwesome5} from '@expo/vector-icons';
-import React, {useCallback, useState, useEffect} from 'react';
+import React, {useCallback, useState, useEffect, useRef} from 'react';
 import {Provider, useDispatch, useSelector} from 'react-redux';
 import CheckoutScreen from './screens/CheckoutScreen';
 import CustomDrawer from './components/common/CustomDrawer';
@@ -76,14 +76,30 @@ import DashboardScreen from './screens/DashboardScreen';
 import SalesDashboard from './components/DashboardScreen/SalesDashboard';
 import StaffDashboard from './components/DashboardScreen/StaffDashboard';
 import ClientDashboard from './components/DashboardScreen/ClientDashboard';
-import { DataProvider, useDataContext } from './context/DataFlowContext';
-import { formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonthYYYYMMMDD } from './util/Helpers';
-import { loadResourceIdByUserInfo, loadRevenueByGender, loadRevenueByPrepaid, loadRevenueCountByGender, loadSalesDashboard, loadStaffDashboardReport, loadTopRevenueProducts, loadTopRevenueServices } from './store/dashboardSlice';
+import {DataProvider, useDataContext} from './context/DataFlowContext';
+import {
+    formatDateYYYYMMDD,
+    formatDateYYYYMMDDD,
+    getFirstDateOfCurrentMonthYYYYMMDD,
+    getLastDateOfCurrentMonthYYYYMMMDD
+} from './util/Helpers';
+import {
+    loadResourceIdByUserInfo,
+    loadRevenueByGender,
+    loadRevenueByPrepaid,
+    loadRevenueCountByGender,
+    loadSalesDashboard,
+    loadStaffDashboardReport,
+    loadTopRevenueProducts,
+    loadTopRevenueServices
+} from './store/dashboardSlice';
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import AppointmentsScreen from "./screens/AppointmentsScreen";
 import LeadManagementScreen from "./screens/LeadManagementScreen";
 import Expenses from "./screens/Expenses";
 import PrimaryButton from './ui/PrimaryButton';
+import DashboardStack from "./stacks/DashboardStack";
+import LeadManagementStack from "./stacks/LeadManagementStack";
 
 enableScreens();
 
@@ -99,6 +115,7 @@ export default function App() {
         'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
     });
     const [isAuth, setIsAuth] = useState(false)
+
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
@@ -178,7 +195,7 @@ const CheckoutStack = ({route}) => {
             })}
             initialParams={route.params}
         />
-        <Stack.Screen component={SalesDashboard} name="SalesScreen" />
+        <Stack.Screen component={SalesDashboard} name="SalesScreen"/>
     </Stack.Navigator>
 };
 
@@ -242,6 +259,7 @@ const AppNavigator = (props) => {
     //     return () => backHandler.remove();
     // }, []);
 
+
     const checkAuthentication = async () => {
         try {
             // const authKey = await AsyncStorage.getItem('authKey');
@@ -299,31 +317,30 @@ const BackButton = () => {
     const navigation = useNavigation();
     const username = useSelector((state) => state.loginUser.details);
     const page = useSelector((state) => state.dashboardDetails.dashboardName)
-    const {setIsDashboardPage} = useDataContext()
     return (
         <TouchableOpacity
-        style={{left:15}}
-                        onPress={async() => {
-                            // setTimeout(() => {
-                            //     setIsDashboardPage(true)
-                            // }, 40);
-                            // setTimeout(() => {
-                                // dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
-                                // dispatch(loadTopRevenueServices(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
-                                // dispatch(loadTopRevenueProducts(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
-                                if(page === "Client"){
-                                    dispatch(loadRevenueByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
-                                    dispatch(loadRevenueCountByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
-                                    dispatch(loadRevenueByPrepaid(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
-                                }
-                                else if(page === "Staff"){
-                                    dispatch(loadResourceIdByUserInfo(username.username));
-                                    dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
-                                }
-                                navigation.navigate("DashboardScreen")}}
-                    >
-                        <AntDesign name="arrowleft" size={24} color="black"/>
-                    </TouchableOpacity>
+            style={{left: 15}}
+            onPress={async () => {
+                // setTimeout(() => {
+                //     setIsDashboardPage(true)
+                // }, 40);
+                // setTimeout(() => {
+                // dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+                // dispatch(loadTopRevenueServices(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+                // dispatch(loadTopRevenueProducts(getFirstDateOfCurrentMonthYYYYMMDD(), getLastDateOfCurrentMonthYYYYMMMDD()));
+                if (page === "Client") {
+                    dispatch(loadRevenueByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                    dispatch(loadRevenueCountByGender(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                    dispatch(loadRevenueByPrepaid(getFirstDateOfCurrentMonthYYYYMMDD(), formatDateYYYYMMDDD()));
+                } else if (page === "Staff") {
+                    dispatch(loadResourceIdByUserInfo(username.username));
+                    dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+                }
+                navigation.navigate("DashboardScreen")
+            }}
+        >
+            <AntDesign name="arrowleft" size={24} color="black"/>
+        </TouchableOpacity>
         // <TouchableOpacity onPress={async() => {
         //     // setTimeout(() => {
         //     //     setIsDashboardPage(true)
@@ -356,54 +373,8 @@ const MainDrawerNavigator = (props) => {
     const {currentLocation, reload, setReload} = useLocationContext();
     const {isDashboardPage} = useDataContext();
 
-    const DashboardStack = ({route}) => {
-        return (
-        <Stack.Navigator
-        initialRouteName="DashboardScreen"
-          screenOptions={({ route }) => ({
-            headerShown: !isDashboardPage,
-            // headerTitleAlign: 'center',
-            // headerShown:false,
-            // animation:"ios"
-          })}
-        >
-            <Stack.Screen name='DashboardScreen'
-            component={DashboardScreen}
-            options={{headerTitle:"Dashboard"}}
-            />
-            <Stack.Screen
-            name="SalesScreen"
-            component={SalesDashboard}
-            options={{
-                headerTitle: "Sales Dashboard",
-                headerTitleAlign:"center",
-                // headerLeft: () => <BackButton />,
-                // animation:'ios_from_right'
 
-            }}
 
-            />
-            <Stack.Screen
-            name='StaffScreen'
-            component={StaffDashboard}
-            options={{
-                headerTitle:"Staff Dashboard",
-                // headerLeft:()=><BackButton/>,
-                // animation:'ios_from_right'
-            }}
-            />
-            <Stack.Screen
-            name='ClientScreen'
-            component={ClientDashboard}
-            options={{
-                headerTitle:"Client Dashboard",
-                // headerLeft:()=><BackButton/>,
-                // animation:'ios_from_right'
-            }}
-            />
-        </Stack.Navigator>
-        )
-    }
     useEffect(() => {
         const backAction = () => {
             Alert.alert(
@@ -469,6 +440,8 @@ const MainDrawerNavigator = (props) => {
         }
     }, [currentLocation])
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
+    const currentRoute = useSelector(state => state.navigation.current);
+    console.log(currentRoute)
     return (
         <>
             {!props.auth ? <AuthNavigator/> :
@@ -536,15 +509,17 @@ const MainDrawerNavigator = (props) => {
                             <Drawer.Screen
                                 name="Dashboard"
                                 component={DashboardStack}
-                                options={({navigation,route})=>({
-                                    headerLeft:currentLocation !== "Dashboard" ? ()=> <BackButton/> : () =>  <CustomDrawerIcon navigation={navigation} />,
-                                    headerTitle:`${currentLocation}`,
-                                    headerTitleAlign:"center",
-                                    swipeEnabled:currentLocation !== "Dashboard" ? false : true,
-                                    headerShown:isDashboardPage,
+                                options={({navigation, route}) => ({
+                                    headerLeft: currentLocation !== "Dashboard" ? () => <BackButton/> : () =>
+                                        <CustomDrawerIcon navigation={navigation}/>,
+                                    headerTitle: `${currentLocation}`,
+                                    headerTitleAlign: "center",
+                                    swipeEnabled: currentLocation !== "Dashboard" ? false : true,
+                                    headerShown: isDashboardPage,
                                     drawerIcon: () => <Image
-                                        source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}
-                                        style={{ resizeMode: "contain" }} />
+                                        source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25}
+                                        height={25}
+                                        style={{resizeMode: "contain"}}/>
                                 })}
                             />
                             {/*<Drawer.Screen*/}
@@ -590,7 +565,7 @@ const MainDrawerNavigator = (props) => {
                                 }}
                             />
                             <Drawer.Screen name="Lead Management"
-                                           component={LeadManagementScreen}
+                                           component={LeadManagementStack}
                                            options={{
                                                drawerIcon: () => <Image
                                                    source={{uri: Image.resolveAssetSource(lead_management_icon).uri}}
@@ -599,6 +574,7 @@ const MainDrawerNavigator = (props) => {
                                                    style={{resizeMode: "contain"}}/>,
                                                headerTitle: 'Lead Management',
                                                headerTitleAlign: 'center',
+                                               headerShown: currentRoute !== "Lead Profile",
                                            }}/>
                             {/*<Drawer.Screen name="Marketing" component={CheckoutStack} options={{*/}
                             {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}*/}
@@ -608,12 +584,12 @@ const MainDrawerNavigator = (props) => {
                                            options={{
                                                headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
                                                drawerIcon: () => <Image
-                                                   source={{ uri: Image.resolveAssetSource(expenses_icon).uri }}
+                                                   source={{uri: Image.resolveAssetSource(expenses_icon).uri}}
                                                    width={25}
                                                    height={25}
-                                                   style={{ resizeMode: "contain", tintColor: Colors.white }} />,
+                                                   style={{resizeMode: "contain", tintColor: Colors.white}}/>,
                                                headerTitleAlign: 'center',
-                                           }} />
+                                           }}/>
                             {/*<Drawer.Screen*/}
                             {/*    name="Reports"*/}
                             {/*    component={CheckoutStack}*/}
@@ -663,7 +639,7 @@ const MainDrawerNavigator = (props) => {
                                                    width={25}
                                                    height={25}
                                                    style={{resizeMode: "contain", tintColor: Colors.white}}/>
-                            }}/>
+                                           }}/>
 
                         </Drawer.Navigator>
                         : <Drawer.Navigator initialRouteName="List Of Business"
