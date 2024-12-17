@@ -6,6 +6,7 @@ import ListIconData from "./ListIconData";
 import {
   clientPieColorCode,
   lifetimeData,
+  prepaidNonPrepaidColorCode,
 } from "../../data/DashboardSelection";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -83,19 +84,19 @@ const ClientDashboard = () => {
       return {
         page: "clientRedemption",
         value: item,
-        color: clientPieColorCode[index]?.color || "#999999",
+        color: prepaidNonPrepaidColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
       };
     }) || [{
       page: "clientRedemption",
       value: 1,
-      color: clientPieColorCode[0]?.color || "#999999",
+      color: prepaidNonPrepaidColorCode[0]?.color || "#999999",
       text: "error",
     }];
 
   const valueMap = {
-    "Lifetime Unique Clients": clientStatistics[0]?.repeat_clients || 0,
-    "Lifetime Repeat Clients": clientStatistics[0]?.unique_clients || 0,
+    "Lifetime Unique Clients": clientStatistics[0]?.unique_clients || 0,
+    "Lifetime Repeat Clients": clientStatistics[0]?.repeat_clients || 0,
     "Unique Clients Till Date":
       clientStatistics[0]?.unique_clients_till_date || 0,
   };

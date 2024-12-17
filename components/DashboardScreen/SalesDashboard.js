@@ -108,7 +108,7 @@ const SalesDashboard = () => {
     if (item.day1 === undefined) {
       setIsCustomRange(false);
 
-      if (item.label !== "Current month" && item.value !== "Custom range") {
+      if (item.value !== "Current month" && item.value !== "Custom range") {
         // dispatch(updateLoadingState(true));
         setDate(
           item.day !== -6 && item.day !== -29
@@ -119,11 +119,13 @@ const SalesDashboard = () => {
         await dispatch(
           loadSalesDashboard(
             formatDateYYYYMMDD(item.day),
-            formatDateYYYYMMDD(0)
+            item.day !== -6 && item.day !== -29
+            ? formatDateYYYYMMDD(item.day)
+            : formatDateYYYYMMDD(0)
           )
         );
       }
-    } else if (item.label === "Current month") {
+    } else if (item.value === "Current month") {
       setIsCustomRange(false);
       setIsLoading(true);
       setDate(firstDateDDMMYYYY + " - " + lastDateDDMMYYYY);
@@ -464,6 +466,7 @@ const SalesDashboard = () => {
           tableData={topRevenueDetails[0].services_list}
           toggleTitle={"Top 10 Revenue Services"}
           dateArray={labelArray}
+          tableHeader={["Top Services", "Count", "Value", "%"]}
           showPie={togglePercentageData.length !== 0}
           dropdownKey={"vipslinetopservices_1"}
         />
@@ -478,6 +481,7 @@ const SalesDashboard = () => {
           tableData={topProductDetails[0].services_list}
           toggleTitle={"Top 10 Revenue Products"}
           dateArray={labelArray}
+          tableHeader={["Top Products", "Count", "Value", "%"]}
           showPie={toggleProductData.length !== 0}
           dropdownKey={"vipslinetopproducts_1"}
         />

@@ -137,6 +137,8 @@ export const loadExpensesFromDb = () => async (dispatch, getState) => {
     const { expenses } = getState();
     if (expenses.isFetching) return;
 
+
+
     try {
         dispatch(updateFetchingState(true));
         const response = await axios.post(

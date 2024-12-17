@@ -36,7 +36,9 @@ export default function CustomPagination(props) {
             props.resetPageNo();
             props.refreshOnChange();
         }
-    }, [props.maxEntry,props.isFetching]);
+    }, [props.maxEntry
+        // ,props.isFetching
+    ]);
 
     const [isBackwardButtonDisabled, setIsBackwardButtonDisabled] = useState(false);
     const [isForwardButtonDisabled, setIsForwardButtonDisabled] = useState(false);

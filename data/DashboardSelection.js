@@ -204,6 +204,13 @@ export const clientPieColorCode = [
   { color: "#999999",title:"No Data"},
 ]
 
+export const prepaidNonPrepaidColorCode = [
+  { color: "#357AF6",title:"Prepaid"},
+  { color: "#AF52DE",title:"Non Prepaid"},
+  { color: "#BAA3EB",title:"Others"},
+  { color: "#999999",title:"No Data"},
+]
+
 export const trophyIcon = [
   {
     icon:require("../assets/icons/dashboard/staffdashboard/first.png"),

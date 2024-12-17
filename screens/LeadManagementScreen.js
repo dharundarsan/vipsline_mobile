@@ -14,7 +14,7 @@ import textTheme from "../constants/TextTheme";
 import PrimaryButton from "../ui/PrimaryButton";
 import SearchBar from "../ui/SearchBar";
 import Divider from "../ui/Divider";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import LeadCard from "../components/LeadManagementScreen/LeadCard";
 import {AntDesign, Feather, FontAwesome6} from "@expo/vector-icons";
 import {useDispatch, useSelector} from "react-redux";
@@ -39,6 +39,7 @@ import EnquiryNotesModal from "../components/LeadManagementScreen/EnquiryNotesMo
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
     const totalCount = useSelector(state => state.leads.totalLeadCount)
+    const searchTerm = useSelector(state => state.leads.searchTerm)
     const [upperCount, setUpperCount] = useState(10);
     const [lowerCount, setLowerCount] = useState(1);
     const leads = useSelector(state => state.leads.leads);
@@ -47,9 +48,8 @@ const LeadManagementScreen = () => {
     const [isPaginationModalVisible, setIsPaginationModalVisible] = useState(false);
     const dispatch = useDispatch();
     const [isCreateLeadModalVisible, setIsCreateClientModalVisible] = useState(false);
+    const [doesLeadExist, setDoesLeadExist] = useState(false);
     const isFetching = useSelector(state => state.leads.isFetching);
-    const [isLeadExists, setIsLeadExists] = useState(false);
-    // const [isLeadExists, setIsLeadExists] = useState(false);
     const businessId = useSelector(state => state.authDetails.businessId);
 
     const options = [
@@ -59,16 +59,15 @@ const LeadManagementScreen = () => {
         {label: '100', value: 100},
     ];
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const apiCalls = async () => {
             dispatch(updateFetchingState(true));
             dispatch(updateSearchTerm(""));
             await dispatch(loadLeadStatusesFromDb());
             await dispatch(loadLeadSourcesFromDb());
-            // await getLeadsAPI(0, 10, "");
+            const response = await getLeadsAPI(0, 10, "");
+            setDoesLeadExist(response.data.data[0].count > 0)
             await dispatch(loadLeadsFromDb());
-            // setIsLeadExists(totalCount > 0);
-            setIsLeadExists(false);
             dispatch(updateFetchingState(false));
         }
         apiCalls();
@@ -142,12 +141,12 @@ const LeadManagementScreen = () => {
     return <View style={styles.leadManagementScreen}>
         {isCreateLeadModalVisible && <CreateLeadModal isVisible={isCreateLeadModalVisible}
                                                       onCloseModal={() => setIsCreateClientModalVisible(false)}/>}
-        <PrimaryButton buttonStyle={styles.fab}
-                       onPress={() => setIsCreateClientModalVisible(true)}
-                       pressableStyle={{flex: 1}}>
+        {!(totalCount === 0 && !doesLeadExist) ? <PrimaryButton buttonStyle={styles.fab}
+                        onPress={() => setIsCreateClientModalVisible(true)}
+                        pressableStyle={{flex: 1}}>
             <Feather name="plus" size={24}
                      color={Colors.white}/>
-        </PrimaryButton>
+        </PrimaryButton> : <></>}
         {
             isPaginationModalVisible &&
             <Modal
@@ -190,7 +189,7 @@ const LeadManagementScreen = () => {
                     title={false}
                 />
             </View> :
-            (totalCount === 0 && !isLeadExists) ?
+            totalCount === 0 && !doesLeadExist ?
                 <View style={styles.noLeadContainer}>
                     <Text style={[textTheme.titleMedium, {marginTop: 100}]}>Convert your lead into a Client</Text>
                     <Text style={[textTheme.bodyMedium, {
@@ -208,7 +207,8 @@ const LeadManagementScreen = () => {
                 <View style={styles.content}>
                     <ScrollView fadingEdgeLength={100} style={{flex: 1}}>
                         <View style={styles.searchBarAndFilterContainer}>
-                            <SearchBar filter onChangeText={(text) => {
+                            <SearchBar filter onChangeText={async (text) => {
+                                dispatch(updateFetchingState(true))
                                 dispatch(resetPageNo())
                                 dispatch(updateSearchTerm(text));
                                 dispatch(updateFetchingState(true))

@@ -1,5 +1,5 @@
 import {Modal, Text, View, StyleSheet, ScrollView, ActivityIndicator} from "react-native";
-import { shadowStyling} from "../../util/Helpers";
+import {checkNullUndefined, shadowStyling} from "../../util/Helpers";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -18,6 +18,8 @@ import moment from "moment";
 import editExpensesAPI from "../../util/apis/editExpensesAPI";
 import DeleteExpenseModal from "./DeleteExpenseModal";
 import colors from "../../constants/Colors";
+import {loadBusinessNotificationDetails} from "../../store/listOfBusinessSlice";
+import Toast from "../../ui/Toast";
 
 export default function RecordExpenses(props) {
     const dispatch = useDispatch();
@@ -27,6 +29,8 @@ export default function RecordExpenses(props) {
     const category = useSelector(state => state.expenses.category);
     const currentCategoryId = useSelector(state => state.expenses.currentCategoryId);
     const currentSubId = useSelector(state => state.expenses.currentSubId);
+    const businessNotification = useSelector(state => state.businesses.businessNotificationDetails);
+
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -36,6 +40,8 @@ export default function RecordExpenses(props) {
     const expenseTypeRef = useRef(null);
     const paymentModeRef = useRef(null);
 
+    const toastRef = useRef(null);
+
 
     function parseDate(dateStr) {
         const [day, month, year] = dateStr.split(" ");
@@ -44,21 +50,18 @@ export default function RecordExpenses(props) {
     }
 
     const [expenseData, setExpenseData] = useState({
-        expenseDate: props.type === "add" ? new Date() : parseDate((currentExpense.date.split(",")[0])),
+        expenseDate: props.type === "add" ? new Date() : props.searchQuery === "" ? parseDate((currentExpense.date.split(",")[0])) : currentExpense.date,
         expenseAmountType: props.type === "add" ? "" : currentExpense.expense_category,
         expenseType: props.type === "add" ? "" : currentExpense.expense_sub_category,
-        amount: props.type === "add" ? "" : currentExpense.amount+"",
+        amount: props.type === "add" ? "" : currentExpense.amount + "",
         paymentMode: props.type === "add" ? "" : currentExpense.payment_mode,
         reference: props.type === "add" ? "" : currentExpense.reference,
         notes: props.type === "add" ? "" : currentExpense.notes,
     });
 
     useEffect(() => {
-        async function f() {
-            // await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
-        }
-        f();
-    }, [expenseData.expenseAmountType]);
+        dispatch(loadBusinessNotificationDetails());
+    }, []);
 
     const [deleteExpenseVisibility, setDeleteExpenseVisibility] = useState(false);
     const subIds = useSelector(state => state.expenses.subId);
@@ -74,6 +77,8 @@ export default function RecordExpenses(props) {
     };
 
 
+
+
     return (
         <Modal
             visible={props.isVisible}
@@ -82,6 +87,7 @@ export default function RecordExpenses(props) {
             presentationStyle={"formSheet"}
             onRequestClose={props.closeModal}
         >
+            <Toast ref={toastRef}/>
             {
                 deleteExpenseVisibility &&
                 <DeleteExpenseModal
@@ -99,6 +105,8 @@ export default function RecordExpenses(props) {
                         await dispatch(loadExpensesFromDb());
 
                     }}
+                    toastRef={props.toastRef}
+
                 />
             }
             <View style={styles.recordExpense}>
@@ -124,6 +132,7 @@ export default function RecordExpenses(props) {
                         value={expenseData.expenseDate ? new Date(expenseData.expenseDate) : null}
                         onChangeValue={(date) => updateExpenseData("expenseDate", date)}
                         maximumDate={new Date()}
+                        minimumDate={checkNullUndefined(businessNotification.data[0].back_date_allowed) && businessNotification.data[0].back_date_allowed ? undefined : new Date()}
                         required
                         onSave={(callback) => {
                             dateRef.current = callback;
@@ -297,19 +306,23 @@ export default function RecordExpenses(props) {
                                                 if(res) {
                                                     dispatch(loadExpensesFromDb());
                                                     setIsLoading(false);
+                                                    props.toastRef.current.show("Expense added successfully");
                                                     props.closeModal();
                                                 }
                                                 else {
-                                                    setIsLoading(false)
+                                                    toastRef.current.show("Expense cannot be added");
+                                                    setIsLoading(false);
                                                 }
                                             }
                                             else {
                                                 const res = await editExpensesAPI(expenseData, catId, subId, currentExpenseId);
                                                 if(res) {
                                                     dispatch(loadExpensesFromDb());
+                                                    props.toastRef.current.show("Expense updated successfully");
                                                     props.closeModal()
                                                 }
                                                 else {
+                                                    toastRef.current.show("Expense cannot be updated");
                                                     setIsLoading(false)
                                                 }
                                             }

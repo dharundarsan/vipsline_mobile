@@ -29,6 +29,7 @@ const Colors = {
     grey700: "#616161",
     grey800: "#424242",
     grey900: "#212121",
+    highlight100: "#c3b9fa",
     highlight: "#6950F3",
     inactiveClient: "#d5d7da",
     lightGreen: "#e2f4f6",

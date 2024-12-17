@@ -79,6 +79,7 @@ export default function DeleteExpenseModal(props) {
                             onPress={ async () => {
                                 await deleteExpenseAPI(props.id);
                                 await dispatch(loadExpensesFromDb());
+                                props.toastRef.current.show("Expense deleted successfully");
                                 props.oncloseAfterDelete()
                             }}
                         />

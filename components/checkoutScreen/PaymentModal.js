@@ -94,6 +94,7 @@ const PaymentModal = (props) => {
     ]
     )
 
+    const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
     const cartSliceState = useSelector((state) => state.cart);
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
@@ -152,7 +153,7 @@ const PaymentModal = (props) => {
                         mode: "digital payments",
                         shown: false,
                         amount: 0,
-                        name: "Digial payment"
+                        name: "Digital payment"
                     },
                 ])
             } else {
@@ -176,7 +177,7 @@ const PaymentModal = (props) => {
                         mode: "digital payments",
                         shown: false,
                         amount: 0,
-                        name: "Digial payment"
+                        name: "Digital payment"
                     },
                 ])
             }
@@ -196,7 +197,7 @@ const PaymentModal = (props) => {
                     mode: "digital payments",
                     shown: false,
                     amount: 0,
-                    name: "Digial payment"
+                    name: "Digital payment"
                 },
             ])
         }
@@ -408,7 +409,7 @@ const PaymentModal = (props) => {
 
                     setIsSplitPaymentDropdownVisible(false)
                 }}
-                dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digial payment"] : ["Cash", "Credit / Debit card", "Digial payment"]}
+                dropdownItems={isPrepaidAvailable ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment"] : ["Cash", "Credit / Debit card", "Digital payment"]}
                 onChangeValue={(value) => {
 
                     setAddedSplitPayment(value)
@@ -475,32 +476,35 @@ const PaymentModal = (props) => {
             </PrimaryButton>
         </View>
         <ScrollView>
-            <View
-                style={{
-                    padding: 10,
-                    backgroundColor: "#E7E8FF",
-                    marginTop: 30,
-                    marginHorizontal: 20,
-                    borderRadius: 8,
-                }}
-            >
+            {(businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled &&
+                cartSliceState?.calculatedPrice[0]?.reward_points !== undefined && cartSliceState.calculatedPrice[0].reward_points !== 0) &&
                 <View
                     style={{
-                        flexDirection: "row",
-                        alignItems: "flex-start",
-                        flexWrap: "wrap",
+                        padding: 10,
+                        backgroundColor: "#E7E8FF",
+                        marginTop: 30,
+                        marginHorizontal: 20,
+                        borderRadius: 8,
                     }}
                 >
-                    <MaterialIcons name="info" size={20} color="#FF6B00" style={{ marginTop: 2 }} />
-                    <Text style={{ color: "#FF6B00", fontWeight: "bold", marginLeft: 5, }}>Reward points - </Text>
-                    <View style={{ marginLeft: 8, flex: 1 }}>
-                        <Text>
-                            <Text style={{ color: "#5252FF", textDecorationLine: "underline" }}>20</Text>
-                            <Text style={{ color: "#5252FF" }}> will be added to customer for this transaction.</Text>
-                        </Text>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "flex-start",
+                            flexWrap: "wrap",
+                        }}
+                    >
+                        <MaterialIcons name="info" size={20} color="#FF6B00" style={{ marginTop: 2 }} />
+                        <Text style={{ color: "#FF6B00", fontWeight: "bold", marginLeft: 5, }}>Reward points - </Text>
+                        <View style={{ marginLeft: 8, flex: 1 }}>
+                            <Text>
+                                <Text style={{ color: "#5252FF", textDecorationLine: "underline" }}>{cartSliceState.calculatedPrice[0].reward_points}</Text>
+                                <Text style={{ color: "#5252FF" }}> will be added to customer for this transaction.</Text>
+                            </Text>
+                        </View>
                     </View>
                 </View>
-            </View>
+            }
             <View style={styles.modalContent}>
                 {isZeroPayment && <View style={styles.zeroPaymentNote}>
                     <View style={styles.zeroPaymentNoteBar} />
