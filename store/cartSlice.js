@@ -31,7 +31,13 @@ const initialCartState = {
         source: "",
         wallet_amount: "",
     }],
-    appointment_date: Date.now()
+    appointment_date: Date.now(),
+    rewardAllocated:{
+        isRewardSelected:false,
+        rewardAmount:0,
+        statusCode:200,
+        rewardPoints:0
+    },
 };
 
 async function getBusinessId() {
@@ -216,6 +222,10 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount) => async
         promo_code: "",
         user_coupon: "",
         walkin: "yes",
+        isRewardSelected:cart.rewardAllocated.isRewardSelected,
+        redeemed_points:parseInt(cart.rewardAllocated.rewardPoints),
+        reward_amt:cart.rewardAllocated.rewardAmount ,
+        // splitPaymentMap	:[]
     }).then(response => {
         dispatch(setCalculatedPrice(response))
     })
@@ -255,6 +265,51 @@ export const removeItemFromCart = (itemId) => async (dispatch, getState) => {
         dispatch(await loadCartFromDB());
     } catch (error) {
         console.error(e.response.data)
+    }
+}
+
+
+export const calculateAmountForRewardPoints = (clientId,rp,tp) => async (dispatch, getState) => {
+    const {cart} = getState();
+
+    let authToken = ""
+    try {
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (cartSlice loadCartFromDb)" + e);
+    }
+    let response;
+    try {
+        response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/rewards/calculateAmountForRewardPoints`,
+            {
+                business_id: `${await getBusinessId()}`,
+                client_id:clientId,
+                reward_points:rp,
+                total_price:tp,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            }
+        )
+        console.log(response.data);
+        
+        if(response.status_code !== 404){
+            dispatch(updateRewardAmount({data:response.data.data,rp:rp,status_code:response.status_code}));
+        }
+    }
+    catch(e){
+        console.log(JSON.stringify(e.response.data,null,3));
+        
+        dispatch(updateRewardAmount({data:e.response.data.data,status_code:e.response.data.status_code}));
+        console.error("Error Occurred in calculateAmountForRewardPoints");
+        console.log(e);
     }
 }
 
@@ -331,7 +386,10 @@ export const cartSlice = createSlice({
             state.additionalDiscounts = [];
             state.chargesData = initialCartState.chargesData;
             state.prepaid_wallet = initialCartState.prepaid_wallet;
-            state.appointment_date = initialCartState.appointment_date
+            state.appointment_date = initialCartState.appointment_date;
+            state.rewardAllocated.isRewardSelected = false;
+            state.rewardAllocated.rewardAmount = 0;
+            state.rewardAllocated.rewardPoints = 0;
         },
         updateCustomItem(state, action) {
             state.customItems = state.customItems.map(item => {
@@ -468,7 +526,25 @@ export const cartSlice = createSlice({
                     console.error("Unknown action type:", type);
             }
         },
+        updateRewardAmount(state, action) {
+            const { data = [], status_code = 200,rp = 0 } = action.payload ?? {};
+            const firstItem = (data !== null && data.length > 0 && data[0] !== null) ? data[0] : {};
 
+            if (data !== null && data.length > 0 && firstItem.reward_amount !== undefined) {
+                state.rewardAllocated.rewardPoints = rp;
+                state.rewardAllocated.isRewardSelected = true;
+                state.rewardAllocated.rewardAmount = firstItem.reward_amount;
+                state.rewardAllocated.statusCode = status_code;
+            } else {
+                state.rewardAllocated.isRewardSelected = false;
+                state.rewardAllocated.rewardAmount = 0;
+                state.rewardAllocated.rewardPoints = 0; // Ensure `rewardPoints` is reset
+                state.rewardAllocated.statusCode = status_code;
+            }
+        }
+        
+        
+        
     }
 });
 
@@ -496,7 +572,8 @@ export const {
     modifyPrepaidDetails,
     modifyClientId,
     clearCustomItems,
-    updateAppointmentDate
+    updateAppointmentDate,
+    updateRewardAmount,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
