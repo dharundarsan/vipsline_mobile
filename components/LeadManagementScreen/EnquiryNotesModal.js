@@ -281,6 +281,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         paddingVertical: 20,
         gap: 10,
+        backgroundColor:"#FDFDFD",
+        zIndex:-1,
     },
     headerLeadProfile: {
         width: 45,
