@@ -37,6 +37,7 @@ import ContentLoader from "react-native-easy-content-loader";
 import EnquiryNotesModal from "../components/LeadManagementScreen/EnquiryNotesModal";
 import {updateNavigationState} from "../store/NavigationSlice";
 import LeadAdvancedFiltersModal from "../components/LeadManagementScreen/LeadAdvancedFiltersModal";
+import moment from "moment";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -72,7 +73,7 @@ const LeadManagementScreen = () => {
             dispatch(updateSearchTerm(""));
             await dispatch(loadLeadStatusesFromDb());
             await dispatch(loadLeadSourcesFromDb());
-            const response = await getLeadsAPI(0, 10, "");
+            const response = await dispatch(loadLeadsFromDb());
             setDoesLeadExist(response.data.data[0].count > 0)
             await dispatch(loadLeadsFromDb());
             dispatch(updateFetchingState(false));

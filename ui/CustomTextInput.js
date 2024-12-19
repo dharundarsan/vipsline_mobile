@@ -247,9 +247,9 @@ const CustomTextInput = (props) => {
                 >
 
                     {props.object ? <Text style={[textTheme.bodyLarge]}>
-                        {props.value === undefined || props.value === null || props.value === "" ? "Select " + props.label : props.value.name}
+                        {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value.name}
                     </Text> : <Text style={[textTheme.bodyLarge]}>
-                        {props.value === undefined || props.value === null || props.value === "" ? "Select " + props.label : props.value}
+                        {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value}
                     </Text>}
                     <FontAwesome name="angle-down" size={24} color="black"/>
                 </PrimaryButton>
