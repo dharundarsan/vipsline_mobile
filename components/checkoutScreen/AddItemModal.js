@@ -213,6 +213,7 @@ const AddItemModal = (props) => {
 
                                     if (!isSameDay) {
                                         setIsBackDateInvoiceNoteVisible(true);
+
                                     } else {
                                         setIsBackDateInvoiceNoteVisible(false);
                                     }

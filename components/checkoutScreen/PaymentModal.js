@@ -1,7 +1,7 @@
 import {FlatList, Modal, Platform, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Feather, Ionicons} from "@expo/vector-icons";
+import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import React, {useEffect, useRef, useState} from "react";
 import Colors from "../../constants/Colors";
@@ -66,6 +66,9 @@ const PaymentModal = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isOptionsDropdownModalVisible, setIsOptionsDropdownModalVisible] = useState(false)
     const [isCancelSalesModalVisible, setIsCancelSalesModalVisible] = useState(false)
+    const appointmentDate = useSelector(state => state.cart.appointment_date);
+
+    const [isBackDateInvoiceNoteVisible, setIsBackDateInvoiceNoteVisible] = useState(new Date(appointmentDate).getDate() !== new Date(Date.now()).getDate());
 
 
     const [splitUpState, setSplitUpState] = useState([
@@ -97,7 +100,30 @@ const PaymentModal = (props) => {
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
 
-    const toastRef = useRef(null)
+    const toastRef = useRef(null);
+
+    useEffect(() => {
+        const now = new Date();
+        const formatForComparison = (appointmentDate) => {
+            return new Date(appointmentDate).toISOString().split(':').slice(0, 2).join(':') + ':00.000Z';
+        };
+        const formattedCurrentDate = formatForComparison(now);
+        const formattedSelectedDate = formatForComparison(appointmentDate);
+        if (formattedCurrentDate !== formattedSelectedDate) {
+            const selectedDateLocal = new Date(appointmentDate);
+            const isSameDay =
+                now.getDate() === selectedDateLocal.getDate() &&
+                now.getMonth() === selectedDateLocal.getMonth() &&
+                now.getFullYear() === selectedDateLocal.getFullYear();
+
+            if (!isSameDay) {
+                setIsBackDateInvoiceNoteVisible(true);
+
+            } else {
+                setIsBackDateInvoiceNoteVisible(false);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         if (addedSplitPayment !== null) setPaymentOrder(prev => [...prev, addedSplitPayment]);
@@ -474,6 +500,18 @@ const PaymentModal = (props) => {
             </PrimaryButton>
         </View>
         <ScrollView>
+            {isBackDateInvoiceNoteVisible && <View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "rgba(253,253,150,.6)",
+                paddingVertical: 10,
+                justifyContent: "center",
+                gap: 3
+            }}>
+                <AntDesign name="warning" size={22} color={Colors.orange}/>
+                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You're trying to raise the invoice on a
+                    previous date</Text>
+            </View>}
             <View style={styles.modalContent}>
                 { isZeroPayment && <View style={styles.zeroPaymentNote}>
                     <View style={styles.zeroPaymentNoteBar}/>
@@ -481,6 +519,7 @@ const PaymentModal = (props) => {
                         There is no payment required for this sale. you can save it now.
                     </Text>
                 </View>}
+
                 <View style={styles.paymentOptionsContainer}>
                     <View style={styles.paymentOptionsRow}>
                         <PrimaryButton
