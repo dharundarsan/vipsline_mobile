@@ -161,6 +161,7 @@ export const loadExpensesFromDb = () => async (dispatch, getState) => {
     } catch (error) {
         console.error("Error fetching expenses data11: ", error);
         dispatch(updateFetchingState(false));
+        throw "error expenses loading"
     }
 };
 
@@ -187,8 +188,8 @@ export const loadSearchExpensesFromDb = (query) => async (dispatch, getState) =>
                 business_id: `${await getBusinessId()}`,
                 query: query.trim(),
                 expense_cat_id: expenses.currentCategoryId,
-                fromDate: expenses.fromDate,
-                toDate: expenses.toDate,
+                fromDate: expenses.range === "Custom range" ? expenses.customRangeStartDate : expenses.fromDate,
+                toDate: expenses.range === "Custom range" ? expenses.customRangeEndDate : expenses.toDate,
             },
             {
                 headers: {

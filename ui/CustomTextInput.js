@@ -94,7 +94,7 @@ const CustomTextInput = (props) => {
                     props.type === "multiLine" ? {height: 100, textAlignVertical: "top", paddingVertical: 10} : {},
                     props.textInputStyle
                 ]}
-                placeholderTextColor={Colors.grey400}
+                placeholderTextColor={Colors.grey300}
                 keyboardType={props.type === "number" ? "number-pad" : "default"}
                 multiline={props.type === "multiLine"}
                 value={props.value}
@@ -119,7 +119,7 @@ const CustomTextInput = (props) => {
                 onEndEditing={props.onEndEditing !== undefined ? (event) => props.onEndEditing(event.nativeEvent.text) : () => {
                 }}
                 readOnly={props.readOnly}
-                placeholderTextColor={Colors.grey400}
+                placeholderTextColor={Colors.grey300}
                 style={[
                     textTheme.bodyLarge,
                     styles.textInput,
@@ -161,7 +161,7 @@ const CustomTextInput = (props) => {
                         props.textInputStyle,
                         {flex: 1}
                     ]}
-                    placeholderTextColor={Colors.grey400}
+                    placeholderTextColor={Colors.grey300}
                     keyboardType={"number-pad"}
                     value={props.value}
                     defaultValue={props.defaultValue}
@@ -208,7 +208,7 @@ const CustomTextInput = (props) => {
                             styles.phoneNumberInput,
                             {borderColor: error ? Colors.error : Colors.grey400},
                         ]}
-                        placeholderTextColor={Colors.grey400}
+                        placeholderTextColor={Colors.grey300}
                         value={phoneNumber}
                         placeholder={props.placeholder}
                         onBlur={() => handleSave()}

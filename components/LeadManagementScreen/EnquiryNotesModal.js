@@ -7,12 +7,13 @@ import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import {formatDate, formatTime, shadowStyling} from "../../util/Helpers";
 import {Divider} from "react-native-paper";
 import CustomTextInput from "../../ui/CustomTextInput";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../../store/cartSlice";
 import addEnquiryNotesAPI from "../../util/apis/addEnquiryNotesAPI";
 import moment from "moment";
 import editEnquiryNotesAPI from "../../util/apis/editEnquiryNotesAPI";
+import {loadLeadsFromDb} from "../../store/leadManagementSlice";
 
 const EnquiryNotesModal = (props) => {
     const leadStatuses = useSelector(state => state.leads.leadStatuses)
@@ -25,6 +26,7 @@ const EnquiryNotesModal = (props) => {
     const leadStatusRef = useRef(null);
     const nextFollowUpDateRef = useRef(null);
     const nextFollowUpTimeRef = useRef(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted") {
@@ -75,7 +77,7 @@ const EnquiryNotesModal = (props) => {
                 notes)
         }
 
-
+        await dispatch(loadLeadsFromDb());
         props.refreshLeadsData();
         props.onCloseModal();
     }
@@ -119,6 +121,7 @@ const EnquiryNotesModal = (props) => {
         }
 
         props.refreshLeadsData();
+        await dispatch(loadLeadsFromDb());
         props.onCloseModal();
     }
 
@@ -170,6 +173,7 @@ const EnquiryNotesModal = (props) => {
                     labelTextStyle={{fontWeight: "700"}}
                     type="dropdown"
                     label="Lead Status"
+                    required
                     value={leadStatus}
                     onChangeValue={setLeadStatus}
                     dropdownItems={leadStatuses.map(status => status.name)}
@@ -192,6 +196,7 @@ const EnquiryNotesModal = (props) => {
 
                 <Text style={[{marginVertical: 10}, textTheme.titleMedium]}>Follow Up</Text>
                 <CustomTextInput
+                    required
                     labelTextStyle={{fontWeight: "700"}}
                     type="date"
                     minimumDate={new Date()}
@@ -210,6 +215,7 @@ const EnquiryNotesModal = (props) => {
                     }}
                 />
                 <CustomTextInput
+                    required
                     labelTextStyle={{fontWeight: "700"}}
                     type="time"
                     readOnly={leadStatus === "Not interested" || leadStatus === "Unqualified" || leadStatus === "Converted"}

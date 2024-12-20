@@ -44,7 +44,7 @@ export default function RecordExpenses(props) {
     }
 
     const [expenseData, setExpenseData] = useState({
-        expenseDate: props.type === "add" ? new Date() : parseDate((currentExpense.date.split(",")[0])),
+        expenseDate: props.type === "add" ? new Date() : props.searchQuery === "" ? parseDate((currentExpense.date.split(",")[0])) : currentExpense.date,
         expenseAmountType: props.type === "add" ? "" : currentExpense.expense_category,
         expenseType: props.type === "add" ? "" : currentExpense.expense_sub_category,
         amount: props.type === "add" ? "" : currentExpense.amount+"",
@@ -91,11 +91,12 @@ export default function RecordExpenses(props) {
                     }}
                     id={currentExpenseId}
                     content={"Do you want to delete this expense ?"}
-                    oncloseAfterDelete={() => {
+                    oncloseAfterDelete={async () => {
                         props.closeModal();
-                        dispatch(loadExpensesFromDb())
                         dispatch(updateMaxEntry(10))
                         dispatch(resetExpensesPageNo());
+                        props.setClientDetected(prev => !prev);
+                        await dispatch(loadExpensesFromDb());
 
                     }}
                 />
@@ -275,24 +276,31 @@ export default function RecordExpenses(props) {
                                     const isAmountEntered = amountRef.current();
                                     const isPaymentModeEntered = paymentModeRef.current();
 
+
                                     if(!isDateEntered ||
                                         !isExpenseAmountEntered ||
                                         !isExpenseTypeEntered ||
                                         !isAmountEntered ||
                                         !isPaymentModeEntered) {
+                                        setIsLoading(false)
                                         return ;
                                     }
 
-                                    await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id)).then( async res => {
-                                            const subId = res.id;
-                                            const catId = await categories.find(item => item.name === expenseData.expenseAmountType).id
+                                    await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id)).then( async res1 => {
+
+                                        const subId = res1.id;
+                                        const catId = await categories.find(item => item.name === expenseData.expenseAmountType).id
 
 
                                             if(props.type === "add") {
                                                 const res = await addExpensesAPI(expenseData, catId, subId);
                                                 if(res) {
                                                     dispatch(loadExpensesFromDb());
+                                                    setIsLoading(false);
                                                     props.closeModal();
+                                                }
+                                                else {
+                                                    setIsLoading(false)
                                                 }
                                             }
                                             else {
@@ -300,6 +308,9 @@ export default function RecordExpenses(props) {
                                                 if(res) {
                                                     dispatch(loadExpensesFromDb());
                                                     props.closeModal()
+                                                }
+                                                else {
+                                                    setIsLoading(false)
                                                 }
                                             }
                                         }
