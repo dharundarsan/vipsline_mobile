@@ -52,7 +52,7 @@ const LeadAdvancedFiltersModal = (props) => {
     useEffect(() => {
         if (selectedLeadFollowUpOption === "Overdue") {
             dispatch(updateAdvancedFilters({field: "leadFollowUp", value: "overdue"}))
-        } else if (selectedLeadFollowUpOption === "Overdue" || selectedLeadFollowUpOption === "Custom Range") {
+        } else if (selectedLeadFollowUpOption === "Today" || selectedLeadFollowUpOption === "Custom Range") {
             dispatch(updateAdvancedFilters({field: "leadFollowUp", value: "date"}))
         }
     }, [selectedLeadFollowUpOption]);

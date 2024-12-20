@@ -39,7 +39,7 @@ export const loadLeadsFromDb = () => async (dispatch, getState) => {
 }
 
 
-const initialLeadState = {
+export const initialLeadState = {
     leadStatuses: [],
     leadSources: [],
     isFetching: false,
