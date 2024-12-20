@@ -20,7 +20,7 @@ import {AntDesign, Feather, FontAwesome6} from "@expo/vector-icons";
 import {useDispatch, useSelector} from "react-redux";
 import {
     decrementPageNumber,
-    incrementPageNumber, resetPageNo, updateFetchingState,
+    incrementPageNumber, initialLeadState, resetPageNo, updateFetchingState,
     updateMaxEntry, updateSearchTerm
 } from "../store/leadManagementSlice";
 import {clientFilterNames} from "../util/chooseFilter";
@@ -37,6 +37,8 @@ import ContentLoader from "react-native-easy-content-loader";
 import EnquiryNotesModal from "../components/LeadManagementScreen/EnquiryNotesModal";
 import {updateNavigationState} from "../store/NavigationSlice";
 import LeadAdvancedFiltersModal from "../components/LeadManagementScreen/LeadAdvancedFiltersModal";
+import moment from "moment";
+import CustomTagFilter from "../components/LeadManagementScreen/CustomTagFilter";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -55,6 +57,9 @@ const LeadManagementScreen = () => {
     const businessId = useSelector(state => state.authDetails.businessId);
     const [isAdvancedFiltersModalVisible, setIsAdvancedFiltersModalVisible] = useState(false);
 
+    // const {followupDate, followupEndDate, fromDate, toDate, gender, leadFollowUp, lead_campaign, lead_owner, lead_source, lead_status, selectedLeadFollowUpOption} = useSelector(state => state.leads);
+
+
     const options = [
         {label: '10', value: 10},
         {label: '25', value: 25},
@@ -66,13 +71,14 @@ const LeadManagementScreen = () => {
         dispatch(updateNavigationState("Lead Management Screen"));
     }, []);
 
+
     useLayoutEffect(() => {
         const apiCalls = async () => {
             dispatch(updateFetchingState(true));
             dispatch(updateSearchTerm(""));
             await dispatch(loadLeadStatusesFromDb());
             await dispatch(loadLeadSourcesFromDb());
-            const response = await getLeadsAPI(0, 10, "");
+            const response = await dispatch(loadLeadsFromDb());
             setDoesLeadExist(response.data.data[0].count > 0)
             await dispatch(loadLeadsFromDb());
             dispatch(updateFetchingState(false));
@@ -227,6 +233,10 @@ const LeadManagementScreen = () => {
                                 dispatch(loadLeadsFromDb());
                                 dispatch(updateFetchingState(false))
                             }} placeholder={"Search by name email or mobile "}/>
+                        </View>
+                        <Divider/>
+                        <View>
+                            {/*<CustomTagFilter />*/}
                         </View>
                         <Divider/>
                         <View style={[styles.leadCountContainer]}>
