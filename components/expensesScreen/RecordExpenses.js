@@ -61,6 +61,9 @@ export default function RecordExpenses(props) {
 
     useEffect(() => {
         dispatch(loadBusinessNotificationDetails());
+        if(props.type === "update") {
+            dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
+        }
     }, []);
 
     const [deleteExpenseVisibility, setDeleteExpenseVisibility] = useState(false);

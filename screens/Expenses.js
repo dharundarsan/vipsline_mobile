@@ -12,7 +12,7 @@ import {
     loadExpensesFromDb,
     loadSearchExpensesFromDb,
     updateCurrentExpense,
-    updateCurrentExpensesId
+    updateCurrentExpensesId, updateFilters
 } from "../store/ExpensesSlice";
 import {capitalizeFirstLetter, dateFormatter} from "../util/Helpers";
 import ExpensesPagination from "../components/expensesScreen/ExpensesPagination";
@@ -62,6 +62,17 @@ export default function Expenses() {
         () => {
             dispatch(loadBusinessNotificationDetails());
             dispatch(loadExpensesFromDb());
+
+            return () => {
+                dispatch(updateFilters({
+                    fromDate: moment().format("YYYY-MM-DD"),
+                    toDate: moment().format("YYYY-MM-DD"),
+                    category: "All expenses",
+                    range: "Today",
+                    customRangeStartDate: "",
+                    customRangeEndDate: ""
+                }));
+            }
         },
         [],
     )
@@ -209,7 +220,7 @@ export default function Expenses() {
                                 renderItem={renderItem}
                                 ListEmptyComponent={() => (
                                     <View style={styles.noDataContainer}>
-                                        <Text style={[textTheme.bodyLarge]}>No Data</Text>
+                                        <Text style={[textTheme.bodyLarge]}>No Data Found</Text>
                                     </View>
                                 )}
                                 contentContainerStyle={styles.flatList}

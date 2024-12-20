@@ -18,6 +18,8 @@ export default function VerificationCodeBody(props) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const [otp, setOtp] = useState("");
+
+    const [emptyChecker, setEmptyChecker] = useState(false);
     // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const [timer, setTimer] = useState(60);
@@ -42,6 +44,9 @@ export default function VerificationCodeBody(props) {
         setOtp(otp);
     }
 
+
+    console.log("changing")
+    console.log(changing)
     // async function verifyWithOTP() {
     //
     //
@@ -74,8 +79,6 @@ export default function VerificationCodeBody(props) {
                         </Text>
                     </Pressable>
                 </View>
-
-
             </View>
 
             <OtpInputBox
@@ -85,6 +88,14 @@ export default function VerificationCodeBody(props) {
                 changing={changing}
                 setChanging={setChanging}
             />
+            {
+                emptyChecker ?
+                    <View style={{width: '30%', marginTop: 8}}>
+                        <Text style={[textTheme.titleSmall, {textAlign: "left", color: Colors.error}]}>Enter OTP</Text>
+                    </View> :
+                    <></>
+
+            }
 
             <View style={styles.resendOtpContainer}>
                 <Text style={[textTheme.titleMedium, styles.didntGetCodeText]}>Didn't get a code?</Text>
@@ -97,7 +108,6 @@ export default function VerificationCodeBody(props) {
                     }}
                     style={{justifyContent:"center"}}>
                     <Text style={[textTheme.titleSmall, styles.resendOtp]}>
-
                         Resend OTP {
                         timer > 0 ?
                             <Text style={[textTheme.titleSmall, styles.timer]}>
@@ -114,7 +124,15 @@ export default function VerificationCodeBody(props) {
                 buttonStyle={styles.submitButton}
                 textStyle={[textTheme.titleSmall]}
                 onPress={async () => {
-                    const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS")
+                    if(otp.trim().length === 0) {
+                        setEmptyChecker(true);
+                        return;
+                    }
+                    else {
+                        setEmptyChecker(false);
+                    }
+
+                    const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS");
                     setIsAuthenticated(authStatus);
                     setChanging(true);
                     if(authStatus === true) {

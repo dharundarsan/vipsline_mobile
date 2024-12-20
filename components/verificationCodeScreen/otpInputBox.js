@@ -209,9 +209,10 @@ export default function OtpInputBox(props) {
         }));
 
         // Trigger OTP callback when the last input is filled
-        if (index === 3) {
-            props.otp(newOtp.join(''));
-        }
+        // if (index === 3) {
+        //     props.otp(newOtp.join(''));
+        // }
+        props.otp(newOtp.join(''));
 
         // if(index === 1 && (parseInt(state.otp[0]) !== "")) {
         //     setState(prevState => ({
