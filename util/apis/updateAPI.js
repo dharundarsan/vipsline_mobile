@@ -3,6 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 
 export default async function updateAPI(response, mode_of_payment, splitUpState, clientInfo) {
     let authToken = "";
+    console.log(mode_of_payment);
+    
     let businessId = "";
     try {
         // authToken = await AsyncStorage.getItem('authKey') || "";
@@ -58,6 +60,14 @@ export default async function updateAPI(response, mode_of_payment, splitUpState,
                 wallet_id: clientInfo.wallet_id
             };
             break;
+        case "reward points":
+            data = {
+                bookingId: response.booking_id,
+                mode_of_payment:"REWARDS",
+                status:"paid_at_venue",
+                transactionId : "",
+            }
+            break;
         case "NIL":
             data = {
                 status: "paid_at_venue",
@@ -68,6 +78,7 @@ export default async function updateAPI(response, mode_of_payment, splitUpState,
                 wallet_id: clientInfo.wallet_id
             };
             break;
+
         default:
             throw new Error("Unknown payment mode");
     }

@@ -32,6 +32,7 @@ const PrimaryButton = (props) => {
             overflow: "hidden",
             height: props.height,
             width: props.width,
+            opacity:props.disabled ? 0.5 : 1
         },
         pressable: {
             paddingHorizontal: 13,
@@ -48,6 +49,7 @@ const PrimaryButton = (props) => {
     return (
         <View style={[styles.primaryButton, props.buttonStyle]}>
             <Pressable
+                disabled={props.disabled}
                 style={({pressed}) => [
                     styles.pressable,
                     props.pressableStyle,
