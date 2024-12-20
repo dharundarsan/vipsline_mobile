@@ -375,7 +375,10 @@ const CheckoutSection = (props) => {
                 checkoutScreenToast={() => {
                     props.checkoutScreenToast("Sale Cancelled", 2000);
                 }}
-                price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} />
+                calculatedPrice={calculatedPrice}
+                price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} 
+                totalPriceToPay={calculatedPrice[0].total_price_to_pay}
+                />
         }
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?

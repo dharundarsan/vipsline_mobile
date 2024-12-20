@@ -322,9 +322,12 @@ const LeadDetailsModal = (props) => {
                                        lead={props.lead} onCloseModal={() => {
                         setIsEnquiryNotesModalVisible(false)
                     }}/>}
-                <FlatList scrollEnabled={false} data={followUpDetails}
-                          renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls}
-                                                                   followup={item}/>}/>
+                {followUpDetails.length === 0 ? <View style={{height:400, justifyContent: "center", alignItems: "center"}}>
+                        <Text style={textTheme.titleSmall}>No Enquiry Notes Added</Text>
+                    </View> :
+                    <FlatList scrollEnabled={false} data={followUpDetails}
+                              renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls}
+                                                                       followup={item}/>}/>}
             </View>}
         </ScrollView>}
         {selectedTab === 1 && <PrimaryButton buttonStyle={styles.fab}

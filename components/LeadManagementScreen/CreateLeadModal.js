@@ -44,6 +44,7 @@ const CreateLeadModal = (props) => {
     const phoneNoRef = useRef(null);
     const followUpTimeRef = useRef(null);
     const followUpDateRef = useRef(null)
+    const scrollViewRef = useRef(null);
 
 
     useLayoutEffect(() => {
@@ -55,6 +56,13 @@ const CreateLeadModal = (props) => {
         }
         api();
     }, [leadSource]);
+
+
+    useEffect(() => {
+        if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: 0, animated: true });
+        }
+    }, [view]);
 
     const handleSave = async () => {
         const firstNameValid = firstNameRef.current();
@@ -145,7 +153,7 @@ const CreateLeadModal = (props) => {
             </PrimaryButton>
         </View>
         <Divider/>
-        <ScrollView>
+        <ScrollView ref={scrollViewRef}>
             <View style={styles.modalContent}>
                 <View style={styles.sectionTitleContainer}>
                     <Text style={styles.sectionTitleText}>Lead
@@ -155,6 +163,7 @@ const CreateLeadModal = (props) => {
                                  labelTextStyle={{fontWeight: "700"}}
                                  value={firstName}
                                  label={"First Name"}
+                                 required
                                  onChangeText={setFirstName}
                                  validator={(text) => {
                                      if (text === null || text === undefined || text.trim().length === 0) {
@@ -173,6 +182,7 @@ const CreateLeadModal = (props) => {
                                  onChangeText={setLastName}
                                  type={"text"}/>
                 <CustomTextInput placeholder={"1234567890"}
+                                 required
                                  labelTextStyle={{fontWeight: "700"}}
                                  label={"Mobile"}
                                  value={phoneNo[1]}
@@ -287,6 +297,7 @@ const CreateLeadModal = (props) => {
                     <CustomTextInput
                         labelTextStyle={{fontWeight: "700"}}
                         type="date"
+                        required
                         minimumDate={new Date()}
                         label="Next Follow up Date"
                         value={nextFollowUpDate === null || nextFollowUpDate === undefined ? null : new Date(nextFollowUpDate)}
@@ -304,6 +315,7 @@ const CreateLeadModal = (props) => {
                     <CustomTextInput
                         labelTextStyle={{fontWeight: "700"}}
                         type="time"
+                        required
                         label="Follow up time"
                         value={followUpTime}
                         onChangeValue={setFollowUpTime}

@@ -53,35 +53,41 @@ const DateRangePicker = (props) => {
         <View style={styles.container}>
             <Text style={styles.label}>Date</Text>
             <View style={styles.dateRangeContainer}>
-                {/* Start Date */}
                 <Pressable style={styles.dateButton} onPress={showStartDatePicker} android_ripple={{color: Colors.ripple}}>
                     <Text style={[textTheme.bodyLarge, {flex: 1, textAlign: 'center'}]}>
                         {props.fromDate !== "" ? moment(props.fromDate).format('ddd, DD MMM YYYY') : 'Select Start Date'}
                     </Text>
                     <Feather name="calendar" size={24} color="grey" style={styles.calenderIcon}/>
                 </Pressable>
+                {
+                    !props.startDateRangeIsValid &&
+                    <Text style={{alignSelf: "flex-start", color: Colors.error, marginTop: 4}}>Start date is required</Text>
+                }
 
                 <Text style={styles.toText}>TO</Text>
 
-                {/* End Date */}
+
                 <Pressable style={styles.dateButton} onPress={showEndDatePicker} android_ripple={{color: Colors.ripple}}>
                     <Text style={[textTheme.bodyLarge, {flex: 1, textAlign: 'center'}]}>
                         {props.toDate !== "" ? moment(props.toDate).format('ddd DD MMM YYYY') : 'Select End Date'}
                     </Text>
                     <Feather name="calendar" size={24} color="grey" style={styles.calenderIcon}/>
                 </Pressable>
+                {
+                    !props.endDateRangeIsValid &&
+                    <Text style={{alignSelf: "flex-start", color: Colors.error, marginTop: 4}}>End date is required</Text>
+                }
             </View>
 
-            {/* Start Date Picker */}
             <DateTimePickerModal
                 isVisible={isStartPickerVisible}
                 mode="date"
                 onConfirm={handleConfirmStartDate}
                 onCancel={hideStartDatePicker}
                 // date={props.fromDate === "" ? new Date() : new Date(props.fromDate)}
+
             />
 
-            {/* End Date Picker */}
             <DateTimePickerModal
                 isVisible={isEndPickerVisible}
                 mode="date"

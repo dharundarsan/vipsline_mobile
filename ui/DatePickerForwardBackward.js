@@ -1,5 +1,5 @@
 // DatePickerForwardBackward.js
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import { Text, View, StyleSheet, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
@@ -35,15 +35,25 @@ function formatDateRange(view, fromDate, toDate = fromDate) {
 }
 
 export default function DatePickerForwardBackward({ label, type, fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate }) {
+
+
+
     const dispatch = useDispatch();
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [forwardVisibility, setForwardVisibility] = useState(false);
     const [backwardVisibility, setBackwardVisibility] = useState(true);
+    const isFirstRender = useRef(true);
 
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
 
+
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false; // Skip first render
+            return;
+        }
+
         if(type === "Today") {
             dispatch(updateFilters({
                 category,
@@ -78,8 +88,8 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
             dispatch(updateFilters({
                 category,
                 range,
-                fromDate: moment(formatDateRange(type, fromDate, toDate).split(" - ")[0].trim()).format("YYYY-MM-DD"),
-                toDate: moment(formatDateRange(type, fromDate, toDate).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+                fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+                toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
                 customRangeStartDate: "",
                 customRangeEndDate: ""
             }))
@@ -97,7 +107,7 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
             }
         }
         else {
-            if(moment(toDate).toDate() >= moment().toDate()) {
+            if(moment(toDate).add(1, "days").toDate() >= moment().toDate()) {
                 setForwardVisibility(false)
             }
             else {
@@ -106,6 +116,7 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
 
         }
     }, [toDate, type, fromDate]);
+
 
 
     const handleConfirm = (date) => {
@@ -171,8 +182,9 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
                         }
                     }
                     else {
-                        if(moment(toDate).toDate() > moment().toDate()) {
-                            return ;
+                        if(moment(toDate).add(1, "days").toDate() >= moment().toDate()) {
+                            setForwardVisibility(false);
+                            return;
                         }
                         dispatch(updateFilters({
                             range,
