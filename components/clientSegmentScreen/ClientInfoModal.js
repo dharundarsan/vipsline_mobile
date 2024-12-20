@@ -486,9 +486,10 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
+        width: '20%'
     },
     callButton: {
-        width: '30%',
+        width: '70%',
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
@@ -497,10 +498,10 @@ const styles = StyleSheet.create({
         width: '30%'
     },
     pressableStyle: {
-        flex: 1
+        flex: 1,
     },
     salesCard: {
-        marginTop: 64,
+        marginTop: 30,
         width: '100%'
     },
     clientInfoCategoryContainer: {
@@ -528,6 +529,6 @@ const styles = StyleSheet.create({
     },
     pressable: {
         paddingVertical: 8,
-        paddingHorizontal: 8,
+        paddingHorizontal: 0,
     }
 })
