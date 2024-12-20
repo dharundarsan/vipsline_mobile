@@ -189,7 +189,7 @@ export default function EmailLogin() {
             <TextInput
                 autoCapitalize={"none"}
                 placeholder="Enter email Address"
-                style={[textTheme.titleSmall, styles.emailInput]}
+                style={[textTheme.bodyMedium, styles.emailInput]}
                 onChangeText={(text) => {
                     setEmail(text);
                     setIsEmailTyping(true);
@@ -214,7 +214,7 @@ export default function EmailLogin() {
             <TextInput
                 placeholder="Enter password"
                 value={password}
-                style={[textTheme.titleSmall, styles.passwordInput]}
+                style={[textTheme.bodyMedium, styles.passwordInput]}
                 onChangeText={(text) => {
                     setPassword(text)
                     setIsPasswordTyping(true)

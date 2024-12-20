@@ -119,7 +119,7 @@ export default function MobileOtp() {
 
 
                 <TextInput
-                    style={[textTheme.titleSmall, styles.mobileNumberInput]}
+                    style={[textTheme.bodyMedium, styles.mobileNumberInput]}
                     placeholder='Enter mobile number'
                     keyboardType="number-pad"
                     onFocus={onFocusHandler}
@@ -147,7 +147,7 @@ export default function MobileOtp() {
                     buttonStyle={styles.sendOtpButton}
                     onPress={async () => {
                         await sendOtp();
-                        setIsSendOtpPressed(true)
+                        setIsSendOtpPressed(true);
                     }}
                 >
                     {

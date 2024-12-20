@@ -41,7 +41,7 @@ const InvoiceModal = (props) => {
     const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
-    // console.log(selectedClientDetails)
+    console.log(JSON.stringify(selectedClientDetails, null, 3));
 
     const dispatch = useDispatch();
 
@@ -107,6 +107,8 @@ const InvoiceModal = (props) => {
     const selectedBusinessDetails = listOfBusinesses.filter((item) => {
         return item.id === businessId
     })[0];
+
+
 
 
     const businessName = selectedBusinessDetails.name;
@@ -469,7 +471,8 @@ styles.heading]}>Invoice</Text>*/}
                                 <></>
                         }
                         {
-                            selectedClientDetails.customer_gst !== null && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                            // selectedClientDetails.customer_gst !== null && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                            checkNullUndefined(selectedClientDetails.customer_gst) && (selectedClientDetails.customer_gst).trim().length !== 0?
                                 <Text style={textTheme.bodyLarge}><Text
                                     style={textTheme.titleMedium}>GSTIN
                                     : </Text>{selectedClientDetails.customer_gst}</Text> :
