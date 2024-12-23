@@ -43,6 +43,7 @@ export default function RecordExpenses(props) {
     const toastRef = useRef(null);
 
 
+
     function parseDate(dateStr) {
         const [day, month, year] = dateStr.split(" ");
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -300,11 +301,12 @@ export default function RecordExpenses(props) {
 
                                     await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id)).then( async res1 => {
 
-                                        const subId = res1.id;
-                                        const catId = await categories.find(item => item.name === expenseData.expenseAmountType).id
+                                        const subId = await res1.find(item => item.name === expenseData.expenseType).id;
+                                        const catId = await categories.find(item => item.name === expenseData.expenseAmountType).id;
 
 
                                             if(props.type === "add") {
+
                                                 const res = await addExpensesAPI(expenseData, catId, subId);
                                                 if(res) {
                                                     dispatch(loadExpensesFromDb());
