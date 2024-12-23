@@ -65,7 +65,7 @@ export default function ForgetPasswordOTP(props) {
             />
             {
                 emptyChecker ?
-                    <View style={{width: '30%', marginTop: 8}}>
+                    <View style={{marginTop: 8, alignSelf: "flex-start", marginLeft: 68}}>
                         <Text style={[textTheme.titleSmall, {textAlign: "left", color: Colors.error}]}>Enter OTP</Text>
                     </View> :
                     <></>

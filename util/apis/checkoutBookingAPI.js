@@ -188,9 +188,9 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             walkInUserId: clientDetails.id,
             walkin: "yes",
             wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
-            isRewardSelected:cartSliceState.rewardAllocated.isRewardSelected,
-            redeemed_points:cartSliceState.rewardAllocated.rewardPoints,
-            reward_amt:cartSliceState.rewardAllocated.rewardAmount 
+            isRewardSelected:cartSliceState?.rewardAllocated?.isRewardSelected,
+            redeemed_points:cartSliceState?.rewardAllocated?.rewardPoints,
+            reward_amt:cartSliceState?.rewardAllocated?.rewardAmount
         }, {
             headers: {
                 Authorization: `Bearer ${authToken}`

@@ -9,6 +9,7 @@ import {updateAuthStatus} from "../../store/authSlice";
 import {useNavigation} from "@react-navigation/native";
 import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
 import sendOTPApi from '../../util/apis/sendOTPApi';
+import Toast from "../../ui/Toast";
 
 export default function VerificationCodeBody(props) {
 
@@ -23,6 +24,8 @@ export default function VerificationCodeBody(props) {
     // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const [timer, setTimer] = useState(60);
+
+    const toastRef = useRef(null);
 
     useEffect(() => {
         if (timer <= 0) {
@@ -44,9 +47,6 @@ export default function VerificationCodeBody(props) {
         setOtp(otp);
     }
 
-
-    console.log("changing")
-    console.log(changing)
     // async function verifyWithOTP() {
     //
     //
@@ -64,6 +64,7 @@ export default function VerificationCodeBody(props) {
 
     return (
         <View style={styles.verificationCodeBody}>
+            <Toast ref={toastRef}/>
             <Text style={styles.verificationText}>Verification Code</Text>
             <View style={styles.verificationMessage}>
                 <Text>Enter the 4-digit number we sent to</Text>
@@ -90,7 +91,7 @@ export default function VerificationCodeBody(props) {
             />
             {
                 emptyChecker ?
-                    <View style={{width: '30%', marginTop: 8}}>
+                    <View style={{marginTop: 8, alignSelf: 'flex-start', marginLeft: 68}}>
                         <Text style={[textTheme.titleSmall, {textAlign: "left", color: Colors.error}]}>Enter OTP</Text>
                     </View> :
                     <></>
@@ -137,6 +138,9 @@ export default function VerificationCodeBody(props) {
                     setChanging(true);
                     if(authStatus === true) {
                         dispatch(updateAuthStatus(true));
+                    }
+                    else {
+                        toastRef.current.show("Entered OTP is wrong");
                     }
                 }}
             />

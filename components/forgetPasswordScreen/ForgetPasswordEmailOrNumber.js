@@ -153,7 +153,7 @@ export default function ForgetPasswordEmailOrNumber(props) {
                 <Text style={[textTheme.titleMedium, styles.inputLabel]}>Mobile number / Email</Text>
                 <TextInput
                     ref={textRef}
-                    style={[textTheme.titleSmall, styles.mobileNumberInput]}
+                    style={[textTheme.bodyMedium, styles.mobileNumberInput]}
                     placeholder='Mobile number / Email'
                     onFocus={onFocusHandler}
                     onBlur={onFocusOutHandler}

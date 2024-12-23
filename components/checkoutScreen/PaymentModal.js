@@ -1,7 +1,7 @@
 import { FlatList, Image, Modal, Platform, ScrollView, StyleSheet, Text, ToastAndroid, View } from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import React, { useEffect, useRef, useState } from "react";
 import Colors from "../../constants/Colors";
@@ -30,8 +30,7 @@ import {
     clearLocalCart, clearSalesNotes,
     modifyClientMembershipId,
     modifyPrepaidDetails,
-    updateCalculatedPrice,
-    updateRewardAmount
+    updateCalculatedPrice
 } from "../../store/cartSlice";
 import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
 import Loader from 'react-native-three-dots-loader'
@@ -42,12 +41,11 @@ import { clearClientInfo } from "../../store/clientInfoSlice";
 import * as Haptics from "expo-haptics";
 import Toast from "../../ui/Toast";
 import { MaterialIcons } from '@expo/vector-icons';
-import RewardPointModal from "./RewardPointModal";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
 
-    const fullClientData = useSelector(state => state.clientInfo);
+
     const clientInfo = useSelector(state => state.clientInfo.details);
     const isZeroPayment = props.price === 0;
     const isPrepaidInCart = useSelector(state => state.cart.prepaid_wallet[0].wallet_amount) !== "";
@@ -69,9 +67,35 @@ const PaymentModal = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isOptionsDropdownModalVisible, setIsOptionsDropdownModalVisible] = useState(false)
     const [isCancelSalesModalVisible, setIsCancelSalesModalVisible] = useState(false)
-    const [isRewardModalVisible, setIsRewardModalVisible] = useState(false)
-    const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
-    const isRewardActive = (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.reward_balance !== 0)
+
+    const [isBackDateInvoiceNoteVisible, setIsBackDateInvoiceNoteVisible] = useState(new Date(appointmentDate).getDate() !== new Date(Date.now()).getDate());
+
+    const appointmentDate = useSelector(state => state.cart.appointment_date);
+
+
+    useEffect(() => {
+        const now = new Date();
+        const formatForComparison = (appointmentDate) => {
+            return new Date(appointmentDate).toISOString().split(':').slice(0, 2).join(':') + ':00.000Z';
+        };
+        const formattedCurrentDate = formatForComparison(now);
+        const formattedSelectedDate = formatForComparison(appointmentDate);
+        if (formattedCurrentDate !== formattedSelectedDate) {
+            const selectedDateLocal = new Date(appointmentDate);
+            const isSameDay =
+                now.getDate() === selectedDateLocal.getDate() &&
+                now.getMonth() === selectedDateLocal.getMonth() &&
+                now.getFullYear() === selectedDateLocal.getFullYear();
+
+            if (!isSameDay) {
+                setIsBackDateInvoiceNoteVisible(true);
+            } else {
+                setIsBackDateInvoiceNoteVisible(false);
+            }
+        }
+    }, []);
+
+
     const [splitUpState, setSplitUpState] = useState([
         {
             mode: "cash",
@@ -97,6 +121,7 @@ const PaymentModal = (props) => {
     ]
     )
 
+    const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
     const cartSliceState = useSelector((state) => state.cart);
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
@@ -417,6 +442,7 @@ const PaymentModal = (props) => {
                     setAddedSplitPayment(value)
                 }} />
         }
+
         {isCancelSalesModalVisible && <DeleteClient
             isVisible={isCancelSalesModalVisible}
             onCloseModal={() => {
@@ -439,13 +465,6 @@ const PaymentModal = (props) => {
                 props.checkoutScreenToast()
             }}
         />}
-        {isRewardModalVisible && <RewardPointModal
-            isVisible={isRewardModalVisible}
-            perPointValue={props.calculatedPrice[0].reward_details.pointValue}
-            price={props.price}
-            onCloseModal={() => setIsRewardModalVisible(false)} 
-            setSelectedPaymentOption={setSelectedPaymentOption}/>
-        }
         {
             isOptionsDropdownModalVisible && <DropdownModal isVisible={isOptionsDropdownModalVisible}
                 onCloseModal={() => setIsOptionsDropdownModalVisible(false)}
@@ -477,7 +496,7 @@ const PaymentModal = (props) => {
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={() => {
-                    dispatch(updateRewardAmount(0))
+
                     props.onCloseModal()
                 }}
             >
@@ -485,35 +504,18 @@ const PaymentModal = (props) => {
             </PrimaryButton>
         </View>
         <ScrollView>
-            {(businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled &&
-                cartSliceState?.calculatedPrice[0]?.reward_points !== undefined && cartSliceState.calculatedPrice[0].reward_points !== 0) &&
-                <View
-                    style={{
-                        padding: 10,
-                        backgroundColor: "#E7E8FF",
-                        marginTop: 30,
-                        marginHorizontal: 20,
-                        borderRadius: 8,
-                    }}
-                >
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "flex-start",
-                            flexWrap: "wrap",
-                        }}
-                    >
-                        <MaterialIcons name="info" size={20} color="#FF6B00" style={{ marginTop: 2 }} />
-                        <Text style={{ color: "#FF6B00", fontWeight: "bold", marginLeft: 5, }}>Reward points - </Text>
-                        <View style={{ marginLeft: 8, flex: 1 }}>
-                            <Text>
-                                <Text style={{ color: "#5252FF", textDecorationLine: "underline" }}>{cartSliceState.calculatedPrice[0].reward_points}</Text>
-                                <Text style={{ color: "#5252FF" }}> will be added to customer for this transaction.</Text>
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-            }
+            {isBackDateInvoiceNoteVisible && <View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "rgba(253,253,150,.6)",
+                paddingVertical: 10,
+                justifyContent: "center",
+                gap: 3
+            }}>
+                <AntDesign name="warning" size={22} color={Colors.orange}/>
+                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You're trying to raise the invoice on a
+                    previous date</Text>
+            </View>}
             <View style={styles.modalContent}>
                 {isZeroPayment && <View style={styles.zeroPaymentNote}>
                     <View style={styles.zeroPaymentNoteBar} />
@@ -582,60 +584,32 @@ const PaymentModal = (props) => {
                             <Text>Split Payment</Text>
                         </PrimaryButton>
                     </View>
-                    <View style={styles.paymentOptionsRow}>
-                        {isRewardActive && <PrimaryButton
-                            disableRipple={isZeroPayment}
-                            buttonStyle={[
-                                styles.paymentOptionRewardButton,
-                                isRewardActive && isPrepaidAvailable
-                                    ? { flex: 0.5 }
-                                    : isRewardActive
-                                    ? { flex: 1 }
-                                    : {}, // Default to an empty object if no condition is met
-                                selectedPaymentOption === "reward points"
-                                    ? styles.paymentOptionSelected
-                                    : {}
-                            ]}
-                            
-                            onPress={isZeroPayment ? () => { } : () => {
-                                setSelectedPaymentOption("reward points")
-                                setIsRewardModalVisible(true)
-                            }}
-                            pressableStyle={styles.paymentOptionButtonPressable}>
-                            {selectedPaymentOption === "reward points" ? <View style={styles.tickContainer}>
-                                <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                    color={Colors.highlight} />
-                            </View> : null}
-                            <Image source={require("../../assets/icons/checkout/payment/rewardIcon.png")} style={{ width: 30, height: 30 }} />
-                            <Text>Reward Points {fullClientData.rewardPointBalance} </Text>
-                        </PrimaryButton>}
-                        {(isPrepaidAvailable) &&
-                            <PrimaryButton
-                                disableRipple={isZeroPayment}
-                                buttonStyle={[styles.paymentOptionButton,isRewardActive && isPrepaidAvailable ? {flex:0.5} : isPrepaidAvailable ? {flex:1,marginBottom: 20} : {}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
-                                onPress={isZeroPayment ? () => { } : () => {
-
-                                    if (clientInfo.wallet_balance < props.price) {
-                                        setSelectedPaymentOption("split_payment")
-                                    } else {
-                                        setSelectedPaymentOption("prepaid")
-                                    }
-                                }}
-                                pressableStyle={styles.paymentOptionButtonPressable}>
-                                {selectedPaymentOption === "prepaid" ? <View style={styles.tickContainer}>
-                                    <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                        color={Colors.highlight} />
-                                </View> : null}
-                                <FontAwesome6 name="indian-rupee-sign" size={24} color={isZeroPayment ? Colors.grey400 : Colors.green} />
-                                <Text>Prepaid <Text
-                                    style={{
-                                        color: isZeroPayment ? Colors.grey400 : Colors.highlight,
-                                        fontWeight: "bold"
-                                    }}>₹ {clientInfo.wallet_balance}</Text>
-                                </Text>
-                            </PrimaryButton>}
-                    </View>
                 </View>
+                {(isPrepaidAvailable) &&
+                    <PrimaryButton
+                        disableRipple={isZeroPayment}
+                        buttonStyle={[styles.paymentOptionButton, { marginBottom: 20 }, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
+                        onPress={isZeroPayment ? () => { } : () => {
+
+                            if (clientInfo.wallet_balance < props.price) {
+                                setSelectedPaymentOption("split_payment")
+                            } else {
+                                setSelectedPaymentOption("prepaid")
+                            }
+                        }}
+                        pressableStyle={styles.paymentOptionButtonPressable}>
+                        {selectedPaymentOption === "prepaid" ? <View style={styles.tickContainer}>
+                            <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
+                                color={Colors.highlight} />
+                        </View> : null}
+                        <FontAwesome6 name="indian-rupee-sign" size={24} color={isZeroPayment ? Colors.grey400 : Colors.green} />
+                        <Text>Prepaid <Text
+                            style={{
+                                color: isZeroPayment ? Colors.grey400 : Colors.highlight,
+                                fontWeight: "bold"
+                            }}>₹ {clientInfo.wallet_balance}</Text>
+                        </Text>
+                    </PrimaryButton>}
                 {selectedPaymentOption === "cash" || selectedPaymentOption === null || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" || selectedPaymentOption === "prepaid" ? <>
                     <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
                         readOnly={isZeroPayment}
@@ -1044,21 +1018,27 @@ const styles = StyleSheet.create({
     },
     headingAndCloseContainer: {
         marginTop: Platform.OS === "ios" ? 50 : 0,
-        paddingVertical:15,
-        alignItems:"center",
+        paddingVertical:
+            15,
+        alignItems:
+            "center",
     },
     heading: {
         fontWeight: 500
     },
     closeButton: {
         position: "absolute",
-        right:0,
-        top:5,
-        backgroundColor:Colors.background,
+        right:
+            0,
+        top:
+            5,
+        backgroundColor:
+            Colors.background,
     },
     modalContent: {
         flex: 1,
-        padding:25,
+        padding:
+            25,
     },
     zeroPaymentNoteBar: {
         position: "absolute",
@@ -1074,99 +1054,135 @@ const styles = StyleSheet.create({
     },
     paymentOptionsContainer: {
         marginTop: 10,
-        gap:15,
-        marginBottom:25,
+        gap:
+            15,
+        marginBottom:
+            25,
     }
     ,
     paymentOptionsRow: {
         gap: 15,
-        flexDirection:"row",
+        flexDirection:
+            "row",
     }
     ,
     paymentOptionButton: {
         backgroundColor: Colors.background,
-        overflow:"visible",
-        borderRadius:10,
-        borderWidth:1,
-        alignItems:"center",
-        flex:1,
-        borderColor:Colors.grey400,
-    },
-    paymentOptionRewardButton: {
-        backgroundColor: Colors.background,
-        overflow:"visible",
-        borderRadius:10,
-        borderWidth:1,
-        alignItems:"center",
-        borderColor:Colors.grey400,
-    },
+        overflow:
+            "visible",
+        borderRadius:
+            10,
+        borderWidth:
+            1,
+        alignItems:
+            "center",
+        flex:
+            1,
+        borderColor:
+            Colors.grey400,
+    }
+    ,
     paymentOptionSelected: {
         borderRadius: 10,
-        borderColor:Colors.highlight,
-        borderWidth:2,
-    },
+        borderColor:
+            Colors.highlight,
+        borderWidth:
+            2,
+    }
+    ,
     tickContainer: {
         position: "absolute",
-        right:-15,
-        top:-15,
-        zIndex:10,
-    },
+        right:
+            -15,
+        top:
+            -15,
+        zIndex:
+            10,
+    }
+    ,
     paymentOptionButtonPressable: {
         paddingHorizontal: 0,
-        paddingVertical:20,
-    },
+        paddingVertical:
+            20,
+    }
+    ,
     addPaymentButtonContainer: {
         flexDirection: "row",
-        justifyContent:"center",
-        alignItems:"center"
-    },
+        justifyContent:
+            "center",
+        alignItems:
+            "center"
+    }
+    ,
     addPaymentButton: {
         backgroundColor: Colors.grey100,
-        borderWidth:1,
-        borderRadius:8,
-        borderColor:Colors.grey400,
-        alignSelf:"flex-start"
-    },
+        borderWidth:
+            1,
+        borderRadius:
+            8,
+        borderColor:
+            Colors.grey400,
+        alignSelf:
+            "flex-start"
+    }
+    ,
     addPaymentButtonPressable: {
         paddingVertical: 5,
-        paddingHorizontal:20,
-        gap:5,
-        justifyContent:"flex-start",
-        flexDirection:"row",
-    },
+        paddingHorizontal:
+            20,
+        gap:
+            5,
+        justifyContent:
+            "flex-start",
+        flexDirection:
+            "row",
+    }
+    ,
     buttonContainer: {
         flexDirection: "row",
-        margin:10,
-        gap:10,
-        padding:3,
-    },
+        margin:
+            10,
+        gap:
+            10,
+        padding:
+            3,
+    }
+    ,
     optionButton: {
-        backgroundColor: Colors.transparent, 
-        borderColor:Colors.grey900,
-        borderWidth:1,
-    },
+        backgroundColor: Colors.transparent, borderColor:
+            Colors.grey900, borderWidth:
+            1,
+    }
+    ,
     checkoutButton: {
         flex: 1,
-    },
+    }
+    ,
     checkoutButtonPressable: {
         // flex:1,
         flexDirection: "row",
-        justifyContent:"space-between",
-        alignContent:"space-between", 
-        // alignItems:"stretch",
+        justifyContent:
+            "space-between",
+        alignContent:
+            "space-between", // alignItems:"stretch",
         // alignSelf:"auto",
-    },
+    }
+    ,
     checkoutButtonAmountAndArrowContainer: {
-        flexDirection: "row", 
-        gap:25,
-    },
+        flexDirection: "row", gap:
+            25,
+    }
+    ,
     checkoutButtonText: {
         color: Colors.white
-    },
+    }
+    ,
     splitInputAndCloseContainer: {
         gap: 10,
-        flexDirection:"row",
-    },
+        flexDirection:
+            "row",
+    }
+    ,
     splitInputCloseButton: {
         backgroundColor: Colors.background,
     }
