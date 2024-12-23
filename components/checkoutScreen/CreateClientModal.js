@@ -179,6 +179,7 @@ const CreateClientModal = (props) => {
                         onSave={(callback) => {
                             firstNameRef.current = callback;
                         }}
+                        required
                     />
                     <CustomTextInput
                         labelTextStyle={textTheme.bodyMedium}
@@ -209,6 +210,7 @@ const CreateClientModal = (props) => {
                         onSave={(callback) => {
                             phoneNoRef.current = callback;
                         }}
+                        required
                     />
                     <CustomTextInput
                         labelTextStyle={textTheme.bodyMedium}
@@ -217,7 +219,15 @@ const CreateClientModal = (props) => {
                         placeholder="Enter email address"
                         value={email}
                         onChangeText={setEmail}
-                        validator={(text) =>  (text === null || text === undefined || text.trim() === "") ? true : !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Phone number is Invalid" : true}
+                        // validator={(text) =>  (text === null || text === undefined || text.trim() === "") ? true : !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) ? "Phone number is Invalid" : true}
+                        validator={(text) => {
+                            if(checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== ""){
+                                return "Email is invalid"
+                            }
+                            else {
+                                return true
+                            }
+                        }}
                     />
                     <CustomTextInput
                         type="dropdown"

@@ -110,7 +110,7 @@ export const getExpenseSubCategoryId = (subId) => async (dispatch, getState) => 
             })
 
         dispatch(updateExpenseSubCategoryId(response1.data.data));
-        return response1.data.data[0]
+        return response1.data.data;
     }
     catch (e) {
         console.log(e + " error occurred in getting the expense sub category Id")

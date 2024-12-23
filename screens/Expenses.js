@@ -10,7 +10,7 @@ import ExpenseFilters from "../components/expensesScreen/ExpenseFilters";
 import {useDispatch, useSelector} from "react-redux";
 import {
     loadExpensesFromDb,
-    loadSearchExpensesFromDb,
+    loadSearchExpensesFromDb, resetExpensesPageNo,
     updateCurrentExpense,
     updateCurrentExpensesId, updateFilters
 } from "../store/ExpensesSlice";
@@ -72,6 +72,7 @@ export default function Expenses() {
                     customRangeStartDate: "",
                     customRangeEndDate: ""
                 }));
+                dispatch(resetExpensesPageNo());
             }
         },
         [],
@@ -114,6 +115,7 @@ export default function Expenses() {
         </View>
         </PrimaryButton>
     }
+
 
 
 
