@@ -14,7 +14,7 @@ import textTheme from "../constants/TextTheme";
 import PrimaryButton from "../ui/PrimaryButton";
 import SearchBar from "../ui/SearchBar";
 import Divider from "../ui/Divider";
-import React, {useEffect, useLayoutEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import LeadCard from "../components/LeadManagementScreen/LeadCard";
 import {AntDesign, Feather, FontAwesome6} from "@expo/vector-icons";
 import {useDispatch, useSelector} from "react-redux";
@@ -39,6 +39,7 @@ import {updateNavigationState} from "../store/NavigationSlice";
 import LeadAdvancedFiltersModal from "../components/LeadManagementScreen/LeadAdvancedFiltersModal";
 import moment from "moment";
 import CustomTagFilter from "../components/LeadManagementScreen/CustomTagFilter";
+import Toast from "../ui/Toast";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -151,10 +152,16 @@ const LeadManagementScreen = () => {
         }
     }
 
+    const leadManagementToastRef = useRef();
+
     return <View style={styles.leadManagementScreen}>
+        <Toast ref={leadManagementToastRef}/>
         {isCreateLeadModalVisible && <CreateLeadModal isVisible={isCreateLeadModalVisible}
+                                                      leadManagementToastRef={leadManagementToastRef}
                                                       onCloseModal={() => setIsCreateClientModalVisible(false)}/>}
-        {isAdvancedFiltersModalVisible ? <LeadAdvancedFiltersModal onCloseModal={()=>{setIsAdvancedFiltersModalVisible(false)}} isVisible={isAdvancedFiltersModalVisible}/> : null}
+        {isAdvancedFiltersModalVisible ? <LeadAdvancedFiltersModal onCloseModal={() => {
+            setIsAdvancedFiltersModalVisible(false)
+        }} isVisible={isAdvancedFiltersModalVisible}/> : null}
         {!(totalCount === 0 && !doesLeadExist) ? <PrimaryButton buttonStyle={styles.fab}
                                                                 onPress={() => setIsCreateClientModalVisible(true)}
                                                                 pressableStyle={{flex: 1}}>
@@ -224,8 +231,8 @@ const LeadManagementScreen = () => {
                             <SearchBar
                                 filter
                                 onPressFilter={() => {
-                                setIsAdvancedFiltersModalVisible(true);
-                            }} onChangeText={async (text) => {
+                                    setIsAdvancedFiltersModalVisible(true);
+                                }} onChangeText={async (text) => {
                                 dispatch(updateFetchingState(true))
                                 dispatch(resetPageNo())
                                 dispatch(updateSearchTerm(text));
@@ -236,7 +243,7 @@ const LeadManagementScreen = () => {
                         </View>
                         <Divider/>
                         <View>
-                            {/*<CustomTagFilter />*/}
+                            <CustomTagFilter/>
                         </View>
                         <Divider/>
                         <View style={[styles.leadCountContainer]}>
@@ -255,6 +262,7 @@ const LeadManagementScreen = () => {
                                     name={lead.name}
                                     status={lead.lead_status}
                                     phoneNo={lead.mobile}
+                                    leadManagementToastRef={leadManagementToastRef}
                                 />
                             ))}
                         {totalCount < 10 ? null : <View style={styles.pagination}>

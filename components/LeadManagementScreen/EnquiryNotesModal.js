@@ -79,6 +79,7 @@ const EnquiryNotesModal = (props) => {
 
         await dispatch(loadLeadsFromDb());
         props.refreshLeadsData();
+        props.leadProfileToastRef.current.show("Enquiry Notes Added Successfully")
         props.onCloseModal();
     }
 
@@ -122,6 +123,7 @@ const EnquiryNotesModal = (props) => {
 
         props.refreshLeadsData();
         await dispatch(loadLeadsFromDb());
+        props.leadProfileToastRef.current.show("Enquiry Notes Edited Successfully")
         props.onCloseModal();
     }
 

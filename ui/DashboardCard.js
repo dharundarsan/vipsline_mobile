@@ -21,7 +21,7 @@ const DashboardCard = (props) => {
           <Text style={styles.title}>{props.title}</Text>
         </View>
         <Text style={[styles.count, { fontSize: getFontSize(props.value) }]}>
-          {props.title === "Total Sales Value" || props.title === "Avg. Bill Value"
+          {props.title !== "Total Bill Count"
             ? "₹ " + props.value
             : props.value}
         </Text>
@@ -53,7 +53,8 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     flex: 1,
-    padding: 15,
+    padding: 17,
+    // backgroundColor:"grey",
     justifyContent: "space-between",
     alignItems: "center",
   },
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
     color: "#101928",
     opacity: 0.6,
     fontSize: 14,
+    textAlign:"center"
   },
   count: {
     fontSize: 16,

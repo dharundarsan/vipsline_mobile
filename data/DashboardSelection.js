@@ -3,19 +3,19 @@ import Colors from "../constants/Colors";
 export const dashboardSelection = [
   {
     header: "Sales Dashboard",
-    desc: "Dashboard of your business performance",
+    desc: "Dashboard of your Business Performance",
     icon: require("../assets/icons/dashboard/selection/sales.png"),
     navigate: "SalesScreen",
   },
   {
     header: "Staff Dashboard",
-    desc: "Dashboard of your Staff performance",
+    desc: "Dashboard of your Staff Performance",
     icon: require("../assets/icons/dashboard/selection/staff.png"),
     navigate: "StaffScreen",
   },
   {
     header: "Client Dashboard",
-    desc: "Dashboard of your client performance",
+    desc: "Dashboard of your Client Performance",
     icon: require("../assets/icons/dashboard/selection/client.png"),
     navigate: "ClientScreen",
   },
@@ -31,6 +31,10 @@ export const salesCardData = [
     title: "Total Sales Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
     color:Colors.lightpurple
+  },{
+    title: "Net Sales",
+    icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
+    color:Colors.darkGreen
   },
   {
     title: "Avg. Bill Value",

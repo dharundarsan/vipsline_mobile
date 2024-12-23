@@ -37,7 +37,7 @@ export default function DashboardScreen() {
                 <Text style={styles.header}>{item.header}</Text>
               </View>
               <Text style={{ paddingTop: 10 }}>
-                Dashboard of your business performance
+                {item.desc}
               </Text>
             </TouchableOpacity>
           );

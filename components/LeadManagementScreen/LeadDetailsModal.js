@@ -14,7 +14,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import SearchBar from "../../ui/SearchBar";
 import Divider from "../../ui/Divider";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import LeadCard from "./LeadCard";
 import {AntDesign, Feather, FontAwesome6, Ionicons, MaterialIcons} from "@expo/vector-icons";
 import {useDispatch, useSelector} from "react-redux";
@@ -42,6 +42,7 @@ import EnquiryNotesModal from "./EnquiryNotesModal";
 import {useNavigation} from "@react-navigation/native";
 import {updateNavigationState} from "../../store/NavigationSlice";
 import {SafeAreaView} from "react-native-safe-area-context";
+import Toast from "../../ui/Toast";
 
 const LeadDetailsModal = ({route}) => {
     const dispatch = useDispatch();
@@ -52,8 +53,10 @@ const LeadDetailsModal = ({route}) => {
     const leadSources = useSelector(state => state.leads.leadSources);
     const [isEnquiryNotesModalVisible, setIsEnquiryNotesModalVisible] = useState(false);
     const [isEditLeadModalVisible, setIsEditLeadModalVisible] = useState(false);
-    const {leadDetails} = route.params; // Access the data passed
+    const {leadDetails, leadManagementToastRef} = route.params; // Access the data passed
     const navigation = useNavigation();
+
+    const leadProfileToastRef = useRef();
 
     useEffect(() => {
         dispatch(updateNavigationState("Lead Profile"));
@@ -175,6 +178,7 @@ const LeadDetailsModal = ({route}) => {
     const validateField = (value, fallback = "Not added") => (value ? value : fallback);
 
     return <SafeAreaView style={{flex:1, backgroundColor:"white"}}>
+        <Toast ref={leadProfileToastRef} />
         <View style={styles.leadDetailsModal} animationType={"none"}
                                presentationStyle={"pageSheet"}>
         {isEditLeadModalVisible && <CreateLeadModal
@@ -182,6 +186,7 @@ const LeadDetailsModal = ({route}) => {
             onCloseModal={() => setIsEditLeadModalVisible(false)}
             refreshData={apiCalls}
             edit={true}
+            leadProfileToastRef={leadProfileToastRef}
             data={{...leadProfile, ...route.params.leadDetails}}
         />}
         <View style={styles.header}>
@@ -331,7 +336,7 @@ const LeadDetailsModal = ({route}) => {
                 title={false}
             /> : <View style={styles.enquiryNotesContent}>
                 {isEnquiryNotesModalVisible &&
-                    <EnquiryNotesModal refreshLeadsData={apiCalls} isVisible={isEnquiryNotesModalVisible}
+                    <EnquiryNotesModal refreshLeadsData={apiCalls} leadProfileToastRef={leadProfileToastRef} isVisible={isEnquiryNotesModalVisible}
                                        lead={route.params.leadDetails} onCloseModal={() => {
                         setIsEnquiryNotesModalVisible(false)
                     }}/>}
@@ -341,6 +346,7 @@ const LeadDetailsModal = ({route}) => {
                     </View> :
                     <FlatList scrollEnabled={false} data={followUpDetails}
                               renderItem={({item}) => <EnquiryNoteCard lead={route.params.leadDetails}
+                                                                       leadProfileToastRef={leadProfileToastRef}
                                                                        refreshLeadsData={apiCalls}
                                                                        followup={item}/>}/>}
             </View>}

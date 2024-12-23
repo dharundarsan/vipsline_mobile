@@ -1,10 +1,14 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
 import Colors from "../../constants/Colors";
-import {initialLeadState, updateAdvancedFilters} from "../../store/leadManagementSlice";
-import {checkNullUndefined} from "../../util/Helpers";
+import {
+    clearAdvancedFilters,
+    loadLeadsFromDb,
+    updateAdvancedFilters
+} from "../../store/leadManagementSlice";
 import moment from "moment";
+import {Ionicons} from "@expo/vector-icons";
 
 const CustomTagFilter = () => {
     const dispatch = useDispatch();
@@ -25,83 +29,80 @@ const CustomTagFilter = () => {
         selectedLeadDateOption
     } = useSelector((state) => state.leads);
 
-    // Create an active filter map for display and dispatching reset actions
-    const activeFilters = [
-        { key: "followupDate", value: followupDate, label: "Follow-Up Date" },
-        { key: "followupEndDate", value: followupEndDate, label: "Follow-Up End Date" },
-        { key: "fromDate", value: fromDate, label: "From Date" },
-        { key: "toDate", value: toDate, label: "To Date" },
-        { key: "gender", value: gender, label: "Gender" },
-        { key: "leadFollowUp", value: leadFollowUp, label: "Lead Follow-Up" },
-        { key: "lead_campaign", value: lead_campaign, label: "Lead Campaign" },
-        { key: "lead_owner", value: lead_owner, label: "Lead Owner" },
-        { key: "lead_source", value: (lead_source?.name) === undefined ? "" : lead_source?.name, label: "Lead Source" },
-        { key: "lead_status", value: lead_status, label: "Lead Status" },
-        { key: "selectedLeadFollowUpOption", value: selectedLeadFollowUpOption, label: "Selected Follow-Up Option" },
-    ].filter((filter) => filter.value !== null && filter.value !== undefined && filter.value !== initialLeadState.followupDate); // Include only active filters
+    // Define all filters and their respective display logic/actions dynamically
+    const filters = [
+        {
+            key: 'lead_owner',
+            value: lead_owner?.name,
+            clearFilter: () => dispatch(updateAdvancedFilters({field: "lead_owner", value: undefined})),
+        },
+        {
+            key: 'selectedLeadDateOption',
+            value: selectedLeadDateOption
+                ? `${moment(fromDate).format("DD-MM-YYYY")} - ${moment(toDate).format("DD-MM-YYYY")}`
+                : null,
+            clearFilter: () => {
+                dispatch(updateAdvancedFilters({field: "selectedLeadDateOption", value: null}));
+                dispatch(updateAdvancedFilters({field: "fromDate", value: new Date()}));
+                dispatch(updateAdvancedFilters({field: "toDate", value: new Date()}));
+            },
+        },
+        {
+            key: 'lead_status',
+            value: lead_status,
+            clearFilter: () => dispatch(updateAdvancedFilters({field: "lead_status", value: undefined})),
+        },
+        {
+            key: 'selectedLeadFollowUpOption',
+            value: selectedLeadFollowUpOption
+                ? `${moment(followupDate).format("DD-MM-YYYY")} - ${moment(followupEndDate).format("DD-MM-YYYY")}`
+                : null,
+            clearFilter: () => {
+                dispatch(updateAdvancedFilters({field: "selectedLeadFollowUpOption", value: null}));
+                dispatch(updateAdvancedFilters({field: "followupDate", value: new Date()}));
+                dispatch(updateAdvancedFilters({field: "followupEndDate", value: new Date()}));
+                dispatch(updateAdvancedFilters({field: "leadFollowUp", value: undefined}));
+            },
+        },
+        {
+            key: 'lead_source',
+            value: lead_source?.name,
+            clearFilter: () => dispatch(updateAdvancedFilters({field: "lead_source", value: undefined})),
+        },
+        {
+            key: 'lead_campaign',
+            value: lead_campaign?.name,
+            clearFilter: () => dispatch(updateAdvancedFilters({field: "lead_campaign", value: undefined})),
+        },
+        {
+            key: 'gender',
+            value: gender,
+            clearFilter: () => dispatch(updateAdvancedFilters({field: "gender", value: undefined})),
+        },
+    ];
 
-
-    const removeOption = (optionKey) => {
-        switch (optionKey) {
-            case "followupDate":
-                dispatch(updateAdvancedFilters({field: "followupDate", value: initialLeadState.followupDate}))
-                break;
-            case "followupEndDate":
-                dispatch(updateAdvancedFilters({field: "followupEndDate", value: initialLeadState.followupEndDate}))
-                break;
-            case "fromDate":
-                dispatch(updateAdvancedFilters({field: "fromDate", value: initialLeadState.fromDate}))
-                break;
-            case "toDate":
-                dispatch(updateAdvancedFilters({field: "toDate", value: initialLeadState.toDate}))
-                break;
-            case "gender":
-                dispatch(updateAdvancedFilters({field: "gender", value: initialLeadState.gender}))
-                break;
-            case "leadFollowUp":
-                dispatch(updateAdvancedFilters({field: "leadFollowUp", value: initialLeadState.leadFollowUp}))
-                break;
-            case "lead_campaign":
-                dispatch(updateAdvancedFilters({field: "lead_campaign", value: initialLeadState.lead_campaign}))
-                break;
-            case "lead_owner":
-                dispatch(updateAdvancedFilters({field: "lead_owner", value: initialLeadState.lead_owner}))
-                break;
-            case "lead_source":
-                dispatch(updateAdvancedFilters({field: "lead_source", value: initialLeadState.lead_source}))
-                break;
-            case "lead_status":
-                dispatch(updateAdvancedFilters({field: "lead_status", value: initialLeadState.lead_status}))
-                break;
-            case "selectedLeadFollowUpOption":
-                dispatch(updateAdvancedFilters({field: "selectedLeadFollowUpOption", value: initialLeadState.selectedLeadFollowUpOption}))
-                break;
-            case "selectedLeadDateOption":
-                dispatch(updateAdvancedFilters({field: "selectedLeadDateOption", value: initialLeadState.selectedLeadDateOption}))
-                break;
-            default:
-                console.warn(`No dispatch action defined for key: ${optionKey}`);
-        }
-    };
-
-    // Clear all options
-    const clearAllOptions = () => {
-        activeFilters.forEach((filter) => removeOption(filter.key));
-    };
+    // Filter out only active filters (those with non-null values)
+    const activeFilters = filters.filter(filter => filter.value);
 
     return (
         activeFilters.length > 0 && (
             <View style={styles.container}>
                 <View style={styles.tagsContainer}>
-                    {activeFilters.map((filter, index) => (
-                        <View key={index} style={styles.tag}>
-                            <Text style={styles.tagText}>{String(filter.value)}</Text>
-                            <TouchableOpacity onPress={() => removeOption(filter.key)}>
-                                <Text style={styles.closeButton}>x</Text>
+                    {activeFilters.map(({key, value, clearFilter}) => (
+                        <View key={key} style={styles.tag}>
+                            <Text style={styles.tagText}>{value}</Text>
+                            <TouchableOpacity style={{alignItems: "center"}} onPress={() => {
+                                clearFilter();
+                                dispatch(loadLeadsFromDb());
+                            }}>
+                                <Ionicons name="close" size={18} color={Colors.highlight}/>
                             </TouchableOpacity>
                         </View>
                     ))}
-                    <TouchableOpacity onPress={clearAllOptions} style={styles.clearAllButton}>
+                    <TouchableOpacity onPress={() => {
+                        dispatch(clearAdvancedFilters());
+                        dispatch(loadLeadsFromDb());
+                    }} style={styles.clearAllButton}>
                         <Text style={styles.clearAll}>Clear All</Text>
                     </TouchableOpacity>
                 </View>
@@ -136,6 +137,7 @@ const styles = StyleSheet.create({
     tagText: {
         color: Colors.highlight,
         marginRight: 5,
+        marginBottom: 2,
     },
     closeButton: {
         color: Colors.highlight,

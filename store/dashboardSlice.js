@@ -13,6 +13,7 @@ const initialDashboardState = {
   expenseValues: {
     totalBillCount: 0,
     totalSalesValue: 0,
+    net_sales_without_expense: 0,
     totalExpenseValue: 0,
     avgBillValue: 0,
   },
@@ -639,6 +640,7 @@ export const dashboardSlice = createSlice({
       state.expenseValues.totalSalesValue = action.payload.total_sales_value;
       state.expenseValues.avgBillValue = action.payload.total_expense;
       state.expenseValues.totalExpenseValue = action.payload.avg_bill_value;
+      state.expenseValues.net_sales_without_expense = action.payload.net_sales_without_expense
     },
     updateListData(state, action) {
       state.listData.totalAppointments = action.payload.total_appointments;

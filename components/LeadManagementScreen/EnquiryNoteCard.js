@@ -44,6 +44,7 @@ const enquiryNoteCard = (props) => {
         <View style={styles.enquiryNoteCard}>
             {isEditEnquiryNotesModalVisible && <EnquiryNotesModal refreshLeadsData={props.refreshLeadsData}
                                                                   edit={true}
+                                                                  leadProfileToastRef={props.leadProfileToastRef}
                                                                   lead={props.lead}
                                                                   isVisible={isEditEnquiryNotesModalVisible}
                                                                   onCloseModal={() => {
