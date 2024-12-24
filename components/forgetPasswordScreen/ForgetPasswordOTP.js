@@ -5,13 +5,13 @@ import OtpInputBox from "../verificationCodeScreen/otpInputBox";
 import {Ionicons} from '@expo/vector-icons';
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useState} from "react";
-import sendOTPApi from "../../util/apis/sendOTPApi";
+import sendOTPApi from "../../apis/authApis/sendOTPApi";
 import {useDispatch} from "react-redux";
-import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
+import authenticateWithOTPApi from "../../apis/authApis/authenticateWithOTPApi";
 import {useNavigation} from "@react-navigation/native";
 import {updateAuthStatus} from "../../store/authSlice";
-import verifyOTPAPI from "../../util/apis/verifyOTPAPI";
-import forgetPasswordAPI from "../../util/apis/forgetPasswordAPI";
+import verifyOTPAPI from "../../apis/authApis/verifyOTPAPI";
+import forgetPasswordAPI from "../../apis/authApis/forgetPasswordAPI";
 
 export default function ForgetPasswordOTP(props) {
     const [otp, setOtp] = useState("");

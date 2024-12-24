@@ -39,7 +39,7 @@
 
 import axios from "axios";
 import {useSelector} from "react-redux";
-import {formatDate} from "../Helpers";
+import {formatDate} from "../../util/Helpers";
 import * as SecureStore from 'expo-secure-store';
 
 export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {

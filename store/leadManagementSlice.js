@@ -2,11 +2,10 @@ import {createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from "@env";
 import * as SecureStore from 'expo-secure-store';
-import LeadStatusAPI from "../util/apis/leadStatusAPI";
-import LeadSourcesAPI from "../util/apis/leadSourcesAPI";
-import getLeadsAPI from "../util/apis/getLeadsAPI";
+import LeadStatusAPI from "../apis/leadManagementAPIs/leadStatusAPI";
+import LeadSourcesAPI from "../apis/leadManagementAPIs/leadSourcesAPI";
+import getLeadsAPI from "../apis/leadManagementAPIs/getLeadsAPI";
 import moment from "moment";
-
 export const loadLeadStatusesFromDb = () => async (dispatch) => {
     const response = await LeadStatusAPI();
     dispatch(updateLeadStatuses(response.data.data))

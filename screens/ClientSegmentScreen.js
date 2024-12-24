@@ -30,7 +30,7 @@ import {
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
 import { clearClientsList, loadClientCountFromDb, loadClientsFromDb } from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
-import { clientFilterAPI } from "../util/apis/clientFilterAPI";
+import { clientFilterAPI } from "../apis/ClientSegmentAPIs/clientFilterAPI";
 import axios from "axios";
 import { checkNullUndefined, convertAppliedFilters } from "../util/Helpers";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
