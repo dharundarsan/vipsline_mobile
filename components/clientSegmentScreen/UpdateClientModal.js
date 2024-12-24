@@ -221,6 +221,8 @@ const UpdateClientModal = ((props) => {
                         onSave={(callback) => {
                             phoneNoRef.current = callback;
                         }}
+
+
                     />
                     <CustomTextInput
                         type="email"
