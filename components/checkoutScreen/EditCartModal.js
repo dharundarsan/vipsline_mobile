@@ -8,7 +8,7 @@ import MembershipItem from "./MembershipItem";
 import CustomTextInput from "../../ui/CustomTextInput";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import getDiscountAPI from "../../util/apis/getDiscountAPI";
+import getDiscountAPI from "../../apis/checkoutAPIs/getDiscountAPI";
 import Divider from "../../ui/Divider";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -17,7 +17,7 @@ import {
     updateCalculatedPrice,
     updateCustomItem,
 } from "../../store/cartSlice";
-import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import calculateCartPriceAPI from "../../apis/checkoutAPIs/calculateCartPriceAPI";
 import {formatDate} from "../../util/Helpers";
 import * as Haptics from "expo-haptics";
 import Toast from "../../ui/Toast";

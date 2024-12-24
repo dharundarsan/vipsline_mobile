@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
-import {checkAPIError} from "../Helpers";
+import {checkAPIError} from "../../util/Helpers";
 import moment from "moment";
 
 const getLeadsAPI = async (pageNo, pageSize, search_term, advancedFilters,) => {

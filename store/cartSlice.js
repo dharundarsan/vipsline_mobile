@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 import axios from "axios";
 import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
-import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
+import calculateCartPriceAPI from "../apis/checkoutAPIs/calculateCartPriceAPI";
 import {formatDate} from "../util/Helpers";
 import * as SecureStore from 'expo-secure-store';
 import {useState} from "react";

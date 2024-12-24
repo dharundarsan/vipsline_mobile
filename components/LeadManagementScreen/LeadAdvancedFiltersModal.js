@@ -4,12 +4,12 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons, MaterialCommunityIcons, MaterialIcons} from "@expo/vector-icons";
 import React, {useEffect, useLayoutEffect, useState} from "react";
 import Colors from "../../constants/Colors";
-import deleteLeadAPI from "../../util/apis/deleteLeadAPI";
+import deleteLeadAPI from "../../apis/leadManagementAPIs/deleteLeadAPI";
 import {clearAdvancedFilters, loadLeadsFromDb, updateAdvancedFilters} from "../../store/leadManagementSlice";
 import {updateNavigationState} from "../../store/NavigationSlice";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {useDispatch, useSelector} from "react-redux";
-import getLeadCampaignsAPI from "../../util/apis/getLeadCampaignsAPI";
+import getLeadCampaignsAPI from "../../apis/leadManagementAPIs/getLeadCampaignsAPI";
 import {Dropdown} from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {formatDateYYYYMMDDD, shadowStyling} from "../../util/Helpers";
@@ -43,7 +43,7 @@ const LeadAdvancedFiltersModal = (props) => {
 
     useLayoutEffect(() => {
         const api = async () => {
-            const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "") ? 0 : leadSource.id)
+            const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "" || leadSource === undefined) ? 0 : leadSource.id)
             setCampaignList(response.data.data);
         }
         api();
@@ -312,7 +312,7 @@ const LeadAdvancedFiltersModal = (props) => {
                     onChangeValue={async (object) => {
                         dispatch(updateAdvancedFilters({field: "lead_source", value: object}))
                         dispatch(updateAdvancedFilters({field: "lead_campaign", value: undefined}))
-                        const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "") ? 0 : leadSource.id)
+                        const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "" || leadSource === undefined) ? 0 : leadSource.id)
                         setCampaignList(response.data.data);
                     }}
                     dropdownItems={leadSources}

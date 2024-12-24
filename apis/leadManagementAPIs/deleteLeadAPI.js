@@ -1,12 +1,12 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
-import {checkAPIError} from "../Helpers";
+import {checkAPIError} from "../../util/Helpers";
 
-const editLeadAPI = async (data) => {
+const deleteLeadAPI = async (leadId) => {
     try {
-        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/leads/editLeadsForBusiness", {
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/leads/deleteLeadsForBusiness", {
             business_id: await SecureStore.getItemAsync('businessId'),
-            ...data
+            leads_id: leadId
         }, {
             headers: {
                 'Authorization': `Bearer ${await SecureStore.getItemAsync('authKey')}`
@@ -19,4 +19,4 @@ const editLeadAPI = async (data) => {
     }
 }
 
-export default editLeadAPI;
+export default deleteLeadAPI;

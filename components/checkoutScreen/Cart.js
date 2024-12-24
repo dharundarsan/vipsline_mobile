@@ -14,7 +14,7 @@ import AddItemModal from "./AddItemModal";
 import CartItem from "./CartItem";
 import CheckoutSection from "./CheckoutSection";
 import {useDispatch, useSelector} from "react-redux";
-import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import calculateCartPriceAPI from "../../apis/checkoutAPIs/calculateCartPriceAPI";
 import {updateDiscount} from '../../store/cartSlice';
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";

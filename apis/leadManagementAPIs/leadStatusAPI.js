@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
-import {checkAPIError} from "../Helpers";
+import {checkAPIError} from "../../util/Helpers";
 
 const leadStatusAPI = async () => {
     try {

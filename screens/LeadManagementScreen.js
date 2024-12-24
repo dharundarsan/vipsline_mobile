@@ -27,7 +27,7 @@ import {clientFilterNames} from "../util/chooseFilter";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
 import RadioButton from "../ui/RadioButton";
 import {loadLeadsFromDb, loadLeadSourcesFromDb, loadLeadStatusesFromDb} from "../store/leadManagementSlice";
-import getLeadsAPI from "../util/apis/getLeadsAPI";
+import getLeadsAPI from "../apis/leadManagementAPIs/getLeadsAPI";
 import CreateClientModal from "../components/checkoutScreen/CreateClientModal";
 import CreateLeadModal from "../components/LeadManagementScreen/CreateLeadModal";
 import * as Haptics from "expo-haptics";
