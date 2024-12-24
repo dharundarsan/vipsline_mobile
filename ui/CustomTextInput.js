@@ -223,6 +223,9 @@ const CustomTextInput = (props) => {
                             }
                         }}
                         keyboardType="number-pad"
+
+
+
                     />
                 </View>
             </>

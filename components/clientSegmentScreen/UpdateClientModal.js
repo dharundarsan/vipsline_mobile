@@ -241,7 +241,6 @@ const UpdateClientModal = ((props) => {
                         // onSave={(callback) => {
                         //     emailRef.current = callback;
                         // }}
-
                     />
                     <CustomTextInput
                         type="dropdown"
