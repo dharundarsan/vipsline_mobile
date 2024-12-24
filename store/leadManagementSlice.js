@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import LeadStatusAPI from "../util/apis/leadStatusAPI";
 import LeadSourcesAPI from "../util/apis/leadSourcesAPI";
 import getLeadsAPI from "../util/apis/getLeadsAPI";
+import moment from "moment";
 
 export const loadLeadStatusesFromDb = () => async (dispatch) => {
     const response = await LeadStatusAPI();
@@ -46,10 +47,10 @@ export const initialLeadState = {
     searchTerm: "",
 
     // AdvancedFilters
-    followupDate: new Date(),
-    followupEndDate: new Date(),
-    fromDate: new Date(),
-    toDate: new Date(),
+    followupDate: moment().toISOString(),
+    followupEndDate: moment().toISOString(),
+    fromDate: moment().toISOString(),
+    toDate: moment().toISOString(),
     gender: undefined,
     leadFollowUp: undefined,
     lead_campaign: undefined,
