@@ -7,8 +7,8 @@ import textTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus} from "../../store/authSlice";
 import {useNavigation} from "@react-navigation/native";
-import authenticateWithOTPApi from "../../apis/authApis/authenticateWithOTPApi";
-import sendOTPApi from '../../apis/authApis/sendOTPApi';
+import authenticateWithOTPApi from "../../apis/authAPIs/authenticateWithOTPApi";
+import sendOTPApi from '../../apis/authAPIs/sendOTPApi';
 import Toast from "../../ui/Toast";
 
 export default function VerificationCodeBody(props) {

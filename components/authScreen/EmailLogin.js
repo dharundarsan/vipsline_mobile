@@ -5,7 +5,7 @@ import {useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
 import CheckBox from 'react-native-check-box'
-import findUser from "../../apis/authApis/findUserApi";
+import findUser from "../../apis/authAPIs/findUserApi";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch} from "react-redux";
 import {updateAuthStatus, updateAuthToken} from "../../store/authSlice";

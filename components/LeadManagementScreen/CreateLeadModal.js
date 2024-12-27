@@ -166,20 +166,6 @@ const CreateLeadModal = (props) => {
                           onCancel={() => {
                               setIsConfirmLeadDeleteModalVisible(false);
                           }}/>
-        {/*{isConfirmLeadDeleteModalVisible && <ConfirmDeleteLeadModal isVisible={isConfirmLeadDeleteModalVisible}*/}
-        {/*                                                            setVisible={setIsConfirmLeadDeleteModalVisible}*/}
-        {/*                                                            onCloseModal={() => setIsConfirmLeadDeleteModalVisible(false)}*/}
-        {/*                                                            ActionOptionName={"Delete Lead"}*/}
-        {/*                                                            header={"Delete Lead"}*/}
-        {/*                                                            content={"Are you sure you want to delete this lead?"}*/}
-        {/*                                                            onConfirm={() => {*/}
-        {/*                                                                props.onCloseModal()*/}
-        {/*                                                                props.refreshData()*/}
-        {/*                                                                navigation.goBack();*/}
-        {/*                                                            }}*/}
-        {/*                                                            data={props.data}*/}
-        {/*/>}*/}
-
         <View style={styles.closeAndHeadingContainer}>
             <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Lead" : "Create Lead"}</Text>
             <PrimaryButton
