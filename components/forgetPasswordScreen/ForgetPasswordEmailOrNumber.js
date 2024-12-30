@@ -6,7 +6,7 @@ import {useNavigation} from "@react-navigation/native";
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useRef, useState} from "react";
 import axios from "axios";
-import forgetPasswordAPI from "../../util/apis/forgetPasswordAPI";
+import forgetPasswordAPI from "../../apis/authApis/forgetPasswordAPI";
 import Toast from "../../ui/Toast";
 
 export default function ForgetPasswordEmailOrNumber(props) {

@@ -79,6 +79,7 @@ const StaffDashboard = () => {
       value: pieData.chart_series[index],
       text: percentage,
       color: pieChartColorCode[index].color,
+      tooltipText:pieData.label_list[index]
     };
   });
 

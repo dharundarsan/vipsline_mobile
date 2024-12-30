@@ -39,7 +39,7 @@
 
 import axios from "axios";
 import {useSelector} from "react-redux";
-import {formatDate} from "../Helpers";
+import {formatDate} from "../../util/Helpers";
 import * as SecureStore from 'expo-secure-store';
 
 export default async function checkoutBookingAPI(clientDetails, cartSliceState, prepaidStatus, prepaidAmount) {
@@ -188,7 +188,9 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             walkInUserId: clientDetails.id,
             walkin: "yes",
             wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
-
+            isRewardSelected:cartSliceState?.rewardAllocated?.isRewardSelected,
+            redeemed_points:cartSliceState?.rewardAllocated?.rewardPoints,
+            reward_amt:cartSliceState?.rewardAllocated?.rewardAmount
         }, {
             headers: {
                 Authorization: `Bearer ${authToken}`

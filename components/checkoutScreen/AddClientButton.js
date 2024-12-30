@@ -160,7 +160,7 @@ const AddClientButton = (props) => {
                                 {
                                     clientInfo.membershipDetails.length !== 0
                                     || clientInfo.packageDetails.length !== 0 
-                                    || (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.details.reward_balance !== 0)
+                                    // || (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.details.reward_balance !== 0)
                                     || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0) 
                                         ? (
                                             isClientInfo ? (
@@ -264,7 +264,7 @@ const AddClientButton = (props) => {
                                         <Text style={{fontSize:12}}> Package</Text>
                                     </PrimaryButton>
                                 }
-                                {
+                                {/* {
                                     clientInfo.details.reward_balance !== 0 &&
                                     clientInfo.details.reward_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
@@ -273,7 +273,7 @@ const AddClientButton = (props) => {
                                             Points <Text style={{color: Colors.highlight}}>{clientInfo.rewardPointBalance}</Text>
                                         </Text>
                                     </PrimaryButton>
-                                }
+                                } */}
                                 </View>
                             </ScrollView>
                             : null
@@ -336,7 +336,8 @@ const styles = StyleSheet.create({
         // justifyContent: "space-around",
         flexDirection: "row",
         gap:10,
-        marginTop:15,
+        marginTop:3,
+        marginBottom:7,
         paddingHorizontal:10
     },
     activePlan: {

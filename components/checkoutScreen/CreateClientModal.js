@@ -7,7 +7,7 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import Divider from "../../ui/Divider";
-import createNewClientAPI from "../../util/apis/createNewClientAPI";
+import createNewClientAPI from "../../apis/ClientSegmentAPIs/createNewClientAPI";
 import {checkNullUndefined, formatDate, showToast} from "../../util/Helpers";
 import {useDispatch} from "react-redux";
 import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";

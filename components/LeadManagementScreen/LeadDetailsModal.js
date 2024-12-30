@@ -14,7 +14,7 @@ import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import SearchBar from "../../ui/SearchBar";
 import Divider from "../../ui/Divider";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import LeadCard from "./LeadCard";
 import {AntDesign, Feather, FontAwesome6, Ionicons, MaterialIcons} from "@expo/vector-icons";
 import {useDispatch, useSelector} from "react-redux";
@@ -27,20 +27,24 @@ import {clientFilterNames} from "../../util/chooseFilter";
 import EntryModel from "../clientSegmentScreen/EntryModel";
 import RadioButton from "../../ui/RadioButton";
 import {loadLeadsFromDb, loadLeadSourcesFromDb, loadLeadStatusesFromDb} from "../../store/leadManagementSlice";
-import getLeadsAPI from "../../util/apis/getLeadsAPI";
+import getLeadsAPI from "../../apis/leadManagementAPIs/getLeadsAPI";
 import CreateClientModal from "../checkoutScreen/CreateClientModal";
 import CreateLeadModal from "./CreateLeadModal";
 import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../../store/cartSlice";
 import {shadowStyling} from "../../util/Helpers";
 import ClientCard from "../clientSegmentScreen/ClientCard";
-import getLeadDetailsAPI from "../../util/apis/getLeadDetailsAPI";
+import getLeadDetailsAPI from "../../apis/leadManagementAPIs/getLeadDetailsAPI";
 import ContentLoader from "react-native-easy-content-loader";
 import EnquiryNoteCard from "./EnquiryNoteCard";
-import getFollowUpDetailsAPI from "../../util/apis/getFollowUpDetailsAPI";
+import getFollowUpDetailsAPI from "../../apis/leadManagementAPIs/getFollowUpDetailsAPI";
 import EnquiryNotesModal from "./EnquiryNotesModal";
+import {useNavigation} from "@react-navigation/native";
+import {updateNavigationState} from "../../store/NavigationSlice";
+import {SafeAreaView} from "react-native-safe-area-context";
+import Toast from "../../ui/Toast";
 
-const LeadDetailsModal = (props) => {
+const LeadDetailsModal = ({route}) => {
     const dispatch = useDispatch();
     const [selectedTab, setSelectedTab] = useState(0);
     const [leadProfile, setLeadProfile] = useState([]);
@@ -49,6 +53,14 @@ const LeadDetailsModal = (props) => {
     const leadSources = useSelector(state => state.leads.leadSources);
     const [isEnquiryNotesModalVisible, setIsEnquiryNotesModalVisible] = useState(false);
     const [isEditLeadModalVisible, setIsEditLeadModalVisible] = useState(false);
+    const {leadDetails, leadManagementToastRef} = route.params; // Access the data passed
+    const navigation = useNavigation();
+
+    const leadProfileToastRef = useRef();
+
+    useEffect(() => {
+        dispatch(updateNavigationState("Lead Profile"));
+    }, []);
 
     const styles = StyleSheet.create({
         leadDetailsModal: {
@@ -153,9 +165,9 @@ const LeadDetailsModal = (props) => {
 
     const apiCalls = async () => {
         setIsLoading(true)
-        let response = await getLeadDetailsAPI(props.lead.lead_id, props.lead.lead_source);
+        let response = await getLeadDetailsAPI(route.params.leadDetails.lead_id, route.params.leadDetails.lead_source);
         setLeadProfile(response.data.data[0]);
-        response = await getFollowUpDetailsAPI(props.lead.lead_id);
+        response = await getFollowUpDetailsAPI(route.params.leadDetails.lead_id);
         setFollowUpDetails(response.data.data)
         setIsLoading(false)
     }
@@ -165,14 +177,17 @@ const LeadDetailsModal = (props) => {
 
     const validateField = (value, fallback = "Not added") => (value ? value : fallback);
 
-    return <Modal visible={props.isVisible} style={styles.leadDetailsModal} animationType={"slide"}
-                  presentationStyle={"pageSheet"}>
+    return <SafeAreaView style={{flex:1, backgroundColor:"white"}}>
+        <Toast ref={leadProfileToastRef} />
+        <View style={styles.leadDetailsModal} animationType={"none"}
+                               presentationStyle={"pageSheet"}>
         {isEditLeadModalVisible && <CreateLeadModal
             isVisible={isEditLeadModalVisible}
             onCloseModal={() => setIsEditLeadModalVisible(false)}
             refreshData={apiCalls}
             edit={true}
-            data={{...leadProfile, ...props.lead}}
+            leadProfileToastRef={leadProfileToastRef}
+            data={{...leadProfile, ...route.params.leadDetails}}
         />}
         <View style={styles.header}>
             <View style={styles.headerLeadContainer}>
@@ -181,17 +196,20 @@ const LeadDetailsModal = (props) => {
                         color: Colors.highlight,
                         fontWeight: "bold",
                         fontSize: 20
-                    }}>{props.lead.name[0].toUpperCase()}</Text>
+                    }}>{route.params.leadDetails.name[0].toUpperCase()}</Text>
                 </View>
                 <View style={{justifyContent: "center", gap: 2}}>
-                    <Text style={[textTheme.labelLarge, {fontSize: 16}]}>{props.lead.name}</Text>
-                    <Text style={{fontWeight: "500", color: Colors.grey800}}>{props.lead.mobile}</Text>
+                    <Text style={[textTheme.labelLarge, {fontSize: 16}]}>{route.params.leadDetails.name}</Text>
+                    <Text style={{fontWeight: "500", color: Colors.grey800}}>{route.params.leadDetails.mobile}</Text>
                 </View>
             </View>
             <PrimaryButton
                 buttonStyle={styles.backButton}
                 pressableStyle={styles.backButtonPressable}
-                onPress={props.onCloseModal}
+                onPress={() => {
+                    dispatch(updateNavigationState(null));
+                    navigation.goBack()
+                }}
             >
                 <AntDesign name="arrowleft" size={24} color="black"/>
             </PrimaryButton>
@@ -201,12 +219,12 @@ const LeadDetailsModal = (props) => {
             <Pressable style={styles.tab} onPress={() => {
                 setSelectedTab(0)
             }}>
-                <Text style={[selectedTab === 0 ? {color: Colors.highlight} : {}, {fontSize: 15}]}>Lead Profile</Text>
+                <Text style={[selectedTab === 0 ? {color: Colors.highlight} : {}, {fontSize: 15, fontWeight:"bold"}]}>Lead Profile</Text>
             </Pressable>
             <Pressable style={styles.tab} onPress={() => {
                 setSelectedTab(1)
             }}>
-                <Text style={[selectedTab === 1 ? {color: Colors.highlight} : {}, {fontSize: 15}]}>Enquiry Notes</Text>
+                <Text style={[selectedTab === 1 ? {color: Colors.highlight} : {}, {fontSize: 15, fontWeight:"bold"}]}>Enquiry Notes</Text>
             </Pressable>
             <View style={styles.tabIndicator}/>
         </View>
@@ -318,15 +336,18 @@ const LeadDetailsModal = (props) => {
                 title={false}
             /> : <View style={styles.enquiryNotesContent}>
                 {isEnquiryNotesModalVisible &&
-                    <EnquiryNotesModal refreshLeadsData={apiCalls} isVisible={isEnquiryNotesModalVisible}
-                                       lead={props.lead} onCloseModal={() => {
+                    <EnquiryNotesModal refreshLeadsData={apiCalls} leadProfileToastRef={leadProfileToastRef} isVisible={isEnquiryNotesModalVisible}
+                                       lead={route.params.leadDetails} onCloseModal={() => {
                         setIsEnquiryNotesModalVisible(false)
                     }}/>}
-                {followUpDetails.length === 0 ? <View style={{height:400, justifyContent: "center", alignItems: "center"}}>
+                {followUpDetails.length === 0 ?
+                    <View style={{height: 400, justifyContent: "center", alignItems: "center"}}>
                         <Text style={textTheme.titleSmall}>No Enquiry Notes Added</Text>
                     </View> :
                     <FlatList scrollEnabled={false} data={followUpDetails}
-                              renderItem={({item}) => <EnquiryNoteCard lead={props.lead} refreshLeadsData={apiCalls}
+                              renderItem={({item}) => <EnquiryNoteCard lead={route.params.leadDetails}
+                                                                       leadProfileToastRef={leadProfileToastRef}
+                                                                       refreshLeadsData={apiCalls}
                                                                        followup={item}/>}/>}
             </View>}
         </ScrollView>}
@@ -337,7 +358,8 @@ const LeadDetailsModal = (props) => {
                                              pressableStyle={{flex: 1}}>
             <MaterialIcons name="sticky-note-2" size={24} color="white"/>
         </PrimaryButton>}
-    </Modal>
+    </View>
+    </SafeAreaView>
 }
 
 

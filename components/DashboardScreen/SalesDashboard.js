@@ -24,7 +24,7 @@ import SalesDashboardDateLoader from "./SalesDashboardDateLoader";
 
 const SalesDashboard = () => {
   const dispatch = useDispatch();
-  const {getLocation} = useLocationContext()
+  const { getLocation } = useLocationContext()
   useFocusEffect(useCallback(() => {
     getLocation("Sales Dashboard");
   }, []))
@@ -63,13 +63,13 @@ const SalesDashboard = () => {
   const totalAppointmentOverTime = useSelector((state) => state.dashboardDetails.totalAppointmentOverTime);
 
   const billItemTotalValue = calculateTotalValue(billItemDetails[0].series);
-  
+
   const servicesTotalValue = calculateTotalValue(topRevenueDetails[0].chart_series);
   const productsTotalValue = calculateTotalValue(topProductDetails[0].chart_series);
 
   const data = billItemDetails[0].series.map((value) => ({ value })) || [];
-  const totalSalesOverTimeData = totalSalesOverTime.count.map((value) => ({ value }))
-  const totalAppointmentsOverTimeData = totalAppointmentOverTime.count.map((value) => ({ value }))
+  const totalSalesOverTimeData = totalSalesOverTime.count.map((value) => ({ value: value, dataPointText: value.toString() }))
+  const totalAppointmentsOverTimeData = totalAppointmentOverTime.count.map((value) => ({ value: value, dataPointText: value.toString() }))
 
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
   const percentageBillData = data.map((item, index) => {
@@ -80,19 +80,22 @@ const SalesDashboard = () => {
       value: item.value,
       text: percentage <= 2.0 ? "" : `${percentage}%`,
       color: pieChartColorCode[index]?.color || "#000",
+      tooltipText:billItemDetails[0].labels[index]
     };
   });
 
   const togglePercentageData = processPieChartData(
     topRevenueDetails[0].services_list,
-    "salesPercent"
+    "salesPercent",
+    topRevenueDetails[0].label_list,
   );
 
   const toggleProductData = processPieChartData(
     topProductDetails[0].services_list,
-    "salesProduct"
+    "salesProduct",
+    topProductDetails[0].label_list,
   );
-
+  
   const valueMap = {
     "Total Appointments": listStoreData.totalAppointments,
     "Online Sales": listStoreData.onlineSales,
@@ -120,8 +123,8 @@ const SalesDashboard = () => {
           loadSalesDashboard(
             formatDateYYYYMMDD(item.day),
             item.day !== -6 && item.day !== -29
-            ? formatDateYYYYMMDD(item.day)
-            : formatDateYYYYMMDD(0)
+              ? formatDateYYYYMMDD(item.day)
+              : formatDateYYYYMMDD(0)
           )
         );
       }
@@ -196,12 +199,12 @@ const SalesDashboard = () => {
 
   const removeZeroLineSalesOverTime = removeZero(roundUp(maxTotalSalesValue)) || 10;
   const roundLineSalesOverTime = roundUp(maxTotalSalesValue)
-  
+
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
       <View style={styles.container}>
         {
-          isPageLoading ? <SalesDashboardScreenLoader/> :
+          isPageLoading ? <SalesDashboardScreenLoader /> :
             <>
               <View style={isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
                 <Dropdown
@@ -311,88 +314,90 @@ const SalesDashboard = () => {
               </View>
               {
                 isDateDataLoading ?
-                  <SalesDashboardDateLoader/> :
-                <>
-                <View style={styles.statisticContainer}>
-                {salesCardData.map((item, index) => {
-                  const expenseKeys = Object.keys(expenseValues);
-                  const expenseValue = expenseValues[expenseKeys[index]];
-                  return (
-                    <DashboardCard
-                      key={index}
-                      icon={item.icon}
-                      title={item.title}
-                      color={item.color}
-                      value={expenseValue}
-                    />
-                  );
-                })}
-              </View>
-              <View style={styles.listDataContainer}>
-                {listData.map((item, index) => {
-                  const value = valueMap[item.title] || 0;
-                  return (
-                    <ListIconData
-                      key={index}
-                      icon={item.icon}
-                      title={item.title}
-                      value={value}
-                    />
-                  );
-                })}
-              </View>
-
-              <View style={styles.commonContainer}>
-                <Text
-                  style={[
-                    textTheme.titleMedium,
-                    { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
-                  ]}
-                >
-                  Payment Mode
-                </Text>
-                {paymentStoreData.length > 0 ? (
-                  paymentStoreData.map((item, index) => {
-                    const title = convertToTitleCase(item.mode_of_payment);
-                    return (
-                      title !== "Nil" && (
-                        <View key={index}>
-                          <ServiceList title={title} value={item.net_sales} />
-                          {index !== paymentStoreData.length - 1 && <Divider />}
-                        </View>
-                      )
-                    );
-                  })
-                ) : (
-                  <Text style={{ textAlign: "center", marginBottom: 20 }}>
-                    No data found!{" "}
-                  </Text>
-                )}
-              </View>
-
-              <View style={styles.commonContainer}>
-                <Text
-                  style={[
-                    textTheme.titleMedium,
-                    { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
-                  ]}
-                >
-                  Total Sales
-                </Text>
-                {salesData.map((item, index) => {
-                  const revenueKeys = Object.keys(totalSalesRevenue);
-                  const revenueValue = totalSalesRevenue[revenueKeys[index]];
-                  return (
-                    <View key={index}>
-                      <ServiceList title={item.title} value={revenueValue} />
-                      {index !== salesData.length - 1 && <Divider />}
+                  <SalesDashboardDateLoader /> :
+                  <>
+                    <View style={styles.statisticContainer}>
+                      {salesCardData.map((item, index) => {
+                        const expenseKeys = Object.keys(expenseValues);
+                        const expenseValue = expenseValues[expenseKeys[index]];
+                        return (
+                          <DashboardCard
+                            key={index}
+                            icon={item.icon}
+                            title={item.title}
+                            color={item.color}
+                            value={expenseValue}
+                            popoverText={item.popoverText}
+                          />
+                        );
+                      })}
                     </View>
-                  );
-                })}
-              </View>
-                </>
+                    <View style={styles.listDataContainer}>
+                      {listData.map((item, index) => {
+                        const value = (item.title === "Online Sales" || item.title === "Cancelled bill value")
+                          ? "₹ " + valueMap[item.title] : valueMap[item.title] || 0;
+                        return (
+                          <ListIconData
+                            key={index}
+                            icon={item.icon}
+                            title={item.title}
+                            value={value}
+                          />
+                        );
+                      })}
+                    </View>
+
+                    <View style={styles.commonContainer}>
+                      <Text
+                        style={[
+                          textTheme.titleMedium,
+                          { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
+                        ]}
+                      >
+                        Payment Mode
+                      </Text>
+                      {paymentStoreData.length > 0 ? (
+                        paymentStoreData.map((item, index) => {
+                          const title = convertToTitleCase(item.mode_of_payment);
+                          return (
+                            title !== "Nil" && (
+                              <View key={index}>
+                                <ServiceList title={title} value={item.net_sales} />
+                                {index !== paymentStoreData.length - 1 && <Divider />}
+                              </View>
+                            )
+                          );
+                        })
+                      ) : (
+                        <Text style={{ textAlign: "center", marginBottom: 20 }}>
+                          No data found!{" "}
+                        </Text>
+                      )}
+                    </View>
+
+                    <View style={styles.commonContainer}>
+                      <Text
+                        style={[
+                          textTheme.titleMedium,
+                          { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
+                        ]}
+                      >
+                        Total Sales
+                      </Text>
+                      {salesData.map((item, index) => {
+                        const revenueKeys = Object.keys(totalSalesRevenue);
+                        const revenueValue = totalSalesRevenue[revenueKeys[index]];
+                        return (
+                          <View key={index}>
+                            <ServiceList title={item.title} value={revenueValue} />
+                            {index !== salesData.length - 1 && <Divider />}
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </>
               }
-              </>
+            </>
         }
 
 
@@ -442,7 +447,7 @@ const SalesDashboard = () => {
           max={roundLineSalesOverTime}
           sections={removeZeroLineSalesOverTime === "1" ? 10 : removeZeroLineSalesOverTime}
           page="SalesOverTime"
-          // key1={"SalesOverTime"}
+        // key1={"SalesOverTime"}
         />
         <LineChartBox
           title={"Appointments over time"}
@@ -576,7 +581,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     // alignItems: "center",
     paddingVertical: 30,
-    paddingLeft:10,
+    // paddingLeft:10,
     // overflow: "scroll",
   },
   piechart: {

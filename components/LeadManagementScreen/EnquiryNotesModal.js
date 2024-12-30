@@ -10,9 +10,9 @@ import CustomTextInput from "../../ui/CustomTextInput";
 import {useDispatch, useSelector} from "react-redux";
 import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../../store/cartSlice";
-import addEnquiryNotesAPI from "../../util/apis/addEnquiryNotesAPI";
+import addEnquiryNotesAPI from "../../apis/leadManagementAPIs/addEnquiryNotesAPI";
 import moment from "moment";
-import editEnquiryNotesAPI from "../../util/apis/editEnquiryNotesAPI";
+import editEnquiryNotesAPI from "../../apis/leadManagementAPIs/editEnquiryNotesAPI";
 import {loadLeadsFromDb} from "../../store/leadManagementSlice";
 
 const EnquiryNotesModal = (props) => {
@@ -79,6 +79,7 @@ const EnquiryNotesModal = (props) => {
 
         await dispatch(loadLeadsFromDb());
         props.refreshLeadsData();
+        props.leadProfileToastRef.current.show("Enquiry Notes Added Successfully")
         props.onCloseModal();
     }
 
@@ -122,6 +123,7 @@ const EnquiryNotesModal = (props) => {
 
         props.refreshLeadsData();
         await dispatch(loadLeadsFromDb());
+        props.leadProfileToastRef.current.show("Enquiry Notes Edited Successfully")
         props.onCloseModal();
     }
 
@@ -281,6 +283,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         paddingVertical: 20,
         gap: 10,
+        backgroundColor:"#FDFDFD",
+        zIndex:-1,
     },
     headerLeadProfile: {
         width: 45,

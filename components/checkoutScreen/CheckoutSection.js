@@ -25,9 +25,8 @@ import {
 } from "../../store/cartSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import MiniActionTextModal from "./MiniActionTextModal";
-import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
-import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
-import clearCartAPI from "../../util/apis/clearCartAPI";
+import calculateCartPriceAPI from "../../apis/checkoutAPIs/calculateCartPriceAPI";
+import clearCartAPI from "../../apis/checkoutAPIs/clearCartAPI";
 import { updateChargeData, updateDiscount, updateSalesNotes } from "../../store/cartSlice";
 import { checkNullUndefined, showToast } from "../../util/Helpers";
 import { loadBusinessesListFromDb } from "../../store/listOfBusinessSlice";
@@ -38,6 +37,7 @@ import * as Haptics from 'expo-haptics';
 import Toast from "../../ui/Toast";
 import { updateToastRef } from "../../store/toastSlice";
 import { checkoutScreenToast } from "../../screens/CheckoutScreen";
+import BottomActionCard from "../../ui/BottomActionCard";
 // import Toast from 'react-native-root-toast';
 
 
@@ -300,31 +300,50 @@ const CheckoutSection = (props) => {
             UpdateSalesNotes={UpdateSalesNotes}
             clearCharges={clearCharges}
         />}
-        {isDelete && <DeleteClient
-            isVisible={isDelete}
-            ActionOptionName={"Cancel Sale"}
-            onCloseModal={() => {
-                setIsDelete(false)
-                // setModalVisibility(false);
-                // dispatch(loadClientInfoFromDb(props.id))
-            }}
-            header={"Cancel Sale"}
-            content={"If you cancel this sale transaction will not be processed."}
-            onCloseClientInfoAfterDeleted={async () => {
-                // props.setVisible(false);
-                // props.setSearchQuery("");
-                // props.setFilterPressed("all_clients_count");
-                await clearCartAPI();
-                dispatch(modifyClientMembershipId({ type: "clear" }))
-                clearSaleNotes();
-                dispatch(clearLocalCart());
-                dispatch(clearClientInfo());
-                dispatch(clearCalculatedPrice())
-            }}
-            checkoutScreenToast={() => {
-                props.checkoutScreenToast("sale cancelled", 2000);
-            }}
-        />}
+        <BottomActionCard isVisible={isDelete}
+                          header={"Cancel Sale"}
+                          content={"If you cancel this sale transaction will not be processed."}
+                          onClose={() => {
+                              setIsDelete(false)
+                          }}
+                          onConfirm={async () => {
+                              await clearCartAPI();
+                              dispatch(modifyClientMembershipId({ type: "clear" }))
+                              clearSaleNotes();
+                              dispatch(clearLocalCart());
+                              dispatch(clearClientInfo());
+                              dispatch(clearCalculatedPrice())
+                              props.checkoutScreenToast("sale cancelled", 2000);
+                              setIsDelete(false)
+                          }}
+                          onCancel={() => setIsDelete(false)}
+                          confirmLabel={"Cancel Sale"}
+                          cancelLabel={"Cancel"}/>
+        {/*{isDelete && <DeleteClient*/}
+        {/*    isVisible={isDelete}*/}
+        {/*    ActionOptionName={"Cancel Sale"}*/}
+        {/*    onCloseModal={() => {*/}
+        {/*        setIsDelete(false)*/}
+        {/*        // setModalVisibility(false);*/}
+        {/*        // dispatch(loadClientInfoFromDb(props.id))*/}
+        {/*    }}*/}
+        {/*    header={"Cancel Sale"}*/}
+        {/*    content={"If you cancel this sale transaction will not be processed."}*/}
+        {/*    onCloseClientInfoAfterDeleted={async () => {*/}
+        {/*        // props.setVisible(false);*/}
+        {/*        // props.setSearchQuery("");*/}
+        {/*        // props.setFilterPressed("all_clients_count");*/}
+        {/*        await clearCartAPI();*/}
+        {/*        dispatch(modifyClientMembershipId({ type: "clear" }))*/}
+        {/*        clearSaleNotes();*/}
+        {/*        dispatch(clearLocalCart());*/}
+        {/*        dispatch(clearClientInfo());*/}
+        {/*        dispatch(clearCalculatedPrice())*/}
+        {/*    }}*/}
+        {/*    checkoutScreenToast={() => {*/}
+        {/*        props.checkoutScreenToast("sale cancelled", 2000);*/}
+        {/*    }}*/}
+        {/*/>}*/}
         {isModalOpen && <DropdownModal
             isVisible={isModalOpen}
             onCloseModal={() => {
@@ -375,7 +394,10 @@ const CheckoutSection = (props) => {
                 checkoutScreenToast={() => {
                     props.checkoutScreenToast("Sale Cancelled", 2000);
                 }}
-                price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} />
+                calculatedPrice={calculatedPrice}
+                price={calculatedPrice.length === 0 ? 0 : calculatedPrice[0].total_price} 
+                totalPriceToPay={calculatedPrice[0].total_price_to_pay}
+                />
         }
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
