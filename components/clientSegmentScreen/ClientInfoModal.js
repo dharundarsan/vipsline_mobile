@@ -106,6 +106,8 @@ export default function clientInfoModal(props) {
 
     }, [analyticDetails, details]);
 
+    console.log(JSON.stringify(salesData, null, 2));
+
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
     // const [selectedOption, setSelectedOption] = useState("");
@@ -285,7 +287,7 @@ export default function clientInfoModal(props) {
 
             />
     } else if (clientMoreDetails === "billActivity") {
-        content = checkNullUndefined(salesData) && checkNullUndefined(salesData.history_appointmentList.length) && salesData.history_appointmentList.length > 0 ?
+        content = checkNullUndefined(salesData) && checkNullUndefined(salesData.history_appointment_count) && salesData.history_appointment_count > 0 ?
             <BillingActivity
                 salesData={salesData}
                 clientId={details.id}
