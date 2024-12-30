@@ -198,8 +198,8 @@ const InvoiceModal = (props) => {
                 dropdownItems={[
                     "SMS",
                     "Email",
-                    "Thermal Print",
-                    "A4 Print",
+                    // "Thermal Print",
+                    // "A4 Print",
                     "Cancel Invoice"
                 ]}
                 iconImage={[
@@ -386,14 +386,14 @@ styles.heading]}>Invoice</Text>*/}
                                 props.onCloseModal();
                             }}
                         />
-                        <PrimaryButton
-                            onPress={() => setOptionModalVisibility(true)}
-                            buttonStyle={styles.backToCheckoutOptionsButton}>
-                            <MaterialIcons name="keyboard-arrow-down"
-                                           size={24}
-                                           color={Colors.background}
-                            />
-                        </PrimaryButton>
+                        {/*<PrimaryButton*/}
+                        {/*    onPress={() => setOptionModalVisibility(true)}*/}
+                        {/*    buttonStyle={styles.backToCheckoutOptionsButton}>*/}
+                        {/*    <MaterialIcons name="keyboard-arrow-down"*/}
+                        {/*                   size={24}*/}
+                        {/*                   color={Colors.background}*/}
+                        {/*    />*/}
+                        {/*</PrimaryButton>*/}
                     </View>
                     {
                         !isCancelled ?
@@ -700,8 +700,8 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     backToCheckoutButton: {
-        borderTopRightRadius: 0,
-        borderBottomRightRadius: 0,
+        // borderTopRightRadius: 0,
+        // borderBottomRightRadius: 0,
         flex: 4,
 
     },
