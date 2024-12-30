@@ -186,6 +186,7 @@ const LeadDetailsModal = ({route}) => {
             onCloseModal={() => setIsEditLeadModalVisible(false)}
             refreshData={apiCalls}
             edit={true}
+            leadManagementToastRef={leadManagementToastRef}
             leadProfileToastRef={leadProfileToastRef}
             data={{...leadProfile, ...route.params.leadDetails}}
         />}

@@ -144,7 +144,7 @@ const CreateLeadModal = (props) => {
         })
         await dispatch(loadLeadsFromDb());
         props.refreshData();
-        props.leadProfileToastRef.current.show("Lead Edited Successfully");
+        props.leadProfileToastRef.current.show("Lead Updated");
         props.onCloseModal();
     }
 
@@ -159,6 +159,7 @@ const CreateLeadModal = (props) => {
                               await dispatch(loadLeadsFromDb());
                               setIsConfirmLeadDeleteModalVisible(false);
                               dispatch(updateNavigationState("Lead Management Screen"));
+                              props.leadManagementToastRef.current.show("Lead Deleted Successfully");
                               props.onCloseModal()
                               props.refreshData()
                               navigation.goBack();
