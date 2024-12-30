@@ -28,23 +28,26 @@ export const salesCardData = [
     color:Colors.lightblue,
   },
   {
-    title: "Total Sales Value",
+    title: "Sales Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
-    color:Colors.lightpurple
+    color:Colors.lightpurple,
+    popoverText: "Total sales from all channels for the selected period"
   },{
     title: "Net Sales",
     icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
-    color:Colors.darkGreen
+    color:Colors.darkGreen,
+    popoverText: "Net Sales = Total sales(excluding tax) - expenses"
   },
   {
     title: "Avg. Bill Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalbillvalue.png"),
-    color:Colors.teal
+    color:Colors.teal,
+    popoverText: "Average sales value from all the channels for the selected period"
   },
   {
-    title: "Total Expense Value",
+    title: "Expense Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalexpense.png"),
-    color:Colors.neonblue
+    color:Colors.neonblue,
   },
 ];
 

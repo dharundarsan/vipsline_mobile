@@ -1,6 +1,6 @@
 import { pieChartColorCode } from "../../data/DashboardSelection";
 
-export const processPieChartData = (dataArray, pageType) => {
+export const processPieChartData = (dataArray, pageType,labelList) => {
   if (!dataArray || dataArray.length === 0) {
     return [
       {
@@ -8,6 +8,7 @@ export const processPieChartData = (dataArray, pageType) => {
         value: 0,
         text: "0%",
         color: "#E0E0E0",
+        tooltipText: "0"
       },
     ];
   }
@@ -18,6 +19,7 @@ export const processPieChartData = (dataArray, pageType) => {
       value: item.revenue || 0,
       text: item.percent <= 3.0 ? "" : item.percent.toFixed(1) + "%",
       color: pieChartColorCode[index % pieChartColorCode.length].color,
+      tooltipText: labelList[index]
     };
   });
 };
