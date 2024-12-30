@@ -46,7 +46,8 @@ const LeadCard = (props) => {
     return <PrimaryButton buttonStyle={{backgroundColor: "white"}}
                           pressableStyle={styles.leadCardPressable}
                           onPress={() => {
-                              navigation.navigate("Lead Profile", { leadDetails: props.lead, leadManagementToastRef:props.toastRef })
+                              navigation.navigate("Lead Profile", { leadDetails: props.lead, leadManagementToastRef:props.leadManagementToastRef })
+                              console.log(props.leadManagementToastRef)
                           }} style={styles.leadCard}>
         <View style={styles.detailsContainer}>
             <Text style={[styles.nameText]}>{props.lead.name}</Text>
