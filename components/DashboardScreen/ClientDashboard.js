@@ -40,7 +40,7 @@ const ClientDashboard = () => {
   const totalValue = revenueGenderData[0]?.chart_series.reduce((acc, val) => acc + val, 0) || 0;
   const totalCountValue = revenueCountGenderData[0]?.chart_series.reduce((acc, val) => acc + val, 0) || 0;
   const totalPrepaidValue = revenuePrepaidData[0]?.chart_series.reduce((acc, val) => acc + val, 0) || 0;
-
+  const revenueGenderDataLabelList = revenueGenderData[0]?.label_list ?? [];
   const convertRevenueData = revenueGenderData[0]?.chart_series.map(
     (item, index) => {
       const percentage = ((item / totalValue) * 100).toFixed(1);
@@ -49,6 +49,7 @@ const ClientDashboard = () => {
         value: item,
         color: clientPieColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
+        tooltipText: revenueGenderDataLabelList[index]
       };
     }
   ) || [
@@ -57,9 +58,10 @@ const ClientDashboard = () => {
         value: 1,
         color: clientPieColorCode[0]?.color || "#999999",
         text: "error",
+        tooltipText: "1"
       },
     ];
-
+  const revenueCountGenderDataLabelList = revenueCountGenderData[0]?.label_list;
   const convertRevenueCountData =
     revenueCountGenderData[0]?.chart_series.map((item, index) => {
       const percentage = ((item / totalCountValue) * 100).toFixed(1);
@@ -68,6 +70,8 @@ const ClientDashboard = () => {
         value: item,
         color: clientPieColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
+        tooltipText: revenueCountGenderDataLabelList[index],
+        // textSize:32
       };
     }) || [
       {
@@ -75,9 +79,10 @@ const ClientDashboard = () => {
         value: 1,
         color: clientPieColorCode[0]?.color || "#E9ECF1",
         text: "error",
+        tooltipText: "1"
       }
     ];
-
+  const revenuePrepaidDataLabelList = revenuePrepaidData[0].label_list ?? [];
   const convertRevenuePrepaidData =
     revenuePrepaidData[0]?.chart_series.map((item, index) => {
       const percentage = ((item / totalPrepaidValue) * 100).toFixed(1);
@@ -86,12 +91,14 @@ const ClientDashboard = () => {
         value: item,
         color: prepaidNonPrepaidColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
+        tooltipText: revenuePrepaidDataLabelList[index]
       };
     }) || [{
       page: "clientRedemption",
       value: 1,
       color: prepaidNonPrepaidColorCode[0]?.color || "#999999",
       text: "error",
+      tooltipText: "1"
     }];
 
   const valueMap = {

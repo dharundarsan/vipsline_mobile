@@ -24,45 +24,57 @@ const SalesDashboardScreenLoader = () => {
 
                     />
                 </View>
-                <View style={{ marginTop: "7%", flexDirection: "row", paddingHorizontal: 10 }}>
-                    <ContentLoader
-                        pRows={1}
-                        pHeight={[85]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-                        containerStyles={{ width: '50%' }}
+                <View style={{alignItems:'center'}}>
+                    <View style={{ marginTop: "7%", flexDirection: "row", paddingHorizontal: 10 }}>
+                        <ContentLoader
+                            pRows={1}
+                            pHeight={[85]}
+                            pWidth={["100%"]}
+                            active
+                            title={false}
+                            containerStyles={{ width: '50%' }}
 
-                    />
-                    <ContentLoader
-                        pRows={1}
-                        pHeight={[85]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-                        containerStyles={{ width: "50%" }}
+                        />
+                        <ContentLoader
+                            pRows={1}
+                            pHeight={[85]}
+                            pWidth={["100%"]}
+                            active
+                            title={false}
+                            containerStyles={{ width: "50%" }}
 
-                    />
-                </View>
-                <View style={{ marginTop: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
-                    <ContentLoader
-                        pRows={1}
-                        pHeight={[85]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-                        containerStyles={{ width: '50%' }}
+                        />
+                    </View>
+                    <View style={{ marginTop: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
+                        <ContentLoader
+                            pRows={1}
+                            pHeight={[85]}
+                            pWidth={["100%"]}
+                            active
+                            title={false}
+                            containerStyles={{ width: '50%' }}
 
-                    />
-                    <ContentLoader
-                        pRows={1}
-                        pHeight={[85]}
-                        pWidth={["100%"]}
-                        active
-                        title={false}
-                        containerStyles={{ width: "50%" }}
+                        />
+                        <ContentLoader
+                            pRows={1}
+                            pHeight={[85]}
+                            pWidth={["100%"]}
+                            active
+                            title={false}
+                            containerStyles={{ width: "50%" }}
 
-                    />
+                        />
+                    </View>
+                    <View style={{ marginTop: "5%", flexDirection: "row", paddingHorizontal: 10 }}>
+                        <ContentLoader
+                            pRows={1}
+                            pHeight={[85]}
+                            pWidth={["100%"]}
+                            active
+                            title={false}
+                            containerStyles={{ width: '50%' }}
+                        />
+                    </View>
                 </View>
             </View>
             <View style={{ marginTop: "5%", rowGap: 10 }}>
@@ -127,5 +139,5 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         columnGap: 5,
         // rowGap: 5,
-      },
+    },
 })
