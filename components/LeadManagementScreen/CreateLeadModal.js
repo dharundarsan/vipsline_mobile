@@ -7,18 +7,19 @@ import Divider from "../../ui/Divider";
 import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {useDispatch, useSelector} from "react-redux";
-import createLeadAPI from "../../util/apis/createLeadAPI";
+import createLeadAPI from "../../apis/leadManagementAPIs/createLeadAPI";
 import {formatDate, formatTime} from "../../util/Helpers";
 import moment from "moment";
-import editLeadAPI from "../../util/apis/editLeadAPI";
+import editLeadAPI from "../../apis/leadManagementAPIs/editLeadAPI";
 import {loadLeadsFromDb} from "../../store/leadManagementSlice";
 import Toast from "../../ui/Toast";
-import getLeadCampaignsAPI from "../../util/apis/getLeadCampaignsAPI";
-import deleteLeadAPI from "../../util/apis/deleteLeadAPI";
+import getLeadCampaignsAPI from "../../apis/leadManagementAPIs/getLeadCampaignsAPI";
+import deleteLeadAPI from "../../apis/leadManagementAPIs/deleteLeadAPI";
 import {useNavigation} from "@react-navigation/native";
 import {updateNavigationState} from "../../store/NavigationSlice";
 import MiniActionTextModal from "../checkoutScreen/MiniActionTextModal";
 import ConfirmDeleteLeadModal from "./ConfirmDeleteLeadModal";
+import BottomActionCard from "../../ui/BottomActionCard";
 
 const CreateLeadModal = (props) => {
     const leadSources = useSelector(state => state.leads.leadSources);
@@ -149,19 +150,35 @@ const CreateLeadModal = (props) => {
 
     return <Modal style={styles.createLeadModal} visible={props.isVisible} animationType={"slide"}
                   presentationStyle={"pageSheet"}>
-        {isConfirmLeadDeleteModalVisible && <ConfirmDeleteLeadModal isVisible={isConfirmLeadDeleteModalVisible}
-                                                                    setVisible={setIsConfirmLeadDeleteModalVisible}
-                                                                    onCloseModal={() => setIsConfirmLeadDeleteModalVisible(false)}
-                                                                    ActionOptionName={"Delete Lead"}
-                                                                    header={"Delete Lead"}
-                                                                    content={"Are you sure you want to delete this lead?"}
-                                                                    onConfirm={() => {
-                                                                        props.onCloseModal()
-                                                                        props.refreshData()
-                                                                        navigation.goBack();
-                                                                    }}
-                                                                    data={props.data}
-        />}
+        <BottomActionCard isVisible={isConfirmLeadDeleteModalVisible}
+                          header={"Delete Lead"}
+                          content={"Are you sure you want to delete this lead?"}
+                          onClose={() => setIsConfirmLeadDeleteModalVisible(false)}
+                          onConfirm={async () => {
+                              await deleteLeadAPI(props.data.lead_id);
+                              await dispatch(loadLeadsFromDb());
+                              setIsConfirmLeadDeleteModalVisible(false);
+                              dispatch(updateNavigationState("Lead Management Screen"));
+                              props.onCloseModal()
+                              props.refreshData()
+                              navigation.goBack();
+                          }}
+                          onCancel={() => {
+                              setIsConfirmLeadDeleteModalVisible(false);
+                          }}/>
+        {/*{isConfirmLeadDeleteModalVisible && <ConfirmDeleteLeadModal isVisible={isConfirmLeadDeleteModalVisible}*/}
+        {/*                                                            setVisible={setIsConfirmLeadDeleteModalVisible}*/}
+        {/*                                                            onCloseModal={() => setIsConfirmLeadDeleteModalVisible(false)}*/}
+        {/*                                                            ActionOptionName={"Delete Lead"}*/}
+        {/*                                                            header={"Delete Lead"}*/}
+        {/*                                                            content={"Are you sure you want to delete this lead?"}*/}
+        {/*                                                            onConfirm={() => {*/}
+        {/*                                                                props.onCloseModal()*/}
+        {/*                                                                props.refreshData()*/}
+        {/*                                                                navigation.goBack();*/}
+        {/*                                                            }}*/}
+        {/*                                                            data={props.data}*/}
+        {/*/>}*/}
 
         <View style={styles.closeAndHeadingContainer}>
             <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Lead" : "Create Lead"}</Text>

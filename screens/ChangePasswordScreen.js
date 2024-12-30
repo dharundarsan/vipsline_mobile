@@ -10,7 +10,7 @@ import Colors from "../constants/Colors";
 import CustomTextInput from "../ui/CustomTextInput";
 import {checkNullUndefined} from "../util/Helpers";
 import PrimaryButton from "../ui/PrimaryButton";
-import resetPasswordAPI from "../util/apis/resetPasswordAPI";
+import resetPasswordAPI from "../apis/authApis/resetPasswordAPI";
 import {useNavigation} from "@react-navigation/native";
 
 export default function ChangePasswordScreen(props) {

@@ -70,7 +70,9 @@
     "react-navigation": "^5.0.0",
     "react-redux": "^9.1.2",
     "redux-thunk": "^3.1.0",
-    "victory-native": "^37.3.1"
+    "victory-native": "^37.3.1",
+    "typescript": "~5.3.3",
+    "@types/react": "~18.2.79"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0"

@@ -530,6 +530,8 @@ const PieChartBox = (props) => {
               showText
               textColor="white"
               textSize={14}
+              tooltipDuration={3000}
+              showTooltip
             />
           ) : (
             <PieChart
@@ -547,6 +549,9 @@ const PieChartBox = (props) => {
               textSize={14}
               isAnimated
               animationDuration={5000}
+              // showTooltip
+              tooltipDuration={3000}
+              showTooltip
             />
             // null
           )}

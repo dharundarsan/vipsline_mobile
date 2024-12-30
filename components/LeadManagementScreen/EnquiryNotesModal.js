@@ -10,9 +10,9 @@ import CustomTextInput from "../../ui/CustomTextInput";
 import {useDispatch, useSelector} from "react-redux";
 import * as Haptics from "expo-haptics";
 import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../../store/cartSlice";
-import addEnquiryNotesAPI from "../../util/apis/addEnquiryNotesAPI";
+import addEnquiryNotesAPI from "../../apis/leadManagementAPIs/addEnquiryNotesAPI";
 import moment from "moment";
-import editEnquiryNotesAPI from "../../util/apis/editEnquiryNotesAPI";
+import editEnquiryNotesAPI from "../../apis/leadManagementAPIs/editEnquiryNotesAPI";
 import {loadLeadsFromDb} from "../../store/leadManagementSlice";
 
 const EnquiryNotesModal = (props) => {

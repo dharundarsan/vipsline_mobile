@@ -9,7 +9,7 @@ import Divider from "../../ui/Divider";
 import {capitalizeFirstLetter, checkNullUndefined, formatDate} from "../../util/Helpers";
 import {useDispatch, useSelector} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
-import updateClientAPI from "../../util/apis/updateClientAPI";
+import updateClientAPI from "../../apis/ClientSegmentAPIs/updateClientAPI";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 /**
@@ -241,7 +241,6 @@ const UpdateClientModal = ((props) => {
                         // onSave={(callback) => {
                         //     emailRef.current = callback;
                         // }}
-
                     />
                     <CustomTextInput
                         type="dropdown"

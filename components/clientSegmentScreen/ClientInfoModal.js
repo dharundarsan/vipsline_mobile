@@ -7,19 +7,18 @@ import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Divider from "../../ui/Divider";
 import ClientStatistics from "./ClientStatistics";
 import ClientDetails from "./ClientDetails";
 import MoreOptionDropDownModal from "./MoreOptionDropDownModal";
 import UpdateClientModal from "./UpdateClientModal";
-import DeleteClient from "./DeleteClientModal";
 import {useDispatch, useSelector} from "react-redux";
 import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
 import {clearClientInfo, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
-import {loadClientsFromDb} from "../../store/clientSlice";
+import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import Toast from "../../ui/Toast";
 import BillingActivity from "./BillingActivity";
 import Appointments from "./Appointments";
@@ -27,6 +26,10 @@ import {MembershipDetails} from "./MembershipDetails";
 import {PackageDetails} from "./PackageDetails";
 import {PrepaidDetails} from "./PrepaidDetails";
 import ClientRewardPoints from "./ClientRewardPoints";
+import clearCartAPI from "../../apis/checkoutAPIs/clearCartAPI";
+import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "../../store/cartSlice";
+import BottomActionCard from "../../ui/BottomActionCard";
+import deleteClientAPI from "../../apis/ClientSegmentAPIs/deleteClientAPI";
 
 /**
  * ClientInfoModal Component
@@ -67,10 +70,11 @@ export default function clientInfoModal(props) {
     const dispatch = useDispatch();
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails || {});
-    const details = useSelector(state => state.clientInfo.details)|| {};
+    const details = useSelector(state => state.clientInfo.details) || {};
     const salesData = useSelector(state => state.clientInfo.analyticDetails || {});
     const membershipData = useSelector(state => state.clientInfo.membershipList || {});
     const packageData = useSelector(state => state.clientInfo.packageList || {});
+    const currentClientId = useSelector(state => state.clientInfo.clientId);
 
 
     const [totalSales, setTotalSales] = useState("");
@@ -179,25 +183,29 @@ export default function clientInfoModal(props) {
 
             />}
 
-            <DeleteClient
-                isVisible={deleteClientModalVisibility}
-                deleteClient={true}
-                onCloseModal={() => {
-                    setDeleteClientModalVisibility(false)
-                    props.setModalVisibility(false);
-                    dispatch(loadClientsFromDb())
-                }}
-                header={"Delete Client"}
-                content={"Are you sure? This action cannot be undone."}
-                onCloseClientInfoAfterDeleted={() => {
-                    props.setVisible(false);
-                    props.setSearchQuery("");
-                    props.setFilterPressed("all_clients_count");
-                    dispatch(clearClientInfo());
-                }}
-                deleteClientToast={props.deleteClientToast}
-
+            <BottomActionCard isVisible={deleteClientModalVisibility}
+                              header={"Delete Client"}
+                              content={"Are you sure? This action cannot be undone."}
+                              onClose={() => {
+                                  setDeleteClientModalVisibility(false)
+                              }}
+                              onConfirm={async () => {
+                                  deleteClientAPI(currentClientId);
+                                  props.deleteClientToast();
+                                  dispatch(loadClientCountFromDb());
+                                  dispatch(loadClientFiltersFromDb(10, "All"));
+                                  dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
+                                  props.setVisible(false);
+                                  props.setSearchQuery("");
+                                  props.setFilterPressed("all_clients_count");
+                                  dispatch(clearClientInfo());
+                                  setDeleteClientModalVisibility(false)
+                              }}
+                              onCancel={() => setDeleteClientModalVisibility(false)}
+                              confirmLabel={"Delete"}
+                              cancelLabel={"Cancel"}
             />
+
             <View style={styles.modalContent}>
                 <ClientCard
                     clientDetailsContainer={{width: "auto"}}
@@ -281,11 +289,12 @@ export default function clientInfoModal(props) {
     } else if (clientMoreDetails === "billActivity") {
         content = checkNullUndefined(salesData) && checkNullUndefined(salesData.history_appointment_count) && salesData.history_appointment_count > 0 ?
             <BillingActivity
-            salesData={salesData}
-            clientId={details.id}
+                salesData={salesData}
+                clientId={details.id}
             /> :
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight} style={{height: 30, width: 30, marginBottom: 6}}/>
+                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight}
+                       style={{height: 30, width: 30, marginBottom: 6}}/>
                 <Text style={[textTheme.labelLarge]}>No Sales</Text>
                 <Text style={textTheme.bodyMedium}>The client has no upcoming or past sales</Text>
             </View>
@@ -296,7 +305,8 @@ export default function clientInfoModal(props) {
                 clientId={details.id}
             /> :
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight} style={{height: 30, width: 30, marginBottom: 6}}/>
+                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight}
+                       style={{height: 30, width: 30, marginBottom: 6}}/>
                 <Text style={[textTheme.labelLarge]}>No Appointments</Text>
                 <Text style={textTheme.bodyMedium}>The client has no upcoming Appointments</Text>
             </View>
@@ -306,7 +316,8 @@ export default function clientInfoModal(props) {
                 membershipData={membershipData}
             /> :
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                <Image source={require("../../assets/icons/membership.png")} tintColor={Colors.highlight} style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Image source={require("../../assets/icons/membership.png")} tintColor={Colors.highlight}
+                       style={{height: 40, width: 40, marginBottom: 6}}/>
                 <Text style={[textTheme.labelLarge]}>No Membership</Text>
                 <Text style={textTheme.bodyMedium}>This client doesn’t have any active memberships</Text>
             </View>
@@ -316,7 +327,8 @@ export default function clientInfoModal(props) {
                 pacakgeData={packageData}
             /> :
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                <Image source={require("../../assets/icons/package.png")} tintColor={Colors.highlight} style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Image source={require("../../assets/icons/package.png")} tintColor={Colors.highlight}
+                       style={{height: 40, width: 40, marginBottom: 6}}/>
                 <Text style={[textTheme.labelLarge]}>No Package</Text>
                 <Text style={textTheme.bodyMedium}>This client doesn’t have any package.</Text>
             </View>
@@ -325,15 +337,16 @@ export default function clientInfoModal(props) {
             <PrepaidDetails
                 details={details}/> :
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                <Image source={require("../../assets/icons/prepaid.png")} tintColor={Colors.highlight} style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Image source={require("../../assets/icons/prepaid.png")} tintColor={Colors.highlight}
+                       style={{height: 40, width: 40, marginBottom: 6}}/>
                 <Text style={[textTheme.labelLarge]}>No Prepaid</Text>
                 <Text style={textTheme.bodyMedium}>This client doesn’t have any prepaid.</Text>
             </View>
 
-    } 
-    // else if (clientMoreDetails === "rewardpoints") {
-    //     content =
-    //         <ClientRewardPoints details={details} />
+    }
+        // else if (clientMoreDetails === "rewardpoints") {
+        //     content =
+        //         <ClientRewardPoints details={details} />
     // }
     else {
         content =

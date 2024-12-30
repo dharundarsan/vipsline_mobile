@@ -4,12 +4,12 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons, MaterialCommunityIcons, MaterialIcons} from "@expo/vector-icons";
 import React, {useEffect, useLayoutEffect, useState} from "react";
 import Colors from "../../constants/Colors";
-import deleteLeadAPI from "../../util/apis/deleteLeadAPI";
+import deleteLeadAPI from "../../apis/leadManagementAPIs/deleteLeadAPI";
 import {clearAdvancedFilters, loadLeadsFromDb, updateAdvancedFilters} from "../../store/leadManagementSlice";
 import {updateNavigationState} from "../../store/NavigationSlice";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {useDispatch, useSelector} from "react-redux";
-import getLeadCampaignsAPI from "../../util/apis/getLeadCampaignsAPI";
+import getLeadCampaignsAPI from "../../apis/leadManagementAPIs/getLeadCampaignsAPI";
 import {Dropdown} from "react-native-element-dropdown";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {formatDateYYYYMMDDD, shadowStyling} from "../../util/Helpers";
@@ -25,10 +25,10 @@ const LeadAdvancedFiltersModal = (props) => {
     const campaign = useSelector(state => state.leads.lead_campaign)
     const gender = useSelector(state => state.leads.gender)
     const leadFollowUp = useSelector(state => state.leads.leadFollowUp)
-    const followupDate = useSelector(state => state.leads.followupDate)
-    const followupEndDate = useSelector(state => state.leads.followupEndDate)
-    const fromDate = useSelector(state => state.leads.fromDate)
-    const toDate = useSelector(state => state.leads.toDate)
+    const followupDate = moment(useSelector(state => state.leads.followupDate)).toDate();
+    const followupEndDate = moment(useSelector(state => state.leads.followupEndDate)).toDate();
+    const fromDate = moment(useSelector(state => state.leads.fromDate)).toDate();
+    const toDate = moment(useSelector(state => state.leads.toDate)).toDate();
     const [isFromDatePickerModalVisible, setIsFromDatePickerModalVisible] = useState(false);
     const [isToDatePickerModalVisible, setIsToDatePickerModalVisible] = useState(false);
 
@@ -43,7 +43,7 @@ const LeadAdvancedFiltersModal = (props) => {
 
     useLayoutEffect(() => {
         const api = async () => {
-            const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "") ? 0 : leadSource.id)
+            const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "" || leadSource === undefined) ? 0 : leadSource.id)
             setCampaignList(response.data.data);
         }
         api();
@@ -59,42 +59,42 @@ const LeadAdvancedFiltersModal = (props) => {
 
     useEffect(() => {
         if (selectedLeadDateOption === "Today") {
-            dispatch(updateAdvancedFilters({field: "fromDate", value: new Date()}))
-            dispatch(updateAdvancedFilters({field: "toDate", value: new Date()}))
+            dispatch(updateAdvancedFilters({field: "fromDate", value: moment().toISOString()}))
+            dispatch(updateAdvancedFilters({field: "toDate", value: moment().toISOString()}))
         } else if (selectedLeadDateOption === "Yesterday") {
             dispatch(updateAdvancedFilters({
                 field: "fromDate",
-                value: new Date(new Date().setDate(new Date().getDate() - 1))
+                value: moment(new Date(new Date().setDate(new Date().getDate() - 1))).toISOString()
             }))
             dispatch(updateAdvancedFilters({
                 field: "toDate",
-                value: new Date(new Date().setDate(new Date().getDate() - 1))
+                value: moment(new Date(new Date().setDate(new Date().getDate() - 1))).toISOString()
             }))
         } else if (selectedLeadDateOption === "Last 7 days") {
             dispatch(updateAdvancedFilters({
                 field: "fromDate",
-                value: new Date(new Date().setDate(new Date().getDate() - 6))
+                value: moment(new Date(new Date().setDate(new Date().getDate() - 6))).toISOString()
             }))
-            dispatch(updateAdvancedFilters({field: "toDate", value: new Date()}))
+            dispatch(updateAdvancedFilters({field: "toDate", value: moment().toISOString()}))
         } else if (selectedLeadDateOption === "Month") {
             dispatch(updateAdvancedFilters({
                 field: "fromDate",
-                value: new Date(new Date().setDate(1))
+                value: moment(new Date(new Date().setDate(1))).toISOString()
             }))
-            dispatch(updateAdvancedFilters({field: "toDate", value: new Date()}))
+            dispatch(updateAdvancedFilters({field: "toDate", value: moment().toISOString()}))
         } else if (selectedLeadDateOption === "Last 30 days") {
             dispatch(updateAdvancedFilters({
                 field: "fromDate",
-                value: new Date(new Date().setDate(new Date().getDate() - 29))
+                value: moment(new Date(new Date().setDate(new Date().getDate() - 29))).toISOString()
             }))
-            dispatch(updateAdvancedFilters({field: "toDate", value: new Date()}))
+            dispatch(updateAdvancedFilters({field: "toDate", value: moment().toISOString()}))
         }
     }, [selectedLeadDateOption]);
 
     useEffect(() => {
         if (selectedLeadFollowUpOption === "Today") {
-            dispatch(updateAdvancedFilters({field: "followupDate", value: new Date()}))
-            dispatch(updateAdvancedFilters({field: "followupEndDate", value: new Date()}))
+            dispatch(updateAdvancedFilters({field: "followupDate", value: moment().toISOString()}))
+            dispatch(updateAdvancedFilters({field: "followupEndDate", value: moment().toISOString()}))
         }
     }, [selectedLeadFollowUpOption]);
 
@@ -138,7 +138,7 @@ const LeadAdvancedFiltersModal = (props) => {
                 <DateTimePickerModal
                     onConfirm={(date) => {
                         setIsFromDatePickerModalVisible(false);
-                        dispatch(updateAdvancedFilters({field: "fromDate", value: date}))
+                        dispatch(updateAdvancedFilters({field: "fromDate", value: moment(date).toISOString()}))
                     }}
                     isVisible={isFromDatePickerModalVisible}
                     mode="date"
@@ -149,7 +149,7 @@ const LeadAdvancedFiltersModal = (props) => {
                 <DateTimePickerModal
                     onConfirm={(date) => {
                         setIsToDatePickerModalVisible(false);
-                        dispatch(updateAdvancedFilters({field: "toDate", value: date}))
+                        dispatch(updateAdvancedFilters({field: "toDate", value: moment(date).toISOString()}))
                     }}
                     isVisible={isToDatePickerModalVisible}
                     mode="date"
@@ -160,7 +160,7 @@ const LeadAdvancedFiltersModal = (props) => {
                 <DateTimePickerModal
                     onConfirm={(date) => {
                         setIsLeadFollowUpDatePickerModalVisible(false);
-                        dispatch(updateAdvancedFilters({field: "followupDate", value: date}))
+                        dispatch(updateAdvancedFilters({field: "followupDate", value: moment(date).toISOString()}))
                     }}
                     isVisible={isLeadFollowUpDatePickerModalVisible}
                     mode="date"
@@ -171,7 +171,7 @@ const LeadAdvancedFiltersModal = (props) => {
                 <DateTimePickerModal
                     onConfirm={(date) => {
                         setIsLeadFollowUpEndDatePickerModalVisible(false);
-                        dispatch(updateAdvancedFilters({field: "followupEndDate", value: date}))
+                        dispatch(updateAdvancedFilters({field: "followupEndDate", value: moment(date).toISOString()}))
                     }}
                     isVisible={isLeadFollowUpEndDatePickerModalVisible}
                     mode="date"
@@ -312,7 +312,7 @@ const LeadAdvancedFiltersModal = (props) => {
                     onChangeValue={async (object) => {
                         dispatch(updateAdvancedFilters({field: "lead_source", value: object}))
                         dispatch(updateAdvancedFilters({field: "lead_campaign", value: undefined}))
-                        const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "") ? 0 : leadSource.id)
+                        const response = await getLeadCampaignsAPI((leadSource === null || leadSource === "" || leadSource === undefined) ? 0 : leadSource.id)
                         setCampaignList(response.data.data);
                     }}
                     dropdownItems={leadSources}

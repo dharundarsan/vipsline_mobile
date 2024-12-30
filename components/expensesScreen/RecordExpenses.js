@@ -2,11 +2,11 @@ import {Modal, Text, View, StyleSheet, ScrollView, ActivityIndicator} from "reac
 import {checkNullUndefined, shadowStyling} from "../../util/Helpers";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import {AntDesign, Ionicons} from "@expo/vector-icons";
 import React, {useEffect, useRef, useState} from "react";
 import Colors from "../../constants/Colors";
 import CustomTextInput from "../../ui/CustomTextInput";
-import addExpensesAPI from "../../util/apis/addExpensesAPI";
+import addExpensesAPI from "../../apis/expenseAPIs/addExpensesAPI";
 import {useDispatch, useSelector} from "react-redux";
 import {
     getExpenseSubCategoryId,
@@ -15,11 +15,12 @@ import {
     updateMaxEntry
 } from "../../store/ExpensesSlice";
 import moment from "moment";
-import editExpensesAPI from "../../util/apis/editExpensesAPI";
-import DeleteExpenseModal from "./DeleteExpenseModal";
+import editExpensesAPI from "../../apis/expenseAPIs/editExpensesAPI";
 import colors from "../../constants/Colors";
 import {loadBusinessNotificationDetails} from "../../store/listOfBusinessSlice";
 import Toast from "../../ui/Toast";
+import BottomActionCard from "../../ui/BottomActionCard";
+import deleteExpenseAPI from "../../apis/expenseAPIs/deleteExpenseAPI";
 
 export default function RecordExpenses(props) {
     const dispatch = useDispatch();
@@ -43,7 +44,6 @@ export default function RecordExpenses(props) {
     const toastRef = useRef(null);
 
 
-
     function parseDate(dateStr) {
         const [day, month, year] = dateStr.split(" ");
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -62,7 +62,7 @@ export default function RecordExpenses(props) {
 
     useEffect(() => {
         dispatch(loadBusinessNotificationDetails());
-        if(props.type === "update") {
+        if (props.type === "update") {
             dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id));
         }
     }, []);
@@ -72,15 +72,12 @@ export default function RecordExpenses(props) {
     const categories = useSelector(state => state.expenses.categories);
 
 
-
     const updateExpenseData = (field, value) => {
         setExpenseData((prevState) => ({
             ...prevState,
             [field]: value,
         }));
     };
-
-
 
 
     return (
@@ -94,24 +91,24 @@ export default function RecordExpenses(props) {
             <Toast ref={toastRef}/>
             {
                 deleteExpenseVisibility &&
-                <DeleteExpenseModal
-                    isVisible={deleteExpenseVisibility}
-                    onCloseModal={() => {
-                        setDeleteExpenseVisibility(false);
-                    }}
-                    id={currentExpenseId}
-                    content={"Do you want to delete this expense ?"}
-                    oncloseAfterDelete={async () => {
-                        props.closeModal();
-                        dispatch(updateMaxEntry(10))
-                        dispatch(resetExpensesPageNo());
-                        props.setClientDetected(prev => !prev);
-                        await dispatch(loadExpensesFromDb());
+                <BottomActionCard isVisible={deleteExpenseVisibility}
+                                  header={"Delete Expense"}
+                                  content={"Do you want to delete this expense ?"}
+                                  onClose={() => {
+                                      setDeleteExpenseVisibility(false);
+                                  }}
+                                  onConfirm={async () => {
+                                      await deleteExpenseAPI(props.id);
+                                      await dispatch(loadExpensesFromDb());
+                                      props.toastRef.current.show("Expense deleted successfully");
+                                      setDeleteExpenseVisibility(false);
+                                  }}
+                                  onCancel={() => {
+                                      setDeleteExpenseVisibility(false);
+                                  }}
+                                  confirmLabel={"Delete"}
+                                  cancelLabel={"Cancel"}/>
 
-                    }}
-                    toastRef={props.toastRef}
-
-                />
             }
             <View style={styles.recordExpense}>
                 <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
@@ -125,10 +122,10 @@ export default function RecordExpenses(props) {
                             props.closeModal();
                         }}
                     >
-                        <Ionicons name="close" size={25} color="black" />
+                        <Ionicons name="close" size={25} color="black"/>
                     </PrimaryButton>
                 </View>
-                <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 16 }}>
+                <ScrollView style={{flex: 1, paddingHorizontal: 16, paddingVertical: 16}}>
                     <CustomTextInput
                         labelTextStyle={textTheme.titleSmall}
                         label={"Date"}
@@ -142,10 +139,9 @@ export default function RecordExpenses(props) {
                             dateRef.current = callback;
                         }}
                         validator={(text) => {
-                            if(text === null || text === "") {
+                            if (text === null || text === "") {
                                 return "Date is required";
-                            }
-                            else {
+                            } else {
                                 return true
                             }
                         }}
@@ -167,10 +163,9 @@ export default function RecordExpenses(props) {
                             amountTypeRef.current = callback;
                         }}
                         validator={(text) => {
-                            if(text === null || text === "") {
+                            if (text === null || text === "") {
                                 return "Expense account is required";
-                            }
-                            else {
+                            } else {
                                 return true
                             }
                         }}
@@ -187,10 +182,9 @@ export default function RecordExpenses(props) {
                             expenseTypeRef.current = callback
                         }}
                         validator={(text) => {
-                            if(text === null || text === "") {
+                            if (text === null || text === "") {
                                 return "Expense type required";
-                            }
-                            else {
+                            } else {
                                 return true
                             }
                         }}
@@ -208,10 +202,9 @@ export default function RecordExpenses(props) {
                             amountRef.current = callback
                         }}
                         validator={(text) => {
-                            if(text === null || text === "") {
+                            if (text === null || text === "") {
                                 return "Amount is required";
-                            }
-                            else {
+                            } else {
                                 return true
                             }
                         }}
@@ -222,21 +215,20 @@ export default function RecordExpenses(props) {
                         type={"dropdown"}
                         dropdownItems={["Cash", "Card", "Digital Payment"]}
                         value={
-                        expenseData.paymentMode === "CASH" || expenseData.paymentMode === "Cash" ?
-                            "Cash" : expenseData.paymentMode === "CARD" || expenseData.paymentMode === "Card" ?
-                            "Card" : expenseData.paymentMode === "DIGITAL PAYMENT" || expenseData.paymentMode === "Digital Payment"?
-                                "Digital Payment" : ""
-                    }
+                            expenseData.paymentMode === "CASH" || expenseData.paymentMode === "Cash" ?
+                                "Cash" : expenseData.paymentMode === "CARD" || expenseData.paymentMode === "Card" ?
+                                    "Card" : expenseData.paymentMode === "DIGITAL PAYMENT" || expenseData.paymentMode === "Digital Payment" ?
+                                        "Digital Payment" : ""
+                        }
                         onChangeValue={(value) => updateExpenseData("paymentMode", value)}
                         required
                         onSave={(callback) => {
                             paymentModeRef.current = callback;
                         }}
                         validator={(text) => {
-                            if(text === null || text === "") {
+                            if (text === null || text === "") {
                                 return "Payment Mode is required";
-                            }
-                            else {
+                            } else {
                                 return true
                             }
                         }}
@@ -259,14 +251,14 @@ export default function RecordExpenses(props) {
 
                     />
                 </ScrollView>
-                <View style={[styles.bottomButtonContainer, { gap: props.type === "add" ? undefined : 8 }]}>
+                <View style={[styles.bottomButtonContainer, {gap: props.type === "add" ? undefined : 8}]}>
                     {props.type === "add" ? null : (
                         <PrimaryButton
                             buttonStyle={styles.deleteIcon}
                             onPress={() => {
                                 setDeleteExpenseVisibility(true)
                             }}>
-                            <AntDesign name="delete" size={24} color="black" />
+                            <AntDesign name="delete" size={24} color="black"/>
                         </PrimaryButton>
                     )}
                     {
@@ -290,49 +282,45 @@ export default function RecordExpenses(props) {
                                     const isPaymentModeEntered = paymentModeRef.current();
 
 
-                                    if(!isDateEntered ||
+                                    if (!isDateEntered ||
                                         !isExpenseAmountEntered ||
                                         !isExpenseTypeEntered ||
                                         !isAmountEntered ||
                                         !isPaymentModeEntered) {
                                         setIsLoading(false)
-                                        return ;
+                                        return;
                                     }
 
-                                    await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id)).then( async res1 => {
+                                    await dispatch(getExpenseSubCategoryId(categories.find(item => item.name === expenseData.expenseAmountType).id)).then(async res1 => {
 
-                                        const subId = await res1.find(item => item.name === expenseData.expenseType).id;
-                                        const catId = await categories.find(item => item.name === expenseData.expenseAmountType).id;
+                                            const subId = await res1.find(item => item.name === expenseData.expenseType).id;
+                                            const catId = await categories.find(item => item.name === expenseData.expenseAmountType).id;
 
 
-                                            if(props.type === "add") {
+                                            if (props.type === "add") {
 
                                                 const res = await addExpensesAPI(expenseData, catId, subId);
-                                                if(res) {
+                                                if (res) {
                                                     dispatch(loadExpensesFromDb());
                                                     setIsLoading(false);
                                                     props.toastRef.current.show("Expense added successfully");
                                                     props.closeModal();
-                                                }
-                                                else {
+                                                } else {
                                                     toastRef.current.show("Expense cannot be added");
                                                     setIsLoading(false);
                                                 }
-                                            }
-                                            else {
+                                            } else {
                                                 const res = await editExpensesAPI(expenseData, catId, subId, currentExpenseId);
-                                                if(res) {
+                                                if (res) {
                                                     dispatch(loadExpensesFromDb());
                                                     props.toastRef.current.show("Expense updated successfully");
                                                     props.closeModal()
-                                                }
-                                                else {
+                                                } else {
                                                     toastRef.current.show("Expense cannot be updated");
                                                     setIsLoading(false)
                                                 }
                                             }
                                         }
-
                                     );
 
                                     setIsLoading(false);
@@ -347,7 +335,7 @@ export default function RecordExpenses(props) {
 }
 
 const styles = StyleSheet.create({
-    modal: { flex: 1 },
+    modal: {flex: 1},
     recordExpense: {
         alignItems: "center",
         flex: 1,
@@ -372,14 +360,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         textAlign: "center",
     },
-    saveButton: { flex: 1 },
+    saveButton: {flex: 1},
     saveButtonPressable: {},
     bottomButtonContainer: {
         width: '100%',
         paddingHorizontal: 16,
         paddingVertical: 16,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
+        shadowOffset: {width: 0, height: -4},
         shadowOpacity: 0.3,
         shadowRadius: 6,
         elevation: 0.6,

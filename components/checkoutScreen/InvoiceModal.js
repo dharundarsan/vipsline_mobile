@@ -13,12 +13,12 @@ import {useEffect, useRef, useState} from "react";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import {useNavigation} from "@react-navigation/native";
-import sendEmailAPI from "../../util/apis/sendEmailAPI";
-import sendSMSAPI from "../../util/apis/sendSMSAPI";
+import sendEmailAPI from "../../apis/checkoutAPIs/sendEmailAPI";
+import sendSMSAPI from "../../apis/checkoutAPIs/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
-import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
+import cancelInvoiceAPI from "../../apis/checkoutAPIs/cancelInvoiceAPI";
 import * as SecureStore from 'expo-secure-store';
-import clearCartAPI from "../../util/apis/clearCartAPI";
+import clearCartAPI from "../../apis/checkoutAPIs/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import {
     clearCalculatedPrice,

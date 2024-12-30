@@ -6,7 +6,7 @@ import React, {useEffect, useState} from "react";
 import Colors from "../../constants/Colors";
 import PackageModal from "./PackageModal";
 import {useSelector} from "react-redux";
-import getPackagesListOfClientAPI from "../../util/apis/getPackagesListOfClientAPI";
+import getPackagesListOfClientAPI from "../../apis/ClientSegmentAPIs/getPackagesListOfClientAPI";
 import {shadowStyling} from "../../util/Helpers";
 import Divider from "../../ui/Divider";
 
