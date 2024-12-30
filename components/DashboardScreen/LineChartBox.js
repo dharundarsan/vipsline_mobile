@@ -26,11 +26,7 @@ const LineChartBox = (props) => {
         }
         setIsLoading(false);
     }
-    // const maxValue = Math.ceil(lineChartData.sort((a, b) => b - a)[0]);
-    // const yAxisLabels = Array.from({ length: 6 }, (_, i) =>
-    // Math.round((maxValue / 5) * i).toString()
-    // );
-    const dropdownWidth = screenWidth * 0.45;
+    const dropdownWidth = screenWidth * 0.4;
     return (
         <View style={styles.commonContainer}>
             <View
@@ -72,30 +68,20 @@ const LineChartBox = (props) => {
                     yAxisLabelTexts={props.yAxisLabelTexts}
                     color="#4E64D8"
                     dataPointsColor1="#EB8B34"
-                    xAxisColor="#D3D3D3" // Customize as needed to control the appearance
+                    xAxisColor="#D3D3D3"
                     xAxisLabelTexts={props.xLabelArrayData}
                     xAxisLabelTextStyle={{ color: "#6E6E6E", fontSize:  6 }}
                     spacing={80}
-                    yAxisThickness={0} // Set to 0 to remove any y-axis padding
-                    adjustToWidth={true} // Ensures the chart fills the width
+                    yAxisThickness={0}
+                    // adjustToWidth
                     yAxisLabelWidth={props.page === "SalesOverTime" ? 100 : 50}
                     maxValue={props.max}
                     style={{width:"100%"}}
                     noOfSections={props.sections}
-                    // isAnimated
-                    // isAnimated
-                    // animateTogether
-                    // animationDuration={2500}
-                    // noOfSections={6}
-                    // maxValue={yAxisLabels}
-                    // maxValue={arr.sort((a, b) => b - a)[0]}
-                    // noOfSections={5} // Adjust sections as needed
-                    // yAxisColor="transparent" 
-                    // rotateLabel
-                    // startFillColor="transparent" // Makes the fill start at the exact border
-                    // yAxisLabelTextsStyle={{ marginLeft: -15 }} // Adjust as needed for label positioning
-                    // yAxisOffset={-10} // Pushes the chart closer to the left border
-                    // initialSpacing={3} // Starts the line from the very beginning of the chart
+                    focusEnabled
+                    showTextOnFocus
+                    delayBeforeUnFocus={3000}
+                    focusedDataPointHeight={20}
                 />
             </View>
         </View>
@@ -114,7 +100,8 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flexDirection: "row",
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
+    paddingLeft:20,
     paddingVertical: 16,
   },
   dropdown: {
