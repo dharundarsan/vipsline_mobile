@@ -2,6 +2,7 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
+import PopoverIconText from "../../ui/PopoverIconText";
 
 const ListIconData = (props) => {
   return (
@@ -11,7 +12,11 @@ const ListIconData = (props) => {
           source={props.icon}
           style={styles.icon}
         />
-        <Text style={{alignSelf:'center'}}>{props.title}</Text>
+        {
+          props.titlePopoverEnabled ?
+            <PopoverIconText title={props.title} popoverText={props.titlePopoverText} containerStyle={[{ alignSelf: 'center' },props.popoverContainerStyle]} popoverArrowShift={0.24}/>
+            : <Text style={{ alignSelf: 'center' }}>{props.title}</Text>
+        }
       </View>
       <Text style={TextTheme.titleSmall}>{props.value}</Text>
     </View>
@@ -23,8 +28,8 @@ export default ListIconData;
 const styles = StyleSheet.create({
   listData: {
     flexDirection: "row",
-    justifyContent:'space-between',
-    alignItems:'center',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: "white",
     borderRadius: 10,
     padding: 15,
@@ -43,5 +48,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     gap: 10,
+    width: '80%'
   },
 });

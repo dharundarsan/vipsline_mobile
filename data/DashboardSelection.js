@@ -31,7 +31,7 @@ export const salesCardData = [
     title: "Sales Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
     color:Colors.lightpurple,
-    popoverText: "Total sales from all channels for the selected period"
+    popoverText: "Total amount collected apart from prepaid redemption amount"
   },{
     title: "Net Sales",
     icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
@@ -192,15 +192,18 @@ export const pieChartColorCode = [
 export const lifetimeData = [
   {
     title:'Lifetime Unique Clients',
-    icon:require("../assets/icons/dashboard/selection/totalappointments.png")
+    icon:require("../assets/icons/dashboard/selection/totalappointments.png"),
+    titlePopoverText:"Total unique customers in the business"
   },
   {
     title:'Lifetime Repeat Clients',
-    icon:require("../assets/icons/dashboard/selection/totalappointments.png")
+    icon:require("../assets/icons/dashboard/selection/totalappointments.png"),
+    titlePopoverText:"Customers who have visited more than once"
   },
   {
     title:'Unique Clients Till Date',
-    icon:require("../assets/icons/dashboard/selection/totalappointments.png")
+    icon:require("../assets/icons/dashboard/selection/totalappointments.png"),
+    titlePopoverText:"Customers who have visited only once"
   },
 ]
 

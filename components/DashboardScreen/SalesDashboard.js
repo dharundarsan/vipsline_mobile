@@ -21,6 +21,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useLocationContext } from "../../context/LocationContext";
 import SalesDashboardScreenLoader from "./SalesDashboardScreenLoader";
 import SalesDashboardDateLoader from "./SalesDashboardDateLoader";
+import PopoverIconText from "../../ui/PopoverIconText";
 
 const SalesDashboard = () => {
   const dispatch = useDispatch();
@@ -80,7 +81,7 @@ const SalesDashboard = () => {
       value: item.value,
       text: percentage <= 2.0 ? "" : `${percentage}%`,
       color: pieChartColorCode[index]?.color || "#000",
-      tooltipText:billItemDetails[0].labels[index]
+      tooltipText: billItemDetails[0].labels[index]
     };
   });
 
@@ -95,7 +96,7 @@ const SalesDashboard = () => {
     "salesProduct",
     topProductDetails[0].label_list,
   );
-  
+
   const valueMap = {
     "Total Appointments": listStoreData.totalAppointments,
     "Online Sales": listStoreData.onlineSales,
@@ -348,14 +349,14 @@ const SalesDashboard = () => {
                     </View>
 
                     <View style={styles.commonContainer}>
-                      <Text
-                        style={[
-                          textTheme.titleMedium,
-                          { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
-                        ]}
-                      >
-                        Payment Mode
-                      </Text>
+                      <View style={{ paddingLeft: 20, paddingBottom: 16, paddingTop: 8 }}>
+                        <PopoverIconText
+                          title={"Payment Mode"}
+                          titleStyle={[textTheme.titleMedium]}
+                          popoverText={"Amount collected using various modes of payment"}
+                          popoverArrowShift={-0.22}
+                        />
+                      </View>
                       {paymentStoreData.length > 0 ? (
                         paymentStoreData.map((item, index) => {
                           const title = convertToTitleCase(item.mode_of_payment);
@@ -376,14 +377,20 @@ const SalesDashboard = () => {
                     </View>
 
                     <View style={styles.commonContainer}>
-                      <Text
+                      {/* <Text
                         style={[
                           textTheme.titleMedium,
                           { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
                         ]}
                       >
                         Total Sales
-                      </Text>
+                      </Text> */}
+                      <View style={{ paddingLeft: 20, paddingBottom: 16, paddingTop: 8 }}>
+                        <PopoverIconText title={"Total Sales"} popoverText={"Total sales from all channels for the selected period"}
+                          titleStyle={[textTheme.titleMedium]}
+                          popoverArrowShift={-0.41}
+                        />
+                      </View>
                       {salesData.map((item, index) => {
                         const revenueKeys = Object.keys(totalSalesRevenue);
                         const revenueValue = totalSalesRevenue[revenueKeys[index]];
@@ -447,7 +454,8 @@ const SalesDashboard = () => {
           max={roundLineSalesOverTime}
           sections={removeZeroLineSalesOverTime === "1" ? 10 : removeZeroLineSalesOverTime}
           page="SalesOverTime"
-        // key1={"SalesOverTime"}
+          popoverText={"Total sales from all channels for the selected period"}
+          popoverArrowShift={0.89}
         />
         <LineChartBox
           title={"Appointments over time"}
@@ -459,6 +467,8 @@ const SalesDashboard = () => {
           // key1={"SalesOverTime"}
           max={roundUp(maxAppointmentsOverTime)}
           sections={removeZero(roundUp(maxAppointmentsOverTime)) || 10}
+          popoverText={"Total appointments from all channels over time"}
+          popoverArrowShift={0.81}
         />
         <PieChartBox
           title={"Top Services"}
