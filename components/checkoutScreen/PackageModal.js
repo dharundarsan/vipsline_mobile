@@ -33,6 +33,7 @@ const PackageModal = (props) => {
         setSelectedSittingItems(prev => [...prev, item]);
     }
     const cartItems = useSelector(state => state.cart.items);
+    const tempCartItems = cartItems;
 
     const deleteSittingItems = (item) => {
         setSelectedSittingItems(prev => prev.filter(sittingItem => sittingItem !== item));
@@ -40,7 +41,10 @@ const PackageModal = (props) => {
 
     const editSittingCountInEditedPackageDetails = (data) => {
         setModifiedEditedPackageDetails(prev => prev.map(item => {
-                if (item.name === data.name && item.parent_resource_category_id === data.parent_resource_category_id && item.resource_category_id === data.resource_category_id) {
+                if (item.name === data.name &&
+                    item.parent_resource_category_id === data.parent_resource_category_id &&
+                    item.resource_category_id === data.resource_category_id
+                ) {
                     return data;
                 }
                 return item;
@@ -109,11 +113,13 @@ const PackageModal = (props) => {
                     //     ele.parent_resource_category_id === item.par_res_cat_id)[0].item_id;
 
                     // Use a loop to find and remove all matching items
+                    const item_ids = []
                     while ((index = packageSittingItemsInCart.findIndex(ele =>
                         ele.resource_category_name === item.name &&
                         ele.resource_category_id === item.res_cat_id &&
                         ele.parent_resource_category_id === item.par_res_cat_id
                     )) !== -1) {
+                        item_ids.push(packageSittingItemsInCart[index].item_id)
                         packageSittingItemsInCart.splice(index, 1);  // Remove the element at found index
                         counter++;  // Increment counter since one element was removed
                     }
@@ -122,7 +128,7 @@ const PackageModal = (props) => {
                         name: item.name,
                         resource_category_id: item.res_cat_id,
                         parent_resource_category_id: item.par_res_cat_id,
-                        // item_id: item.item_id,
+                        item_ids: item_ids,
                         counter: counter,
                     };
                 });
@@ -137,7 +143,8 @@ const PackageModal = (props) => {
     }, []);
 
 
-    return <Modal visible={props.isVisible} style={styles.packageModal} animationType={props.singlePackage ? "none" : "slide"}
+    return <Modal visible={props.isVisible} style={styles.packageModal}
+                  animationType={props.singlePackage ? "none" : "slide"}
                   presentationStyle="pageSheet" onRequestClose={props.onCloseModal}>
         <View style={[styles.headingAndCloseContainer, shadowStyling]}>
             <Text
@@ -145,7 +152,7 @@ const PackageModal = (props) => {
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 onPress={() => {
-                    if(props.singlePackage) props.closeOverallModal();
+                    if (props.singlePackage) props.closeOverallModal();
                     else props.onCloseModal();
                 }}
             >
