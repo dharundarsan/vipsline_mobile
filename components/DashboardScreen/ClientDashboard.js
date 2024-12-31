@@ -174,6 +174,9 @@ const ClientDashboard = () => {
                     icon={item.icon}
                     title={item.title}
                     value={value}
+                    titlePopoverEnabled
+                    titlePopoverText={item.titlePopoverText}
+                    popoverContainerStyle={{width:"100%"}}
                   />
                 );
               })}
@@ -217,5 +220,6 @@ const styles = StyleSheet.create({
   },
   listDataContainer: {
     width: "100%",
+    marginBottom:'3%'
   },
 });

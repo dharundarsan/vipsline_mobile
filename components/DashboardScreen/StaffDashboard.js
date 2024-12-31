@@ -22,6 +22,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ContentLoader from "react-native-easy-content-loader";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocationContext } from "../../context/LocationContext";
+import PopoverIconText from "../../ui/PopoverIconText";
 
 const StaffDashboard = () => {
   const dispatch = useDispatch();
@@ -380,7 +381,13 @@ const StaffDashboard = () => {
             />
             <View style={styles.performerContainer}>
               <View style={styles.headerContainer}>
-                <Text style={TextTheme.titleMedium}>Top Performer</Text>
+                {/* <Text style={TextTheme.titleMedium}>Top Performer</Text> */}
+                <PopoverIconText 
+                  title={"Top Performer"}
+                  titleStyle={[TextTheme.titleMedium]}
+                  popoverText={"Top performing staff members ordered by sales"}
+                  popoverArrowShift={-0.2}
+                />
               </View>
               <Divider />
               <View style={{ alignItems: "center", paddingVertical: 10 }}>
