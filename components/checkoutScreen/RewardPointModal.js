@@ -110,18 +110,14 @@ const RewardPointModal = (props) => {
                     }} label='Cancel' buttonStyle={{ width: "40%", backgroundColor: Colors.white, borderWidth: 1, borderColor: "#D5D7DA" }} textStyle={{ color: Colors.black }} />
                     <PrimaryButton onPress={async () => {
                         // await splitPaymentAPI({ booking_amount: props.price, paid_amount: [{ mode: "REWARDS", amount: rewardValue }, { mode: "CASH", amount: 0 }] });
-                        console.log("props.rewardValue");
-                        console.log(props.rewardValue);
-                        console.log("rewardValue");
-                        console.log(rewardValue);
-                        
                         // if(props.rewardValue > rewardValue){
                         //     toastRef.current.show("Error")
                         // }
                         // else{
                             // props.setSplitUpState(prev => [...prev, { mode: "REWARDS" }]);
-                            props.setRewardValue(rewardValue)
-                            props.onCloseModal();
+                        // props.setRewardValue(rewardValue)    
+                        props.onRewardValueChange(rewardValue)
+                        props.onCloseModal();
                         // }
                     }} label='Redeem' buttonStyle={{ width: "40%" }}
                         disabled={((rewardStatus !== 400 || rewardStatus !== 404) && parseInt(rewardValue) <= 0)}

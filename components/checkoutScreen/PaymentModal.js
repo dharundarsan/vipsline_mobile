@@ -74,6 +74,7 @@ const PaymentModal = (props) => {
     const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
     const isRewardActive = (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.reward_balance !== 0)
     const [rewardValue, setRewardValue] = useState(0);
+    const [rewardValueToggle, setRewardValueToggle] = useState(0);
     const [initialSplitChange, setInitialSplitChange] = useState([
         {
             mode: "cash",
@@ -488,7 +489,7 @@ const PaymentModal = (props) => {
         let totalCount = 0;
         splitUpState.map((prev => {
             if (prev.shown) {
-                totalCount += prev.amount;
+                totalCount += Number(prev.amount);
             }
         }))
         if (totalCount === props.price)
@@ -531,7 +532,7 @@ const PaymentModal = (props) => {
                     paid_amount: [{ mode: "CASH", amount: totalPrice }]
                 });
                 setSplitResponse(response);
-            } else if (selectedPaymentOption === "split_payment") {
+            } else if (selectedPaymentOption === "split_payment") { 
                 const response = await splitPaymentAPI({
                     booking_amount: props.price,
                     paid_amount: [{ mode: "CASH", amount: totalPrice }]
@@ -546,6 +547,8 @@ const PaymentModal = (props) => {
         return cartSliceState.items.find(item => item.gender === "prepaid");
     }
     useLayoutEffect(() => {
+        console.log("hello");
+        
         if (rewardValue !== 0 && rewardValue < props.price) {
             setSelectedPaymentOption("split_payment")
             const splitApi = async () => {
@@ -566,6 +569,9 @@ const PaymentModal = (props) => {
                 //         }
                 //     })
                 // }
+                console.log("checkSplitActive");
+                console.log(checkSplitActive);
+                
                 if (checkSplitActive === 0) {
                     let flexSplitState;
                     let updated;
@@ -617,7 +623,18 @@ const PaymentModal = (props) => {
             }
             splitApi()
         }
-    }, [rewardValue])
+    }, [rewardValueToggle])
+    
+    function onRewardValueChange(value){
+        console.log("value");
+        console.log(value);
+        
+        setRewardValue(value);
+        setRewardValueToggle(prev => !prev);
+    }
+
+    
+    
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
     // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
     >
@@ -671,6 +688,7 @@ const PaymentModal = (props) => {
             setRewardValue={setRewardValue}
             rewardValue={rewardValue}
             setSplitUpState={setSplitUpState}
+            onRewardValueChange={onRewardValueChange}
             setSelectedPaymentOption={setSelectedPaymentOption} />
         }
         {
@@ -984,7 +1002,9 @@ const PaymentModal = (props) => {
                                         }}
                                     />}
                                 <PrimaryButton buttonStyle={styles.splitInputCloseButton} onPress={() => {
-
+                                    if (item.name === "Reward Points") {
+                                        dispatch(updateRewardAmount(0));
+                                    }
                                     // setPaymentOrder(prev => prev.slice(0, prev.length - 1));
                                     setPaymentOrder(prev => prev.filter((order) => order !== item.mode));
                                     setRecentlyChanged(prev => prev.filter(ele => ele !== item.mode));
@@ -1148,19 +1168,21 @@ const PaymentModal = (props) => {
                             }
                             let totalPrice = splitUpState.reduce((acc, item) => {
                                 if (item.shown) {
-                                    return item.amount + acc;
+                                    console.log("typeof(item.amount)");
+                                    
+                                    console.log(typeof(item.amount));
+                                    console.log(item.amount);
+                                    
+                                    return Number(Number(item.amount) + Number(acc));
                                 }
-                                return acc;
+                                return Number(acc);
                             }, 0)
                             const price = Math.round(totalPrice * 100) / 100
                             if (price < props.price || price > props.price) {
                                 //TODO
-                                console.log("totalPrice1122");
-                                console.log(totalPrice);
-                                console.log("totalCount1122");
-                                console.log(totalCount);
+                                
                                 toastRef.current.show("Split up not summing to the price", 2000);
-                                // setIsLoading(false)
+                                setIsLoading(false)
                                 return;
                             }
                             dispatch(updateCalculatedPrice(details.id, true, splitUpState.filter(item => {
@@ -1217,10 +1239,6 @@ const PaymentModal = (props) => {
                                     totalCount += Number(prev.amount);
                                 }
                             }))
-                            console.log("totalPrice11");
-                            console.log(totalPrice);
-                            console.log("totalCount11");
-                            console.log(totalCount);
                             const count = Math.round(totalCount * 100) / 100
                             if (count < props.price || count > props.price) {
                                 //TODO
