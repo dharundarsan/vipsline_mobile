@@ -1,20 +1,20 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import Colors from "../../constants/Colors";
-import TextTheme from "../../constants/TextTheme";
-import PopoverIconText from "../../ui/PopoverIconText";
-
+import Colors from "../constants/Colors";
+import TextTheme from "../constants/TextTheme";
+import PopoverIconText from "./PopoverIconText";
+import PropTypes from 'prop-types';
 const ListIconData = (props) => {
   return (
     <View style={styles.listData}>
-      <View style={styles.headerContainer}>
+      <View style={[styles.headerContainer,props.headerContainerStyle]}>
         <Image
           source={props.icon}
           style={styles.icon}
         />
         {
           props.titlePopoverEnabled ?
-            <PopoverIconText title={props.title} popoverText={props.titlePopoverText} containerStyle={[{ alignSelf: 'center' },props.popoverContainerStyle]} popoverArrowShift={0.24}/>
+            <PopoverIconText title={props.title} popoverText={props.titlePopoverText} containerStyle={[{ alignSelf: 'center' }, props.popoverContainerStyle]} popoverArrowShift={0.24} />
             : <Text style={{ alignSelf: 'center' }}>{props.title}</Text>
         }
       </View>
@@ -22,6 +22,17 @@ const ListIconData = (props) => {
     </View>
   );
 };
+
+
+ListIconData.propTypes = {
+  icon: PropTypes.node,
+  title: PropTypes.string.isRequired,
+  value: PropTypes.any,
+  titlePopoverEnabled: PropTypes.bool,
+  titlePopoverText: PropTypes.string,
+  popoverContainerStyle: PropTypes.object,
+  headerContainerStyle: PropTypes.object
+}
 
 export default ListIconData;
 
@@ -34,12 +45,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginVertical: 10,
-    // Adding shadow
-    elevation: 3, // For Android shadow
-    shadowColor: "#000", // For iOS shadow color
-    shadowOffset: { width: 0, height: 2 }, // Slight shadow offset
-    shadowOpacity: 0.1, // Mild shadow
-    shadowRadius: 4, // Soft shadow spread
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   icon: {
     width: 24,
