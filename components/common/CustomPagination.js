@@ -106,7 +106,7 @@ export default function CustomPagination(props) {
 
             <View style={styles.paginationInnerContainer}>
                 <Text style={styles.pagingText}>
-                    {lowerCount < 0 ? 0 : lowerCount} - {upperCount} of {props.totalCount}
+                    {lowerCount < 0 ? 0 : lowerCount} - {props.currentCount} of {props.totalCount}
                 </Text>
                 <PrimaryButton
                     buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}

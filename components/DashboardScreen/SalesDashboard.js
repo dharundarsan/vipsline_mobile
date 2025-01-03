@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../../constants/Colors";
@@ -24,7 +24,7 @@ import SalesDashboardDateLoader from "./SalesDashboardDateLoader";
 import PopoverIconText from "../../ui/PopoverIconText";
 import DatePicker from "../../ui/DatePicker";
 
-const SalesDashboard = () => {
+const SalesDashboard = ({route,navigation}) => {
   const dispatch = useDispatch();
   const { getLocation } = useLocationContext()
   
@@ -154,10 +154,10 @@ const SalesDashboard = () => {
       month: "short",
       year: "numeric",
     });
-    if(num === 1){
+    if (num === 1) {
       setSelectedFromCustomDate(formatted)
     }
-    else if ( num === 2){
+    else if (num === 2) {
       setSelectedToCustomDate(formatted)
     }
     await handleCustomDate(num, formatDateYYYYMMDDD(date))
@@ -221,6 +221,17 @@ const SalesDashboard = () => {
     }
     initialCall();
   }, []);
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     navigation.goBack();
+  //   }
+  //   const backHandler = BackHandler.addEventListener(
+  //     "hardwareBackPress",
+  //     backAction
+  //   );
+  //   return () => { backHandler.remove() }
+  // }, [])
+
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
       <View style={styles.container}>
