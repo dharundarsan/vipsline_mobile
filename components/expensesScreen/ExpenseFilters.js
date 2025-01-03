@@ -121,10 +121,20 @@ export default function ExpenseFilters({ isVisible, onClose, setLoading, loading
                             type={range}
                             fromDate={fromDate}
                             toDate={toDate}
-                            category={category}
-                            range={range}
-                            customRangeStartDate={customRangeStartDate}
-                            customRangeEndDate={customRangeEndDate}
+                            // category={category}
+                            // range={range}
+                            // customRangeStartDate={customRangeStartDate}
+                            // customRangeEndDate={customRangeEndDate}
+                            setFromDateToDate={(fromDate, toDate) => {
+                                dispatch(updateFilters({
+                                    category,
+                                    range,
+                                    fromDate: fromDate,
+                                    toDate: toDate,
+                                    customRangeStartDate: "",
+                                    customRangeEndDate: ""
+                                }))
+                            }}
                         />
                     )}
                 </View>
@@ -144,6 +154,8 @@ export default function ExpenseFilters({ isVisible, onClose, setLoading, loading
                             customRangeEndDate: ""
                         }));
                         await dispatch(loadExpensesFromDb());
+                        onClose();
+
                     }}
                 />
                 {
