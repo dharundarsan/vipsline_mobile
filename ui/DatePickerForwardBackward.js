@@ -34,7 +34,7 @@ function formatDateRange(view, fromDate, toDate = fromDate) {
     return `${startDate.format(format)} - ${endDate.format(format)}`;
 }
 
-export default function DatePickerForwardBackward({ label, type, fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate }) {
+export default function DatePickerForwardBackward({ label, type, fromDate, toDate, category, range, customRangeStartDate, customRangeEndDate, setFromDateToDate }) {
 
 
 
@@ -55,50 +55,64 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
         }
 
         if(type === "Today") {
-            dispatch(updateFilters({
-                category,
-                range,
-                fromDate: moment().format("YYYY-MM-DD"),
-                toDate: moment().format("YYYY-MM-DD"),
-                customRangeStartDate: "",
-                customRangeEndDate: ""
-            }))
+            // dispatch(updateFilters({
+            //     category,
+            //     range,
+            //     fromDate: moment().format("YYYY-MM-DD"),
+            //     toDate: moment().format("YYYY-MM-DD"),
+            //     customRangeStartDate: "",
+            //     customRangeEndDate: ""
+            // }))
+            setFromDateToDate(moment().format("YYYY-MM-DD"), moment().format("YYYY-MM-DD"));
+
         }
         else if(type === "Week") {
-            dispatch(updateFilters({
-                category,
-                range,
-                fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
-                toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
-                customRangeStartDate: "",
-                customRangeEndDate: ""
-            }))
+            // dispatch(updateFilters({
+            //     category,
+            //     range,
+            //     fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+            //     toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+            //     customRangeStartDate: "",
+            //     customRangeEndDate: ""
+            // }))
+            setFromDateToDate(
+                moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+                moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD")
+            );
         }
         else if(type === "Month") {
-            dispatch(updateFilters({
-                category,
-                range,
-                fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
-                toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
-                customRangeStartDate: "",
-                customRangeEndDate: ""
-            }))
+            // dispatch(updateFilters({
+            //     category,
+            //     range,
+            //     fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+            //     toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+            //     customRangeStartDate: "",
+            //     customRangeEndDate: ""
+            // }))
+            setFromDateToDate(
+                moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+                moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD")
+            );
         }
         else if(type === "Year") {
-            dispatch(updateFilters({
-                category,
-                range,
-                fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
-                toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
-                customRangeStartDate: "",
-                customRangeEndDate: ""
-            }))
+            // dispatch(updateFilters({
+            //     category,
+            //     range,
+            //     fromDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+            //     toDate: moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD"),
+            //     customRangeStartDate: "",
+            //     customRangeEndDate: ""
+            // }))
+            setFromDateToDate(
+                moment(formatDateRange(type, moment(), moment()).split(" - ")[0].trim()).format("YYYY-MM-DD"),
+                moment(formatDateRange(type, moment(), moment()).split(" - ")[1].trim()).format("YYYY-MM-DD")
+            );
         }
         dispatch(updateCustomRangeStartEndDate({startDate: "", endDate: ""}));
     }, [type]);
 
     useEffect(() => {
-        if(range === "Today") {
+        if(type === "Today") {
             if(moment(fromDate).isSame(moment(), 'day')) {
                 setForwardVisibility(false);
             }
@@ -120,21 +134,29 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
 
 
     const handleConfirm = (date) => {
-        dispatch(updateFilters({
-            fromDate: moment(date).format("YYYY-MM-DD"),
-            toDate: moment(date).format("YYYY-MM-DD"),
-            category,
-            range,
-            customRangeStartDate: "",
-            customRangeEndDate: ""
-        }));
+        // dispatch(updateFilters({
+        //     fromDate: moment(date).format("YYYY-MM-DD"),
+        //     toDate: moment(date).format("YYYY-MM-DD"),
+        //     category,
+        //     range,
+        //     customRangeStartDate: "",
+        //     customRangeEndDate: ""
+        // }));
+        setFromDateToDate(
+            moment(date).format("YYYY-MM-DD"),
+            moment(date).format("YYYY-MM-DD")
+        )
         hideDatePicker();
     };
 
     const changeDate = (increment = true) => {
         const newDate = moment(fromDate)[increment ? 'add' : 'subtract'](1, "days").format("YYYY-MM-DD");
 
-        dispatch(updateFilters({ fromDate: newDate, toDate: newDate, category, range, customRangeStartDate, customRangeEndDate }));
+        // dispatch(updateFilters({ fromDate: newDate, toDate: newDate, category, range, customRangeStartDate, customRangeEndDate }));
+        setFromDateToDate(
+            newDate,
+            newDate
+        );
     };
 
     return (
@@ -150,18 +172,22 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
             <Text style={textTheme.titleSmall}>{label}</Text>
             <View style={styles.datePicker}>
                 <PrimaryButton buttonStyle={styles.backButton} onPress={() => {
-                    if(range === "Today") {
+                    if(type === "Today") {
                         changeDate(false);
                     }
                     else {
-                        dispatch(updateFilters({
-                            range,
-                            category,
-                            fromDate: moment(new Date(fromDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD"),
-                            toDate: moment(new Date(toDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD"),
-                            customRangeStartDate,
-                            customRangeEndDate
-                        }));
+                        // dispatch(updateFilters({
+                        //     range,
+                        //     category,
+                        //     fromDate: moment(new Date(fromDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                        //     toDate: moment(new Date(toDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                        //     customRangeStartDate,
+                        //     customRangeEndDate
+                        // }));
+                        setFromDateToDate(
+                            moment(new Date(fromDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                            moment(new Date(toDate)).subtract(1, type.toLowerCase()).format("YYYY-MM-DD")
+                        )
 
                     }
                 }}>
@@ -173,7 +199,7 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
                     </Text>
                 </Pressable>
                 <PrimaryButton buttonStyle={styles.forwardButton} onPress={() => {
-                    if(range === "Today") {
+                    if(type === "Today") {
                         if(forwardVisibility) {
                             changeDate();
                         }
@@ -186,14 +212,18 @@ export default function DatePickerForwardBackward({ label, type, fromDate, toDat
                             setForwardVisibility(false);
                             return;
                         }
-                        dispatch(updateFilters({
-                            range,
-                            category,
-                            fromDate: moment(new Date(fromDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD"),
-                            toDate: moment(new Date(toDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD"),
-                            customRangeStartDate,
-                            customRangeEndDate
-                        }));
+                        // dispatch(updateFilters({
+                        //     range,
+                        //     category,
+                        //     fromDate: moment(new Date(fromDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                        //     toDate: moment(new Date(toDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                        //     customRangeStartDate,
+                        //     customRangeEndDate
+                        // }));
+                        setFromDateToDate(
+                            moment(new Date(fromDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD"),
+                            moment(new Date(toDate)).add(1, type.toLowerCase()).format("YYYY-MM-DD")
+                        )
                     }
                 }}>
                     <MaterialIcons name="keyboard-arrow-right" size={24} color={!forwardVisibility ? "grey" : "black"} />
