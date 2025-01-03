@@ -91,7 +91,7 @@ export default function VerificationCodeBody(props) {
             />
             {
                 emptyChecker ?
-                    <View style={{marginTop: 8, alignSelf: 'flex-start', marginLeft: 68}}>
+                    <View style={{marginTop: 14, width: '70%', alignItems: 'center'}}>
                         <Text style={[textTheme.titleSmall, {textAlign: "left", color: Colors.error}]}>Enter OTP</Text>
                     </View> :
                     <></>

@@ -127,7 +127,7 @@ export default function BottomModal(props) {
             <Pressable style={{flex: 1}} onPress={props.onCloseModal}/>
 
             <KeyboardAvoidingView
-                behavior="position"
+                // behavior="position"
                 style={{
                     // maxHeight: "80%", backgroundColor: Colors.white,
                     // paddingBottom: insets.bottom

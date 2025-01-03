@@ -24,6 +24,10 @@ export default function App() {
     const [isAuth, setIsAuth] = useState(false)
 
     useEffect(() => {
+
+    }, []);
+
+    useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
         }
