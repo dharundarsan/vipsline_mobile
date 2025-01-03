@@ -673,7 +673,7 @@ const PieChartBox = (props) => {
   );
 };
 
-export default PieChartBox;
+export default React.memo(PieChartBox);
 
 const styles = StyleSheet.create({
   commonContainer: {

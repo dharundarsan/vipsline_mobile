@@ -1,31 +1,22 @@
 import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import TextTheme from "../../constants/TextTheme";
-import Colors from "../../constants/Colors";
+import React, { useRef, useState } from "react";
+import TextTheme from "../constants/TextTheme";
+import Colors from "../constants/Colors";
 import { Dropdown } from "react-native-element-dropdown";
 import { LineChart } from "react-native-gifted-charts";
 import { Divider } from "react-native-paper";
-import { useDispatch } from "react-redux";
-import { loadDailyAppointmentAnalyticsForBusiness } from "../../store/dashboardSlice";
-import PopoverIconText from "../../ui/PopoverIconText";
+import PopoverIconText from "./PopoverIconText";
+import PropTypes from 'prop-types';
 
 const { width: screenWidth } = Dimensions.get('window');
 const LineChartBox = (props) => {
-    const dispatch = useDispatch();
     const [selectedValue, setSelectedValue] = useState("currentmonth");
-    const [isLoading, setIsLoading] = useState(false);
+    const isLoading = useRef(false);
     async function handleSelection(item) {
         setSelectedValue(item.value)
-
-        if (props.page === "SalesOverTime") {
-            setIsLoading(true);
-            dispatch(loadDailyAppointmentAnalyticsForBusiness(false, item.value))
-        }
-        else if (props.page === "AppointmentOverTime") {
-            setIsLoading(true);
-            dispatch(loadDailyAppointmentAnalyticsForBusiness(true, item.value))
-        }
-        setIsLoading(false);
+        isLoading.current = true;
+        await props.handleSelected(item.value)
+        isLoading.current = false;
     }
     const dropdownWidth = screenWidth * 0.4;
     return (
@@ -61,7 +52,7 @@ const LineChartBox = (props) => {
                         value={selectedValue}
                         onChange={handleSelection}
                         placeholder="Current month"
-                        disable={isLoading}
+                        disable={isLoading.current}
                         inverted={false}
                     />
                 ) : null}
@@ -80,20 +71,35 @@ const LineChartBox = (props) => {
                     yAxisThickness={0}
                     // adjustToWidth
                     yAxisLabelWidth={props.page === "SalesOverTime" ? 100 : 50}
+                    // yAxisLabelWidth={50}
                     maxValue={props.max}
                     style={{ width: "100%" }}
                     noOfSections={props.sections}
-                    // focusEnabled
-                    // showTextOnFocus
-                    // delayBeforeUnFocus={3000}
-                    // focusedDataPointHeight={20}
+                    focusEnabled
+                    showTextOnFocus
+                    delayBeforeUnFocus={3000}
+                    focusedDataPointHeight={20}
                 />
             </View>
         </View>
     );
 };
 
-export default LineChartBox;
+LineChartBox.propTypes = {
+    title: PropTypes.string,
+    toggleDateDropdown: PropTypes.bool,
+    dateArray: PropTypes.arrayOf(PropTypes.object),
+    xLabelArrayData: PropTypes.arrayOf(PropTypes.string),
+    lineChartData: PropTypes.arrayOf(PropTypes.object),
+    max: PropTypes.number,
+    sections: PropTypes.number,
+    page: PropTypes.string,
+    popoverText: PropTypes.string,
+    popoverArrowShift: PropTypes.number,
+    handleSelected:PropTypes.func.isRequired
+}
+
+export default React.memo(LineChartBox);
 
 const styles = StyleSheet.create({
     commonContainer: {
