@@ -28,6 +28,8 @@ import clients_icon from "../assets/icons/drawerIcons/clients.png";
 import LeadManagementStack from "../stacks/LeadManagementStack";
 import lead_management_icon from "../assets/icons/drawerIcons/lead_management.png";
 import Expenses from "../screens/Expenses";
+import staffs_icon from "../assets/icons/drawerIcons/staffs.png";
+
 import expenses_icon from "../assets/icons/drawerIcons/expenses.png";
 import ListOfBusinessesScreen from "../screens/ListOfBusinessesScreen";
 import list_of_businesses_icon from "../assets/icons/drawerIcons/list_of_businesses.png";
@@ -43,6 +45,8 @@ import {
 import {formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstDateOfCurrentMonthYYYYMMDD} from "../util/Helpers";
 import {AntDesign} from "@expo/vector-icons";
 import BottomActionCard from "../ui/BottomActionCard";
+import StaffManagementScreen from "../screens/StaffManagementScreen";
+import staffManagementStack from "../stacks/StaffManagementStack";
 
 function CustomDrawerIcon({navigation}) {
     return (
@@ -347,10 +351,11 @@ const MainDrawerNavigator = (props) => {
                             {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(settings_icon).uri }}*/}
                             {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
                             {/*}} />*/}
-                            {/*<Drawer.Screen name="Staffs" component={CheckoutStack} options={{*/}
-                            {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}*/}
-                            {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
-                            {/*}}/>*/}
+                            <Drawer.Screen name="Staffs" component={staffManagementStack} options={{
+                                headerShown: false,
+                                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}
+                                                         width={25} height={25} style={{resizeMode: "contain"}}/>
+                            }}/>
                             <Drawer.Screen name="List of Business" component={ListOfBusinessesScreen} options={{
                                 headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
                                 headerLeft: () => null,

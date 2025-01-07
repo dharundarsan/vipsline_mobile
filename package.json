@@ -5,6 +5,7 @@
     "start": "expo start --dev-client",
     "dev": "node -e \"const ip = require('ip'); console.log('Current IP address: ' + ip.address());\" && for /f \"tokens=*\" %i in ('node -e \"const ip = require('ip'); console.log(ip.address());\"') do set REACT_NATIVE_PACKAGER_HOSTNAME=%i && npx expo start",
     "android": "expo run:android",
+    "dev": "node -e \"const ip = require('ip'); console.log('Current IP address: ' + ip.address());\" && for /f \"tokens=*\" %i in ('node -e \"const ip = require('ip'); console.log(ip.address());\"') do set REACT_NATIVE_PACKAGER_HOSTNAME=%i && npx expo start",
     "ios": "expo run:ios",
     "web": "expo start --web"
   },
