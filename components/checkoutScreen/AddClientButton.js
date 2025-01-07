@@ -272,7 +272,7 @@ const AddClientButton = (props) => {
                                                        pressableStyle={styles.activePlanPressable}>
                                             <Text style={{fontSize: 12}}>
                                                 Points <Text
-                                                style={{color: Colors.highlight}}>{(clientInfo.rewardPointBalance).toFixed(2)}</Text>
+                                                style={{color: Colors.highlight}}>{(clientInfo.rewardPointBalance ?? 0).toFixed(2)}</Text>
                                             </Text>
                                         </PrimaryButton>
                                     }
@@ -338,8 +338,8 @@ const styles = StyleSheet.create({
         // justifyContent: "space-around",
         flexDirection: "row",
         gap: 10,
-        marginTop:10,
-        marginBottom:7,
+        marginTop: 10,
+        marginBottom: 7,
         paddingHorizontal: 10
     },
     activePlan: {

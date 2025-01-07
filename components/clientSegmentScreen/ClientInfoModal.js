@@ -59,8 +59,8 @@ const getCategoryTitle =
         "memberships": "Memberships",
         "packageSales": "Package sales",
         "prepaidSales": "Prepaid sales",
-        "review": "Review",
-        "giftVoucher": "Gift Voucher",
+        // "review": "Review",
+        // "giftVoucher": "Gift Voucher",
         "seeMoreStats": "Statistics"
     }
 
