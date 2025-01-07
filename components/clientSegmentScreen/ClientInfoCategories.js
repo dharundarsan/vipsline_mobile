@@ -46,7 +46,7 @@ export default function ClientInfoCategories(props) {
     const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
     const clientInfo = useSelector(state => state.clientInfo.details);
     const isRewardActive = (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled )
-    
+
 const modalClientDetails = [
     {id: "clientDetails", title: "Client details", divider: false, msg: false, thickness: 1},
     {id: "billActivity", title: "Bill activity", divider: true, msg: false, thickness: 1},
@@ -55,8 +55,8 @@ const modalClientDetails = [
     {id: "memberships", title: "Memberships", divider: true, msg: true, count: props.membershipCount, thickness: 1},
     {id: "packageSales", title: "Package sales", divider: true, msg: true, count: props.packageCount, thickness: 1},
     {id: "prepaidSales", title: "Prepaid sales", divider: true, msg: true, count: props.prepaidCount, thickness: 1},
-    {id: "review", title: "Review", divider: true, msg: true, count: 0, thickness: 1},
-    {id: "giftVoucher", title: "Gift Voucher", divider: true, msg: true, count: 0, thickness: 1},
+    // {id: "review", title: "Review", divider: true, msg: true, count: 0, thickness: 1},
+    // {id: "giftVoucher", title: "Gift Voucher", divider: true, msg: true, count: 0, thickness: 1},
 ];
 
     function renderItem(itemData) {

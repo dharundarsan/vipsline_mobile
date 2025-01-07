@@ -32,14 +32,13 @@ const SearchBar = (props) => {
             />
         </View>
         {props.filter ? <PrimaryButton
-            buttonStyle={styles.filterButton}
+            buttonStyle={[styles.filterButton, props.filterIcon]}
             onPress={props.onPressFilter}
         >
             <SimpleLineIcons
                 name="equalizer"
                 size={18}
                 color={Colors.darkBlue}
-                style={styles.filterIcon}
             />
         </PrimaryButton> : null}
     </View>

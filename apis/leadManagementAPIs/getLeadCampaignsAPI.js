@@ -1,12 +1,12 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
-import {checkAPIError} from "../Helpers";
+import {checkAPIError} from "../../util/Helpers";
 
-const createLeadAPI = async (data) => {
+const getLeadCampaignsAPI = async (leadSourceId) => {
     try {
-        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/leads/addLeadsForBusiness", {
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/leads/getListOfCampaignNameById", {
             business_id: await SecureStore.getItemAsync('businessId'),
-            ...data
+            lead_source_id: leadSourceId,
         }, {
             headers: {
                 'Authorization': `Bearer ${await SecureStore.getItemAsync('authKey')}`
@@ -15,9 +15,8 @@ const createLeadAPI = async (data) => {
         checkAPIError(response)
         return response;
     } catch (e) {
-        console.error("Error: Get Leads API")
-        throw e.response;
+        console.error("Error: Get Lead Campaigns API")
     }
 }
 
-export default createLeadAPI;
+export default getLeadCampaignsAPI;

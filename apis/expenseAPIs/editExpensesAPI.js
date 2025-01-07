@@ -30,6 +30,7 @@ export default async function editExpensesAPI(data, id, subId, expensesId) {
     const api = process.env.EXPO_PUBLIC_API_URI + "/expense/editExpense";
     let response;
     try {
+
         response = await axios.post(api,
             {
                 amount: data.amount,

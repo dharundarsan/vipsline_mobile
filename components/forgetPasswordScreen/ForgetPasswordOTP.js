@@ -1,17 +1,17 @@
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Text, View, StyleSheet, Pressable} from "react-native";
+import {Text, View, StyleSheet, Pressable, TouchableWithoutFeedback, Keyboard} from "react-native";
 import Colors from "../../constants/Colors";
 import OtpInputBox from "../verificationCodeScreen/otpInputBox";
 import {Ionicons} from '@expo/vector-icons';
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useState} from "react";
-import sendOTPApi from "../../util/apis/sendOTPApi";
+import sendOTPApi from "../../apis/authAPIs/sendOTPApi";
 import {useDispatch} from "react-redux";
-import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
+import authenticateWithOTPApi from "../../apis/authAPIs/authenticateWithOTPApi";
 import {useNavigation} from "@react-navigation/native";
 import {updateAuthStatus} from "../../store/authSlice";
-import verifyOTPAPI from "../../util/apis/verifyOTPAPI";
-import forgetPasswordAPI from "../../util/apis/forgetPasswordAPI";
+import verifyOTPAPI from "../../apis/authAPIs/verifyOTPAPI";
+import forgetPasswordAPI from "../../apis/authAPIs/forgetPasswordAPI";
 
 export default function ForgetPasswordOTP(props) {
     const [otp, setOtp] = useState("");
@@ -19,6 +19,8 @@ export default function ForgetPasswordOTP(props) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigation = useNavigation();
     const [changing, setChanging] = useState(false);
+
+    const [emptyChecker, setEmptyChecker] = useState(false);
 
     const [timer, setTimer] = useState(60)
     useEffect(() => {
@@ -39,7 +41,8 @@ export default function ForgetPasswordOTP(props) {
     }
 
     return (
-        <View style={styles.forgetPasswordBody}>
+        <TouchableWithoutFeedback onPress={()=> {Keyboard.dismiss()}}>
+        <View style={styles.forgetPasswordBody} >
             <PrimaryButton
                 buttonStyle={styles.buttonStyle}
                 onPress={props.backHandler}
@@ -60,6 +63,14 @@ export default function ForgetPasswordOTP(props) {
                 changing={changing}
                 setChanging={setChanging}
             />
+            {
+                emptyChecker ?
+                    <View style={{marginTop: 14, width: '70%', alignItems: 'center'}}>
+                        <Text style={[textTheme.titleSmall, {textAlign: "left", color: Colors.error}]}>Enter OTP</Text>
+                    </View> :
+                    <></>
+
+            }
 
             <View style={styles.resendOtpContainer}>
                 <Text
@@ -87,6 +98,14 @@ export default function ForgetPasswordOTP(props) {
                 buttonStyle={styles.submitButton}
                 textStyle={[textTheme.titleMedium]}
                 onPress={async () => {
+                    if(otp.trim().length === 0) {
+                        setEmptyChecker(true);
+                        return;
+                    }
+                    else {
+                        setEmptyChecker(false);
+                    }
+
                     const authStatus = await verifyOTPAPI(props.mobileNumber, "BUSINESS", otp);
                     props.verifyOTP(authStatus);
                     setChanging(true);
@@ -102,6 +121,7 @@ export default function ForgetPasswordOTP(props) {
 
 
         </View>
+        </TouchableWithoutFeedback>
     );
 
 }
@@ -114,6 +134,7 @@ const styles = StyleSheet.create({
     },
     forgetPasswordBody: {
         alignItems: "center",
+
     },
     forgetPasswordText: {
         color: Colors.black,

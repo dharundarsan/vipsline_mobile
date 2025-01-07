@@ -6,6 +6,13 @@ export const capitalizeFirstLetter = (string) => {
     return string[0].toUpperCase() + string.slice(1, string.length).toLowerCase();
 }
 
+export function capitalizeFirstLetters(str) {
+    return str
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
 export function formatTime(date, format) {
     let hours = date.getHours();
     const minutes = date.getMinutes();

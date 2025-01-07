@@ -6,7 +6,7 @@ import {useNavigation} from "@react-navigation/native";
 import textTheme from "../../constants/TextTheme";
 import {useEffect, useRef, useState} from "react";
 import axios from "axios";
-import forgetPasswordAPI from "../../util/apis/forgetPasswordAPI";
+import forgetPasswordAPI from "../../apis/authAPIs/forgetPasswordAPI";
 import Toast from "../../ui/Toast";
 
 export default function ForgetPasswordEmailOrNumber(props) {
@@ -153,7 +153,7 @@ export default function ForgetPasswordEmailOrNumber(props) {
                 <Text style={[textTheme.titleMedium, styles.inputLabel]}>Mobile number / Email</Text>
                 <TextInput
                     ref={textRef}
-                    style={[textTheme.titleSmall, styles.mobileNumberInput]}
+                    style={[textTheme.bodyMedium, styles.mobileNumberInput]}
                     placeholder='Mobile number / Email'
                     onFocus={onFocusHandler}
                     onBlur={onFocusOutHandler}

@@ -19,7 +19,7 @@ export default function ForgetPasswordScreen() {
     }
 
     function verifyOTPMessage(message) {
-        toastRef.current.show(message);
+        toastRef.current.show(message === "something went wrong" ? "Entered OTP is wrong" : message);
     }
 
     /**
@@ -29,7 +29,7 @@ export default function ForgetPasswordScreen() {
     const [isOtp, setIsOtp] = useState(false);
 
     const [mobileNumber, setMobileNumber] = useState("");
-    const toastRef = useRef(null)
+    const toastRef = useRef(null);
 
 
     return(

@@ -31,7 +31,7 @@ const AddClientButton = (props) => {
     const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
 
     // console.log(JSON.stringify(businessDetails.data[0].rewardsEnabled));
-    
+
     const [isClientInfo, setIsClientInfo] = useState(false)
     const [isVisibileModal, setIsVisibleModal] = useState(false)
     const [filterPressed, setFilterPressed] = useState("")
@@ -93,7 +93,7 @@ const AddClientButton = (props) => {
             setEditClientModalVisibility(true);
         }
     }
-    
+
     return (
         <>
             {
@@ -158,9 +158,9 @@ const AddClientButton = (props) => {
                             <View style={styles.actionMenu}>
                                 {
                                     clientInfo.membershipDetails.length !== 0
-                                    || clientInfo.packageDetails.length !== 0 
+                                    || clientInfo.packageDetails.length !== 0
                                     || (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.details.reward_balance !== 0)
-                                    || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0) 
+                                    || (clientInfo.details.wallet_balance !== undefined && clientInfo.details.wallet_balance !== 0)
                                         ? (
                                             isClientInfo ? (
                                                 <PrimaryButton
@@ -227,53 +227,54 @@ const AddClientButton = (props) => {
                             </View>
                         </View>
                         {isClientInfo ?
-                            <ScrollView  horizontal showsHorizontalScrollIndicator={false} >
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 <View style={styles.clientDetailContainer}>
-                                {
-                                    clientInfo.details.wallet_balance !== 0 &&
-                                    clientInfo.details.wallet_balance !== undefined &&
-                                    <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}>
-                                        <Text style={{fontSize:12}}>
-                                            Bal <Text style={{color: Colors.highlight}}> -
-                                            ₹{clientInfo.details.wallet_balance}</Text>
-                                        </Text>
-                                    </PrimaryButton>
-                                }
-                                <MemberShipDetailModal isMembershipModalVisible={isMembershipModalVisible}
-                                                       membershipDetails={clientInfo.membershipDetails}
-                                                       closeModal={() => setIsMembershipModalVisible(false)}
-                                                       onApplyMembership={onApplyMembership}
-                                                       storedMembershipId={storeMembershipId}
-                                />
-                                {clientInfo.membershipDetails.length !== 0 &&
-                                    <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}
-                                                   onPress={() => setIsMembershipModalVisible(true)}
-                                    >
-                                        <Feather name="user-check" size={13} color="black"/>
-                                        <Text style={{fontSize:12}}> Membership</Text>
-                                    </PrimaryButton>}
-                                {clientInfo.packageDetails.length !== 0 &&
-                                    <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}
-                                                   onPress={openRedeemPackageModalHandler}
-                                    >
-                                        <MaterialCommunityIcons name="clipboard-list-outline" size={13} color="black"/>
-                                        <Text style={{fontSize:12}}> Package</Text>
-                                    </PrimaryButton>
-                                }
-                                {
-                                    businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled &&
-                                    clientInfo?.details?.reward_balance !== undefined &&
-                                    clientInfo.details.reward_balance !== 0 &&
-                                    <PrimaryButton buttonStyle={styles.activePlan}
-                                                   pressableStyle={styles.activePlanPressable}>
-                                        <Text style={{fontSize:12}}>
-                                            Points <Text style={{color: Colors.highlight}}>{(clientInfo.rewardPointBalance).toFixed(2)}</Text>
-                                        </Text>
-                                    </PrimaryButton>
-                                }
+                                    {
+                                        clientInfo.details.wallet_balance !== 0 &&
+                                        clientInfo.details.wallet_balance !== undefined &&
+                                        <PrimaryButton buttonStyle={styles.activePlan}
+                                                       pressableStyle={styles.activePlanPressable}>
+                                            <Text style={{fontSize: 12}}>
+                                                Bal <Text style={{color: Colors.highlight}}> -
+                                                ₹{clientInfo.details.wallet_balance}</Text>
+                                            </Text>
+                                        </PrimaryButton>
+                                    }
+                                    <MemberShipDetailModal isMembershipModalVisible={isMembershipModalVisible}
+                                                           membershipDetails={clientInfo.membershipDetails}
+                                                           closeModal={() => setIsMembershipModalVisible(false)}
+                                                           onApplyMembership={onApplyMembership}
+                                                           storedMembershipId={storeMembershipId}
+                                    />
+                                    {clientInfo.membershipDetails.length !== 0 &&
+                                        <PrimaryButton buttonStyle={styles.activePlan}
+                                                       pressableStyle={styles.activePlanPressable}
+                                                       onPress={() => setIsMembershipModalVisible(true)}
+                                        >
+                                            <Feather name="user-check" size={13} color="black"/>
+                                            <Text style={{fontSize: 12}}> Membership</Text>
+                                        </PrimaryButton>}
+                                    {clientInfo.packageDetails.length !== 0 &&
+                                        <PrimaryButton buttonStyle={styles.activePlan}
+                                                       pressableStyle={styles.activePlanPressable}
+                                                       onPress={openRedeemPackageModalHandler}
+                                        >
+                                            <MaterialCommunityIcons name="clipboard-list-outline" size={13}
+                                                                    color="black"/>
+                                            <Text style={{fontSize: 12}}> Package</Text>
+                                        </PrimaryButton>
+                                    }
+                                    {
+                                        businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled &&
+                                        clientInfo?.details?.reward_balance !== undefined &&
+                                        clientInfo.details.reward_balance !== 0 &&
+                                        <PrimaryButton buttonStyle={styles.activePlan}
+                                                       pressableStyle={styles.activePlanPressable}>
+                                            <Text style={{fontSize: 12}}>
+                                                Points {(clientInfo.rewardPointBalance ?? 0).toFixed(2)}
+                                            </Text>
+                                        </PrimaryButton>
+                                    }
                                 </View>
                             </ScrollView>
                             : null
@@ -322,22 +323,23 @@ const styles = StyleSheet.create({
     },
     clientCard: {
         flex: 0.60,
-        marginBottom:-10
+        marginBottom: -10
     },
     actionMenu: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
         flex: 0.40,
-        marginBottom:-10
+        marginBottom: -10
     },
     clientDetailContainer: {
         // alignItems: "center",
         // justifyContent: "space-around",
         flexDirection: "row",
-        gap:10,
-        marginTop:15,
-        paddingHorizontal:10
+        gap: 10,
+        marginTop: 10,
+        marginBottom: 7,
+        paddingHorizontal: 10
     },
     activePlan: {
         borderColor: Colors.grey200,

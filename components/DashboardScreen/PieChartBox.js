@@ -530,6 +530,8 @@ const PieChartBox = (props) => {
               showText
               textColor="white"
               textSize={14}
+              tooltipDuration={3000}
+              // showTooltip
             />
           ) : (
             <PieChart
@@ -547,6 +549,8 @@ const PieChartBox = (props) => {
               textSize={14}
               isAnimated
               animationDuration={5000}
+              tooltipDuration={3000}
+              // showTooltip
             />
             // null
           )}
@@ -669,7 +673,7 @@ const PieChartBox = (props) => {
   );
 };
 
-export default PieChartBox;
+export default React.memo(PieChartBox);
 
 const styles = StyleSheet.create({
   commonContainer: {

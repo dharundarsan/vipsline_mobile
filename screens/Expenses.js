@@ -1,7 +1,7 @@
 import {View, StyleSheet, Text, Image, FlatList} from "react-native";
 import textTheme from "../constants/TextTheme";
 import PrimaryButton from "../ui/PrimaryButton";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import RecordExpenses from "../components/expensesScreen/RecordExpenses";
 import SearchBar from "../ui/SearchBar";
 import Colors from "../constants/Colors";
@@ -10,16 +10,20 @@ import ExpenseFilters from "../components/expensesScreen/ExpenseFilters";
 import {useDispatch, useSelector} from "react-redux";
 import {
     loadExpensesFromDb,
-    loadSearchExpensesFromDb,
+    loadSearchExpensesFromDb, resetExpensesPageNo,
     updateCurrentExpense,
-    updateCurrentExpensesId
+    updateCurrentExpensesId, updateFilters
 } from "../store/ExpensesSlice";
-import {dateFormatter} from "../util/Helpers";
+import {capitalizeFirstLetter, dateFormatter} from "../util/Helpers";
 import ExpensesPagination from "../components/expensesScreen/ExpensesPagination";
 import EntryModal from "../components/expensesScreen/EntryModal";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import {useFocusEffect} from "@react-navigation/native";
 import SearchExpensesPagination from "../components/expensesScreen/SearchExpensesPagination";
+import {loadBusinessNotificationDetails} from "../store/listOfBusinessSlice";
+import {Col} from "react-native-table-component";
+import moment from "moment/moment";
+import Toast from "../ui/Toast";
 
 
 export default function Expenses() {
@@ -40,6 +44,11 @@ export default function Expenses() {
     const isExpensesExists = useSelector(state => state.expenses.isExpensesExists);
     const currentExpense = useSelector(state => state.expenses.currentExpense);
 
+    const {range, category, fromDate, toDate} = useSelector(state => state.expenses);
+
+    const toastRef = useRef(null);
+
+
 
 
     useEffect(() => {
@@ -51,7 +60,20 @@ export default function Expenses() {
 
     useFocusEffect(useCallback(
         () => {
+            dispatch(loadBusinessNotificationDetails());
             dispatch(loadExpensesFromDb());
+
+            return () => {
+                dispatch(updateFilters({
+                    fromDate: moment().format("YYYY-MM-DD"),
+                    toDate: moment().format("YYYY-MM-DD"),
+                    category: "All expenses",
+                    range: "Today",
+                    customRangeStartDate: "",
+                    customRangeEndDate: ""
+                }));
+                dispatch(resetExpensesPageNo());
+            }
         },
         [],
     )
@@ -65,9 +87,7 @@ export default function Expenses() {
             pressableStyle={styles.expensesCardPressable}
             onPress={() => {
                 setUpdateIsVisible(true)
-                dispatch(updateCurrentExpensesId(itemData.item.id))
-
-                ;
+                dispatch(updateCurrentExpensesId(itemData.item.id));
                 dispatch(updateCurrentExpense(
                     expenseItems.find((item) => item.id === itemData.item.id)
                 ))
@@ -76,25 +96,26 @@ export default function Expenses() {
             }}
         >
         <View style={{width: '100%', paddingVertical: 16}}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16}}>
-                <Text style={[textTheme.titleSmall]}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20}}>
+                <Text style={[textTheme.titleSmall, {fontWeight: "400"}]}>
                     {itemData.item.expense_sub_category}
                 </Text>
                 <Text style={[textTheme.titleSmall]}>
                     ₹ {itemData.item.amount}
                 </Text>
             </View>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16}}>
-                <Text style={[textTheme.titleSmall, {color: Colors.grey500}]}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20}}>
+                <Text style={[textTheme.labelSmall, {color: Colors.grey500, fontSize: 13,}]}>
                     {itemData.item.date.split(",")[0]}
                 </Text>
-                <Text style={[textTheme.titleSmall, {color: Colors.grey500}]}>
-                    {itemData.item.payment_mode}
+                <Text style={[textTheme.labelSmall, {color: Colors.grey500, fontSize: 13}]}>
+                    {itemData.item.payment_mode === "CASH" ? "Cash" : itemData.item.payment_mode === "CARD" ? "Card" : "Digital"}
                 </Text>
             </View>
         </View>
         </PrimaryButton>
     }
+
 
 
 
@@ -117,8 +138,7 @@ export default function Expenses() {
                 type={"add"}
                 setClientDetected={setClientDeleted}
                 searchQuery={searchQuery}
-
-
+                toastRef={toastRef}
             />
         }
         {
@@ -131,6 +151,7 @@ export default function Expenses() {
                 type={"update"}
                 setClientDetected={setClientDeleted}
                 searchQuery={searchQuery}
+                toastRef={toastRef}
             />
         }
         {
@@ -159,6 +180,7 @@ export default function Expenses() {
                     />
                 </View> :
                 <View>
+                    <Toast ref={toastRef}/>
                     <View style={styles.searchBarContainer}>
                         <SearchBar
                             filter
@@ -166,6 +188,14 @@ export default function Expenses() {
                             searchContainerStyle={styles.searchBar}
                             placeholder={"Search expense"}
                             onChangeText={setSearchQuery}
+                            filterIcon={{
+                                backgroundColor: range === "Today" &&
+                                                 category === "All expenses" &&
+                                                 fromDate === moment().format("YYYY-MM-DD") &&
+                                                 toDate === moment().format("YYYY-MM-DD") ?
+                                                 null :
+                                                 Colors.highlight100
+                            }}
                         />
 
                     </View>
@@ -192,7 +222,7 @@ export default function Expenses() {
                                 renderItem={renderItem}
                                 ListEmptyComponent={() => (
                                     <View style={styles.noDataContainer}>
-                                        <Text style={[textTheme.titleMedium]}>No Data</Text>
+                                        <Text style={[textTheme.bodyLarge]}>No Data Found</Text>
                                     </View>
                                 )}
                                 contentContainerStyle={styles.flatList}
@@ -206,8 +236,6 @@ export default function Expenses() {
                                     </View>
                                 )}
                             />
-
-
                     }
                     <View style={styles.addButtonContainer}>
                         <PrimaryButton

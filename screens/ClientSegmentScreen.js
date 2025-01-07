@@ -33,7 +33,7 @@ import {
 import SearchClientPagination from "../components/clientSegmentScreen/searchClientPagination";
 import { clearClientsList, loadClientCountFromDb, loadClientsFromDb } from "../store/clientSlice";
 import textTheme from "../constants/TextTheme";
-import { clientFilterAPI } from "../util/apis/clientFilterAPI";
+import { clientFilterAPI } from "../apis/ClientSegmentAPIs/clientFilterAPI";
 import axios from "axios";
 import { checkNullUndefined, convertAppliedFilters } from "../util/Helpers";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
@@ -44,6 +44,7 @@ import Toast from "../ui/Toast";
 import AdvancedFilters from "../components/clientSegmentScreen/AdvancedFilters";
 import CustomTagFilter from "../ui/CustomTagFilter";
 import { Divider } from "react-native-paper";
+import {loadBusinessNotificationDetails} from "../store/listOfBusinessSlice";
 
 
 export default function ClientSegmentScreen(props) {
@@ -125,7 +126,7 @@ export default function ClientSegmentScreen(props) {
         dispatch(loadClientFiltersFromDb(10, "All"));
         getLocation("Clients");
         dispatch(clearClientInfo())
-
+        dispatch(loadBusinessNotificationDetails())
         // return () => {
         //     dispatch(clearClientInfo());
         // }

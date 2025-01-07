@@ -15,6 +15,7 @@ import toastReducer from "./toastSlice";
 import businessDetailReducer from "./BusinessDetailSlice";
 import leadManagementReducer from "./leadManagementSlice";
 import ExpensesReducer from './ExpensesSlice';
+import navigationReducer from "./NavigationSlice";
 
 const store = configureStore({
     reducer: {
@@ -33,7 +34,8 @@ const store = configureStore({
         toast: toastReducer,
         leads: leadManagementReducer,
         expenses: ExpensesReducer,
-        dashboardDetails:dashboardReducer
+        dashboardDetails:dashboardReducer,
+        navigation: navigationReducer,
     },
 });
 

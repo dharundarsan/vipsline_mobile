@@ -2,18 +2,24 @@ import {KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, Vi
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import {Ionicons} from "@expo/vector-icons";
+import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import CustomTextInput from "../../ui/CustomTextInput";
 import {useDispatch, useSelector} from "react-redux";
-import createLeadAPI from "../../util/apis/createLeadAPI";
+import createLeadAPI from "../../apis/leadManagementAPIs/createLeadAPI";
 import {formatDate, formatTime} from "../../util/Helpers";
 import moment from "moment";
-import editLeadAPI from "../../util/apis/editLeadAPI";
+import editLeadAPI from "../../apis/leadManagementAPIs/editLeadAPI";
 import {loadLeadsFromDb} from "../../store/leadManagementSlice";
 import Toast from "../../ui/Toast";
-import getLeadCampaignsAPI from "../../util/apis/getLeadCampaignsAPI";
+import getLeadCampaignsAPI from "../../apis/leadManagementAPIs/getLeadCampaignsAPI";
+import deleteLeadAPI from "../../apis/leadManagementAPIs/deleteLeadAPI";
+import {useNavigation} from "@react-navigation/native";
+import {updateNavigationState} from "../../store/NavigationSlice";
+import MiniActionTextModal from "../checkoutScreen/MiniActionTextModal";
+import ConfirmDeleteLeadModal from "./ConfirmDeleteLeadModal";
+import BottomActionCard from "../../ui/BottomActionCard";
 
 const CreateLeadModal = (props) => {
     const leadSources = useSelector(state => state.leads.leadSources);
@@ -39,12 +45,16 @@ const CreateLeadModal = (props) => {
     const [view, setView] = useState("smart");
     const dispatch = useDispatch();
 
+    const [isConfirmLeadDeleteModalVisible, setIsConfirmLeadDeleteModalVisible] = useState(false);
+
     const firstNameRef = useRef(null);
     const emailRef = useRef(null);
     const phoneNoRef = useRef(null);
     const followUpTimeRef = useRef(null);
     const followUpDateRef = useRef(null)
     const scrollViewRef = useRef(null);
+
+    const navigation = useNavigation();
 
 
     useLayoutEffect(() => {
@@ -60,7 +70,7 @@ const CreateLeadModal = (props) => {
 
     useEffect(() => {
         if (scrollViewRef.current) {
-            scrollViewRef.current.scrollTo({ y: 0, animated: true });
+            scrollViewRef.current.scrollTo({y: 0, animated: true});
         }
     }, [view]);
 
@@ -74,7 +84,7 @@ const CreateLeadModal = (props) => {
         }
         if (!(email === undefined || email === null || email === "")) {
             const emailIsValid = emailRef.current();
-            if(!emailIsValid){
+            if (!emailIsValid) {
                 return;
             }
         }
@@ -98,6 +108,7 @@ const CreateLeadModal = (props) => {
                 resource_id: leadOwner === null || leadOwner === "" ? "" : leadOwner.id,
             })
             await dispatch(loadLeadsFromDb());
+            props.leadManagementToastRef.current.show("Lead Added Successfully");
             props.onCloseModal();
         } catch (e) {
             toastRef.current.show(e.data.other_message);
@@ -113,7 +124,7 @@ const CreateLeadModal = (props) => {
         }
         if (!(email === undefined || email === null || email === "")) {
             const emailIsValid = emailRef.current();
-            if(!emailIsValid){
+            if (!emailIsValid) {
                 return;
             }
         }
@@ -133,15 +144,29 @@ const CreateLeadModal = (props) => {
         })
         await dispatch(loadLeadsFromDb());
         props.refreshData();
+        props.leadProfileToastRef.current.show("Lead Updated");
         props.onCloseModal();
     }
 
-
-    const toastRef = useRef(null);
-
     return <Modal style={styles.createLeadModal} visible={props.isVisible} animationType={"slide"}
                   presentationStyle={"pageSheet"}>
-        <Toast ref={toastRef}/>
+        <BottomActionCard isVisible={isConfirmLeadDeleteModalVisible}
+                          header={"Delete Lead"}
+                          content={"Are you sure you want to delete this lead?"}
+                          onClose={() => setIsConfirmLeadDeleteModalVisible(false)}
+                          onConfirm={async () => {
+                              await deleteLeadAPI(props.data.lead_id);
+                              await dispatch(loadLeadsFromDb());
+                              setIsConfirmLeadDeleteModalVisible(false);
+                              dispatch(updateNavigationState("Lead Management Screen"));
+                              props.leadManagementToastRef.current.show("Lead Deleted Successfully");
+                              props.onCloseModal()
+                              props.refreshData()
+                              navigation.goBack();
+                          }}
+                          onCancel={() => {
+                              setIsConfirmLeadDeleteModalVisible(false);
+                          }}/>
         <View style={styles.closeAndHeadingContainer}>
             <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Lead" : "Create Lead"}</Text>
             <PrimaryButton
@@ -341,7 +366,18 @@ const CreateLeadModal = (props) => {
         </ScrollView>
         <KeyboardAvoidingView>
             <View style={styles.saveButtonContainer}>
-                <PrimaryButton onPress={props.edit ? handleEdit : handleSave} label="Save"/>
+                {props.edit ? <PrimaryButton onPress={async () => {
+                    setIsConfirmLeadDeleteModalVisible(true);
+                }}
+                                             buttonStyle={{
+                                                 backgroundColor: "white",
+                                                 borderWidth: 1,
+                                                 borderColor: Colors.grey400
+                                             }}
+                                             pressableStyle={{paddingHorizontal: 8, paddingVertical: 8}}>
+                    <MaterialIcons name="delete-outline" size={28} color={Colors.error}/>
+                </PrimaryButton> : null}
+                <PrimaryButton onPress={props.edit ? handleEdit : handleSave} label="Save" buttonStyle={{flex: 1}}/>
             </View>
         </KeyboardAvoidingView>
     </Modal>
@@ -380,7 +416,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginHorizontal: -20,
         backgroundColor: "#F8F8FB",
-        paddingVertical: 5,
+        paddingVertical: 10,
         paddingHorizontal: 13,
     },
     sectionTitleText: {
@@ -404,6 +440,8 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         borderTopWidth: 1,
         borderTopColor: Colors.grey300,
+        flexDirection: "row",
+        gap: 12,
     }
 
 })

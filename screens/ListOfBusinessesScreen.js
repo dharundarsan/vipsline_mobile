@@ -4,39 +4,27 @@ import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
 import BusinessCard from "../components/listOfBusinessesScreen/BusinessCard";
 import {useDispatch, useSelector} from "react-redux";
-import {updateAuthStatus, updateBusinessId, updateBusinessName, updateInBusiness} from "../store/authSlice";
+import {updateBusinessId, updateInBusiness} from "../store/authSlice";
 import {
-    loadBusinessesListFromDb,
-    loadBusinessNotificationDetails,
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
-import {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
-
-import {
-    loadMembershipsDataFromDb,
-    loadPackagesDataFromDb,
-    loadProductsDataFromDb,
-    loadServicesDataFromDb
-} from "../store/catalogueSlice";
-import {clearClientsList, loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
-import {loadClientFiltersFromDb, resetClientFilter, resetMaxEntry} from "../store/clientFilterSlice";
-import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
+import {useCallback, useRef, useState} from "react";
+import {resetClientFilter, resetMaxEntry} from "../store/clientFilterSlice";
 import * as SecureStore from 'expo-secure-store';
 import {useFocusEffect} from "@react-navigation/native";
 import {clearClientInfo} from "../store/clientInfoSlice";
-import clearCartAPI from "../util/apis/clearCartAPI";
+import clearCartAPI from "../apis/checkoutAPIs/clearCartAPI";
 import {
     clearCalculatedPrice,
-    clearCustomItems,
     clearLocalCart,
     clearSalesNotes,
     modifyClientMembershipId
 } from "../store/cartSlice";
 import * as Haptics from "expo-haptics";
 import {useLocationContext} from '../context/LocationContext';
-import DeleteClient from '../components/clientSegmentScreen/DeleteClientModal';
 import Toast from "../ui/Toast";
+import BottomActionCard from "../ui/BottomActionCard";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -45,7 +33,6 @@ export default function ListOfBusinessesScreen({navigation}) {
     const dispatch = useDispatch();
     const {getLocation, currentLocation, reload, setReload} = useLocationContext();
     const toastRef = useRef();
-
 
 
     useFocusEffect(useCallback(() => {
@@ -166,36 +153,31 @@ export default function ListOfBusinessesScreen({navigation}) {
 
                 </ScrollView>
             </View>
-            : <DeleteClient
-                isVisible={isDelete}
-                setVisible={setIsDelete}
-                onCloseModal={async () => {
-                    // Navigate directly to CheckoutScreen
-                    setTimeout(() => {
-                        setIsDelete(false);
-                        navigation.navigate("Checkout", {screen: "CheckoutScreen"});
-                    }, 10);
-                    setReload(true)
-                    // console.log(navigationRef.current.getRootState());
-                    // navigate("Checkout")
-                }}
-                header={"Cancel Sale"}
-                content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
-                onCloseClientInfoAfterDeleted={async () => {
-                    await clearCartAPI();
-                    dispatch(modifyClientMembershipId({type: "clear"}));
-                    clearSalesNotes();
-                    dispatch(clearLocalCart());
-                    dispatch(clearClientInfo());
-                    dispatch(clearCalculatedPrice());
-                    setTimeout(() => {
-                        // navigation.navigate("Checkout", { screen: "CheckoutScreen" });
-                        setReload(false);
-                        navigation.navigate(currentLocation);
-                    }, 10);
-                }}
-                checkoutScreenToast={() => null}
-            />
+            : <BottomActionCard isVisible={isDelete}
+                                header={"Cancel Sale"}
+                                content={"If you cancel this sale transaction will not be processed. Do you wish to exit?"}
+                                onClose={() => {
+                                    setIsDelete(false);
+                                }}
+                                onConfirm={async () => {
+                                    await clearCartAPI();
+                                    dispatch(modifyClientMembershipId({type: "clear"}));
+                                    clearSalesNotes();
+                                    dispatch(clearLocalCart());
+                                    dispatch(clearClientInfo());
+                                    dispatch(clearCalculatedPrice());
+                                    setTimeout(() => {
+                                        // navigation.navigate("Checkout", { screen: "CheckoutScreen" });
+                                        setReload(false);
+                                        navigation.navigate(currentLocation);
+                                    }, 10);
+                                    setIsDelete(false);
+                                }}
+                                onCancel={() => {
+                                    setIsDelete(false)
+                                }}
+                                confirmLabel={"Cancel Sale"}
+                                cancelLabel={"Close"}/>
     );
 }
 

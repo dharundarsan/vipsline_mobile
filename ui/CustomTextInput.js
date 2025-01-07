@@ -32,7 +32,9 @@ import RequiredSymbol from "./RequiredSymbol";
  * @param {function} [props.onSave] - Function to call when the save button is pressed.
  * @param {Date} [props.minimumDate] - This optional prop defines the earliest date that the user can select.
  * @param {Date} [props.maximumDate] - This optional prop defines the latest date that the user can select.
+ * @param {required} [props.required] - This is used to add the red-star at the end of the label
  * @returns {React.ReactElement} A styled custom text input component.
+ *
  */
 const CustomTextInput = (props) => {
     const [error, setError] = useState(false);
@@ -221,6 +223,9 @@ const CustomTextInput = (props) => {
                             }
                         }}
                         keyboardType="number-pad"
+
+
+
                     />
                 </View>
             </>
@@ -247,9 +252,9 @@ const CustomTextInput = (props) => {
                 >
 
                     {props.object ? <Text style={[textTheme.bodyLarge]}>
-                        {props.value === undefined || props.value === null || props.value === "" ? "Select " + props.label : props.value.name}
+                        {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value.name}
                     </Text> : <Text style={[textTheme.bodyLarge]}>
-                        {props.value === undefined || props.value === null || props.value === "" ? "Select " + props.label : props.value}
+                        {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value}
                     </Text>}
                     <FontAwesome name="angle-down" size={24} color="black"/>
                 </PrimaryButton>

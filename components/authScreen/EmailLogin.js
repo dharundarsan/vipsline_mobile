@@ -5,7 +5,7 @@ import {useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
 import CheckBox from 'react-native-check-box'
-import findUser from "../../util/apis/findUserApi";
+import findUser from "../../apis/authAPIs/findUserApi";
 import textTheme from "../../constants/TextTheme";
 import {useDispatch} from "react-redux";
 import {updateAuthStatus, updateAuthToken} from "../../store/authSlice";
@@ -189,7 +189,7 @@ export default function EmailLogin() {
             <TextInput
                 autoCapitalize={"none"}
                 placeholder="Enter email Address"
-                style={[textTheme.titleSmall, styles.emailInput]}
+                style={[textTheme.bodyMedium, styles.emailInput]}
                 onChangeText={(text) => {
                     setEmail(text);
                     setIsEmailTyping(true);
@@ -214,7 +214,7 @@ export default function EmailLogin() {
             <TextInput
                 placeholder="Enter password"
                 value={password}
-                style={[textTheme.titleSmall, styles.passwordInput]}
+                style={[textTheme.bodyMedium, styles.passwordInput]}
                 onChangeText={(text) => {
                     setPassword(text)
                     setIsPasswordTyping(true)

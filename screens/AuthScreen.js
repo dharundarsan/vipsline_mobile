@@ -158,7 +158,7 @@ function AuthScreen(props) {
                     >
                         <View style={{flexDirection: "row"}}>
                             <Entypo name="mobile" size={20} color={isMobileOtp ? Colors.white : "black"}/>
-                            <Text style={[textTheme.labelLarge, styles.mobileButtonTextStyle]}>Mobile otp</Text>
+                            <Text style={[textTheme.labelLarge, styles.mobileButtonTextStyle]}>Mobile OTP</Text>
                         </View>
 
                     </PrimaryButton>

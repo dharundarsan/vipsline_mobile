@@ -22,6 +22,9 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ContentLoader from "react-native-easy-content-loader";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocationContext } from "../../context/LocationContext";
+import PopoverIconText from "../../ui/PopoverIconText";
+import StaffDashboardLoader from "./StaffDashboardLoader";
+import DatePicker from "../../ui/DatePicker";
 
 const StaffDashboard = () => {
   const dispatch = useDispatch();
@@ -79,6 +82,7 @@ const StaffDashboard = () => {
       value: pieData.chart_series[index],
       text: percentage,
       color: pieChartColorCode[index].color,
+      tooltipText: pieData.label_list[index]
     };
   });
 
@@ -99,11 +103,11 @@ const StaffDashboard = () => {
           ? formatDateDDMMYYYY(item.day)
           : `${formatDateDDMMYYYY(item.day)} - ${formatDateDDMMYYYY(0)}`
       );
-      await dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(item.day), 
-            item.day !== -6 && item.day !== -29
-            ? formatDateYYYYMMDD(item.day)
-            : formatDateYYYYMMDD(0)
-    ));
+      await dispatch(loadStaffDashboardReport(formatDateYYYYMMDD(item.day),
+        item.day !== -6 && item.day !== -29
+          ? formatDateYYYYMMDD(item.day)
+          : formatDateYYYYMMDD(0)
+      ));
     }
     else if (item.value === "Current month") {
       setIsCustomRange(false);
@@ -127,7 +131,24 @@ const StaffDashboard = () => {
     setIsLoading(false);
   };
 
+  async function handleCustomDateConfirm(num, date) {
+    const formatted = date.toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+    if (num === 1) {
+      setSelectedFromCustomDate(formatted)
+    }
+    else if (num === 2) {
+      setSelectedToCustomDate(formatted)
+    }
+    await handleCustomDate(num, formatDateYYYYMMDDD(date))
+  }
+
   const handleCustomDate = async (type, date) => {
+    setIsDateDataLoading(true)
     if (type === 1) {
       setCustomFromPassData(date);
       await dispatch(loadStaffDashboardReport(date, customToPassData));
@@ -136,7 +157,11 @@ const StaffDashboard = () => {
       setCustomToPassData(date);
       await dispatch(loadStaffDashboardReport(customFromPassData, date));
     }
-    else return
+    else {
+      setIsDateDataLoading(false)
+      return
+    }
+    setIsDateDataLoading(false)
   }
 
   const formatTableData = (data) => {
@@ -191,53 +216,22 @@ const StaffDashboard = () => {
     <ScrollView style={{ backgroundColor: Colors.white }}>
       {isVisible && <StaffDetailsModel isVisible={isVisible} closeModal={() => { setIsVisible(false) }} data={selectedData} />}
       {
-        isPageLoading ?
-          <View style={styles.container}>
-            <View style={[{ flexDirection: "row", columnGap: 0, width: "50%", marginBottom: 10 }]}>
-              <ContentLoader
-                pRows={1}
-                pHeight={[45]}
-                pWidth={["100%"]}
-                active
-                title={false}
-
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[45]}
-                pWidth={["100%"]}
-                active
-                title={false}
-
-              />
-            </View>
-            <View style={{ rowGap: 10 }}>
-              <ContentLoader
-                pRows={1}
-                pHeight={[120]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[120]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[120]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-            </View>
-          </View>
+        isPageLoading ? <StaffDashboardLoader />
           :
           <View style={styles.container}>
-            <View style={isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
+            <DatePicker
+              isCustomRange={isCustomRange}
+              handleSelection={handleSelection}
+              isLoading={isLoading}
+              handleCustomDateConfirm={handleCustomDateConfirm}
+              handleCustomDate={handleCustomDate}
+              dateData={dateData}
+              selectedValue={selectedValue}
+              date={date}
+              selectedToCustomDate={selectedToCustomDate}
+              selectedFromCustomDate={selectedFromCustomDate}
+            />
+            {/* <View style={isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
               <Dropdown
                 style={isCustomRange ? styles.customDropdown : styles.dropdown}
                 data={dateData}
@@ -342,110 +336,116 @@ const StaffDashboard = () => {
                   <Text style={styles.dateText}>{date}</Text>
                 )}
               </View>
-            </View>
+            </View> */}
             {
-              isDateDataLoading ? 
-              <View style={{ rowGap: 10 }}>
-              <ContentLoader
-                pRows={1}
-                pHeight={[120]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[120]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[120]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-            </View>
-              :
-              <>
-              <PieChartBox
-              title={"Staff Performance"}
-              pieDataArray={togglePercentageData}
-              totalCenterValue={servicesTotalValue}
-              labelArray={pieData.label_list}
-            // toggleDateDropdown
-            />
-            <View style={styles.performerContainer}>
-              <View style={styles.headerContainer}>
-                <Text style={TextTheme.titleMedium}>Top Performer</Text>
-              </View>
-              <Divider />
-              <View style={{ alignItems: "center", paddingVertical: 10 }}>
-                {topPerformer[0]?.name !== undefined && topPerformer[0].name !== "" > 0 ? (
-                  topPerformer.map((item, index) => {
-                    return (
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          width: "50%",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          paddingVertical: 10,
-                        }}
-                      >
-                        <Image
-                          source={trophyIcon[index].icon}
-                          style={{ width: 40, height: 40 }}
-                        />
-                        <View style={{ width: '80%', alignItems: 'center'}}>
-                          <View style={{ alignItems: 'center' }}>
-                            <Text style={TextTheme.bodyMedium}>{item.name}</Text>
-                            <Text style={TextTheme.bodyMedium}>
-                              {"₹ " + pieData.chart_series[index]}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  })
-                ) : (
-                  <Text style={{ justifyContent: "center", alignItems: "center" }}>
-                    No data Found !
-                  </Text>
-                )}
-              </View>
-            </View>
-            <View style={styles.topList}>
-              <View style={styles.headerPerformerContainer}>
-                <Text style={[TextTheme.titleMedium, { textAlign: "center" }]}>
-                  Staff Performance Summary
-                </Text>
-              </View>
-              <Divider />
-              <TableWrapper>
-                <Table style={styles.tableHeaderContainer}>
-                  <Row
-                    data={["Staff Name", "Clients", "Item #", "Total"]}
-                    style={styles.headerData}
-                    textStyle={[TextTheme.titleSmall, { textAlign: "center" }]}
-                    flexArr={[2, 1, 1, 1]}
+              isDateDataLoading ?
+                <View style={{ rowGap: 10 }}>
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[120]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
                   />
-                  {tableData.length > 0 ? tableData.map((rowData, index) => {
-                    // console.log((rowData[0].value + rowData[1].value + index) === NaN ? index : rowData[0].value + rowData[1].value + index);
-                    return (
-                      <View key={rowData} style={styles.rowData}>
-                        {renderRow(rowData, index)}
-                      </View>
-                    )
-                  }) : <Text style={{ paddingVertical: 20, alignSelf: 'center' }}>No data found!</Text>}
-                </Table>
-              </TableWrapper>
-            </View>
-              </>
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[120]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
+                  />
+                  <ContentLoader
+                    pRows={1}
+                    pHeight={[120]}
+                    pWidth={["100%"]}
+                    active
+                    title={false}
+                  />
+                </View>
+                :
+                <>
+                  <PieChartBox
+                    title={"Staff Performance"}
+                    pieDataArray={togglePercentageData}
+                    totalCenterValue={servicesTotalValue}
+                    labelArray={pieData.label_list}
+                  // toggleDateDropdown
+                  />
+                  <View style={styles.performerContainer}>
+                    <View style={styles.headerContainer}>
+                      {/* <Text style={TextTheme.titleMedium}>Top Performer</Text> */}
+                      <PopoverIconText
+                        title={"Top Performer"}
+                        titleStyle={[TextTheme.titleMedium]}
+                        popoverText={"Top performing staff members ordered by sales"}
+                        popoverArrowShift={-0.2}
+                      />
+                    </View>
+                    <Divider />
+                    <View style={{ alignItems: "center", paddingVertical: 10 }}>
+                      {topPerformer[0]?.name !== undefined && topPerformer[0].name !== "" > 0 ? (
+                        topPerformer.map((item, index) => {
+                          return (
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                width: "50%",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                paddingVertical: 10,
+                              }}
+                            >
+                              <Image
+                                source={trophyIcon[index].icon}
+                                style={{ width: 40, height: 40 }}
+                              />
+                              <View style={{ width: '80%', alignItems: 'center' }}>
+                                <View style={{ alignItems: 'center' }}>
+                                  <Text style={TextTheme.bodyMedium}>{item.name}</Text>
+                                  <Text style={TextTheme.bodyMedium}>
+                                    {"₹ " + pieData.chart_series[index]}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                          );
+                        })
+                      ) : (
+                        <Text style={{ justifyContent: "center", alignItems: "center" }}>
+                          No data Found !
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                  <View style={styles.topList}>
+                    <View style={styles.headerPerformerContainer}>
+                      <Text style={[TextTheme.titleMedium, { textAlign: "center" }]}>
+                        Staff Performance Summary
+                      </Text>
+                    </View>
+                    <Divider />
+                    <TableWrapper>
+                      <Table style={styles.tableHeaderContainer}>
+                        <Row
+                          data={["Staff Name", "Clients", "Item #", "Total"]}
+                          style={styles.headerData}
+                          textStyle={[TextTheme.titleSmall, { textAlign: "center" }]}
+                          flexArr={[2, 1, 1, 1]}
+                        />
+                        {tableData.length > 0 ? tableData.map((rowData, index) => {
+                          // console.log((rowData[0].value + rowData[1].value + index) === NaN ? index : rowData[0].value + rowData[1].value + index);
+                          return (
+                            <View key={rowData} style={styles.rowData}>
+                              {renderRow(rowData, index)}
+                            </View>
+                          )
+                        }) : <Text style={{ paddingVertical: 20, alignSelf: 'center' }}>No data found!</Text>}
+                      </Table>
+                    </TableWrapper>
+                  </View>
+                </>
             }
-            
+
           </View>
       }
     </ScrollView>

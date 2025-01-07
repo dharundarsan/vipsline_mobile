@@ -69,10 +69,7 @@ export default function AdvancedFilters(props) {
     const fromDateRef = useRef(null)
     const toDateRef = useRef(null)
 
-
-
-
-    return <Modal style={{flex: 1}} visible={props.isVisible} animationType={"slide"}>
+    return <Modal style={{flex: 1}} visible={props.isVisible} animationType={"slide"} presentationStyle={"pageSheet"} onRequestClose={props.onClose}>
            <View style={styles.advancedFilters}>
                <View style={styles.header}>
                    <Text style={[textTheme.titleLarge, styles.headerText]}>
