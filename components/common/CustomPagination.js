@@ -8,7 +8,9 @@ export default function CustomPagination(props) {
 
     const [upperCount, setUpperCount] = useState(10);
     const [lowerCount, setLowerCount] = useState(1);
-
+    console.log("props.currentCount");
+    console.log(props.currentCount);
+    
     useEffect(() => {
         props.refreshOnChange();
         if (lowerCount === 1) {

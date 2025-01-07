@@ -18,6 +18,7 @@ import * as Haptics from "expo-haptics";
 import * as SecureStore from 'expo-secure-store';
 import Toast from "react-native-toast-message";
 import { Divider } from "react-native-paper";
+import { loadBusinessNotificationDetails } from "../../store/listOfBusinessSlice";
 
 const AddClientModal = (props) => {
     // const pageNo = useSelector(state => state.client.pageNo);
@@ -184,6 +185,7 @@ const AddClientModal = (props) => {
                                         dispatch(loadAnalyticsClientDetailsFromDb(item.id));
                                         props.setSearchClientQuery("");
                                         dispatch(updateClientId(item.id))
+                                        dispatch(getRewardPointBalance(clientId));
                                     }}
                                 />
                             )}
