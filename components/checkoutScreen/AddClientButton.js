@@ -271,8 +271,7 @@ const AddClientButton = (props) => {
                                         <PrimaryButton buttonStyle={styles.activePlan}
                                                        pressableStyle={styles.activePlanPressable}>
                                             <Text style={{fontSize: 12}}>
-                                                Points <Text
-                                                style={{color: Colors.highlight}}>{(clientInfo.rewardPointBalance ?? 0).toFixed(2)}</Text>
+                                                Points {(clientInfo.rewardPointBalance ?? 0).toFixed(2)}
                                             </Text>
                                         </PrimaryButton>
                                     }
