@@ -140,7 +140,9 @@ const PaymentModal = (props) => {
     const cartSliceState = useSelector((state) => state.cart);
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
-
+    const rewardDetails = useSelector((state) => state.clientInfo.customerRewardDetails);
+    const rewardMinValue =  cartSliceState?.calculatedPrice[0]?.reward_details?.minValue ?? 0;
+    // cartSliceState?.calculatedPrice[0]?.reward_details?.minValue
     const toastRef = useRef(null)
 
     useEffect(() => {
@@ -547,8 +549,6 @@ const PaymentModal = (props) => {
         return cartSliceState.items.find(item => item.gender === "prepaid");
     }
     useLayoutEffect(() => {
-        console.log("hello");
-        
         if (rewardValue !== 0 && rewardValue < props.price) {
             setSelectedPaymentOption("split_payment")
             const splitApi = async () => {
@@ -569,8 +569,6 @@ const PaymentModal = (props) => {
                 //         }
                 //     })
                 // }
-                console.log("checkSplitActive");
-                console.log(checkSplitActive);
                 
                 if (checkSplitActive === 0) {
                     let flexSplitState;
@@ -626,9 +624,6 @@ const PaymentModal = (props) => {
     }, [rewardValueToggle])
     
     function onRewardValueChange(value){
-        console.log("value");
-        console.log(value);
-        
         setRewardValue(value);
         setRewardValueToggle(prev => !prev);
     }
@@ -647,9 +642,9 @@ const PaymentModal = (props) => {
 
                     setIsSplitPaymentDropdownVisible(false)
                 }}
-                dropdownItems={isPrepaidAvailable && isRewardActive ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                dropdownItems={isPrepaidAvailable && isRewardActive && rewardDetails?.customerRewardList.length > 0 ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
                     : isPrepaidAvailable && !isRewardActive ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
-                        : isRewardActive ? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                        : isRewardActive && rewardDetails?.customerRewardList.length > 0 ? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
                             : ["Cash", "Credit / Debit card", "Digital payment"]}
                 onChangeValue={(value) => {
                     setAddedSplitPayment(value)
@@ -803,7 +798,7 @@ const PaymentModal = (props) => {
                         </PrimaryButton>
                     </View>
                     <View style={styles.paymentOptionsRow}>
-                        {isRewardActive && <PrimaryButton
+                        {clientInfo.reward_balance >= rewardMinValue && isRewardActive && <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[
                                 styles.paymentOptionRewardButton,
@@ -834,7 +829,7 @@ const PaymentModal = (props) => {
                         {(isPrepaidAvailable) &&
                             <PrimaryButton
                                 disableRipple={isZeroPayment}
-                                buttonStyle={[styles.paymentOptionButton, isRewardActive && isPrepaidAvailable ? { flex: 0.5 } : isPrepaidAvailable ? { flex: 1, marginBottom: 20 } : {}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
+                                buttonStyle={[styles.paymentOptionButton, isRewardActive && clientInfo.reward_balance >= rewardMinValue && isPrepaidAvailable ? { flex: 0.5 } : isPrepaidAvailable ? { flex: 1, marginBottom: 20 } : {}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
                                 onPress={isZeroPayment ? () => { } : () => {
 
                                     if (clientInfo.wallet_balance < props.price) {
@@ -1168,11 +1163,6 @@ const PaymentModal = (props) => {
                             }
                             let totalPrice = splitUpState.reduce((acc, item) => {
                                 if (item.shown) {
-                                    console.log("typeof(item.amount)");
-                                    
-                                    console.log(typeof(item.amount));
-                                    console.log(item.amount);
-                                    
                                     return Number(Number(item.amount) + Number(acc));
                                 }
                                 return Number(acc);

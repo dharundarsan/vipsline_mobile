@@ -19,7 +19,10 @@ import {
     clearClientInfo,
     loadAnalyticsClientDetailsFromDb,
     loadClientInfoFromDb,
-    updateClientId
+    resetRewardPageNo,
+    updateClientId,
+    updateCustomerRewards,
+    updateRewardsPointBalance
 } from "../store/clientInfoSlice";
 import {
     loadClientFiltersFromDb,
@@ -325,6 +328,9 @@ export default function ClientSegmentScreen(props) {
                         onClose={() => {
                             setIsClientInfoModalVisible(false)
                             dispatch(clearClientInfo())
+                            dispatch(resetRewardPageNo());
+                            dispatch(updateCustomerRewards({customerRewardList:[],count:0}))
+                            dispatch(updateRewardsPointBalance(0))
                         }}
                         deleteClientToast={() => {
                             clientSegmentToast("client deleted successfully.", 2000);

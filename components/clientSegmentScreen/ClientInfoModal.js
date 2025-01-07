@@ -16,7 +16,7 @@ import UpdateClientModal from "./UpdateClientModal";
 import DeleteClient from "./DeleteClientModal";
 import {useDispatch, useSelector} from "react-redux";
 import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
-import {clearClientInfo, loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import {clearClientInfo, loadClientInfoFromDb, resetRewardPageNo, updateCustomerRewards, updateRewardsPointBalance} from "../../store/clientInfoSlice";
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
 import {loadClientsFromDb} from "../../store/clientSlice";
@@ -333,7 +333,13 @@ export default function clientInfoModal(props) {
                         <PrimaryButton
                             buttonStyle={styles.backButton}
                             onPress={() => {
+                                if(clientMoreDetails === "rewardpoints"){
+                                    dispatch(resetRewardPageNo());
+                                    dispatch(updateCustomerRewards({customerRewardList:[],count:0}))
+                                    dispatch(updateRewardsPointBalance(0))
+                                }
                                 setClientMoreDetails(null);
+                                
                             }}
                         >
                             <AntDesign name="arrowleft" size={24} color="black"/>
