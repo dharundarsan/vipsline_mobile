@@ -63,7 +63,6 @@ const AddClientButton = (props) => {
     }
 
     // console.log("clientInfo.membershipDetails.length ");
-    // console.log(clientInfo.membershipDetails.length);
 
     useEffect(() => {
         function singleMembershipApply() {
@@ -265,12 +264,13 @@ const AddClientButton = (props) => {
                                     </PrimaryButton>
                                 }
                                 {
+                                    businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled &&
+                                    clientInfo?.details?.reward_balance !== undefined &&
                                     clientInfo.details.reward_balance !== 0 &&
-                                    clientInfo.details.reward_balance !== undefined &&
                                     <PrimaryButton buttonStyle={styles.activePlan}
                                                    pressableStyle={styles.activePlanPressable}>
                                         <Text style={{fontSize:12}}>
-                                            Points <Text style={{color: Colors.highlight}}>{clientInfo.rewardPointBalance}</Text>
+                                            Points <Text style={{color: Colors.highlight}}>{(clientInfo.rewardPointBalance).toFixed(2)}</Text>
                                         </Text>
                                     </PrimaryButton>
                                 }
