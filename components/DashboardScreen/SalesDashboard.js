@@ -1,10 +1,10 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../../constants/Colors";
 import { listData, pieChartColorCode, salesCardData, salesData } from "../../data/DashboardSelection";
 import DashboardCard from "../../ui/DashboardCard";
-import ListIconData from "./ListIconData";
+import ListIconData from "../../ui/ListIconData";
 import { Divider } from "react-native-paper";
 import textTheme from "../../constants/TextTheme";
 import ServiceList from "./ServiceList";
@@ -15,16 +15,19 @@ import PieChartBox from "./PieChartBox";
 import { calculateTotalValue, processPieChartData } from "./PieData";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import LineChartBox from "./LineChartBox";
+import LineChartBox from "../../ui/LineChartBox";
 import GroupedBarChart from "./GroupedBarChart";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocationContext } from "../../context/LocationContext";
 import SalesDashboardScreenLoader from "./SalesDashboardScreenLoader";
 import SalesDashboardDateLoader from "./SalesDashboardDateLoader";
+import PopoverIconText from "../../ui/PopoverIconText";
+import DatePicker from "../../ui/DatePicker";
 
-const SalesDashboard = () => {
+const SalesDashboard = ({route,navigation}) => {
   const dispatch = useDispatch();
-  const {getLocation} = useLocationContext()
+  const { getLocation } = useLocationContext()
+  
   useFocusEffect(useCallback(() => {
     getLocation("Sales Dashboard");
   }, []))
@@ -33,12 +36,8 @@ const SalesDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState(formatDateDDMMYYYY().toString());
   const [isCustomRange, setIsCustomRange] = useState(false);
-  const [fromDateVisibility, setFromDateVisibility] = useState(false);
-  const [toDateVisibility, setToDateVisibility] = useState(false);
   const [selectedFromCustomDate, setSelectedFromCustomDate] = useState("0");
   const [selectedToCustomDate, setSelectedToCustomDate] = useState("0");
-  const [customFromDateData, setCustomFromDateData] = useState(new Date());
-  const [customToDateData, setCustomToDateData] = useState(new Date());
   const [customFromPassData, setCustomFromPassData] = useState(formatDateYYYYMMDD(0));
   const [customToPassData, setCustomToPassData] = useState(formatDateYYYYMMDD(0));
   const [isDateDataLoading, setIsDateDataLoading] = useState(false);
@@ -63,13 +62,13 @@ const SalesDashboard = () => {
   const totalAppointmentOverTime = useSelector((state) => state.dashboardDetails.totalAppointmentOverTime);
 
   const billItemTotalValue = calculateTotalValue(billItemDetails[0].series);
-  
+
   const servicesTotalValue = calculateTotalValue(topRevenueDetails[0].chart_series);
   const productsTotalValue = calculateTotalValue(topProductDetails[0].chart_series);
 
   const data = billItemDetails[0].series.map((value) => ({ value })) || [];
-  const totalSalesOverTimeData = totalSalesOverTime.count.map((value) => ({ value }))
-  const totalAppointmentsOverTimeData = totalAppointmentOverTime.count.map((value) => ({ value }))
+  const totalSalesOverTimeData = totalSalesOverTime.count.map((value) => ({ value: value, dataPointText: value.toString() }))
+  const totalAppointmentsOverTimeData = totalAppointmentOverTime.count.map((value) => ({ value: value, dataPointText: value.toString() }))
 
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
   const percentageBillData = data.map((item, index) => {
@@ -80,17 +79,20 @@ const SalesDashboard = () => {
       value: item.value,
       text: percentage <= 2.0 ? "" : `${percentage}%`,
       color: pieChartColorCode[index]?.color || "#000",
+      tooltipText: billItemDetails[0].labels[index]
     };
   });
 
   const togglePercentageData = processPieChartData(
     topRevenueDetails[0].services_list,
-    "salesPercent"
+    "salesPercent",
+    topRevenueDetails[0].label_list,
   );
 
   const toggleProductData = processPieChartData(
     topProductDetails[0].services_list,
-    "salesProduct"
+    "salesProduct",
+    topProductDetails[0].label_list,
   );
 
   const valueMap = {
@@ -120,8 +122,8 @@ const SalesDashboard = () => {
           loadSalesDashboard(
             formatDateYYYYMMDD(item.day),
             item.day !== -6 && item.day !== -29
-            ? formatDateYYYYMMDD(item.day)
-            : formatDateYYYYMMDD(0)
+              ? formatDateYYYYMMDD(item.day)
+              : formatDateYYYYMMDD(0)
           )
         );
       }
@@ -145,7 +147,24 @@ const SalesDashboard = () => {
     setIsDateDataLoading(false);
   };
 
+  async function handleCustomDateConfirm(num, date) {
+    const formatted = date.toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+    if (num === 1) {
+      setSelectedFromCustomDate(formatted)
+    }
+    else if (num === 2) {
+      setSelectedToCustomDate(formatted)
+    }
+    await handleCustomDate(num, formatDateYYYYMMDDD(date))
+  }
+
   const handleCustomDate = async (type, date) => {
+    setIsDateDataLoading(true)
     if (type === 1) {
       setCustomFromPassData(date);
       await dispatch(loadSalesDashboard(date, customToPassData));
@@ -154,24 +173,14 @@ const SalesDashboard = () => {
       setCustomToPassData(date);
       await dispatch(loadSalesDashboard(customFromPassData, date));
     }
-    else return
+    else {
+      setIsDateDataLoading(false)
+      return
+    }
+    setIsDateDataLoading(false)
   }
 
-  useEffect(() => {
-    let firstMonth = firstMonthDate;
-    let lastMonth = lastMonthDate;
 
-    async function initialCall() {
-      await dispatch(updateDashBoardName("Sales"))
-      await dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
-      await dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
-      await dispatch(loadDailyAppointmentAnalyticsForBusiness(true, "currentmonth"))
-      await dispatch(loadTopRevenueProducts(firstMonth, lastMonth));
-      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false, "currentmonth"))
-      setIsPageLoading(false);
-    }
-    initialCall();
-  }, []);
   const totalSalesOverTimeArr = [...totalSalesOverTime.count];
   const maxTotalSalesValue = totalSalesOverTimeArr.sort((a, b) => b - a)[0];
   const appointmentsOverTimeArr = [...totalAppointmentOverTime.count];
@@ -196,212 +205,142 @@ const SalesDashboard = () => {
 
   const removeZeroLineSalesOverTime = removeZero(roundUp(maxTotalSalesValue)) || 10;
   const roundLineSalesOverTime = roundUp(maxTotalSalesValue)
-  
+
+  useEffect(() => {
+    let firstMonth = firstMonthDate;
+    let lastMonth = lastMonthDate;
+
+    async function initialCall() {
+      await dispatch(updateDashBoardName("Sales"))
+      await dispatch(loadSalesDashboard(formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)));
+      await dispatch(loadTopRevenueServices(firstMonthDate, lastMonthDate));
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(true, "currentmonth"))
+      await dispatch(loadTopRevenueProducts(firstMonth, lastMonth));
+      await dispatch(loadDailyAppointmentAnalyticsForBusiness(false, "currentmonth"))
+      setIsPageLoading(false);
+    }
+    initialCall();
+  }, []);
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     navigation.goBack();
+  //   }
+  //   const backHandler = BackHandler.addEventListener(
+  //     "hardwareBackPress",
+  //     backAction
+  //   );
+  //   return () => { backHandler.remove() }
+  // }, [])
+
   return (
     <ScrollView style={{ backgroundColor: Colors.white }}>
       <View style={styles.container}>
         {
-          isPageLoading ? <SalesDashboardScreenLoader/> :
+          isPageLoading ? <SalesDashboardScreenLoader /> :
             <>
-              <View style={isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
-                <Dropdown
-                  style={isCustomRange ? styles.customDropdown : styles.dropdown}
-                  data={dateData}
-                  labelField="label"
-                  valueField="value"
-                  value={selectedValue}
-                  onChange={handleSelection}
-                  // placeholder="Today"
-                  disable={isLoading}
-                />
-                <DateTimePickerModal
-                  onConfirm={(date) => {
-                    setFromDateVisibility(false);
-                    setCustomFromDateData(date)
-                    const formatted = date.toLocaleDateString("en-GB", {
-                      weekday: "short",
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    });
-                    setSelectedFromCustomDate(formatted)
-                    handleCustomDate(1, formatDateYYYYMMDDD(date))
-                  }}
-                  isVisible={fromDateVisibility}
-                  mode="date"
-                  date={customFromDateData}
-                  maximumDate={customToDateData}
-                  themeVariant="light"
-                  onCancel={() => setFromDateVisibility(false)}
-                />
-                <DateTimePickerModal
-                  onConfirm={(date) => {
-                    setToDateVisibility(false);
-                    setCustomToDateData(date)
-                    const formatted = date.toLocaleDateString("en-GB", {
-                      weekday: "short",
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    });
-                    setSelectedToCustomDate(formatted)
-                    handleCustomDate(2, formatDateYYYYMMDDD(date))
-                  }}
-                  minimumDate={customFromDateData}
-                  isVisible={toDateVisibility}
-                  mode="date"
-                  date={customToDateData}
-                  maximumDate={new Date()}
-                  themeVariant="light"
-                  onCancel={() => setToDateVisibility(false)}
-                />
-                <View style={isCustomRange ? styles.customDateBox : styles.dateBox}>
-                  {isCustomRange ? (
-                    <View style={styles.customDateContainer}>
-                      <Pressable
-                        style={styles.datePressable}
-                        android_ripple={{ color: Colors.ripple }}
-                        onPress={() => setFromDateVisibility(true)}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: "Inter-Bold",
-                            fontSize: 12,
-                            fontWeight: "500",
-                            letterSpacing: 0.1,
-                            lineHeight: 20,
-                          }}
-                        >
-                          {selectedFromCustomDate}
-                        </Text>
-                        <MaterialCommunityIcons
-                          name="calendar-month-outline"
-                          size={18}
-                          color={Colors.darkBlue}
-                        />
-                      </Pressable>
-                      <Text> TO </Text>
-                      <Pressable
-                        style={styles.datePressable}
-                        android_ripple={{ color: Colors.ripple }}
-                        onPress={() => setToDateVisibility(true)}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: "Inter-Bold",
-                            fontSize: 12,
-                            fontWeight: "500",
-                            letterSpacing: 0.1,
-                            lineHeight: 20,
-                          }}
-                        >
-                          {selectedToCustomDate}
-                        </Text>
-                        <MaterialCommunityIcons
-                          name="calendar-month-outline"
-                          size={18}
-                          color={Colors.darkBlue}
-                        />
-                      </Pressable>
-                    </View>
-                  ) : (
-                    <Text style={styles.dateText}>{date}</Text>
-                  )}
-                </View>
-              </View>
+              <DatePicker
+                isCustomRange={isCustomRange}
+                handleSelection={handleSelection}
+                isLoading={isLoading}
+                handleCustomDateConfirm={handleCustomDateConfirm}
+                handleCustomDate={handleCustomDate}
+                dateData={dateData}
+                selectedValue={selectedValue}
+                date={date}
+                selectedToCustomDate={selectedToCustomDate}
+                selectedFromCustomDate={selectedFromCustomDate}
+              />
               {
                 isDateDataLoading ?
-                  <SalesDashboardDateLoader/> :
-                <>
-                <View style={styles.statisticContainer}>
-                {salesCardData.map((item, index) => {
-                  const expenseKeys = Object.keys(expenseValues);
-                  const expenseValue = expenseValues[expenseKeys[index]];
-                  return (
-                    <DashboardCard
-                      key={index}
-                      icon={item.icon}
-                      title={item.title}
-                      color={item.color}
-                      value={expenseValue}
-                    />
-                  );
-                })}
-              </View>
-              <View style={styles.listDataContainer}>
-                {listData.map((item, index) => {
-                  const value = valueMap[item.title] || 0;
-                  return (
-                    <ListIconData
-                      key={index}
-                      icon={item.icon}
-                      title={item.title}
-                      value={value}
-                    />
-                  );
-                })}
-              </View>
-
-              <View style={styles.commonContainer}>
-                <Text
-                  style={[
-                    textTheme.titleMedium,
-                    { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
-                  ]}
-                >
-                  Payment Mode
-                </Text>
-                {paymentStoreData.length > 0 ? (
-                  paymentStoreData.map((item, index) => {
-                    const title = convertToTitleCase(item.mode_of_payment);
-                    return (
-                      title !== "Nil" && (
-                        <View key={index}>
-                          <ServiceList title={title} value={item.net_sales} />
-                          {index !== paymentStoreData.length - 1 && <Divider />}
-                        </View>
-                      )
-                    );
-                  })
-                ) : (
-                  <Text style={{ textAlign: "center", marginBottom: 20 }}>
-                    No data found!{" "}
-                  </Text>
-                )}
-              </View>
-
-              <View style={styles.commonContainer}>
-                <Text
-                  style={[
-                    textTheme.titleMedium,
-                    { paddingLeft: 20, paddingBottom: 16, paddingTop: 8 },
-                  ]}
-                >
-                  Total Sales
-                </Text>
-                {salesData.map((item, index) => {
-                  const revenueKeys = Object.keys(totalSalesRevenue);
-                  const revenueValue = totalSalesRevenue[revenueKeys[index]];
-                  return (
-                    <View key={index}>
-                      <ServiceList title={item.title} value={revenueValue} />
-                      {index !== salesData.length - 1 && <Divider />}
+                  <SalesDashboardDateLoader isDateDataLoading={isDateDataLoading} /> :
+                  <>
+                    <View style={styles.statisticContainer}>
+                      {salesCardData.map((item, index) => {
+                        const expenseKeys = Object.keys(expenseValues);
+                        const expenseValue = expenseValues[expenseKeys[index]];
+                        return (
+                          <DashboardCard
+                            key={index}
+                            icon={item.icon}
+                            title={item.title}
+                            color={item.color}
+                            value={expenseValue}
+                            popoverText={item.popoverText}
+                          />
+                        );
+                      })}
                     </View>
-                  );
-                })}
-              </View>
-                </>
+                    <View style={styles.listDataContainer}>
+                      {listData.map((item, index) => {
+                        const value = (item.title === "Online Sales" || item.title === "Cancelled bill value")
+                          ? "₹ " + valueMap[item.title] : valueMap[item.title] || 0;
+                        return (
+                          <ListIconData
+                            key={index}
+                            icon={item.icon}
+                            title={item.title}
+                            value={value}
+                            headerContainerStyle={{ width: 'auto' }}
+                          />
+                        );
+                      })}
+                    </View>
+
+                    <View style={styles.commonContainer}>
+                      <View style={{ paddingLeft: 20, paddingBottom: 16, paddingTop: 8 }}>
+                        <PopoverIconText
+                          title={"Payment Mode"}
+                          titleStyle={[textTheme.titleMedium]}
+                          popoverText={"Amount collected using various modes of payment"}
+                          popoverArrowShift={-0.22}
+                        />
+                      </View>
+                      {paymentStoreData.length > 0 ? (
+                        paymentStoreData.map((item, index) => {
+                          const title = convertToTitleCase(item.mode_of_payment);
+                          return (
+                            title !== "Nil" && (
+                              <View key={index}>
+                                <ServiceList title={title} value={item.net_sales} />
+                                {index !== paymentStoreData.length - 1 && <Divider />}
+                              </View>
+                            )
+                          );
+                        })
+                      ) : (
+                        <Text style={{ textAlign: "center", marginBottom: 20 }}>
+                          No data found!{" "}
+                        </Text>
+                      )}
+                    </View>
+
+                    <View style={styles.commonContainer}>
+                      <View style={{ paddingLeft: 20, paddingBottom: 16, paddingTop: 8 }}>
+                        <PopoverIconText title={"Total Sales"} popoverText={"Total sales from all channels for the selected period"}
+                          titleStyle={[textTheme.titleMedium]}
+                          popoverArrowShift={-0.41}
+                        />
+                      </View>
+                      {salesData.map((item, index) => {
+                        const revenueKeys = Object.keys(totalSalesRevenue);
+                        const revenueValue = totalSalesRevenue[revenueKeys[index]];
+                        return (
+                          <View key={index}>
+                            <ServiceList title={item.title} value={revenueValue} />
+                            {index !== salesData.length - 1 && <Divider />}
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </>
               }
-              </>
+            </>
         }
-
-
         <PieChartBox
           totalCenterValue={billItemTotalValue}
           title={"Bill Items"}
           labelArray={billItemDetails[0].labels}
           pieDataArray={percentageBillData}
-          dropdownKey={"vipslinebillitem_1"}
         />
         <View style={styles.commonContainer}>
           <Text
@@ -441,8 +380,11 @@ const SalesDashboard = () => {
           lineChartData={totalSalesOverTimeData}
           max={roundLineSalesOverTime}
           sections={removeZeroLineSalesOverTime === "1" ? 10 : removeZeroLineSalesOverTime}
-          page="SalesOverTime"
-          // key1={"SalesOverTime"}
+          popoverText={"Total sales from all channels for the selected period"}
+          popoverArrowShift={0.89}
+          handleSelected={(value) => {
+            dispatch(loadDailyAppointmentAnalyticsForBusiness(false, value))
+          }}
         />
         <LineChartBox
           title={"Appointments over time"}
@@ -450,10 +392,13 @@ const SalesDashboard = () => {
           dateArray={totalSalesOverTimeDropdown}
           xLabelArrayData={totalAppointmentOverTime.date}
           lineChartData={totalAppointmentsOverTimeData}
-          page="AppointmentOverTime"
-          // key1={"SalesOverTime"}
           max={roundUp(maxAppointmentsOverTime)}
           sections={removeZero(roundUp(maxAppointmentsOverTime)) || 10}
+          popoverText={"Total appointments from all channels over time"}
+          popoverArrowShift={0.81}
+          handleSelected={(value) => {
+            dispatch(loadDailyAppointmentAnalyticsForBusiness(true, value))
+          }}
         />
         <PieChartBox
           title={"Top Services"}
@@ -468,7 +413,6 @@ const SalesDashboard = () => {
           dateArray={labelArray}
           tableHeader={["Top Services", "Count", "Value", "%"]}
           showPie={togglePercentageData.length !== 0}
-          dropdownKey={"vipslinetopservices_1"}
         />
         <PieChartBox
           title={"Top Products"}
@@ -483,7 +427,6 @@ const SalesDashboard = () => {
           dateArray={labelArray}
           tableHeader={["Top Products", "Count", "Value", "%"]}
           showPie={toggleProductData.length !== 0}
-          dropdownKey={"vipslinetopproducts_1"}
         />
       </View>
     </ScrollView>
@@ -551,7 +494,7 @@ const styles = StyleSheet.create({
   },
   dateText: {},
   statisticContainer: {
-    marginVertical: "7%",
+    marginBottom: "4%",
     flexWrap: "wrap",
     flexDirection: "row",
     rowGap: 25,
@@ -576,7 +519,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     // alignItems: "center",
     paddingVertical: 30,
-    paddingLeft:10,
+    // paddingLeft:10,
     // overflow: "scroll",
   },
   piechart: {

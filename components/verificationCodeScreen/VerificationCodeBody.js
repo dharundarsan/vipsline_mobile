@@ -7,8 +7,9 @@ import textTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
 import {updateAuthStatus} from "../../store/authSlice";
 import {useNavigation} from "@react-navigation/native";
-import authenticateWithOTPApi from "../../util/apis/authenticateWithOTPApi";
-import sendOTPApi from '../../util/apis/sendOTPApi';
+import authenticateWithOTPApi from "../../apis/authAPIs/authenticateWithOTPApi";
+import sendOTPApi from '../../apis/authAPIs/sendOTPApi';
+import Toast from "../../ui/Toast";
 
 export default function VerificationCodeBody(props) {
 
@@ -18,9 +19,13 @@ export default function VerificationCodeBody(props) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const [otp, setOtp] = useState("");
+
+    const [emptyChecker, setEmptyChecker] = useState(false);
     // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const [timer, setTimer] = useState(60);
+
+    const toastRef = useRef(null);
 
     useEffect(() => {
         if (timer <= 0) {
@@ -59,6 +64,7 @@ export default function VerificationCodeBody(props) {
 
     return (
         <View style={styles.verificationCodeBody}>
+            <Toast ref={toastRef}/>
             <Text style={styles.verificationText}>Verification Code</Text>
             <View style={styles.verificationMessage}>
                 <Text>Enter the 4-digit number we sent to</Text>
@@ -74,8 +80,6 @@ export default function VerificationCodeBody(props) {
                         </Text>
                     </Pressable>
                 </View>
-
-
             </View>
 
             <OtpInputBox
@@ -85,6 +89,14 @@ export default function VerificationCodeBody(props) {
                 changing={changing}
                 setChanging={setChanging}
             />
+            {
+                emptyChecker ?
+                    <View style={{marginTop: 14, width: '70%', alignItems: 'center'}}>
+                        <Text style={[textTheme.titleSmall, {textAlign: "left", color: Colors.error}]}>Enter OTP</Text>
+                    </View> :
+                    <></>
+
+            }
 
             <View style={styles.resendOtpContainer}>
                 <Text style={[textTheme.titleMedium, styles.didntGetCodeText]}>Didn't get a code?</Text>
@@ -97,7 +109,6 @@ export default function VerificationCodeBody(props) {
                     }}
                     style={{justifyContent:"center"}}>
                     <Text style={[textTheme.titleSmall, styles.resendOtp]}>
-
                         Resend OTP {
                         timer > 0 ?
                             <Text style={[textTheme.titleSmall, styles.timer]}>
@@ -114,11 +125,22 @@ export default function VerificationCodeBody(props) {
                 buttonStyle={styles.submitButton}
                 textStyle={[textTheme.titleSmall]}
                 onPress={async () => {
-                    const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS")
+                    if(otp.trim().length === 0) {
+                        setEmptyChecker(true);
+                        return;
+                    }
+                    else {
+                        setEmptyChecker(false);
+                    }
+
+                    const authStatus = await authenticateWithOTPApi(props.mobileNumber, otp, "BUSINESS");
                     setIsAuthenticated(authStatus);
                     setChanging(true);
                     if(authStatus === true) {
                         dispatch(updateAuthStatus(true));
+                    }
+                    else {
+                        toastRef.current.show("Entered OTP is wrong");
                     }
                 }}
             />

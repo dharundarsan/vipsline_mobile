@@ -3,19 +3,19 @@ import Colors from "../constants/Colors";
 export const dashboardSelection = [
   {
     header: "Sales Dashboard",
-    desc: "Dashboard of your business performance",
+    desc: "Dashboard of your Business Performance",
     icon: require("../assets/icons/dashboard/selection/sales.png"),
     navigate: "SalesScreen",
   },
   {
     header: "Staff Dashboard",
-    desc: "Dashboard of your Staff performance",
+    desc: "Dashboard of your Staff Performance",
     icon: require("../assets/icons/dashboard/selection/staff.png"),
     navigate: "StaffScreen",
   },
   {
     header: "Client Dashboard",
-    desc: "Dashboard of your client performance",
+    desc: "Dashboard of your Client Performance",
     icon: require("../assets/icons/dashboard/selection/client.png"),
     navigate: "ClientScreen",
   },
@@ -28,19 +28,26 @@ export const salesCardData = [
     color:Colors.lightblue,
   },
   {
-    title: "Total Sales Value",
+    title: "Sales Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
-    color:Colors.lightpurple
+    color:Colors.lightpurple,
+    popoverText: "Total amount collected apart from prepaid redemption amount"
+  },{
+    title: "Net Sales",
+    icon: require("../assets/icons/dashboard/salesdashboard/totalsales.png"),
+    color:Colors.darkGreen,
+    popoverText: "Net Sales = Total sales(excluding tax) - expenses"
   },
   {
     title: "Avg. Bill Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalbillvalue.png"),
-    color:Colors.teal
+    color:Colors.teal,
+    popoverText: "Average sales value from all the channels for the selected period"
   },
   {
-    title: "Total Expense Value",
+    title: "Expense Value",
     icon: require("../assets/icons/dashboard/salesdashboard/totalexpense.png"),
-    color:Colors.neonblue
+    color:Colors.neonblue,
   },
 ];
 
@@ -185,15 +192,18 @@ export const pieChartColorCode = [
 export const lifetimeData = [
   {
     title:'Lifetime Unique Clients',
-    icon:require("../assets/icons/dashboard/selection/totalappointments.png")
+    icon:require("../assets/icons/dashboard/selection/totalappointments.png"),
+    titlePopoverText:"Total unique customers in the business"
   },
   {
     title:'Lifetime Repeat Clients',
-    icon:require("../assets/icons/dashboard/selection/totalappointments.png")
+    icon:require("../assets/icons/dashboard/selection/totalappointments.png"),
+    titlePopoverText:"Customers who have visited more than once"
   },
   {
     title:'Unique Clients Till Date',
-    icon:require("../assets/icons/dashboard/selection/totalappointments.png")
+    icon:require("../assets/icons/dashboard/selection/totalappointments.png"),
+    titlePopoverText:"Customers who have visited only once"
   },
 ]
 

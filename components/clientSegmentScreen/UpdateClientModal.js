@@ -9,7 +9,7 @@ import Divider from "../../ui/Divider";
 import {capitalizeFirstLetter, checkNullUndefined, formatDate} from "../../util/Helpers";
 import {useDispatch, useSelector} from "react-redux";
 import {loadClientCountFromDb} from "../../store/clientSlice";
-import updateClientAPI from "../../util/apis/updateClientAPI";
+import updateClientAPI from "../../apis/ClientSegmentAPIs/updateClientAPI";
 import {loadClientInfoFromDb} from "../../store/clientInfoSlice";
 
 /**
@@ -71,7 +71,7 @@ const UpdateClientModal = ((props) => {
     const firstNameRef = useRef(null);
     const lastNameRef = useRef(null);
     const phoneNoRef = useRef(null);
-    // const emailRef = useRef(null);
+    const emailRef = useRef(null);
 
 
     const existingValues = () => {
@@ -199,6 +199,7 @@ const UpdateClientModal = ((props) => {
                         onSave={(callback) => {
                             firstNameRef.current = callback;
                         }}
+                        required
                     />
                     <CustomTextInput
                         type="text"
@@ -221,6 +222,7 @@ const UpdateClientModal = ((props) => {
                         onSave={(callback) => {
                             phoneNoRef.current = callback;
                         }}
+                        required
                     />
                     <CustomTextInput
                         type="email"
@@ -228,9 +230,16 @@ const UpdateClientModal = ((props) => {
                         placeholder="Enter email address"
                         value={clientData.email}
                         onChangeText={(value) => handleChange("email", value)}
-                        validator={(text) => !checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== "" ? "Email is invalid" : true}
+                        validator={(text) => {
+                            if(checkNullUndefined(text) && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && text.trim() !== ""){
+                                return "Email is invalid"
+                            }
+                            else {
+                                return true
+                            }
+                        }}
                         // onSave={(callback) => {
-                            // emailRef.current = callback;
+                        //     emailRef.current = callback;
                         // }}
                     />
                     <CustomTextInput

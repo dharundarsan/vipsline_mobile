@@ -4,11 +4,12 @@ import LeadDetailsModal from "./LeadDetailsModal";
 import React, {useState} from "react";
 import getLeadStatusColor from "../../util/getLeadStatusColor";
 import PrimaryButton from "../../ui/PrimaryButton";
+import {useNavigation} from "@react-navigation/native";
 
 
 const LeadCard = (props) => {
     const [isLeadDetailsModalVisible, setIsLeadDetailsModalVisible] = useState(false);
-
+    const navigation = useNavigation();
     const styles = StyleSheet.create({
         leadCardPressable: {
             flexDirection: "row",
@@ -45,13 +46,9 @@ const LeadCard = (props) => {
     return <PrimaryButton buttonStyle={{backgroundColor: "white"}}
                           pressableStyle={styles.leadCardPressable}
                           onPress={() => {
-                              setIsLeadDetailsModalVisible(true)
+                              navigation.navigate("Lead Profile", { leadDetails: props.lead, leadManagementToastRef:props.leadManagementToastRef })
+                              console.log(props.leadManagementToastRef)
                           }} style={styles.leadCard}>
-        {isLeadDetailsModalVisible && <LeadDetailsModal isVisible={isLeadDetailsModalVisible}
-                                                        lead={props.lead}
-                                                        onCloseModal={() => {
-                                                            setIsLeadDetailsModalVisible(false)
-                                                        }}/>}
         <View style={styles.detailsContainer}>
             <Text style={[styles.nameText]}>{props.lead.name}</Text>
             <Text style={[styles.phoneNoText]}>{props.lead.mobile}</Text>

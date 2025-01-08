@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
-import ListIconData from "./ListIconData";
+import ListIconData from "../../ui/ListIconData";
 import {
   clientPieColorCode,
   lifetimeData,
@@ -25,6 +25,7 @@ import ContentLoader from "react-native-easy-content-loader";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocationContext } from "../../context/LocationContext";
 import { calculateTotalValue } from "./PieData";
+import ClientDashboardLoader from "./ClientDashboardLoader";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ const ClientDashboard = () => {
   const totalValue = revenueGenderData[0]?.chart_series.reduce((acc, val) => acc + val, 0) || 0;
   const totalCountValue = revenueCountGenderData[0]?.chart_series.reduce((acc, val) => acc + val, 0) || 0;
   const totalPrepaidValue = revenuePrepaidData[0]?.chart_series.reduce((acc, val) => acc + val, 0) || 0;
-
+  const revenueGenderDataLabelList = revenueGenderData[0]?.label_list ?? [];
   const convertRevenueData = revenueGenderData[0]?.chart_series.map(
     (item, index) => {
       const percentage = ((item / totalValue) * 100).toFixed(1);
@@ -49,6 +50,7 @@ const ClientDashboard = () => {
         value: item,
         color: clientPieColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
+        tooltipText: revenueGenderDataLabelList[index]
       };
     }
   ) || [
@@ -57,9 +59,10 @@ const ClientDashboard = () => {
         value: 1,
         color: clientPieColorCode[0]?.color || "#999999",
         text: "error",
+        tooltipText: "1"
       },
     ];
-
+  const revenueCountGenderDataLabelList = revenueCountGenderData[0]?.label_list;
   const convertRevenueCountData =
     revenueCountGenderData[0]?.chart_series.map((item, index) => {
       const percentage = ((item / totalCountValue) * 100).toFixed(1);
@@ -68,6 +71,8 @@ const ClientDashboard = () => {
         value: item,
         color: clientPieColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
+        tooltipText: revenueCountGenderDataLabelList[index],
+        // textSize:32
       };
     }) || [
       {
@@ -75,9 +80,10 @@ const ClientDashboard = () => {
         value: 1,
         color: clientPieColorCode[0]?.color || "#E9ECF1",
         text: "error",
+        tooltipText: "1"
       }
     ];
-
+  const revenuePrepaidDataLabelList = revenuePrepaidData[0].label_list ?? [];
   const convertRevenuePrepaidData =
     revenuePrepaidData[0]?.chart_series.map((item, index) => {
       const percentage = ((item / totalPrepaidValue) * 100).toFixed(1);
@@ -86,12 +92,14 @@ const ClientDashboard = () => {
         value: item,
         color: prepaidNonPrepaidColorCode[index]?.color || "#999999",
         text: percentage <= 3 ? "" : percentage + "%",
+        tooltipText: revenuePrepaidDataLabelList[index]
       };
     }) || [{
       page: "clientRedemption",
       value: 1,
       color: prepaidNonPrepaidColorCode[0]?.color || "#999999",
       text: "error",
+      tooltipText: "1"
     }];
 
   const valueMap = {
@@ -121,7 +129,7 @@ const ClientDashboard = () => {
     getLocation("Client Dashboard");
   }, []))
   const prepaidVsRedemptionTotalValue = calculateTotalValue(revenuePrepaidData[0].chart_series);
-  
+
   const labelArray = useSelector((state) => state.dashboardDetails.toggleDateData);
 
   return (
@@ -132,31 +140,7 @@ const ClientDashboard = () => {
           <Text style={[TextTheme.bodyLarge, { textAlign: "center" }]}>
             Lifetime Client Statistics
           </Text>
-          {isPageLoading ?
-            <View style={{ marginVertical: "5%", rowGap: 20, width: '100%' }}>
-              <ContentLoader
-                pRows={1}
-                pHeight={[40]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[40]}
-                pWidth={["100%"]}
-                active
-                title={false}
-
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[40]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-            </View>
+          {isPageLoading ? <ClientDashboardLoader />
             :
             <View style={styles.listDataContainer}>
               {lifetimeData.map((item, index) => {
@@ -167,6 +151,9 @@ const ClientDashboard = () => {
                     icon={item.icon}
                     title={item.title}
                     value={value}
+                    titlePopoverEnabled
+                    titlePopoverText={item.titlePopoverText}
+                    popoverContainerStyle={{ width: "100%" }}
                   />
                 );
               })}
@@ -210,5 +197,6 @@ const styles = StyleSheet.create({
   },
   listDataContainer: {
     width: "100%",
+    marginBottom: '3%'
   },
 });

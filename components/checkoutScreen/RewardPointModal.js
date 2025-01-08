@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Divider } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { calculateAmountForRewardPoints, updateCalculatedPrice, updateRewardAmount } from '../../store/cartSlice';
-import splitPaymentAPI from '../../util/apis/SplitPaymentAPI';
+import splitPaymentAPI from '../../apis/checkoutAPIs/SplitPaymentAPI';
 import Colors from '../../constants/Colors';
 import Toast from '../../ui/Toast';
 

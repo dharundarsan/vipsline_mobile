@@ -1,7 +1,7 @@
 import { FlatList, Image, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View } from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Colors from "../../constants/Colors";
@@ -9,39 +9,38 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CustomTextInput from "../../ui/CustomTextInput";
 import Entypo from '@expo/vector-icons/Entypo';
 import InvoiceModal from "./InvoiceModal";
-import splitPaymentAPI from "../../util/apis/SplitPaymentAPI";
+import splitPaymentAPI from "../../apis/checkoutAPIs/SplitPaymentAPI";
 import DropdownModal from "../../ui/DropdownModal";
-import checkoutBooking from "../../util/apis/checkoutBookingAPI";
-import checkoutBookingAPI from "../../util/apis/checkoutBookingAPI";
-import { useDispatch, useSelector } from "react-redux";
+import checkoutBooking from "../../apis/checkoutAPIs/checkoutBookingAPI";
+import checkoutBookingAPI from "../../apis/checkoutAPIs/checkoutBookingAPI";
+import {useDispatch, useSelector} from "react-redux";
 import {
     loadBookingDetailsFromDb,
     loadInvoiceDetailsFromDb,
     loadWalletPriceFromDb,
     updateBookingId
 } from "../../store/invoiceSlice";
-import updateAPI from "../../util/apis/updateAPI";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import updateLiveStatusAPI from "../../util/apis/updateLiveStatusAPI";
-import { shadowStyling } from "../../util/Helpers";
+import updateAPI from "../../apis/checkoutAPIs/updateAPI";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import updateLiveStatusAPI from "../../apis/checkoutAPIs/updateLiveStatusAPI";
+import {shadowStyling} from "../../util/Helpers";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import {
     clearCalculatedPrice,
     clearLocalCart, clearSalesNotes,
     modifyClientMembershipId,
     modifyPrepaidDetails,
-    updateCalculatedPrice,
-    updateRewardAmount
+    updateCalculatedPrice, updateRewardAmount
 } from "../../store/cartSlice";
-import calculateCartPriceAPI from "../../util/apis/calculateCartPriceAPI";
+import calculateCartPriceAPI from "../../apis/checkoutAPIs/calculateCartPriceAPI";
 import Loader from 'react-native-three-dots-loader'
 import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
-import clearCartAPI from "../../util/apis/clearCartAPI";
-import DeleteClient from "../clientSegmentScreen/DeleteClientModal";
-import { clearClientInfo } from "../../store/clientInfoSlice";
+import clearCartAPI from "../../apis/checkoutAPIs/clearCartAPI";
+import {clearClientInfo} from "../../store/clientInfoSlice";
 import * as Haptics from "expo-haptics";
 import Toast from "../../ui/Toast";
-import { MaterialIcons } from '@expo/vector-icons';
+import {MaterialIcons} from '@expo/vector-icons';
+import BottomActionCard from "../../ui/BottomActionCard";
 import RewardPointModal from "./RewardPointModal";
 import { useFirstRender } from "../../hooks/useFirstRender";
 
@@ -53,7 +52,8 @@ const PaymentModal = (props) => {
     const isZeroPayment = props.price === 0;
     const isPrepaidInCart = useSelector(state => state.cart.prepaid_wallet[0].wallet_amount) !== "";
     const isPrepaidAvailable = !isPrepaidInCart && clientInfo.wallet_status && clientInfo.wallet_balance !== undefined && clientInfo.wallet_balance !== 0;
-    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? isZeroPayment ? null : clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
+    // const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? isZeroPayment ? null : clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
+    const [selectedPaymentOption, setSelectedPaymentOption] = useState();
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
     const [splitResponse, setSplitResponse] = useState([]);
@@ -70,7 +70,10 @@ const PaymentModal = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isOptionsDropdownModalVisible, setIsOptionsDropdownModalVisible] = useState(false)
     const [isCancelSalesModalVisible, setIsCancelSalesModalVisible] = useState(false)
+    const appointmentDate = useSelector(state => state.cart.appointment_date);
     const [isRewardModalVisible, setIsRewardModalVisible] = useState(false)
+    const [isBackDateInvoiceNoteVisible, setIsBackDateInvoiceNoteVisible] = useState(new Date(appointmentDate).getDate() !== new Date(Date.now()).getDate());
+    const [isSplitRewardActive, setIsSplitRewardActive] = useState(false);
     const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
     const isRewardActive = (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.reward_balance !== 0)
     const [rewardValue, setRewardValue] = useState(0);
@@ -103,6 +106,29 @@ const PaymentModal = (props) => {
             name: "Reward Points"
         }
     ])
+    useEffect(() => {
+        const now = new Date();
+        const formatForComparison = (appointmentDate) => {
+            return new Date(appointmentDate).toISOString().split(':').slice(0, 2).join(':') + ':00.000Z';
+        };
+        const formattedCurrentDate = formatForComparison(now);
+        const formattedSelectedDate = formatForComparison(appointmentDate);
+        if (formattedCurrentDate !== formattedSelectedDate) {
+            const selectedDateLocal = new Date(appointmentDate);
+            const isSameDay =
+                now.getDate() === selectedDateLocal.getDate() &&
+                now.getMonth() === selectedDateLocal.getMonth() &&
+                now.getFullYear() === selectedDateLocal.getFullYear();
+
+            if (!isSameDay) {
+                setIsBackDateInvoiceNoteVisible(true);
+            } else {
+                setIsBackDateInvoiceNoteVisible(false);
+            }
+        }
+    }, []);
+
+
     const [splitUpState, setSplitUpState] = useState([
         {
             mode: "cash",
@@ -134,8 +160,6 @@ const PaymentModal = (props) => {
     )
     // const [splitUpState, setSplitUpState] = useState(47)
     const [initialSplit, setInitialSplit] = useState(47);
-
-    const firstRender = useFirstRender();
 
     const cartSliceState = useSelector((state) => state.cart);
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
@@ -497,7 +521,7 @@ const PaymentModal = (props) => {
         if (totalCount === props.price)
             setIsError(false);
         else setIsError(true)
-        
+
     }, [splitUpState, rewardValue]);
 
     useEffect(() => {
@@ -531,13 +555,13 @@ const PaymentModal = (props) => {
             if (selectedPaymentOption === "cash") {
                 const response = await splitPaymentAPI({
                     booking_amount: props.price,
-                    paid_amount: [{ mode: "CASH", amount: totalPrice }]
+                    paid_amount: [{mode: "CASH", amount: totalPrice}]
                 });
                 setSplitResponse(response);
             } else if (selectedPaymentOption === "split_payment") { 
                 const response = await splitPaymentAPI({
                     booking_amount: props.price,
-                    paid_amount: [{ mode: "CASH", amount: totalPrice }]
+                    paid_amount: [{mode: "CASH", amount: totalPrice}]
                 });
                 setSplitResponse(response);
             }
@@ -557,6 +581,9 @@ const PaymentModal = (props) => {
                 let splitState = splitUpState.map(item => ({ mode: item.mode, amount: item.amount, shown: item.shown }));
                 const removedZeroSplitState = splitState.filter(e => e.shown).map(item => ({ mode: (item.mode).toUpperCase(), amount: item.amount }));
                 let validatedSplitState = removedZeroSplitState;
+                console.log(validatedSplitState);
+                console.log(checkSplitActive);
+                
                 // const isGreaterSplit = removedZeroSplitState.reduce((acc,item) => { return item.amount + acc },0) >= props.price;
                 // if(isGreaterSplit){
                 //     let len = validatedSplitState.length;
@@ -569,12 +596,12 @@ const PaymentModal = (props) => {
                 //         }
                 //     })
                 // }
-                
+
                 if (checkSplitActive === 0) {
                     let flexSplitState;
                     let updated;
                     let isPrepaidChosen;
-
+                    setIsSplitRewardActive(true);
                     await splitPaymentAPI({
                         booking_amount: props.price,
                         paid_amount: checkSplitActive === 0 ? [{ mode: "REWARDS", amount: rewardValue }, { mode: "CASH", amount: 0 }] : undefined
@@ -605,8 +632,9 @@ const PaymentModal = (props) => {
 
                         }
                     });
-                }
-                else {
+                } else if(isSplitRewardActive){
+                    let isPrepaidChosen;
+
                     isPrepaidChosen = splitUpState.filter(e => e.shown).some(e => e.shown && e.mode === "prepaid")
                     let prepaidValue = isPrepaidChosen ? splitUpState.filter(e => e.shown).find(e => e.mode === "prepaid")?.amount : 0;
                     const updatedSplitState = splitUpState.map(item =>
@@ -616,20 +644,63 @@ const PaymentModal = (props) => {
                     );
                     dispatch(updateCalculatedPrice(details.id, isPrepaidChosen ? prepaidValue === 0 ? false : true : false, isPrepaidChosen ? prepaidValue : 0, updatedSplitState));
                     setSplitUpState(updatedSplitState);
+                } else {
+                    let flexSplitState;
+                    let updated;
+                    let isPrepaidChosen;
+
+                    await splitPaymentAPI({
+                        booking_amount: props.price,
+                        paid_amount: [{ mode: "REWARDS", amount: rewardValue }, { mode: "CASH", amount: 0 }]
+                    }).then(res => {
+                        setSplitResponse(res);
+                        if (res[0] !== undefined) {
+                            const activeModes = Object.entries(res[0]).reduce((map, [key, value]) => {
+                                map[key.toLowerCase()] = value;
+                                return map;
+                            }, {});
+                            flexSplitState = splitUpState.map(item => {
+                                const matchingSplit = splitState.find(splitItem => splitItem.mode === item.mode);
+                                return {
+                                    ...item,
+                                    ...(matchingSplit ? { amount: matchingSplit.amount } : {}),
+                                };
+                            });
+
+                            updated = flexSplitState.map((item) => ({
+                                ...item,
+                                shown: !!activeModes[item.mode.toLowerCase()],
+                                amount: activeModes[item.mode.toLowerCase()] ?? 0,
+                            }));
+                            isPrepaidChosen = splitUpState.filter(e => e.shown).some(e => e.shown && e.mode === "prepaid")
+                            let prepaidValue = isPrepaidChosen ? splitUpState.filter(e => e.shown).find(e => e.mode === "prepaid")?.amount : 0;
+                            dispatch(updateCalculatedPrice(details.id, isPrepaidChosen ? prepaidValue === 0 ? false : true : false, isPrepaidChosen ? prepaidValue : 0, updated));
+                            setSplitUpState(updated)
+
+                        }
+                    });
                 }
                 // }
             }
             splitApi()
         }
     }, [rewardValueToggle])
-    
+
+    useEffect(()=>{
+        if(isSplitRewardActive){
+            setShownCount(prev => prev + 1);
+            setPaymentOrder(prev => [...prev, "Rewards"])
+            setRecentlyChanged(prev => [...prev, "Rewards"])
+        }
+    },[isSplitRewardActive,splitUpState])
+
     function onRewardValueChange(value){
         setRewardValue(value);
         setRewardValueToggle(prev => !prev);
     }
 
-    
-    
+
+
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
     // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
     >
@@ -638,43 +709,41 @@ const PaymentModal = (props) => {
         {
             isSplitPaymentDropdownVisible &&
             <DropdownModal isVisible={isSplitPaymentDropdownVisible}
-                onCloseModal={() => {
+                           onCloseModal={() => {
 
                     setIsSplitPaymentDropdownVisible(false)
                 }}
-                dropdownItems={isPrepaidAvailable && isRewardActive && rewardDetails?.customerRewardList.length > 0 ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                dropdownItems={isPrepaidAvailable && isRewardActive ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
                     : isPrepaidAvailable && !isRewardActive ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
-                        : isRewardActive && rewardDetails?.customerRewardList.length > 0 ? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                        : isRewardActive ? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
                             : ["Cash", "Credit / Debit card", "Digital payment"]}
                 onChangeValue={(value) => {
                     setAddedSplitPayment(value)
                     if (value === "Reward Points") {
                         setIsRewardModalVisible(true);
+                        setIsSplitRewardActive(true);
                     }
                 }} />
         }
-        {isCancelSalesModalVisible && <DeleteClient
-            isVisible={isCancelSalesModalVisible}
-            onCloseModal={() => {
-                setIsCancelSalesModalVisible(false)
-                // setModalVisibility(false);
-                // dispatch(loadClientInfoFromDb(props.id))
-            }}
-            ActionOptionName={"Cancel Sale"}
-            header={"Cancel Sale"}
-            content={"If you cancel this sale transaction will not be processed."}
-            onCloseClientInfoAfterDeleted={async () => {
-                await clearCartAPI();
-                dispatch(modifyClientMembershipId({ type: "clear" }))
-                dispatch(clearSalesNotes());
-                dispatch(clearLocalCart());
-                dispatch(clearClientInfo());
-                dispatch(clearCalculatedPrice())
-            }}
-            checkoutScreenToast={() => {
-                props.checkoutScreenToast()
-            }}
-        />}
+        <BottomActionCard isVisible={isCancelSalesModalVisible}
+                          header={"Cancel Sale"}
+                          content={"If you cancel this sale transaction will not be processed."}
+                          onClose={() => {
+                              setIsCancelSalesModalVisible(false)
+                          }}
+                          onConfirm={async () => {
+                              await clearCartAPI();
+                              dispatch(modifyClientMembershipId({type: "clear"}))
+                              dispatch(clearSalesNotes());
+                              dispatch(clearLocalCart());
+                              dispatch(clearClientInfo());
+                              dispatch(clearCalculatedPrice())
+                              props.checkoutScreenToast("sale cancelled", 2000);
+                              setIsCancelSalesModalVisible(false)
+                          }}
+                          onCancel={() => setIsCancelSalesModalVisible(false)}
+                          confirmLabel={"Cancel Sale"}
+                          cancelLabel={"Cancel"}/>
         {isRewardModalVisible && <RewardPointModal
             isVisible={isRewardModalVisible}
             perPointValue={props.calculatedPrice[0].reward_details.pointValue}
@@ -688,18 +757,18 @@ const PaymentModal = (props) => {
         }
         {
             isOptionsDropdownModalVisible && <DropdownModal isVisible={isOptionsDropdownModalVisible}
-                onCloseModal={() => setIsOptionsDropdownModalVisible(false)}
-                dropdownItems={["Cancel Sales"]}
-                imageWidth={25}
-                imageHeight={25}
-                primaryViewChildrenStyle={{
-                    flexDirection: "row",
-                    alignItems: "center"
-                }}
-                iconImage={[require("../../assets/icons/checkout/actionmenu/cancelsale.png")]}
-                onChangeValue={(value) => {
-                    if (value === "Cancel Sales") setIsCancelSalesModalVisible(true)
-                }} />
+                                                            onCloseModal={() => setIsOptionsDropdownModalVisible(false)}
+                                                            dropdownItems={["Cancel Sales"]}
+                                                            imageWidth={25}
+                                                            imageHeight={25}
+                                                            primaryViewChildrenStyle={{
+                                                                flexDirection: "row",
+                                                                alignItems: "center"
+                                                            }}
+                                                            iconImage={[require("../../assets/icons/checkout/actionmenu/cancelsale.png")]}
+                                                            onChangeValue={(value) => {
+                                                                if (value === "Cancel Sales") setIsCancelSalesModalVisible(true)
+                                                            }}/>
         }
         {
             isInvoiceModalVisible && Object.keys(invoiceDetails).length !== 0 && Object.keys(moreInvoiceDetails).length !== 0 ?
@@ -707,7 +776,7 @@ const PaymentModal = (props) => {
 
                     setIsInvoiceModalVisible(false);
                     props.onCloseModal();
-                }} /> :
+                }}/> :
                 null
         }
 
@@ -722,14 +791,55 @@ const PaymentModal = (props) => {
                     props.onCloseModal()
                 }}
             >
-                <Ionicons name="close" size={25} color="black" />
+                <Ionicons name="close" size={25} color="black"/>
             </PrimaryButton>
         </View>
         <ScrollView>
+            {isBackDateInvoiceNoteVisible && <View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "rgba(253,253,150,.6)",
+                paddingVertical: 10,
+                justifyContent: "center",
+                gap: 3
+            }}>
+                <AntDesign name="warning" size={22} color={Colors.orange}/>
+                <Text style={[textTheme.bodyMedium, {fontWeight: "bold"}]}>You're trying to raise the invoice on a
+                    previous date</Text>
+            </View>}
+            {/*{(businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled &&*/}
+            {/*    cartSliceState?.calculatedPrice[0]?.reward_points !== undefined && cartSliceState.calculatedPrice[0].reward_points !== 0) &&*/}
+            {/*    <View*/}
+            {/*        style={{*/}
+            {/*            padding: 10,*/}
+            {/*            backgroundColor: "#E7E8FF",*/}
+            {/*            marginTop: 30,*/}
+            {/*            marginHorizontal: 20,*/}
+            {/*            borderRadius: 8,*/}
+            {/*        }}*/}
+            {/*    >*/}
+            {/*        <View*/}
+            {/*            style={{*/}
+            {/*                flexDirection: "row",*/}
+            {/*                alignItems: "flex-start",*/}
+            {/*                flexWrap: "wrap",*/}
+            {/*            }}*/}
+            {/*        >*/}
+            {/*            <MaterialIcons name="info" size={20} color="#FF6B00" style={{ marginTop: 2 }} />*/}
+            {/*            <Text style={{ color: "#FF6B00", fontWeight: "bold", marginLeft: 5, }}>Reward points - </Text>*/}
+            {/*            <View style={{ marginLeft: 8, flex: 1 }}>*/}
+            {/*                <Text>*/}
+            {/*                    <Text style={{ color: "#5252FF", textDecorationLine: "underline" }}>{cartSliceState.calculatedPrice[0].reward_points}</Text>*/}
+            {/*                    <Text style={{ color: "#5252FF" }}> will be added to customer for this transaction.</Text>*/}
+            {/*                </Text>*/}
+            {/*            </View>*/}
+            {/*        </View>*/}
+            {/*    </View>*/}
+            {/*}*/}
             <View style={styles.modalContent}>
                 {isZeroPayment && <View style={styles.zeroPaymentNote}>
-                    <View style={styles.zeroPaymentNoteBar} />
-                    <Text style={[textTheme.labelLarge, { paddingLeft: 20, padding: 10 }]}>
+                    <View style={styles.zeroPaymentNoteBar}/>
+                    <Text style={[textTheme.labelLarge, {paddingLeft: 20, padding: 10}]}>
                         There is no payment required for this sale. you can save it now.
                     </Text>
                 </View>}
@@ -738,29 +848,33 @@ const PaymentModal = (props) => {
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "cash" ? styles.paymentOptionSelected : {}]}
-                            onPress={isZeroPayment ? () => { } : () => {
+                            onPress={isZeroPayment ? () => {} :
+                                () => {
                                 setSelectedPaymentOption("cash")
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "cash" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                    color={Colors.highlight} />
+                                                        color={Colors.highlight}/>
                             </View> : null}
-                            <MaterialCommunityIcons name="cash" size={30} color={isZeroPayment ? Colors.grey400 : Colors.green} />
+                            <MaterialCommunityIcons name="cash" size={30}
+                                                    color={isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Cash</Text>
                         </PrimaryButton>
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "card" ? styles.paymentOptionSelected : {}]}
-                            onPress={isZeroPayment ? () => { } : () => {
+                            onPress={isZeroPayment ? () => {} :
+                                () => {
                                 setSelectedPaymentOption("card")
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "card" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                    color={Colors.highlight} />
+                                                        color={Colors.highlight}/>
                             </View> : null}
-                            <Ionicons name="card-outline" size={30} color={isZeroPayment ? Colors.grey400 : Colors.green} />
+                            <Ionicons name="card-outline" size={30}
+                                      color={isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Debit / Credit card</Text>
                         </PrimaryButton>
                     </View>
@@ -768,22 +882,24 @@ const PaymentModal = (props) => {
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "digital payments" ? styles.paymentOptionSelected : {}]}
-                            onPress={isZeroPayment ? () => { } : () => {
+                            onPress={isZeroPayment ? () => {} :
+                                () => {
                                 setSelectedPaymentOption("digital payments")
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "digital payments" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                    color={Colors.highlight} />
+                                                        color={Colors.highlight}/>
                             </View> : null}
-                            <MaterialCommunityIcons name="contactless-payment" size={30} color={isZeroPayment ? Colors.grey400 : Colors.green} />
+                            <MaterialCommunityIcons name="contactless-payment" size={30}
+                                                    color={isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Digital Payments</Text>
                         </PrimaryButton>
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}
                             onPress={isZeroPayment ? () => { } : () => {
-                                
+                                setIsSplitRewardActive(false);
                                 setSplitUpState(initialSplit)
                                 dispatch(updateRewardAmount(0))
                                 setSelectedPaymentOption("split_payment")
@@ -791,9 +907,10 @@ const PaymentModal = (props) => {
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "split_payment" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                    color={Colors.highlight} />
+                                                        color={Colors.highlight}/>
                             </View> : null}
-                            <MaterialCommunityIcons name="table-split-cell" size={30} color={isZeroPayment ? Colors.grey400 : Colors.green} />
+                            <MaterialCommunityIcons name="table-split-cell" size={30}
+                                                    color={isZeroPayment ? Colors.grey400 : Colors.green}/>
                             <Text>Split Payment</Text>
                         </PrimaryButton>
                     </View>
@@ -816,6 +933,7 @@ const PaymentModal = (props) => {
                                 dispatch(updateRewardAmount(0));
                                 // setSelectedPaymentOption("reward points")
                                 setSplitUpState(initialSplit)
+                                setIsSplitRewardActive(false);
                                 setIsRewardModalVisible(true)
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
@@ -855,106 +973,77 @@ const PaymentModal = (props) => {
                 </View>
                 {selectedPaymentOption === "cash" || selectedPaymentOption === null || selectedPaymentOption === "card" || selectedPaymentOption === "digital payments" || selectedPaymentOption === "prepaid" ? <>
                     <CustomTextInput type={"number"} label={"Payment"} value={totalPrice.toString()}
-                        readOnly={isZeroPayment}
-                        placeholder={"Price"}
-                        onChangeText={(price) => {
-                            if (price.trim().length === 0) {
-                                setTotalPrice(0)
-                                return
-                            }
-                            if (price.split(" ").length > 1) return;
-                            if (price.split(".").length > 2) return;
+                                     readOnly={isZeroPayment}
+                                     placeholder={"Price"}
+                                     onChangeText={(price) => {
+                                         if (price.trim().length === 0) {
+                                             setTotalPrice(0)
+                                             return
+                                         }
+                                         if (price.split(" ").length > 1) return;
+                                         if (price.split(".").length > 2) return;
 
-                            setTotalPrice(price.trim());
-                        }}
-                        onEndEditing={(value) => {
-                            if (parseFloat(value) < props.price) {
-                                setSelectedPaymentOption("split_payment")
-                            }
-                            callCashAPI()
-                        }}
+                                         setTotalPrice(price.trim());
+                                     }}
+                                     onEndEditing={(value) => {
+                                         if (parseFloat(value) < props.price) {
+                                             setSelectedPaymentOption("split_payment")
+                                         }
+                                         callCashAPI()
+                                     }}
                     />
                     {selectedPaymentOption === "cash" && splitResponse.length > 0 && splitResponse[0] !== undefined ?
                         <CustomTextInput type={"number"} label={"Change"}
-                            value={splitResponse[0].change_to_be_given === undefined ? "" : splitResponse[0].change_to_be_given.toString()}
-                            readOnly={true} /> : null}
+                                         value={splitResponse[0].change_to_be_given === undefined ? "" : splitResponse[0].change_to_be_given.toString()}
+                                         readOnly={true}/> : null}
                 </> : null}
                 {selectedPaymentOption === "split_payment" ? <View>
-                    <FlatList scrollEnabled={false} data={splitUpState} renderItem={({ item, index }) => {
+                    <FlatList scrollEnabled={false} data={splitUpState} renderItem={({item, index}) => {
                         // const shownCount = splitUpState.reduce((acc, item) => {
                         //     return item.shown ? acc + 1 : acc;
                         // }, 0);
                         if (item.shown) {
                             return <View style={styles.splitInputAndCloseContainer}>
-                                {
-                                    // item.name === "Reward Points" ?
-                                    //     <View style={[styles.commonContainer, { flex: 1 }]}>
-                                    //         {
-                                    //             <Text style={[TextTheme.bodyMedium, styles.labelText]}>Reward Points</Text>
-                                    //         }
-                                    //         <TextInput
-                                    //             style={[
-                                    //                 TextTheme.bodyLarge,
-                                    //                 styles.textInput,
-                                    //                 // { borderColor: error ? Colors.error : Colors.grey400 },
-                                    //             ]}
-                                    //             placeholderTextColor={Colors.grey400}
-                                    //             // onBlur={() => handleSave()}
-                                    //             // onChangeText={(text) => {
-                                    //             //     props.onChangeText(text);
-                                    //             //     if (error && props.validator && props.validator(text) === true) {
-                                    //             //         setError(false);
-                                    //             //         setErrorMessage("");
-                                    //             //     }
-                                    //             // }}
-                                    //             // cursorColor={props.cursorColor}
-                                    //             // onFocus={props.onFocus}
-                                    //             // secureTextEntry={props.secureTextEntry}
-                                    //         />
-                                    //         {/* {content}
-                                    //         {error && <Text style={[textTheme.bodyMedium, styles.errorText, props.errorStyle]}>{errorMessage}</Text>} */}
-                                    //     </View>
-                                    // :
-                                    <CustomTextInput
-                                        onFocus={() => {
-                                            if (item.name === "Reward Points") {
-                                                setIsRewardModalVisible(true);
-                                            }
-                                        }}
-                                        textInputStyle={isError ? { borderColor: Colors.error } : { borderColor: Colors.green }}
-                                        type={"number"} label={item.name} value={item.amount.toString()} flex={1}
-                                        readOnly={shownCount === 4 && item.name === paymentOrder.at(-1)}
-                                        onChangeText={(text) => {
-                                            if (text.split(" ").length > 1) return;
-                                            if (text.split(".").length > 2) return;
-                                            setSplitUpState(prev => prev.map((split) => {
-                                                if (split.mode === item.mode) {
-                                                    if (text.trim().at(-1) === ".") {
-                                                        return ({
-                                                            ...split,
-                                                            amount: text.trim()
-                                                        })
-                                                    } else {
-                                                        return ({
-                                                            ...split,
-                                                            amount: text.trim().length === 0 ? 0 : text
-                                                        })
-                                                    }
+                                <CustomTextInput
+                                    onFocus={() => {
+                                        if (item.name === "Reward Points") {
+                                            setIsRewardModalVisible(true);
+                                        }
+                                    }}
+                                    textInputStyle={isError ? { borderColor: Colors.error } : { borderColor: Colors.green }}
+                                    type={"number"} label={item.name} value={item.amount.toString()} flex={1}
+                                    readOnly={shownCount === 4 && item.name === paymentOrder.at(-1)}
+                                    onChangeText={(text) => {
+                                        if (text.split(" ").length > 1) return;
+                                        if (text.split(".").length > 2) return;
+                                        setSplitUpState(prev => prev.map((split) => {
+                                            if (split.mode === item.mode) {
+                                                if (text.trim().at(-1) === ".") {
+                                                    return ({
+                                                        ...split,
+                                                        amount: text.trim()
+                                                    })
+                                                } else {
+                                                    return ({
+                                                        ...split,
+                                                        amount: text.trim().length === 0 ? 0 : text
+                                                    })
                                                 }
-                                                return split;
-                                            }))
-                                            setStopAPI(false);
-                                            setRecentlyChanged(prev => {
-                                                if (prev.at(-1) === item.mode) return prev
-                                                else return [...prev, item.mode]
                                             }
-                                            );
-                                        }}
-                                        onEndEditing={(text) => {
-                                            if (item.mode === "prepaid") {
-                                                if (parseFloat(text) > clientInfo.wallet_balance) {
-                                                    // ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
-                                                    // TODO
+                                            return split;
+                                        }))
+                                        setStopAPI(false);
+                                        setRecentlyChanged(prev => {
+                                            if (prev.at(-1) === item.mode) return prev
+                                            else return [...prev, item.mode]
+                                        }
+                                        );
+                                    }}
+                                    onEndEditing={(text) => {
+                                        if (item.mode === "prepaid") {
+                                            if (parseFloat(text) > clientInfo.wallet_balance) {
+                                                // ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
+                                                // TODO
 
                                                     // Toast.show("Prepaid split amount is greater than the prepaid balance", {
                                                     //     duration: Toast.durations.LONG,
@@ -995,7 +1084,7 @@ const PaymentModal = (props) => {
 
                                             callSplitAPI();
                                         }}
-                                    />}
+                                    />
                                 <PrimaryButton buttonStyle={styles.splitInputCloseButton} onPress={() => {
                                     if (item.name === "Reward Points") {
                                         dispatch(updateRewardAmount(0));
@@ -1039,14 +1128,14 @@ const PaymentModal = (props) => {
 
 
                                 }}>
-                                    <Ionicons name="close" size={24} color="black" />
+                                    <Ionicons name="close" size={24} color="black"/>
                                 </PrimaryButton>
                             </View>
                         }
-                    }} />
+                    }}/>
                     {isPrepaidAvailable ? shownCount !== 4 ?
-                        <View style={styles.addPaymentButtonContainer}>
-                            <PrimaryButton onPress={() => {
+                            <View style={styles.addPaymentButtonContainer}>
+                                <PrimaryButton onPress={() => {
 
                                 setIsSplitPaymentDropdownVisible(true)
                             }}
@@ -1063,21 +1152,21 @@ const PaymentModal = (props) => {
 
                                     setIsSplitPaymentDropdownVisible(true)
                                 }}
-                                    buttonStyle={styles.addPaymentButton}
-                                    pressableStyle={styles.addPaymentButtonPressable}>
-                                    <Entypo name="plus" size={15} color="black" />
+                                               buttonStyle={styles.addPaymentButton}
+                                               pressableStyle={styles.addPaymentButtonPressable}>
+                                    <Entypo name="plus" size={15} color="black"/>
                                     <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
                                 </PrimaryButton>
                             </View> : null}
                 </View> : null}
             </View>
         </ScrollView>
-        <Divider />
-        <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
+        <Divider/>
+        <View style={[styles.buttonContainer, {paddingBottom: insets.bottom}]}>
             <PrimaryButton buttonStyle={styles.optionButton} onPress={() => {
                 setIsOptionsDropdownModalVisible(true)
             }}>
-                <Entypo name="dots-three-horizontal" size={24} color="black" />
+                <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton}
                 pressableStyle={[styles.checkoutButtonPressable, isLoading ? {
@@ -1146,6 +1235,7 @@ const PaymentModal = (props) => {
                                         dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
                                     }, 500);
                                 });
+                                return;
                             } catch (error) {
                                 console.error("An error occurred:", error);
                             }
@@ -1170,7 +1260,7 @@ const PaymentModal = (props) => {
                             const price = Math.round(totalPrice * 100) / 100
                             if (price < props.price || price > props.price) {
                                 //TODO
-                                
+
                                 toastRef.current.show("Split up not summing to the price", 2000);
                                 setIsLoading(false)
                                 return;
@@ -1209,6 +1299,7 @@ const PaymentModal = (props) => {
                                         dispatch(loadWalletPriceFromDb(details.id));
                                         dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
                                     }, 500);
+                                    return;
                                 });
                             } catch (error) {
                                 console.error("An error occurred:", error);
@@ -1269,6 +1360,7 @@ const PaymentModal = (props) => {
                                 dispatch(loadWalletPriceFromDb(details.id));
                                 dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
                             }, 500);
+                            return;
                         });
                     } catch (error) {
                         console.error("An error occurred:", error);
@@ -1279,8 +1371,8 @@ const PaymentModal = (props) => {
             >
                 {
                     isLoading ?
-                        <View style={{ flex: 1 }}>
-                            <ThreeDotActionIndicator />
+                        <View style={{flex: 1}}>
+                            <ThreeDotActionIndicator/>
                         </View>
                         :
                         <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>Total Amount</Text>
@@ -1290,7 +1382,7 @@ const PaymentModal = (props) => {
                         <View style={styles.checkoutButtonAmountAndArrowContainer}>
                             {/* <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.totalPriceToPay ?? 0}</Text> */}
                             <Text style={[textTheme.titleMedium, styles.checkoutButtonText]}>₹ {props.price ?? 0}</Text>
-                            <Feather name="arrow-right-circle" size={24} color={Colors.white} />
+                            <Feather name="arrow-right-circle" size={24} color={Colors.white}/>
                         </View> :
                         <></>
                 }

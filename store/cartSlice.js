@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 import axios from "axios";
 import {updateClientsList, updateFetchingState} from "./clientFilterSlice";
-import calculateCartPriceAPI from "../util/apis/calculateCartPriceAPI";
+import calculateCartPriceAPI from "../apis/checkoutAPIs/calculateCartPriceAPI";
 import {formatDate} from "../util/Helpers";
 import * as SecureStore from 'expo-secure-store';
 import {useState} from "react";
@@ -158,6 +158,12 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
 
 export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount,splitUpState) => async (dispatch, getState) => {
     const {cart,clientInfo} = getState();
+    console.log("clientInfo.details.id");
+    console.log(clientInfo.details.id);
+    console.log("cart.prepaidClientId");
+    console.log(cart.prepaidClientId);
+    // console.log(clientInfo.details.id);
+    
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems.map(customItem => {

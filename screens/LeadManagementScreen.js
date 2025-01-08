@@ -14,20 +14,20 @@ import textTheme from "../constants/TextTheme";
 import PrimaryButton from "../ui/PrimaryButton";
 import SearchBar from "../ui/SearchBar";
 import Divider from "../ui/Divider";
-import React, {useEffect, useLayoutEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import LeadCard from "../components/LeadManagementScreen/LeadCard";
 import {AntDesign, Feather, FontAwesome6} from "@expo/vector-icons";
 import {useDispatch, useSelector} from "react-redux";
 import {
     decrementPageNumber,
-    incrementPageNumber, resetPageNo, updateFetchingState,
+    incrementPageNumber, initialLeadState, resetPageNo, updateFetchingState,
     updateMaxEntry, updateSearchTerm
 } from "../store/leadManagementSlice";
 import {clientFilterNames} from "../util/chooseFilter";
 import EntryModel from "../components/clientSegmentScreen/EntryModel";
 import RadioButton from "../ui/RadioButton";
 import {loadLeadsFromDb, loadLeadSourcesFromDb, loadLeadStatusesFromDb} from "../store/leadManagementSlice";
-import getLeadsAPI from "../util/apis/getLeadsAPI";
+import getLeadsAPI from "../apis/leadManagementAPIs/getLeadsAPI";
 import CreateClientModal from "../components/checkoutScreen/CreateClientModal";
 import CreateLeadModal from "../components/LeadManagementScreen/CreateLeadModal";
 import * as Haptics from "expo-haptics";
@@ -35,6 +35,11 @@ import {addCustomItems, updateCalculatedPrice, updateCustomItem} from "../store/
 import LeadDetailsModal from "../components/LeadManagementScreen/LeadDetailsModal";
 import ContentLoader from "react-native-easy-content-loader";
 import EnquiryNotesModal from "../components/LeadManagementScreen/EnquiryNotesModal";
+import {updateNavigationState} from "../store/NavigationSlice";
+import LeadAdvancedFiltersModal from "../components/LeadManagementScreen/LeadAdvancedFiltersModal";
+import moment from "moment";
+import CustomTagFilter from "../components/LeadManagementScreen/CustomTagFilter";
+import Toast from "../ui/Toast";
 
 const LeadManagementScreen = () => {
     const maxEntry = useSelector(state => state.leads.maxEntry);
@@ -51,6 +56,10 @@ const LeadManagementScreen = () => {
     const [doesLeadExist, setDoesLeadExist] = useState(false);
     const isFetching = useSelector(state => state.leads.isFetching);
     const businessId = useSelector(state => state.authDetails.businessId);
+    const [isAdvancedFiltersModalVisible, setIsAdvancedFiltersModalVisible] = useState(false);
+
+    // const {followupDate, followupEndDate, fromDate, toDate, gender, leadFollowUp, lead_campaign, lead_owner, lead_source, lead_status, selectedLeadFollowUpOption} = useSelector(state => state.leads);
+
 
     const options = [
         {label: '10', value: 10},
@@ -59,13 +68,18 @@ const LeadManagementScreen = () => {
         {label: '100', value: 100},
     ];
 
+    useEffect(() => {
+        dispatch(updateNavigationState("Lead Management Screen"));
+    }, []);
+
+
     useLayoutEffect(() => {
         const apiCalls = async () => {
             dispatch(updateFetchingState(true));
             dispatch(updateSearchTerm(""));
             await dispatch(loadLeadStatusesFromDb());
             await dispatch(loadLeadSourcesFromDb());
-            const response = await getLeadsAPI(0, 10, "");
+            const response = await dispatch(loadLeadsFromDb());
             setDoesLeadExist(response.data.data[0].count > 0)
             await dispatch(loadLeadsFromDb());
             dispatch(updateFetchingState(false));
@@ -138,12 +152,19 @@ const LeadManagementScreen = () => {
         }
     }
 
+    const leadManagementToastRef = useRef();
+
     return <View style={styles.leadManagementScreen}>
+        <Toast ref={leadManagementToastRef}/>
         {isCreateLeadModalVisible && <CreateLeadModal isVisible={isCreateLeadModalVisible}
+                                                      leadManagementToastRef={leadManagementToastRef}
                                                       onCloseModal={() => setIsCreateClientModalVisible(false)}/>}
+        {isAdvancedFiltersModalVisible ? <LeadAdvancedFiltersModal onCloseModal={() => {
+            setIsAdvancedFiltersModalVisible(false)
+        }} isVisible={isAdvancedFiltersModalVisible}/> : null}
         {!(totalCount === 0 && !doesLeadExist) ? <PrimaryButton buttonStyle={styles.fab}
-                        onPress={() => setIsCreateClientModalVisible(true)}
-                        pressableStyle={{flex: 1}}>
+                                                                onPress={() => setIsCreateClientModalVisible(true)}
+                                                                pressableStyle={{flex: 1}}>
             <Feather name="plus" size={24}
                      color={Colors.white}/>
         </PrimaryButton> : <></>}
@@ -207,7 +228,11 @@ const LeadManagementScreen = () => {
                 <View style={styles.content}>
                     <ScrollView fadingEdgeLength={100} style={{flex: 1}}>
                         <View style={styles.searchBarAndFilterContainer}>
-                            <SearchBar filter onChangeText={async (text) => {
+                            <SearchBar
+                                filter
+                                onPressFilter={() => {
+                                    setIsAdvancedFiltersModalVisible(true);
+                                }} onChangeText={async (text) => {
                                 dispatch(updateFetchingState(true))
                                 dispatch(resetPageNo())
                                 dispatch(updateSearchTerm(text));
@@ -215,6 +240,10 @@ const LeadManagementScreen = () => {
                                 dispatch(loadLeadsFromDb());
                                 dispatch(updateFetchingState(false))
                             }} placeholder={"Search by name email or mobile "}/>
+                        </View>
+                        <Divider/>
+                        <View>
+                            <CustomTagFilter/>
                         </View>
                         <Divider/>
                         <View style={[styles.leadCountContainer]}>
@@ -233,6 +262,7 @@ const LeadManagementScreen = () => {
                                     name={lead.name}
                                     status={lead.lead_status}
                                     phoneNo={lead.mobile}
+                                    leadManagementToastRef={leadManagementToastRef}
                                 />
                             ))}
                         {totalCount < 10 ? null : <View style={styles.pagination}>

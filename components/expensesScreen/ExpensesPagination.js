@@ -7,7 +7,12 @@ import {chooseFilterCount, clientFilterNames} from "../../util/chooseFilter";
 import {useDispatch, useSelector} from "react-redux";
 import Colors from "../../constants/Colors";
 import {loadClientCountFromDb} from "../../store/clientSlice";
-import {loadExpensesFromDb, decrementPageNumber, incrementPageNumber,} from "../../store/ExpensesSlice";
+import {
+    loadExpensesFromDb,
+    decrementPageNumber,
+    incrementPageNumber,
+    resetExpensesPageNo,
+} from "../../store/ExpensesSlice";
 
 /**
  * Pagination Component
@@ -60,6 +65,7 @@ export default function ExpensesPagination(props) {
     }, [lowerCount, upperCount]);
 
     useEffect(() => {
+        dispatch(resetExpensesPageNo());
         setLowerCount(1);
         if(maxEntry > props.totalCount) {
 
@@ -70,6 +76,7 @@ export default function ExpensesPagination(props) {
         }
 
         dispatch(loadExpensesFromDb());
+
     }, [maxEntry, props.clientDeleted]);
 
 

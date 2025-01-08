@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {updateMaxEntry, updateSearchClientMaxEntry} from "../../store/clientFilterSlice";
 import RadioButton from "./../../ui/RadioButton"
-import {updateSalesMaxEntry} from "../../store/clientInfoSlice";
+import {updatePageNo, updateSalesMaxEntry} from "../../store/clientInfoSlice";
 
 
 /**
@@ -32,6 +32,8 @@ export default function EntryBoxModal(props) {
 
     const [selectedOption, setSelectedOption] = useState(null);
 
+    const maxEntry = useSelector(state => state.clientInfo.maxEntry)
+
     const options = [
         {label: '10', value: 10},
         {label: '25', value: 25},
@@ -41,36 +43,35 @@ export default function EntryBoxModal(props) {
 
 
     useEffect(() => {
-        setCheckedNumber(props.maxEntry);
-    }, [props.maxEntry]);
+        setCheckedNumber(maxEntry);
+        dispatch(updatePageNo(0));
+    }, [maxEntry]);
 
     return (
         <Modal
-            style={{alignItems: 'center', justifyContent: 'center'}}
             visible={props.isModalVisible}
             animationType="fade"
             transparent={true}
         >
-            <TouchableOpacity activeOpacity={1}
-                              style={{flex: 1, justifyContent: "center", backgroundColor: Colors.dim}}
-                              onPress={() => {
-                                  props.setIsModalVisible(false);
-                              }}>
-
-                <View style={styles.model}>
+            <TouchableOpacity
+                activeOpacity={1}
+                style={styles.overlay}
+                onPress={() => props.setIsModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <Text style={styles.modalTitle}>Select Max Count</Text>
                     <View style={styles.innerContainer}>
                         <RadioButton
                             options={options}
-                            value={selectedOption}
+                            value={checkedNumber}
                             onValueChange={setSelectedOption}
                             onPress={(value) => {
-                                setCheckedNumber(value)
+                                setCheckedNumber(value);
                                 props.setIsModalVisible(false);
-                                props.radioButtomPressed(value);
+                                dispatch(updateSalesMaxEntry(value))
                             }}
                         />
                     </View>
-
                 </View>
             </TouchableOpacity>
         </Modal>
@@ -78,22 +79,32 @@ export default function EntryBoxModal(props) {
 }
 
 const styles = StyleSheet.create({
-    model: {
-        justifyContent: "center",
-        alignItems: "center",
-        width: '70%',
-        height: modalHeight,
-        backgroundColor: Colors.grey200,
-        borderRadius: 24,
-        margin: 'auto',
-        borderWidth: 1.5,
-        overflow: 'hidden'
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '80%',
+        backgroundColor: Colors.white,
+        borderRadius: 16,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: Colors.primary,
+        marginBottom: 10,
     },
     innerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
         width: '100%',
-        justifyContent: 'space-around',
-
+        paddingVertical: 15,
     },
-})
+});

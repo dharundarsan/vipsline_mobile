@@ -1,4 +1,4 @@
-import {Modal, Text, View, StyleSheet, ScrollView, Platform, Linking} from "react-native";
+import {Modal, Text, View, StyleSheet, ScrollView, Platform, Linking, Image} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
@@ -7,19 +7,18 @@ import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Divider from "../../ui/Divider";
 import ClientStatistics from "./ClientStatistics";
 import ClientDetails from "./ClientDetails";
 import MoreOptionDropDownModal from "./MoreOptionDropDownModal";
 import UpdateClientModal from "./UpdateClientModal";
-import DeleteClient from "./DeleteClientModal";
 import {useDispatch, useSelector} from "react-redux";
 import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
 import {clearClientInfo, loadClientInfoFromDb, resetRewardPageNo, updateCustomerRewards, updateRewardsPointBalance} from "../../store/clientInfoSlice";
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
-import {loadClientsFromDb} from "../../store/clientSlice";
+import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
 import Toast from "../../ui/Toast";
 import BillingActivity from "./BillingActivity";
 import Appointments from "./Appointments";
@@ -27,6 +26,10 @@ import {MembershipDetails} from "./MembershipDetails";
 import {PackageDetails} from "./PackageDetails";
 import {PrepaidDetails} from "./PrepaidDetails";
 import ClientRewardPoints from "./ClientRewardPoints";
+import clearCartAPI from "../../apis/checkoutAPIs/clearCartAPI";
+import {clearCalculatedPrice, clearLocalCart, clearSalesNotes, modifyClientMembershipId} from "../../store/cartSlice";
+import BottomActionCard from "../../ui/BottomActionCard";
+import deleteClientAPI from "../../apis/ClientSegmentAPIs/deleteClientAPI";
 
 /**
  * ClientInfoModal Component
@@ -56,8 +59,9 @@ const getCategoryTitle =
         "memberships": "Memberships",
         "packageSales": "Package sales",
         "prepaidSales": "Prepaid sales",
-        "review": "Review",
-        "giftVoucher": "Gift Voucher",
+        "rewardpoints": "Reward Points",
+        // "review": "Review",
+        // "giftVoucher": "Gift Voucher",
         "seeMoreStats": "Statistics"
     }
 
@@ -67,10 +71,11 @@ export default function clientInfoModal(props) {
     const dispatch = useDispatch();
 
     const analyticDetails = useSelector(state => state.clientInfo.analyticDetails || {});
-    const details = useSelector(state => state.clientInfo.details)|| {};
+    const details = useSelector(state => state.clientInfo.details) || {};
     const salesData = useSelector(state => state.clientInfo.analyticDetails || {});
     const membershipData = useSelector(state => state.clientInfo.membershipList || {});
     const packageData = useSelector(state => state.clientInfo.packageList || {});
+    const currentClientId = useSelector(state => state.clientInfo.clientId);
 
 
     const [totalSales, setTotalSales] = useState("");
@@ -84,7 +89,6 @@ export default function clientInfoModal(props) {
     const [name, setName] = useState("");
 
     const toastRef = useRef(null)
-
 
     useEffect(() => {
         setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
@@ -102,6 +106,8 @@ export default function clientInfoModal(props) {
         setPhone(details.mobile_1);
 
     }, [analyticDetails, details]);
+
+    console.log(JSON.stringify(salesData, null, 2));
 
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
@@ -178,25 +184,29 @@ export default function clientInfoModal(props) {
 
             />}
 
-            <DeleteClient
-                isVisible={deleteClientModalVisibility}
-                deleteClient={true}
-                onCloseModal={() => {
-                    setDeleteClientModalVisibility(false)
-                    props.setModalVisibility(false);
-                    dispatch(loadClientsFromDb())
-                }}
-                header={"Delete Client"}
-                content={"Are you sure? This action cannot be undone."}
-                onCloseClientInfoAfterDeleted={() => {
-                    props.setVisible(false);
-                    props.setSearchQuery("");
-                    props.setFilterPressed("all_clients_count");
-                    dispatch(clearClientInfo());
-                }}
-                deleteClientToast={props.deleteClientToast}
-
+            <BottomActionCard isVisible={deleteClientModalVisibility}
+                              header={"Delete Client"}
+                              content={"Are you sure? This action cannot be undone."}
+                              onClose={() => {
+                                  setDeleteClientModalVisibility(false)
+                              }}
+                              onConfirm={async () => {
+                                  deleteClientAPI(currentClientId);
+                                  props.deleteClientToast();
+                                  dispatch(loadClientCountFromDb());
+                                  dispatch(loadClientFiltersFromDb(10, "All"));
+                                  dispatch(loadSearchClientFiltersFromDb(10, "All", ""));
+                                  props.setVisible(false);
+                                  props.setSearchQuery("");
+                                  props.setFilterPressed("all_clients_count");
+                                  dispatch(clearClientInfo());
+                                  setDeleteClientModalVisibility(false)
+                              }}
+                              onCancel={() => setDeleteClientModalVisibility(false)}
+                              confirmLabel={"Delete"}
+                              cancelLabel={"Cancel"}
             />
+
             <View style={styles.modalContent}>
                 <ClientCard
                     clientDetailsContainer={{width: "auto"}}
@@ -232,12 +242,12 @@ export default function clientInfoModal(props) {
                         </View>
 
                     </PrimaryButton>
-                    <PrimaryButton buttonStyle={styles.bookButton}
-                                   pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>
-                        <Text style={[textTheme.bodyMedium, {color: Colors.white}]}>
-                            Book now
-                        </Text>
-                    </PrimaryButton>
+                    {/*<PrimaryButton buttonStyle={styles.bookButton}*/}
+                    {/*               pressableStyle={[styles.pressable, styles.pressableStyle]} onPress={() => null}>*/}
+                    {/*    <Text style={[textTheme.bodyMedium, {color: Colors.white}]}>*/}
+                    {/*        Book now*/}
+                    {/*    </Text>*/}
+                    {/*</PrimaryButton>*/}
                 </View>
 
                 <ClientSaleInfo
@@ -278,41 +288,67 @@ export default function clientInfoModal(props) {
 
             />
     } else if (clientMoreDetails === "billActivity") {
-        content = <BillingActivity
-            salesData={salesData}
-            clientId={details.id}
-        />
+        content = checkNullUndefined(salesData) && checkNullUndefined(salesData.history_appointment_count) && salesData.history_appointment_count > 0 ?
+            <BillingActivity
+                salesData={salesData}
+                clientId={details.id}
+            /> :
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight}
+                       style={{height: 30, width: 30, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Sales</Text>
+                <Text style={textTheme.bodyMedium}>The client has no upcoming or past sales</Text>
+            </View>
     } else if (clientMoreDetails === "appointments") {
-        content = <Appointments
-            salesData={salesData}
-            clientId={details.id}
-        />
+        content = checkNullUndefined(salesData) && checkNullUndefined(salesData.upcoming_appointmentList.length) && salesData.upcoming_appointmentList.length > 0 ?
+            <Appointments
+                salesData={salesData}
+                clientId={details.id}
+            /> :
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/drawerIcons/checkout.png")} tintColor={Colors.highlight}
+                       style={{height: 30, width: 30, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Appointments</Text>
+                <Text style={textTheme.bodyMedium}>The client has no upcoming Appointments</Text>
+            </View>
     } else if (clientMoreDetails === "memberships") {
         content = checkNullUndefined(membershipData) && checkNullUndefined(membershipData.length) && membershipData.length > 0 ?
             <MembershipDetails
                 membershipData={membershipData}
             /> :
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
-                membership for this client</Text></View>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/membership.png")} tintColor={Colors.highlight}
+                       style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Membership</Text>
+                <Text style={textTheme.bodyMedium}>This client doesn’t have any active memberships</Text>
+            </View>
     } else if (clientMoreDetails === "packageSales") {
         content = checkNullUndefined(packageData) && checkNullUndefined(packageData.length) && packageData.length > 0 ?
             <PackageDetails
                 pacakgeData={packageData}
             /> :
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
-                package for this client</Text></View>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/package.png")} tintColor={Colors.highlight}
+                       style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Package</Text>
+                <Text style={textTheme.bodyMedium}>This client doesn’t have any package.</Text>
+            </View>
     } else if (clientMoreDetails === "prepaidSales") {
         content = checkNullUndefined(details) && checkNullUndefined(details.wallet_status) && details.wallet_status ?
             <PrepaidDetails
                 details={details}/> :
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>No
-                Prepaid for this client</Text></View>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Image source={require("../../assets/icons/prepaid.png")} tintColor={Colors.highlight}
+                       style={{height: 40, width: 40, marginBottom: 6}}/>
+                <Text style={[textTheme.labelLarge]}>No Prepaid</Text>
+                <Text style={textTheme.bodyMedium}>This client doesn’t have any prepaid.</Text>
+            </View>
 
-    } 
-    else if (clientMoreDetails === "rewardpoints") {
-        content =
-            <ClientRewardPoints details={details} />
-    } 
+    }
+        else if (clientMoreDetails === "rewardpoints") {
+            content =
+                <ClientRewardPoints details={details} />
+    }
     else {
         content =
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming
@@ -465,15 +501,17 @@ const styles = StyleSheet.create({
     optionsContainer: {
         flexDirection: "row",
         width: "95%",
-        justifyContent: "space-around",
+        justifyContent: "center",
+        gap: 32
     },
     updateOrDeleteOption: {
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
+        width: '20%'
     },
     callButton: {
-        width: '30%',
+        width: '70%',
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.grey250,
@@ -482,10 +520,10 @@ const styles = StyleSheet.create({
         width: '30%'
     },
     pressableStyle: {
-        flex: 1
+        flex: 1,
     },
     salesCard: {
-        marginTop: 64,
+        marginTop: 30,
         width: '100%'
     },
     clientInfoCategoryContainer: {
@@ -513,6 +551,6 @@ const styles = StyleSheet.create({
     },
     pressable: {
         paddingVertical: 8,
-        paddingHorizontal: 8,
+        paddingHorizontal: 0,
     }
 })

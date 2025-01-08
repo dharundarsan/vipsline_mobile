@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, StatusBar} from "react-native";
+import {View, Text, StyleSheet, StatusBar, TouchableWithoutFeedback, Keyboard} from "react-native";
 import SignInHeader from "../components/authScreen/SignInHeader";
 import Toast from "../ui/Toast";
 import ForgetPasswordOTP from "../components/forgetPasswordScreen/ForgetPasswordOTP";
@@ -10,7 +10,7 @@ import Colors from "../constants/Colors";
 import CustomTextInput from "../ui/CustomTextInput";
 import {checkNullUndefined} from "../util/Helpers";
 import PrimaryButton from "../ui/PrimaryButton";
-import resetPasswordAPI from "../util/apis/resetPasswordAPI";
+import resetPasswordAPI from "../apis/authAPIs/resetPasswordAPI";
 import {useNavigation} from "@react-navigation/native";
 
 export default function ChangePasswordScreen(props) {
@@ -24,13 +24,21 @@ export default function ChangePasswordScreen(props) {
 
     const navigation = useNavigation();
 
-    const [checked, setChecked] = useState(true)
+    const [checked, setChecked] = useState(true);
+
+    const [emptyChecker, setEmptyChecker] = useState(0);
+
+    const newPasswordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+
 
 
 
 
     return <SafeAreaView style={styles.safeAreaView}>
         <StatusBar style="light" />
+        <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
         <View style={styles.forgetPassword}>
             <SignInHeader />
             <Toast
@@ -52,12 +60,17 @@ export default function ChangePasswordScreen(props) {
                         cursorColor={Colors.black}
                         onChangeText={setNewPassword}
                         validator={(text) => {
-                            if(newPassword.trim().length === 0) return true
+                            if(newPassword.trim().length === 0 || emptyChecker === 1) {
+                                return "New Password should not be empty"
+                            }
                             if((/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d\S]{6,}$/).test(newPassword)) return true;
                             else return "Password must be at least 6 characters with a mix of uppercase, lowercase & numbers"
                         }}
                         onFocus={() => setOnFocus(1)}
                         secureTextEntry={checked}
+                        onSave={(callback) => {
+                            newPasswordRef.current = callback;
+                        }}
                     />
                     <CustomTextInput
                         type={"text"}
@@ -69,7 +82,9 @@ export default function ChangePasswordScreen(props) {
                         cursorColor={Colors.black}
                         onChangeText={setConfirmPassword}
                         validator={(text) => {
-                            if(confirmPassword.trim().length === 0) return true
+                            if(confirmPassword.trim().length === 0 || emptyChecker === 2) {
+                                return "Re-Enter New Password should not be empty"
+                            }
                             if(confirmPassword === newPassword) {
                                 return true
                             }
@@ -79,6 +94,10 @@ export default function ChangePasswordScreen(props) {
                         }}
                         onFocus={() => setOnFocus(2)}
                         secureTextEntry={checked}
+                        onSave={(callback) => {
+                            confirmPasswordRef.current = callback;
+                        }}
+
                     />
                 </View>
                 <PrimaryButton
@@ -86,7 +105,24 @@ export default function ChangePasswordScreen(props) {
                     textStyle={[textTheme.titleMedium]}
                     buttonStyle={styles.buttonStyle}
                     onPress={async () => {
-                        if(newPassword.trim().length === 0 || confirmPassword.trim().length === 0) return;
+
+                        const newPasswordValid = newPasswordRef.current();
+                        const confirmPasswordValid = confirmPasswordRef.current();
+
+                        if(!newPasswordValid || !confirmPasswordValid) {
+                            console.log("fgfs")
+                            return;
+                        }
+
+
+                        if(newPassword.trim().length === 0) {
+                            setEmptyChecker(1);
+                            return;
+                        }
+                        if(confirmPassword.trim().length === 0) {
+                            setEmptyChecker(2);
+                            return;
+                        }
                         if((/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d\S]{6,}$/).test(newPassword) && newPassword === confirmPassword){
                             const message = await resetPasswordAPI(props.route.params.username, "BUSINESS", props.route.params.otp, newPassword);
                             toastRef.current.show(message);
@@ -102,6 +138,7 @@ export default function ChangePasswordScreen(props) {
 
 
         </View>
+        </TouchableWithoutFeedback>
 
     </SafeAreaView>
 }

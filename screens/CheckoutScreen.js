@@ -34,13 +34,14 @@ import {
     modifyClientMembershipId
 } from "../store/cartSlice";
 import { loadBookingDetailsFromDb } from "../store/invoiceSlice";
-import clearCartAPI from "../util/apis/clearCartAPI";
+import clearCartAPI from "../apis/checkoutAPIs/clearCartAPI";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocationContext } from "../context/LocationContext";
 import Toast from "../ui/Toast";
 import {updateToastRef} from "../store/toastSlice";
 import {loadBusinessDetail} from "../store/BusinessDetailSlice";
 import {getExpenseCategoryId, getExpenseSubCategoryId} from "../store/ExpensesSlice";
+import BottomActionCard from "../ui/BottomActionCard";
 
 const CheckoutScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();

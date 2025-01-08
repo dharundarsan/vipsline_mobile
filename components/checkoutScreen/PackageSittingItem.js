@@ -16,6 +16,9 @@ const PackageSittingItem = (props) => {
     const [isMinReached, setIsMinReached] = useState(true);
     const dispatch = useDispatch();
 
+    // console.log("editedData")
+    // console.log(props.editedData)
+
     useEffect(() => {
         if (props.edited) {
             const filteredData = props.editedData.filter(item =>
@@ -69,6 +72,7 @@ const PackageSittingItem = (props) => {
 
                                                        props.editSittingCountInEditedPackageDetails({
                                                            ...filteredEditedData[0],
+                                                           item_id: filteredEditedData[0].item_ids[sittingCount - 1],
                                                            counter: sittingCount - 1
                                                        })
                                                        setSittingCount(prev => prev - 1)

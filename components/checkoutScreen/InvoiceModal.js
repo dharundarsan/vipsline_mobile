@@ -13,12 +13,12 @@ import {useEffect, useRef, useState} from "react";
 import {loadWalletPriceFromDb} from "../../store/invoiceSlice";
 import DropdownModal from "../../ui/DropdownModal";
 import {useNavigation} from "@react-navigation/native";
-import sendEmailAPI from "../../util/apis/sendEmailAPI";
-import sendSMSAPI from "../../util/apis/sendSMSAPI";
+import sendEmailAPI from "../../apis/checkoutAPIs/sendEmailAPI";
+import sendSMSAPI from "../../apis/checkoutAPIs/sendSMSAPI";
 import BottomModal from "../../ui/BottomModal";
-import cancelInvoiceAPI from "../../util/apis/cancelInvoiceAPI";
+import cancelInvoiceAPI from "../../apis/checkoutAPIs/cancelInvoiceAPI";
 import * as SecureStore from 'expo-secure-store';
-import clearCartAPI from "../../util/apis/clearCartAPI";
+import clearCartAPI from "../../apis/checkoutAPIs/clearCartAPI";
 import {clearClientInfo} from "../../store/clientInfoSlice";
 import {
     clearCalculatedPrice,
@@ -41,7 +41,7 @@ const InvoiceModal = (props) => {
     const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
-    // console.log(selectedClientDetails)
+    console.log(JSON.stringify(selectedClientDetails, null, 3));
 
     const dispatch = useDispatch();
 
@@ -107,6 +107,8 @@ const InvoiceModal = (props) => {
     const selectedBusinessDetails = listOfBusinesses.filter((item) => {
         return item.id === businessId
     })[0];
+
+
 
 
     const businessName = selectedBusinessDetails.name;
@@ -196,8 +198,8 @@ const InvoiceModal = (props) => {
                 dropdownItems={[
                     "SMS",
                     "Email",
-                    "Thermal Print",
-                    "A4 Print",
+                    // "Thermal Print",
+                    // "A4 Print",
                     "Cancel Invoice"
                 ]}
                 iconImage={[
@@ -384,14 +386,14 @@ styles.heading]}>Invoice</Text>*/}
                                 props.onCloseModal();
                             }}
                         />
-                        <PrimaryButton
-                            onPress={() => setOptionModalVisibility(true)}
-                            buttonStyle={styles.backToCheckoutOptionsButton}>
-                            <MaterialIcons name="keyboard-arrow-down"
-                                           size={24}
-                                           color={Colors.background}
-                            />
-                        </PrimaryButton>
+                        {/*<PrimaryButton*/}
+                        {/*    onPress={() => setOptionModalVisibility(true)}*/}
+                        {/*    buttonStyle={styles.backToCheckoutOptionsButton}>*/}
+                        {/*    <MaterialIcons name="keyboard-arrow-down"*/}
+                        {/*                   size={24}*/}
+                        {/*                   color={Colors.background}*/}
+                        {/*    />*/}
+                        {/*</PrimaryButton>*/}
                     </View>
                     {
                         !isCancelled ?
@@ -469,7 +471,8 @@ styles.heading]}>Invoice</Text>*/}
                                 <></>
                         }
                         {
-                            selectedClientDetails.customer_gst !== null && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                            // selectedClientDetails.customer_gst !== null && selectedBusinessDetails.customer_gst !== "" && selectedBusinessDetails.customer_gst !== undefined ?
+                            checkNullUndefined(selectedClientDetails.customer_gst) && (selectedClientDetails.customer_gst).trim().length !== 0?
                                 <Text style={textTheme.bodyLarge}><Text
                                     style={textTheme.titleMedium}>GSTIN
                                     : </Text>{selectedClientDetails.customer_gst}</Text> :
@@ -697,8 +700,8 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     backToCheckoutButton: {
-        borderTopRightRadius: 0,
-        borderBottomRightRadius: 0,
+        // borderTopRightRadius: 0,
+        // borderBottomRightRadius: 0,
         flex: 4,
 
     },
