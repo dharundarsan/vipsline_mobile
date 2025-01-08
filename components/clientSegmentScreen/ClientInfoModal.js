@@ -59,6 +59,7 @@ const getCategoryTitle =
         "memberships": "Memberships",
         "packageSales": "Package sales",
         "prepaidSales": "Prepaid sales",
+        "rewardpoints": "Reward Points",
         // "review": "Review",
         // "giftVoucher": "Gift Voucher",
         "seeMoreStats": "Statistics"
@@ -344,10 +345,10 @@ export default function clientInfoModal(props) {
             </View>
 
     }
-        // else if (clientMoreDetails === "rewardpoints") {
-        //     content =
-        //         <ClientRewardPoints details={details} />
-    // }
+        else if (clientMoreDetails === "rewardpoints") {
+            content =
+                <ClientRewardPoints details={details} />
+    }
     else {
         content =
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming

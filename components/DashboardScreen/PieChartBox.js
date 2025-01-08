@@ -247,7 +247,7 @@ const PieChartBox = (props) => {
     service.name,
     service.count,
     `₹${service?.revenue?.toLocaleString()}`,
-    `${service?.percent?.toFixed(2)}%`,
+    `${service?.percent}%`,
   ]);
 
   return (
@@ -515,6 +515,7 @@ const PieChartBox = (props) => {
                       style={[
                         styles.totalValue,
                         {
+                          zIndex:8,
                           fontSize: getFontSize(
                             props.totalCenterValue.toFixed(2)
                           ),
@@ -531,7 +532,13 @@ const PieChartBox = (props) => {
               textColor="white"
               textSize={14}
               tooltipDuration={3000}
-              // showTooltip
+              showTooltip
+              tooltipTextNoOfLines={100}
+              // tooltipComponent={
+              //   ({index}) => {
+              //     <Text style={{height:10,fontSize:20,padding:100,backgroundColor:Colors.black}}>{index}</Text>
+              //   }
+              // }
             />
           ) : (
             <PieChart
@@ -550,7 +557,7 @@ const PieChartBox = (props) => {
               isAnimated
               animationDuration={5000}
               tooltipDuration={3000}
-              // showTooltip
+              showTooltip
             />
             // null
           )}

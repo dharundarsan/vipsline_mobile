@@ -29,7 +29,7 @@ import LeadManagementStack from "../stacks/LeadManagementStack";
 import lead_management_icon from "../assets/icons/drawerIcons/lead_management.png";
 import Expenses from "../screens/Expenses";
 import staffs_icon from "../assets/icons/drawerIcons/staffs.png";
-
+import reports_icon from "../assets/icons/drawerIcons/reports.png"
 import expenses_icon from "../assets/icons/drawerIcons/expenses.png";
 import ListOfBusinessesScreen from "../screens/ListOfBusinessesScreen";
 import list_of_businesses_icon from "../assets/icons/drawerIcons/list_of_businesses.png";
@@ -47,6 +47,8 @@ import {AntDesign} from "@expo/vector-icons";
 import BottomActionCard from "../ui/BottomActionCard";
 import StaffManagementScreen from "../screens/StaffManagementScreen";
 import staffManagementStack from "../stacks/StaffManagementStack";
+import CustomCancelSale from "../ui/CustomCancelSale";
+import ReportStack from "../stacks/ReportStack";
 
 function CustomDrawerIcon({navigation}) {
     return (
@@ -186,41 +188,45 @@ const MainDrawerNavigator = (props) => {
     }, [currentLocation])
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
     const currentRoute = useSelector(state => state.navigation.current);
-    console.log(currentRoute)
     return (
         <>
             {!props.auth ? <AuthNavigator/> :
-                isDelete ? <BottomActionCard isVisible={isDelete}
-                                             header={"Cancel Sale"}
-                                             content={"If you cancel this sale transaction will not be processed."}
-                                             onClose={() => {
-                                                 setIsDelete(false)
-                                             }}
-                                             onConfirm={async () => {
-                                                 await clearCartAPI();
-                                                 dispatch(modifyClientMembershipId({type: "clear"}));
-                                                 clearSalesNotes();
-                                                 dispatch(clearLocalCart());
-                                                 dispatch(clearClientInfo());
-                                                 dispatch(clearCalculatedPrice());
-                                                 setTimeout(() => {
-                                                     // navigation.navigate("Checkout", { screen: "CheckoutScreen" });
-                                                     setReload(false);
-                                                     navigation.navigate(currentLocation);
-                                                 }, 10);
-                                                 setIsDelete(false);
-                                             }}
-                                             onCancel={() => {
-                                                 setIsDelete(false);
-                                             }}
-                                             confirmLabel={"Cancel Sale"}
-                                             cancelLabel={"Close"}/>
+                isDelete ? <CustomCancelSale
+                isVisible={isDelete}
+                        setVisible={setIsDelete}
+                        onCloseModal={async () => {
+                            setTimeout(() => {
+                                setIsDelete(false);
+                                navigation.navigate("Checkout", {screen: "CheckoutScreen"});
+                            }, 10);
+                            setReload(true)
+                            // console.log(navigationRef.current.getRootState());
+                            // navigate("Checkout")
+                        }}
+                        ActionOptionName={"Cancel Sale"}
+                        header={"Cancel Sale"}
+                        content={"If you cancel this sale transaction will not be processed."}
+                        onCloseClientInfoAfterDeleted={async () => {
+                            await clearCartAPI();
+                            dispatch(modifyClientMembershipId({type: "clear"}));
+                            clearSalesNotes();
+                            dispatch(clearLocalCart());
+                            dispatch(clearClientInfo());
+                            dispatch(clearCalculatedPrice());
+                            setTimeout(() => {
+                                // navigation.navigate("Checkout", { screen: "CheckoutScreen" });
+                                setReload(false);
+                                navigation.navigate(currentLocation);
+                            }, 10);
+                        }}
+                        checkoutScreenToast={() => null}
+                        />
                     :
                     wentToBusiness ?
                         <Drawer.Navigator
                             initialRouteName="Checkout"
                             drawerContent={(props) => <CustomDrawer {...props} />}
-                            screenOptions={({navigation}) => ({
+                            screenOptions={({route,navigation}) => ({
                                 drawerActiveTintColor: Colors.highlight,
                                 drawerInactiveTintColor: Colors.white,
                                 drawerStyle: {backgroundColor: Colors.darkBlue},
@@ -249,16 +255,17 @@ const MainDrawerNavigator = (props) => {
                                 name="Dashboard"
                                 component={DashboardStack}
                                 options={({navigation, route}) => ({
-                                    headerLeft: currentLocation !== "Dashboard" ? () => <BackButton/> : () =>
-                                        <CustomDrawerIcon navigation={navigation}/>,
-                                    headerTitle: `${currentLocation}`,
-                                    headerTitleAlign: "center",
-                                    swipeEnabled: currentLocation !== "Dashboard" ? false : true,
-                                    headerShown: isDashboardPage,
+                                    // headerLeft: currentLocation !== "Dashboard" ? () => <BackButton/> : () =>
+                                    //     <CustomDrawerIcon navigation={navigation}/>,
+                                    // headerTitle: `${currentLocation}`,
+                                    // headerTitleAlign: "center",
+                                    swipeEnabled: currentLocation !== "DashboardScreen" ? false : true,
+                                    // headerShown: isDashboardPage,
                                     drawerIcon: () => <Image
                                         source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25}
                                         height={25}
-                                        style={{resizeMode: "contain"}}/>
+                                        style={{resizeMode: "contain"}}/>,
+                                    headerShown:false
                                 })}
                             />
                             {/*<Drawer.Screen*/}
@@ -330,27 +337,28 @@ const MainDrawerNavigator = (props) => {
                                                    style={{resizeMode: "contain", tintColor: Colors.white}}/>,
                                                headerTitleAlign: 'center',
                                            }}/>
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Reports"*/}
-                            {/*    component={CheckoutStack}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(reports_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
-                            {/*<Drawer.Screen name="Catalogue" component={CheckoutStack} options={{*/}
-                            {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(catalogue_icon).uri }}*/}
-                            {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
-                            {/*}} />*/}
-                            {/*<Drawer.Screen name="Discounts" component={CheckoutStack} options={{*/}
-                            {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(discounts_icon).uri }}*/}
-                            {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
-                            {/*}} />*/}
-                            {/*<Drawer.Screen name="Settings" component={CheckoutStack} options={{*/}
-                            {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(settings_icon).uri }}*/}
-                            {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
-                            {/*}} />*/}
+                            <Drawer.Screen
+                               name="Reports"
+                               component={ReportStack}
+                               options={{
+                                headerShown:false,
+                                   drawerIcon: () => <Image
+                                       source={{ uri: Image.resolveAssetSource(reports_icon).uri }} width={25} height={25}
+                                       style={{ resizeMode: "contain" }} />
+                               }}
+                            />
+                            {/* <Drawer.Screen name="Catalogue" component={CheckoutStack} options={{
+                                drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(catalogue_icon).uri }}
+                                    width={25} height={25} style={{ resizeMode: "contain" }} />
+                            }} />
+                            <Drawer.Screen name="Discounts" component={CheckoutStack} options={{
+                                drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(discounts_icon).uri }}
+                                    width={25} height={25} style={{ resizeMode: "contain" }} />
+                            }} />
+                            <Drawer.Screen name="Settings" component={CheckoutStack} options={{
+                                drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(settings_icon).uri }}
+                                    width={25} height={25} style={{ resizeMode: "contain" }} /> 
+                            }} />  */}
                             <Drawer.Screen name="Staffs" component={staffManagementStack} options={{
                                 headerShown: false,
                                 drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}

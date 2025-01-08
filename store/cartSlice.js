@@ -158,6 +158,12 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
 
 export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount,splitUpState) => async (dispatch, getState) => {
     const {cart,clientInfo} = getState();
+    console.log("clientInfo.details.id");
+    console.log(clientInfo.details.id);
+    console.log("cart.prepaidClientId");
+    console.log(cart.prepaidClientId);
+    // console.log(clientInfo.details.id);
+    
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
         additional_services: cart.customItems.map(customItem => {

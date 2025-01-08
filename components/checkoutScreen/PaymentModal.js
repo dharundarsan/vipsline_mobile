@@ -52,7 +52,8 @@ const PaymentModal = (props) => {
     const isZeroPayment = props.price === 0;
     const isPrepaidInCart = useSelector(state => state.cart.prepaid_wallet[0].wallet_amount) !== "";
     const isPrepaidAvailable = !isPrepaidInCart && clientInfo.wallet_status && clientInfo.wallet_balance !== undefined && clientInfo.wallet_balance !== 0;
-    const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? isZeroPayment ? null : clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
+    // const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? isZeroPayment ? null : clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
+    const [selectedPaymentOption, setSelectedPaymentOption] = useState();
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
     const [totalPrice, setTotalPrice] = useState(props.price);
     const [splitResponse, setSplitResponse] = useState([]);
@@ -72,7 +73,7 @@ const PaymentModal = (props) => {
     const appointmentDate = useSelector(state => state.cart.appointment_date);
     const [isRewardModalVisible, setIsRewardModalVisible] = useState(false)
     const [isBackDateInvoiceNoteVisible, setIsBackDateInvoiceNoteVisible] = useState(new Date(appointmentDate).getDate() !== new Date(Date.now()).getDate());
-
+    const [isSplitRewardActive, setIsSplitRewardActive] = useState(false);
     const businessDetails = useSelector(state => state.businesses.businessNotificationDetails);
     const isRewardActive = (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.reward_balance !== 0)
     const [rewardValue, setRewardValue] = useState(0);
@@ -580,6 +581,9 @@ const PaymentModal = (props) => {
                 let splitState = splitUpState.map(item => ({ mode: item.mode, amount: item.amount, shown: item.shown }));
                 const removedZeroSplitState = splitState.filter(e => e.shown).map(item => ({ mode: (item.mode).toUpperCase(), amount: item.amount }));
                 let validatedSplitState = removedZeroSplitState;
+                console.log(validatedSplitState);
+                console.log(checkSplitActive);
+                
                 // const isGreaterSplit = removedZeroSplitState.reduce((acc,item) => { return item.amount + acc },0) >= props.price;
                 // if(isGreaterSplit){
                 //     let len = validatedSplitState.length;
@@ -597,7 +601,7 @@ const PaymentModal = (props) => {
                     let flexSplitState;
                     let updated;
                     let isPrepaidChosen;
-
+                    setIsSplitRewardActive(true);
                     await splitPaymentAPI({
                         booking_amount: props.price,
                         paid_amount: checkSplitActive === 0 ? [{ mode: "REWARDS", amount: rewardValue }, { mode: "CASH", amount: 0 }] : undefined
@@ -628,7 +632,7 @@ const PaymentModal = (props) => {
 
                         }
                     });
-                } else {
+                } else if(isSplitRewardActive){
                     let isPrepaidChosen;
 
                     isPrepaidChosen = splitUpState.filter(e => e.shown).some(e => e.shown && e.mode === "prepaid")
@@ -640,12 +644,55 @@ const PaymentModal = (props) => {
                     );
                     dispatch(updateCalculatedPrice(details.id, isPrepaidChosen ? prepaidValue === 0 ? false : true : false, isPrepaidChosen ? prepaidValue : 0, updatedSplitState));
                     setSplitUpState(updatedSplitState);
+                } else {
+                    let flexSplitState;
+                    let updated;
+                    let isPrepaidChosen;
+
+                    await splitPaymentAPI({
+                        booking_amount: props.price,
+                        paid_amount: [{ mode: "REWARDS", amount: rewardValue }, { mode: "CASH", amount: 0 }]
+                    }).then(res => {
+                        setSplitResponse(res);
+                        if (res[0] !== undefined) {
+                            const activeModes = Object.entries(res[0]).reduce((map, [key, value]) => {
+                                map[key.toLowerCase()] = value;
+                                return map;
+                            }, {});
+                            flexSplitState = splitUpState.map(item => {
+                                const matchingSplit = splitState.find(splitItem => splitItem.mode === item.mode);
+                                return {
+                                    ...item,
+                                    ...(matchingSplit ? { amount: matchingSplit.amount } : {}),
+                                };
+                            });
+
+                            updated = flexSplitState.map((item) => ({
+                                ...item,
+                                shown: !!activeModes[item.mode.toLowerCase()],
+                                amount: activeModes[item.mode.toLowerCase()] ?? 0,
+                            }));
+                            isPrepaidChosen = splitUpState.filter(e => e.shown).some(e => e.shown && e.mode === "prepaid")
+                            let prepaidValue = isPrepaidChosen ? splitUpState.filter(e => e.shown).find(e => e.mode === "prepaid")?.amount : 0;
+                            dispatch(updateCalculatedPrice(details.id, isPrepaidChosen ? prepaidValue === 0 ? false : true : false, isPrepaidChosen ? prepaidValue : 0, updated));
+                            setSplitUpState(updated)
+
+                        }
+                    });
                 }
                 // }
             }
             splitApi()
         }
     }, [rewardValueToggle])
+
+    useEffect(()=>{
+        if(isSplitRewardActive){
+            setShownCount(prev => prev + 1);
+            setPaymentOrder(prev => [...prev, "Rewards"])
+            setRecentlyChanged(prev => [...prev, "Rewards"])
+        }
+    },[isSplitRewardActive,splitUpState])
 
     function onRewardValueChange(value){
         setRewardValue(value);
@@ -674,6 +721,7 @@ const PaymentModal = (props) => {
                     setAddedSplitPayment(value)
                     if (value === "Reward Points") {
                         setIsRewardModalVisible(true);
+                        setIsSplitRewardActive(true);
                     }
                 }} />
         }
@@ -851,7 +899,7 @@ const PaymentModal = (props) => {
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}
                             onPress={isZeroPayment ? () => { } : () => {
-
+                                setIsSplitRewardActive(false);
                                 setSplitUpState(initialSplit)
                                 dispatch(updateRewardAmount(0))
                                 setSelectedPaymentOption("split_payment")
@@ -885,6 +933,7 @@ const PaymentModal = (props) => {
                                 dispatch(updateRewardAmount(0));
                                 // setSelectedPaymentOption("reward points")
                                 setSplitUpState(initialSplit)
+                                setIsSplitRewardActive(false);
                                 setIsRewardModalVisible(true)
                             }}
                             pressableStyle={styles.paymentOptionButtonPressable}>

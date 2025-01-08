@@ -1,5 +1,5 @@
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../../constants/Colors";
 import { listData, pieChartColorCode, salesCardData, salesData } from "../../data/DashboardSelection";
