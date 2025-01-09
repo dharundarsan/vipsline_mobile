@@ -55,7 +55,9 @@ export default function PrepaidDetailModal(props) {
     }, []);
 
 
-
+    console.log("tableData");
+    console.log(tableData);
+    
     const calculateColumnWidths = () => {
         return tableHead.map((header, index) => {
             const headerWidth = header.length * 10;

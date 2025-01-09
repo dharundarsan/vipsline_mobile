@@ -35,10 +35,10 @@ const initialCartState = {
     rewardAllocated:{
         isRewardSelected:false,
         rewardAmount:0,
-        statusCode:200,
         rewardPoints:0,
         rewardError:"",
     },
+    rewardStatusCode:{statusCode:200},
     splitUpState:[
         {
             mode: "cash",
@@ -64,7 +64,7 @@ const initialCartState = {
     ]
 };
 
-async function getBusinessId() {
+export async function getBusinessId() {
     let businessId = ""
     try {
         // const value = await AsyncStorage.getItem('businessId');
@@ -158,11 +158,6 @@ export const loadCartFromDB = (clientId) => async (dispatch, getState) => {
 
 export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount,splitUpState) => async (dispatch, getState) => {
     const {cart,clientInfo} = getState();
-    console.log("clientInfo.details.id");
-    console.log(clientInfo.details.id);
-    console.log("cart.prepaidClientId");
-    console.log(cart.prepaidClientId);
-    // console.log(clientInfo.details.id);
     
     calculateCartPriceAPI({
         additional_discounts: cart.additionalDiscounts,
@@ -566,13 +561,15 @@ export const cartSlice = createSlice({
                 state.rewardAllocated.rewardPoints = rp;
                 state.rewardAllocated.isRewardSelected = true;
                 state.rewardAllocated.rewardAmount = firstItem.reward_amount;
-                state.rewardAllocated.statusCode = status_code;
+                // state.rewardAllocated.statusCode = status_code;
+                state.rewardStatusCode = {statusCode:status_code};
                 state.rewardAllocated.rewardError = error
             } else {
                 state.rewardAllocated.isRewardSelected = false;
                 state.rewardAllocated.rewardAmount = 0;
                 state.rewardAllocated.rewardPoints = 0;
-                state.rewardAllocated.statusCode = status_code;
+                // state.rewardAllocated.statusCode = status_code;
+                state.rewardStatusCode = {statusCode:status_code};
                 state.rewardAllocated.rewardError = error
             }
         },

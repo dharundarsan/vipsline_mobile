@@ -52,6 +52,16 @@ const PaymentModal = (props) => {
     const isZeroPayment = props.price === 0;
     const isPrepaidInCart = useSelector(state => state.cart.prepaid_wallet[0].wallet_amount) !== "";
     const isPrepaidAvailable = !isPrepaidInCart && clientInfo.wallet_status && clientInfo.wallet_balance !== undefined && clientInfo.wallet_balance !== 0;
+    console.log("clientInfo.wallet_status");
+    console.log(clientInfo.wallet_status);
+    console.log("clientInfo.wallet_balance");
+    console.log(clientInfo.wallet_balance);
+    console.log("isPrepaidInCart");
+    console.log(isPrepaidInCart);
+    
+    console.log("isPrepaidAvailable");
+    console.log(isPrepaidAvailable);
+    
     // const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? isZeroPayment ? null : clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
     const [selectedPaymentOption, setSelectedPaymentOption] = useState();
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
@@ -686,20 +696,24 @@ const PaymentModal = (props) => {
         }
     }, [rewardValueToggle])
 
-    useEffect(()=>{
-        if(isSplitRewardActive){
-            setShownCount(prev => prev + 1);
-            setPaymentOrder(prev => [...prev, "Rewards"])
-            setRecentlyChanged(prev => [...prev, "Rewards"])
-        }
-    },[isSplitRewardActive,splitUpState])
-
+    // useEffect(()=>{
+    //     if(isSplitRewardActive){
+    //         setShownCount(prev => prev + 1);
+    //         setPaymentOrder(prev => [...prev, "Rewards"])
+    //         setRecentlyChanged(prev => [...prev, "Rewards"])
+    //     }
+    // },[isSplitRewardActive,splitUpState])
+    console.log("paymentOrder");
+    console.log(paymentOrder);
+    
     function onRewardValueChange(value){
         setRewardValue(value);
         setRewardValueToggle(prev => !prev);
     }
 
-
+    console.log("shownCount");
+    console.log(shownCount);
+    
 
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
     // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
@@ -713,9 +727,9 @@ const PaymentModal = (props) => {
 
                     setIsSplitPaymentDropdownVisible(false)
                 }}
-                dropdownItems={isPrepaidAvailable && isRewardActive ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
-                    : isPrepaidAvailable && !isRewardActive ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
-                        : isRewardActive ? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                dropdownItems={isPrepaidAvailable && isRewardActive && clientInfo.reward_balance >= rewardMinValue ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                    : isPrepaidAvailable && !isRewardActive && clientInfo.reward_balance <= rewardMinValue ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                        : isRewardActive && clientInfo.reward_balance >= rewardMinValue? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
                             : ["Cash", "Credit / Debit card", "Digital payment"]}
                 onChangeValue={(value) => {
                     setAddedSplitPayment(value)
@@ -931,7 +945,7 @@ const PaymentModal = (props) => {
 
                             onPress={isZeroPayment ? () => { } : () => {
                                 dispatch(updateRewardAmount(0));
-                                // setSelectedPaymentOption("reward points")
+                                setSelectedPaymentOption("reward points")
                                 setSplitUpState(initialSplit)
                                 setIsSplitRewardActive(false);
                                 setIsRewardModalVisible(true)
@@ -1192,6 +1206,9 @@ const PaymentModal = (props) => {
                                     props.onCloseModal();
                                 }, 100)
                             }
+                            console.log(11);
+                            console.log(response.data[0]);
+                            
                             updateAPI(response.data[0], "NIL", splitUpState, clientInfo);
                             setTimeout(() => {
                                 updateLiveStatusAPI(response.data[0].booking_id);
@@ -1225,15 +1242,19 @@ const PaymentModal = (props) => {
                                             props.onCloseModal();
                                         }, 100)
                                     }
+                                    console.log(22);
+                                    console.log(response.data[0]);
+                            
+                                    updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo).then(res =>
+                                        setTimeout(() => {
+                                            updateLiveStatusAPI(response.data[0].booking_id);
+                                            dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                            dispatch(updateBookingId(response.data[0].booking_id));
+                                            dispatch(loadWalletPriceFromDb(details.id));
+                                            dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                        }, 500)
 
-                                    updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
-                                    setTimeout(() => {
-                                        updateLiveStatusAPI(response.data[0].booking_id);
-                                        dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
-                                        dispatch(updateBookingId(response.data[0].booking_id));
-                                        dispatch(loadWalletPriceFromDb(details.id));
-                                        dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
-                                    }, 500);
+                                    );
                                 });
                                 return;
                             } catch (error) {
@@ -1290,7 +1311,10 @@ const PaymentModal = (props) => {
                                             props.onCloseModal();
                                         }, 100)
                                     }
+                                    console.log(33);
 
+                                    console.log(response.data[0]);
+                            
                                     updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
                                     setTimeout(() => {
                                         updateLiveStatusAPI(response.data[0].booking_id);
@@ -1352,6 +1376,9 @@ const PaymentModal = (props) => {
                                     props.onCloseModal();
                                 }, 100)
                             }
+                            console.log(44);
+                            console.log(response.data[0]);
+                            
                             updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
                             setTimeout(() => {
                                 updateLiveStatusAPI(response.data[0].booking_id);

@@ -189,12 +189,13 @@ export default async function checkoutBookingAPI(clientDetails, cartSliceState, 
             walkin: "yes",
             wallet_amt: prepaidAmount === undefined ? 0 : prepaidAmount,
             isRewardSelected:cartSliceState.rewardAllocated.isRewardSelected,
-            redeemed_points:parseInt(cartSliceState.rewardAllocated.rewardPoints),
+            redeemed_points:cartSliceState.rewardAllocated.rewardPoints,
             reward_amt:cartSliceState.rewardAllocated.rewardAmount,
-            splitPaymentMap: splitUpState.filter(state => state.shown).map(state => ({
+            splitPaymentMap: splitUpState.reduce((acc,item)=>{return item.amount ? acc + 1 : acc;
+                }, 0) !== 0 ? splitUpState.filter(state => state.shown).map(state => ({
                 mode_of_payment: state.mode.toUpperCase(),
                 amount: state.amount
-            })),
+            })) : [],
         }, {
             headers: {
                 Authorization: `Bearer ${authToken}`

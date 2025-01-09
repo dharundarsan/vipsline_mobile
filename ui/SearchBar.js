@@ -21,7 +21,7 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 
 const SearchBar = (props) => {
     return <View style={[styles.searchContainer, props.searchContainerStyle]}>
-        <View style={styles.logoAndInputContainer}>
+        <View style={[styles.logoAndInputContainer,props.logoAndInputContainer]}>
             <Ionicons name="search-sharp" style={styles.searchLogo} size={20} color={Colors.grey500}/>
             <TextInput style={[textTheme.bodyMedium, styles.searchTextInput]}
                        placeholder={props.placeholder}
