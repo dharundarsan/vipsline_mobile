@@ -16,6 +16,7 @@ import businessDetailReducer from "./BusinessDetailSlice";
 import leadManagementReducer from "./leadManagementSlice";
 import ExpensesReducer from './ExpensesSlice';
 import navigationReducer from "./NavigationSlice";
+import reportReducer from "./reportSlice";
 
 const store = configureStore({
     reducer: {
@@ -36,6 +37,7 @@ const store = configureStore({
         expenses: ExpensesReducer,
         dashboardDetails:dashboardReducer,
         navigation: navigationReducer,
+        report: reportReducer
     },
 });
 

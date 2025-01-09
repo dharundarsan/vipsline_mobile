@@ -24,7 +24,7 @@ const DatePicker = (props) => {
     return (
         <View style={props.isCustomRange ? styles.customRangeDateContainer : styles.dateContainer}>
             <Dropdown
-                style={props.isCustomRange ? styles.customDropdown : styles.dropdown}
+                style={[props.isCustomRange ? styles.customDropdown : styles.dropdown]}
                 data={props.dateData}
                 labelField="label"
                 valueField="value"

@@ -8,8 +8,6 @@ export default function CustomPagination(props) {
 
     const [upperCount, setUpperCount] = useState(10);
     const [lowerCount, setLowerCount] = useState(1);
-    console.log("props.currentCount");
-    console.log(props.currentCount);
     
     useEffect(() => {
         props.refreshOnChange();
@@ -108,7 +106,7 @@ export default function CustomPagination(props) {
 
             <View style={styles.paginationInnerContainer}>
                 <Text style={styles.pagingText}>
-                    {lowerCount < 0 ? 0 : lowerCount} - {props.currentCount} of {props.totalCount}
+                    {lowerCount < 0 ? 0 : lowerCount} - {props.totalCount > props.currentCount ? lowerCount + props.currentCount - 1 : props.currentCount } of {props.totalCount}
                 </Text>
                 <PrimaryButton
                     buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}

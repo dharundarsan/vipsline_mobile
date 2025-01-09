@@ -155,3 +155,15 @@ export const staffStackDisplay = [
         data:businessStaffSelection
     },
 ]
+
+export const cardTitleData = [
+    {
+        title:"Total Bills"
+    },
+    {
+        title:"Total Net Sales"
+    },
+    {
+        title:"Total Sales Value"
+    },
+]

@@ -22,12 +22,12 @@ const RewardPointModal = (props) => {
     
     const toastRef = useRef(null);
 
-    const rewardStatus = useSelector(state => state.cart.rewardAllocated.statusCode)
+    const rewardStatus = useSelector(state => state.cart.rewardStatusCode)
     const [rewardPoint, setrewardPoint] = useState(rewardPoints);
     const insets = useSafeAreaInsets();
 
     useEffect(() => {
-        if(rewardStatus !== 200){        
+        if(rewardStatus.statusCode !== 200){        
             toastRef.current.show(rewardError ?? "")
         }
     }, [rewardStatus])
@@ -55,18 +55,22 @@ const RewardPointModal = (props) => {
                 </View>
                 <ScrollView style={styles.textEditor} >
                     <CustomTextInput
-                        onChangeText={setrewardPoint}
+                        onChangeText={async(text)=>{
+                            // console.log(text);
+                            setrewardPoint(text);
+                            await dispatch(calculateAmountForRewardPoints(clientInfo.clientId, text.length === 0 ? text.length : text, props.price))
+                        }}
                         defaultValue={0}
                         label='Enter Points'
                         type='number'
                         labelTextStyle={styles.labelStyle}
                         placeholder='0'
-                        onEndEditing={async (rp) => {
-                            // if (rp.length === 0) {
-                                await dispatch(calculateAmountForRewardPoints(clientInfo.clientId, rp.length === 0 ? rp.length : rp, props.price))
-                            // }
-                        }
-                        }
+                        // onEndEditing={async (rp) => {
+                        //     // if (rp.length === 0) {
+                        //         await dispatch(calculateAmountForRewardPoints(clientInfo.clientId, rp.length === 0 ? rp.length : rp, props.price))
+                        //     // }
+                        // }
+                        // }
                         value={rewardPoint}
                         // validator={(e)=>{
                         //     console.log("rewardValue");
@@ -79,7 +83,7 @@ const RewardPointModal = (props) => {
                         //     }
                         //     else return false;
                         // }}
-                        textInputStyle={{ borderColor: rewardPoint === 0 ? "grey" : rewardStatus === 200 ? "grey" : "red" }}
+                        textInputStyle={{ borderColor: rewardPoint === 0 ? "grey" : rewardStatus.statusCode === 200 ? "grey" : "red" }}
                     />
                     <Text style={{ color: "#E24C0C", marginTop: -10 }}>1 Reward Points = {props.perPointValue ?? 0} INR</Text>
                     <Text style={{ marginTop: 20, marginBottom: 5 }}>Value</Text>
@@ -120,7 +124,7 @@ const RewardPointModal = (props) => {
                         props.onCloseModal();
                         // }
                     }} label='Redeem' buttonStyle={{ width: "40%" }}
-                        disabled={((rewardStatus !== 400 || rewardStatus !== 404) && parseInt(rewardValue) <= 0)}
+                        disabled={((rewardStatus.statusCode !== 400 || rewardStatus.statusCode !== 404) && parseInt(rewardValue) <= 0)}
                     />
                 </View>
             </View>
