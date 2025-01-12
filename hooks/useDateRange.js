@@ -1,12 +1,21 @@
-import { useState, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { formatDateDDMMYYYY, formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstAndLastDateOfCurrentMonthDDMMYYYY, getFirstDateOfCurrentMonthYYYYMMDD, getLastDateOfCurrentMonthYYYYMMMDD } from '../util/Helpers';
-import { fetchSalesReportByBusiness, updateDateChangeValue, updateSalesReportList } from '../store/reportSlice';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import {
+    formatDateDDMMYYYY,
+    formatDateToWeekDayDDMMMYYYY,
+    formatDateYYYYMMDD,
+    formatDateYYYYMMDDD,
+    getFirstAndLastDateOfCurrentMonthDDMMYYYY,
+    getFirstDateOfCurrentMonthYYYYMMDD,
+    getLastDateOfCurrentMonthYYYYMMMDD
+} from '../util/Helpers';
 
 const useDateRange = ({
-    query = '',
-    sortName = 'desc',
-    getSortOrderKey = 1,
+    onDateChangeDays = () => { },
+    onDateChangeMonth = () => { },
+    onFirstCustomRangeSelected = () => { },
+    onFirstOptionCustomChange = () => { },
+    onSecondOptionCustomChange = () => { },
 }) => {
     const [isCustomRange, setIsCustomRange] = useState(false);
     const [selectedFromCustomDate, setSelectedFromCustomDate] = useState("0");
@@ -24,8 +33,6 @@ const useDateRange = ({
     const { firstDateDDMMYYYY, lastDateDDMMYYYY } = getFirstAndLastDateOfCurrentMonthDDMMYYYY();
     const firstMonthDate = getFirstDateOfCurrentMonthYYYYMMDD();
     const lastMonthDate = getLastDateOfCurrentMonthYYYYMMMDD();
-
-    const dispatch = useDispatch();
 
     const handleSelection = async (item) => {
         setIsDateDataLoading(true);
@@ -45,18 +52,7 @@ const useDateRange = ({
                 setCurrentFromDate(fromDate);
                 setCurrentToDate(toDate);
                 setIsLoading(true);
-                // Call the passed-in query, fromDate, and toDate
-                dispatch(fetchSalesReportByBusiness(0, 10, fromDate, toDate, query, sortName, getSortOrderKey === 1 ? "desc" : "asc")).then((res) => {
-                    dispatch(updateSalesReportList({ type: 'update', value: res.data[0].sales_report_list }));
-                    dispatch(updateDateChangeValue({
-                        type: 'update',
-                        values: {
-                            total_count: res.data[0].total_count,
-                            totalSalesValue: res.data[0].total_revenue,
-                            totalNetSalesValue: res.data[0].net_revenue,
-                        }
-                    }));
-                });
+                onDateChangeDays(fromDate, toDate);
             }
         } else if (item.value === "Current month") {
             setIsCustomRange(false);
@@ -64,17 +60,7 @@ const useDateRange = ({
             setDate(firstDateDDMMYYYY + " - " + lastDateDDMMYYYY);
             setCurrentFromDate(firstMonthDate);
             setCurrentToDate(lastMonthDate);
-            dispatch(fetchSalesReportByBusiness(0, 10, firstMonthDate, lastMonthDate, query, sortName, getSortOrderKey === 1 ? "desc" : "asc")).then((res) => {
-                dispatch(updateSalesReportList({ type: 'update', value: res.data[0].sales_report_list }));
-                dispatch(updateDateChangeValue({
-                    type: 'update',
-                    values: {
-                        total_count: res.data[0].total_count,
-                        totalSalesValue: res.data[0].total_revenue,
-                        totalNetSalesValue: res.data[0].net_revenue,
-                    }
-                }));
-            });
+            onDateChangeMonth(firstMonthDate, lastMonthDate);
         }
         else {
             setIsLoading(true);
@@ -85,17 +71,7 @@ const useDateRange = ({
             setSelectedToCustomDate(customDay2);
             setCurrentFromDate(customDay1);
             setCurrentToDate(customDay2);
-            dispatch(fetchSalesReportByBusiness(0, 10, formatDateYYYYMMDD(item.day2), formatDateYYYYMMDD(item.day1), query, sortName, getSortOrderKey === 1 ? "desc" : "asc")).then((res) => {
-                dispatch(updateSalesReportList({ type: 'update', value: res.data[0].sales_report_list }));
-                dispatch(updateDateChangeValue({
-                    type: 'update',
-                    values: {
-                        total_count: res.data[0].total_count,
-                        totalSalesValue: res.data[0].total_revenue,
-                        totalNetSalesValue: res.data[0].net_revenue,
-                    }
-                }));
-            });
+            onFirstCustomRangeSelected(customDay1, customDay2);
         }
         setIsLoading(false);
         setIsDateDataLoading(false);
@@ -107,33 +83,13 @@ const useDateRange = ({
             setCustomFromPassData(date);
             setCurrentFromDate(date);
             setCurrentToDate(customToPassData);
-            dispatch(fetchSalesReportByBusiness(0, 10, date, customToPassData, query, sortName, getSortOrderKey === 1 ? "desc" : "asc")).then((res) => {
-                dispatch(updateSalesReportList({ type: 'update', value: res.data[0].sales_report_list }));
-                dispatch(updateDateChangeValue({
-                    type: 'update',
-                    values: {
-                        total_count: res.data[0].total_count,
-                        totalSalesValue: res.data[0].total_revenue,
-                        totalNetSalesValue: res.data[0].net_revenue,
-                    }
-                }));
-            });
+            onFirstOptionCustomChange(date, customToPassData);
         }
         else if (type === 2) {
             setCustomToPassData(date);
             setCurrentFromDate(customFromPassData);
             setCurrentToDate(date);
-            dispatch(fetchSalesReportByBusiness(0, 10, customFromPassData, date, query, sortName, getSortOrderKey === 1 ? "desc" : "asc")).then((res) => {
-                dispatch(updateSalesReportList({ type: 'update', value: res.data[0].sales_report_list }));
-                dispatch(updateDateChangeValue({
-                    type: 'update',
-                    values: {
-                        total_count: res.data[0].total_count,
-                        totalSalesValue: res.data[0].total_revenue,
-                        totalNetSalesValue: res.data[0].net_revenue,
-                    }
-                }));
-            });
+            onSecondOptionCustomChange(customFromPassData, date);
         }
         else {
             setIsDateDataLoading(false);

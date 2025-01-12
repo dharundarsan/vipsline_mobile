@@ -1,10 +1,7 @@
 import { fetchSalesReportByBusiness, updateDateChangeValue, updateSalesReportList } from "../../store/reportSlice";
 
 
-export const fetchAndUpdateSalesReport = (dispatch,{ page, limit, fromDate, toDate, query, sortName, sortOrder }) => {
-    console.log("fetchAndUpdateSalesReport");
-    console.log(page, limit, fromDate, toDate, query, sortName, sortOrder );
-    
+export const fetchAndUpdateSalesReport = (dispatch,page, limit, fromDate, toDate, query, sortName, sortOrder ) => {
     
     dispatch(fetchSalesReportByBusiness(page, limit, fromDate, toDate, query, sortName, sortOrder))
         .then((res) => {
