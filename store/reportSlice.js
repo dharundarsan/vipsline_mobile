@@ -15,7 +15,7 @@ const initialState = {
     searchMaxEntry: 10,
 };
 
-export const fetchSalesReportByBusiness = (initialPage, finalPage,fromDate,toDate,query) => async (dispatch, getState) => {
+export const fetchSalesReportByBusiness = (initialPage, finalPage,fromDate,toDate,query,sortItem="invoice_issued_on",sortOrder="desc") => async (dispatch, getState) => {
     let authToken = "";
     const {pageNo} = getState().report;
     try {
@@ -34,8 +34,8 @@ export const fetchSalesReportByBusiness = (initialPage, finalPage,fromDate,toDat
                 business_id: `${await getBusinessId()}`,
                 fromDate: fromDate,
                 toDate: toDate,
-                sortItem: "net_total",
-                sortOrder: "desc",
+                sortItem: sortItem === null ? "invoice_issued_on" : sortItem,
+                sortOrder: sortOrder,
                 query: query !== undefined ? query : "",
             },
             {
@@ -44,8 +44,6 @@ export const fetchSalesReportByBusiness = (initialPage, finalPage,fromDate,toDat
                 },
             }
         );
-
-        console.log(response.data);
         return response.data; // Return the data explicitly
     } catch (e) {
         console.error(e.response?.data || "Error fetching sales report");

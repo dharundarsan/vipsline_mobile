@@ -23,7 +23,10 @@ const DashboardStack = ({navigation,route}) => {
         >
             <Stack.Screen name='DashboardScreen'
                           component={DashboardScreen}
-                          options={{headerShown: true,
+                          options={{
+                            headerShown: true,
+                            headerTitle: "Dashboard",
+                            headerTitleAlign: "center",
                             headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
                               <Image
                                   source={require('../assets/icons/drawerIcons/drawer.png')}
@@ -49,6 +52,7 @@ const DashboardStack = ({navigation,route}) => {
                 component={StaffDashboard}
                 options={{
                     headerTitle: "Staff Dashboard",
+                    headerTitleAlign: "center",
                     headerShown:true,
                     headerLeft:()=><BackButton/>,
                     // animation:'ios_from_right'
@@ -59,6 +63,7 @@ const DashboardStack = ({navigation,route}) => {
                 component={ClientDashboard}
                 options={{
                     headerTitle: "Client Dashboard",
+                    headerTitleAlign: "center",
                     headerShown:true,
                     headerLeft:()=><BackButton/>,
                     // animation:'ios_from_right'

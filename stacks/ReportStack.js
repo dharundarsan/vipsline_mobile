@@ -5,7 +5,7 @@ import SalesListReport from '../screens/Reports/SalesListReport';
 import SalesListReportScreen from '../screens/Reports/SalesListReportScreen';
 import { BackButton } from './StaffManagementStack';
 
-const ReportStack = ({navigation}) => {
+const ReportStack = ({ navigation }) => {
     const Stack = createNativeStackNavigator();
     return (
         <Stack.Navigator initialRouteName='Reports' screenOptions={{ headerShown: true }}>
@@ -18,9 +18,10 @@ const ReportStack = ({navigation}) => {
                 </TouchableOpacity>,
             }} />
             <Stack.Screen name='Sales list report' component={SalesListReportScreen} options={{
-                headerShown: true, headerLeft: () => <BackButton/>
+                headerShown: true, 
+                headerTitleAlign: 'center',
+                headerLeft: () => <BackButton />
             }}
-                
             />
         </Stack.Navigator>
     )

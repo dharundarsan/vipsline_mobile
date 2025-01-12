@@ -167,3 +167,14 @@ export const cardTitleData = [
         title:"Total Sales Value"
     },
 ]
+
+export const enableRupeeArray = [
+    "Total Net Sales",
+    "Total Sales Value"
+]
+
+export const toggleFunctions = [
+    "DATE",
+    "CLIENT",
+    "GROSS TOTAL"
+]

@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Colors from '../constants/Colors'
 
-const CustomImageTextCard = ({ containerStyle, imgSource, imageStyle, imgTextContainerStyle, title, titleStyle, value, valueContainerStyle, valueStyle }) => {
+const CustomImageTextCard = ({ containerStyle, imgSource, imageStyle, imgTextContainerStyle, title, titleStyle, value, valueContainerStyle, valueStyle, enableRupee = false, rupeeArray = [] }) => {
     return (
         <View style={[styles.container, containerStyle]}>
             <View style={[styles.imgContainer, imgTextContainerStyle]}>
@@ -14,10 +14,15 @@ const CustomImageTextCard = ({ containerStyle, imgSource, imageStyle, imgTextCon
                         />
                         : null
                 }
-                <Text style={titleStyle}>{title}</Text>
+                <Text style={titleStyle}>
+                    {title}
+                </Text>
             </View>
             <View style={valueContainerStyle}>
-                <Text style={valueStyle}>{value}</Text>
+                <Text style={valueStyle}>
+                    {enableRupee && rupeeArray.find(item => item === title) ? '₹ ' : null}
+                    {value}
+                </Text>
             </View>
         </View>
     )
