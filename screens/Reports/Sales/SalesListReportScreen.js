@@ -1,20 +1,20 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
-import TextTheme from '../../constants/TextTheme'
-import DatePicker from '../../ui/DatePicker'
-import { formatDateYYYYMMDD } from '../../util/Helpers'
 import { useDispatch, useSelector } from 'react-redux'
-import CustomImageTextCard from '../../ui/CustomImageTextCard'
-import SearchBar from '../../ui/SearchBar'
-import Colors from '../../constants/Colors'
 import { Row, Table } from "react-native-table-component";
-import { decrementPageNumber, fetchSalesReportByBusiness, incrementPageNumber, updateDateChangeValue, updateMaxEntry, updatePageNo, updateSalesReportList } from '../../store/reportSlice'
-import { cardTitleData, enableRupeeArray } from '../../data/ReportData'
-import CustomPagination from '../../components/common/CustomPagination'
-import EntryPicker from '../../components/common/EntryPicker'
-import useDateRange from '../../hooks/useDateRange'
-import { salesTableSortHeader } from '../../components/ReportScreen/salesTableSortHeader'
-import { fetchAndUpdateSalesReport } from '../../components/ReportScreen/fetchAndUpdateSalesReport'
+import { decrementPageNumber, fetchSalesReportByBusiness, incrementPageNumber, updateDateChangeValue, updateMaxEntry, updatePageNo, updateSalesReportList } from '../../../store/reportSlice'
+import { cardTitleData, enableRupeeArray } from '../../../data/ReportData'
+import CustomPagination from '../../../components/common/CustomPagination'
+import EntryPicker from '../../../components/common/EntryPicker'
+import { salesTableSortHeader } from '../../../components/ReportScreen/salesTableSortHeader'
+import { fetchAndUpdateSalesReport } from '../../../components/ReportScreen/fetchAndUpdateSalesReport'
+import TextTheme from '../../../constants/TextTheme'
+import DatePicker from '../../../ui/DatePicker'
+import { formatDateYYYYMMDD } from '../../../util/Helpers'
+import CustomImageTextCard from '../../../ui/CustomImageTextCard'
+import SearchBar from '../../../ui/SearchBar';
+import Colors from '../../../constants/Colors';
+import useDateRange from '../../../hooks/useDateRange';
 
 const SalesListReportScreen = () => {
     const dispatch = useDispatch();
@@ -24,12 +24,15 @@ const SalesListReportScreen = () => {
     const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
     const [query, setQuery] = useState("")
 
+    const [pageNo, setPageNo] = useState(0);
+    const [maxEntry, setMaxEntry] = useState(10);
+    const [pageSize, setPageSize] = useState(10)
     const totalCount = useSelector((state) => state.report.total_count);
     const totalSalesValue = useSelector((state) => state.report.totalSalesValue);
     const totalNetSalesValue = useSelector((state) => state.report.totalNetSalesValue);
     const salesReportList = useSelector((state) => state.report.salesReportList);
-    const maxEntry = useSelector((state) => state.report.maxEntry);
-    const pageNo = useSelector((state) => state.report.pageNo);
+    // const maxEntry = useSelector((state) => state.report.maxEntry);
+    // const pageNo = useSelector((state) => state.report.pageNo);
 
     const sortName = toggleSortItem !== "" ? toggleSortItem : "invoice_issued_on"
 
@@ -61,11 +64,11 @@ const SalesListReportScreen = () => {
         currentToDate,
         handleCustomDate,
     } = useDateRange({
-        onDateChangeDays: (firstDate,SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
-        onDateChangeMonth: (firstDate,SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
-        onFirstCustomRangeSelectes: (firstDate,SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
-        onFirstOptionCustomChange: (firstDate,SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
-        onSecondOptionCustomChange: (firstDate,SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
+        onDateChangeDays: (firstDate, SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
+        onDateChangeMonth: (firstDate, SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
+        onFirstCustomRangeSelectes: (firstDate, SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
+        onFirstOptionCustomChange: (firstDate, SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
+        onSecondOptionCustomChange: (firstDate, SecondDate) => fetchAndUpdateSalesReport(dispatch, 0, 10, firstDate, SecondDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc"),
     });
 
     useEffect(() => {
@@ -97,6 +100,9 @@ const SalesListReportScreen = () => {
         "₹ " + item.gross_total.toString(),
         item.payment_mode,
     ]), [salesReportList])
+
+    console.log(tableData);
+    
 
     const calculateColumnWidths = () => {
         return tableHeaders.map((header, index) => {
@@ -170,7 +176,6 @@ const SalesListReportScreen = () => {
                                     total_count: data.data[0].total_count,
                                     totalSalesValue: data.data[0].total_revenue,
                                     totalNetSalesValue: data.data[0].net_revenue,
-                                    // salesReportList: data.data[0].sales_report_list,
                                 }
                             }));
                         });
@@ -186,14 +191,14 @@ const SalesListReportScreen = () => {
                     <Table borderStyle={{ borderColor: '#c8e1ff' }}>
                         <Row
                             data={[
-                                salesTableSortHeader(dispatch, "DATE", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
-                                salesTableSortHeader(dispatch, "INVOICE #", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
-                                salesTableSortHeader(dispatch, "CLIENT", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
-                                salesTableSortHeader(dispatch, "MOBILE", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
-                                salesTableSortHeader(dispatch, "NET TOTAL", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
-                                salesTableSortHeader(dispatch, "TAX AMOUNT", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
-                                salesTableSortHeader(dispatch, "GROSS TOTAL", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
-                                salesTableSortHeader(dispatch, "PAYMENT MODE", toggleSortItem, setToggleSortItem, setGetSortOrderKey,query,currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "DATE", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "INVOICE #", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "CLIENT", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "MOBILE", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "NET TOTAL", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "TAX AMOUNT", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "GROSS TOTAL", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
+                                salesTableSortHeader(dispatch, "PAYMENT MODE", toggleSortItem, setToggleSortItem, setGetSortOrderKey, query, currentFromDate, currentToDate),
                             ]}
                             textStyle={{ flex: 1, width: "100%", paddingVertical: 10 }}
                             widthArr={tableData.length > 0 ? widthArr : undefined}
@@ -205,11 +210,11 @@ const SalesListReportScreen = () => {
                                     key={rowIndex}
                                     data={rowData.map((cell, cellIndex) => {
                                         let textColor = 'black';
-                                        if (cellIndex === 1) {
+                                        if(cellIndex === 0){
                                             textColor = Colors.highlight;
                                         }
                                         return (
-                                            <Text style={[styles.text, { color: textColor }]}>
+                                            <Text style={[styles.text, {textAlign:'start',paddingHorizontal:10} , cellIndex === 1 ? { color: textColor } : {}]}>
                                                 {cell}
                                             </Text>
                                         );
@@ -219,9 +224,9 @@ const SalesListReportScreen = () => {
                                 />
                             ))
                         ) :
-                            <Text style={[styles.noDataText, styles.tableBorder]}>No Data Found </Text>}
+                            <Text style={[styles.noDataText, styles.tableBorder]}>No Data Found</Text>
+                        }
                     </Table>
-
                 </View>
             </ScrollView>
             {
@@ -229,8 +234,8 @@ const SalesListReportScreen = () => {
                 <CustomPagination
                     setIsModalVisible={setIsEntryModalVisible}
                     maxEntry={maxEntry}
-                    incrementPageNumber={() => dispatch(incrementPageNumber())}
-                    decrementPageNumber={() => dispatch(decrementPageNumber())}
+                    incrementPageNumber={() => setPageNo(prev => prev + 1)}
+                    decrementPageNumber={() => setPageNo(prev => prev - 1)}
                     refreshOnChange={async () =>
                         await dispatch(fetchSalesReportByBusiness(pageNo, maxEntry, currentFromDate, currentToDate, query, toggleSortItem === "" ? "invoice_issued_on" : toggleSortItem, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc")).then((res) => {
                             dispatch(updateSalesReportList({ type: 'update', value: res.data[0].sales_report_list }))
@@ -238,7 +243,10 @@ const SalesListReportScreen = () => {
                     }
                     currentCount={salesReportList?.length ?? 1}
                     totalCount={totalCount}
-                    resetPageNo={() => dispatch(updatePageNo({ type: 'reset' }))}
+                    resetPageNo={() => {
+                        setPageNo(0);
+                        setPageSize(10);
+                    }}
                     isFetching={false}
                     currentPage={pageNo}
                 />
@@ -268,7 +276,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.grey250,
         borderBottomWidth: 1,
         borderLeftWidth: 1,
-        borderRightWidth: 1
+        borderRightWidth: 1,
     },
     noDataText: {
         textAlign: 'center',

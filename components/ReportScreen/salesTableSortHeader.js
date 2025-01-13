@@ -88,7 +88,7 @@ export const salesTableSortHeader = (dispatch, str, toggleSortItem, setToggleSor
             style={{
                 flex: 1,
                 height: "100%",
-                paddingHorizontal: 20,
+                paddingHorizontal: 10,
                 paddingVertical: 10,
                 width: "100%",
             }}
@@ -96,8 +96,8 @@ export const salesTableSortHeader = (dispatch, str, toggleSortItem, setToggleSor
             <View
                 style={{
                     flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    // justifyContent: "center",
+                    // alignItems: "center",
                     flexDirection: "row",
                     gap: 5,
                 }}
@@ -105,7 +105,7 @@ export const salesTableSortHeader = (dispatch, str, toggleSortItem, setToggleSor
                 <Text
                     style={[
                         TextTheme.bodyMedium,
-                        { textAlign: "center", flexWrap: "wrap" },
+                        { textAlign: "start", flexWrap: "wrap" },
                         toggleSortItem === "invoice_issued_on" && str === "DATE"
                             ? { color: Colors.highlight }
                             : toggleSortItem === "name" && str === "CLIENT"

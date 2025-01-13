@@ -25,7 +25,6 @@ const useDateRange = ({
     const [date, setDate] = useState(formatDateDDMMYYYY().toString());
     const [selectedValue, setSelectedValue] = useState("today");
     const [isLoading, setIsLoading] = useState(false);
-    const [isDateDataLoading, setIsDateDataLoading] = useState(false);
     const [currentFromDate, setCurrentFromDate] = useState(formatDateYYYYMMDD(0));
     const [currentToDate, setCurrentToDate] = useState(formatDateYYYYMMDD(0));
     const dateData = useSelector((state) => state.dashboardDetails.dateData);
@@ -35,7 +34,6 @@ const useDateRange = ({
     const lastMonthDate = getLastDateOfCurrentMonthYYYYMMMDD();
 
     const handleSelection = async (item) => {
-        setIsDateDataLoading(true);
         setSelectedValue(item.value);
         if (item.day1 === undefined) {
             setIsCustomRange(false);
@@ -74,11 +72,9 @@ const useDateRange = ({
             onFirstCustomRangeSelected(customDay1, customDay2);
         }
         setIsLoading(false);
-        setIsDateDataLoading(false);
     };
 
     const handleCustomDate = async (type, date) => {
-        setIsDateDataLoading(true);
         if (type === 1) {
             setCustomFromPassData(date);
             setCurrentFromDate(date);
@@ -92,10 +88,8 @@ const useDateRange = ({
             onSecondOptionCustomChange(customFromPassData, date);
         }
         else {
-            setIsDateDataLoading(false);
             return;
         }
-        setIsDateDataLoading(false);
     };
 
     const handleCustomDateConfirm = async (num, date) => {

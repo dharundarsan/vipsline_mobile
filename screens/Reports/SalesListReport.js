@@ -1,9 +1,7 @@
 import { FlatList, Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import businessIcon from "../../assets/icons/reportIcons/business.png"
 import TextTheme from "../../constants/TextTheme";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import { staffStackDisplay } from '../../data/ReportData';
+import { reportStackDisplay } from '../../data/ReportData';
 import { Divider } from 'react-native-paper';
 import Colors from '../../constants/Colors';
 import ReportCard from '../../components/ReportScreen/ReportCard';
@@ -11,7 +9,7 @@ import ReportCard from '../../components/ReportScreen/ReportCard';
 const SalesListReport = () => {
     return (
         <ScrollView contentContainerStyle={{ paddingVertical: 30 }}>
-            {staffStackDisplay.map((section, index) => (
+            {reportStackDisplay.map((section, index) => (
                 <View key={index}>
                     <View style={[styles.headerContainer, { gap: 15 }]}>
                         <Image source={section.icon} style={styles.icon} />
@@ -23,7 +21,7 @@ const SalesListReport = () => {
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => {
                                 return (
-                                    <ReportCard title={item.title} />
+                                    <ReportCard title={item.title} location={item.navigation} />
                                 )
                             }}
                             ItemSeparatorComponent={() => <Divider />}
