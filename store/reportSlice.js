@@ -80,6 +80,217 @@ export const fetchSalesByServiceForBusiness = (initialPage, finalPage, fromDate,
     }
 };
 
+export const fetchProductSalesSummaryReport = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getProductSalesSummaryReport?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchSalesByMembershipForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "cm.membership_name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesByMembershipForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchSalesByPackagesForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "cm.package_name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesByPackagesForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchSalesByPrepaidForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "bc.name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesByPrepaidForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchPaymentModeReportForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "bc.name", sortOrder = "desc",modeFilter = undefined) => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getPaymentModeReportForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+                modeFilter: modeFilter
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchCancelledInvoiceReportByBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "SUBSTRING(substring_index(business_invoice_no,'/',1),5)+0", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getCancelledInvoiceReportByBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
 const reportSlice = createSlice({
     name: 'report',
     initialState,

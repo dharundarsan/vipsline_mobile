@@ -26,7 +26,25 @@ const ReportStack = ({ navigation }) => {
                         headerTitleAlign: 'center',
                         headerShown: true,
                         headerLeft: () => <BackButton />,
-                    }} />
+                    }} 
+                    initialParams={{
+                        listName: dataItem?.listName,
+                        cardEnabled: dataItem?.cardEnabled,
+                        apiFunction: dataItem?.apiFunction,
+                        apiCountName: dataItem?.apiCountName,
+                        tableHeaderList: dataItem?.tableHeader,
+                        salesListWidthHeader: dataItem?.salesListWidthHeader,
+                        transformTableData: dataItem?.transformTableData,
+                        searchEnabled: dataItem?.searchEnabled,
+                        searchPlaceholder: dataItem?.searchPlaceholder,
+                        cardTitleData: dataItem?.cardTitleData,
+                        cardValueList: dataItem?.cardValueList,
+                        cardCurrencyList: dataItem?.cardCurrencyList,
+                        initialCardValue: dataItem?.initialCardValue,
+                        additionalRowEnabled: dataItem?.additionalRowEnabled,
+                        initialTotalRow: dataItem?.initialTotalRow,
+                    }}
+                    />
                 )))
             }
         </Stack.Navigator>

@@ -13,6 +13,7 @@ import SortableHeader from '../../../components/ReportScreen/SortableHeader';
 import EntryPicker from '../../../components/common/EntryPicker';
 import CustomPagination from '../../../components/common/CustomPagination';
 import { serviceSalesHeader, serviceSalesHeaderWithSort } from '../../../data/ReportData';
+import { formatDateYYYYMMDD } from '../../../util/Helpers';
 
 const ServiceSalesReportScreen = () => {
   const dispatch = useDispatch();
@@ -169,7 +170,7 @@ const ServiceSalesReportScreen = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch(fetchSalesByServiceForBusiness(0, 10, "2025-01-13", "2025-01-13"))
+      dispatch(fetchSalesByServiceForBusiness(0, 10, formatDateYYYYMMDD(0), formatDateYYYYMMDD(0)))
         .then((res) => {
 
           setMaxPageCount(res.data[0].total_count)
@@ -226,7 +227,7 @@ const ServiceSalesReportScreen = () => {
           });
         }}
         placeholder='Search by service name'
-        searchContainerStyle={{ margin: 20 }}
+        searchContainerStyle={{ marginBottom: 20,marginHorizontal: 20 }}
         logoAndInputContainer={{ borderWidth: 1, borderColor: Colors.grey250 }}
         value={query}
       />

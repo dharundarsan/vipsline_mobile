@@ -4,7 +4,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import Colors from '../../constants/Colors';
 import TextTheme from '../../constants/TextTheme';
 import sortIcon from '../../assets/icons/reportIcons/sort.png';
-import { fetchSalesByServiceForBusiness } from '../../store/reportSlice';
 
 const SortableHeader = ({
     dispatch,
@@ -19,14 +18,15 @@ const SortableHeader = ({
     onSortChange,
     onChangeData,
     setGetSortOrderKey,
-    sortOrderKey
+    sortOrderKey,
+    onChangeFunction
 }) => {
     // const [sortOrderKey, setSortOrderKey] = useState(1);
     const [sortComponentOrderKey, setComponentSortOrderKey] = useState(1);
 
     const handleSort = () => {
         if (sortKey !== "") {
-            setComponentSortOrderKey(prev =>{
+            setComponentSortOrderKey(prev => {
                 const newOrderKey = prev + 1 > 3 ? 1 : prev + 1;
                 const sortOrder = newOrderKey === 1 ? 'reset' : newOrderKey === 2 ? 'asc' : 'desc';
                 if (newOrderKey === 1) {
@@ -34,7 +34,7 @@ const SortableHeader = ({
                 } else {
                     onSortChange(sortKey);
                     dispatch(
-                        fetchSalesByServiceForBusiness(
+                        onChangeFunction(
                             pageNo,
                             maxEntry,
                             fromDate,
@@ -62,7 +62,7 @@ const SortableHeader = ({
                     style={[
                         TextTheme.bodyMedium,
                         {
-                            color: sortComponentOrderKey !== 1 ? Colors.highlight : Colors.black,
+                            color: currentSortKey === sortKey ? sortComponentOrderKey !== 1 ? Colors.highlight : Colors.black : Colors.black,
                             textAlign: 'start',
                             flexWrap: 'wrap',
                         },
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,
         flexDirection: 'row',
-        alignItems:'center',
+        alignItems: 'center',
         gap: 5,
     },
     icon: {

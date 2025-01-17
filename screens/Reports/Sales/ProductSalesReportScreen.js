@@ -1,14 +1,219 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useMemo, useState } from 'react'
+import { useDispatch } from 'react-redux';
+import useDateRange from '../../../hooks/useDateRange';
+import { productSalesHeader, productSalesHeaderWithSort } from '../../../data/ReportData';
+import DatePicker from '../../../ui/DatePicker';
+import TextTheme from '../../../constants/TextTheme';
+import SearchBar from '../../../ui/SearchBar';
+import Colors from '../../../constants/Colors';
+import EntryPicker from '../../../components/common/EntryPicker';
+import CustomPagination from '../../../components/common/CustomPagination';
+import { Row, Table } from "react-native-table-component";
+import SortableHeader from '../../../components/ReportScreen/SortableHeader';
 
 const ProductSalesReportScreen = () => {
+  const dispatch = useDispatch();
+
+  const [getSortOrderKey, setGetSortOrderKey] = useState("");
+  const [toggleSortItem, setToggleSortItem] = useState("name");
+  const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
+  const [query, setQuery] = useState("")
+  const [productList, setProductList] = useState([])
+  const [maxPageCount, setMaxPageCount] = useState(0);
+  const [pageNo, setPageNo] = useState(0);
+  const [maxEntry, setMaxEntry] = useState(10);
+
+  const sortName = toggleSortItem !== "" ? toggleSortItem : "name"
+
+  const {
+    isCustomRange,
+    isLoading,
+    dateData,
+    selectedValue,
+    date,
+    selectedFromCustomDate,
+    selectedToCustomDate,
+    handleSelection,
+    handleCustomDateConfirm,
+    currentFromDate,
+    currentToDate,
+    handleCustomDate,
+  } = useDateRange({
+    onDateChangeDays: (firstDate, SecondDate) => {
+      console.log();
+
+    },
+    onDateChangeMonth: (firstDate, SecondDate) => {
+
+    },
+    onFirstCustomRangeSelectes: (firstDate, SecondDate) => {
+
+    },
+    onFirstOptionCustomChange: (firstDate, SecondDate) => {
+
+    },
+    onSecondOptionCustomChange: (firstDate, SecondDate) => {
+
+    },
+  });
+
+  function onChangeData(res) {
+    const transformedData = res.data[0].sales_summary_data.map((item) => [
+      item.service,
+      item.category,
+      item.service_price.toString(),
+      item.service_count.toString(),
+      "₹ " + item.discounts.toString(),
+      "₹ " + item.gross_sales.toString(),
+      "₹ " + item.gst.toString(),
+      "₹ " + item.total_sales.toString(),
+    ]);
+
+    setProductList(transformedData);
+  }
+
+  const calculateColumnWidths = useMemo(() => {
+    return productSalesHeader.map((header, index) => {
+      const headerWidth = header.length * 14;
+      const maxDataWidth = productList.reduce((maxWidth, row) => {
+        const cellContent = row[index] || '';
+        return Math.max(maxWidth, cellContent.length * 16);
+      }, 0);
+      return Math.max(headerWidth, maxDataWidth);
+    });
+  }, [productSalesHeader, productList]);
+
+  const widthArr = calculateColumnWidths;
   return (
-    <View>
-      <Text>ProductSalesReportScreen</Text>
-    </View>
+    <ScrollView style={{ backgroundColor: 'white' }}>
+      <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
+        <Text style={[TextTheme.bodyMedium, { alignSelf: 'center', marginBottom: 20 }]}>Shows complete list of all sales transactions.</Text>
+        <DatePicker
+          isCustomRange={isCustomRange}
+          handleSelection={handleSelection}
+          isLoading={isLoading}
+          handleCustomDateConfirm={handleCustomDateConfirm}
+          handleCustomDate={handleCustomDate}
+          dateData={dateData}
+          selectedValue={selectedValue}
+          date={date}
+          selectedToCustomDate={selectedToCustomDate}
+          selectedFromCustomDate={selectedFromCustomDate}
+        />
+      </View>
+      <SearchBar
+        onChangeText={(text) => {
+          setQuery(text)
+          console.log(text);
+
+        }}
+        placeholder='Search by product name'
+        searchContainerStyle={{ marginBottom: 20,marginHorizontal: 20 }}
+        logoAndInputContainer={{ borderWidth: 1, borderColor: Colors.grey250 }}
+        value={query}
+      />
+      {isEntryModalVisible && (
+        <EntryPicker
+          setIsModalVisible={setIsEntryModalVisible}
+          onPress={(number) => {
+            setMaxEntry(number);
+            setIsEntryModalVisible(false);
+          }}
+          maxEntry={maxEntry}
+          isVisible={isEntryModalVisible}
+        />
+      )}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
+        <View style={{ paddingHorizontal: 20 }}>
+          <Table borderStyle={{ borderColor: '#c8e1ff' }}>
+            <Row
+              data={
+                productSalesHeaderWithSort.map((item, index) => (
+                  <SortableHeader
+                    key={item.key}
+                    title={item.title}
+                    sortKey={item.sortKey}
+                    currentSortKey={toggleSortItem}
+                    dispatch={dispatch}
+                    pageNo={pageNo}
+                    maxEntry={maxEntry}
+                    fromDate={currentFromDate}
+                    toDate={currentToDate}
+                    query={query}
+                    onSortChange={setToggleSortItem}
+                    onChangeData={onChangeData}
+                    setGetSortOrderKey={setGetSortOrderKey}
+                    sortOrderKey={getSortOrderKey}
+                  />
+                ))
+              }
+              textStyle={{ flex: 1, width: "100%", paddingVertical: 10 }}
+              widthArr={productList.length > 0 ? widthArr : undefined}
+              style={{ borderWidth: 1, borderColor: Colors.grey250, backgroundColor: Colors.grey150 }}
+            />
+            {productList.length > 0 ? (
+              productList.map((rowData, rowIndex) => (
+                <Row
+                  key={rowIndex}
+                  data={rowData.map((cell, cellIndex) => {
+                    return (
+                      <Text style={[styles.text, { paddingHorizontal: 10 }]}>
+                        {cell}
+                      </Text>
+                    );
+                  })}
+                  widthArr={widthArr}
+                  style={styles.tableBorder}
+                />
+              ))
+            ) :
+              <Text style={[styles.noDataText, styles.tableBorder]}>No Data Found</Text>
+            }
+          </Table>
+        </View>
+      </ScrollView>
+      {
+        maxPageCount > 10 &&
+        <CustomPagination
+          setIsModalVisible={setIsEntryModalVisible}
+          maxEntry={maxEntry}
+          incrementPageNumber={() => setPageNo(prev => prev + 1)}
+          decrementPageNumber={() => setPageNo(prev => prev - 1)}
+          refreshOnChange={async () =>
+            console.log()
+          }
+          currentCount={productList?.length ?? 1}
+          totalCount={maxPageCount}
+          resetPageNo={() => {
+            setPageNo(0);
+          }}
+          isFetching={false}
+          currentPage={pageNo}
+        />
+      }
+    </ScrollView>
   )
 }
 
 export default ProductSalesReportScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  text: {
+    textAlign: 'left',
+    paddingVertical: 10,
+    fontSize: 14,
+    flex: 1,
+    width: '100%',
+  },
+  tableBorder: {
+    borderColor: Colors.grey250,
+    borderBottomWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+  },
+  noDataText: {
+    textAlign: 'center',
+    paddingVertical: 20
+  }
+})

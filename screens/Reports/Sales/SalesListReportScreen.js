@@ -100,10 +100,7 @@ const SalesListReportScreen = () => {
         "₹ " + item.gross_total.toString(),
         item.payment_mode,
     ]), [salesReportList])
-
-    console.log(tableData);
     
-
     const calculateColumnWidths = () => {
         return tableHeaders.map((header, index) => {
             const headerWidth = header.length * 20;
