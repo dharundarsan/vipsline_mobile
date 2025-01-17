@@ -8,16 +8,10 @@ const initialState = {
     totalSalesValue: 0,
     totalNetSalesValue: 0,
     salesReportList: [],
-
-    pageNo:0,
-    maxEntry: 10,
-    pageSize:10,
-    searchMaxEntry: 10,
 };
 
-export const fetchSalesReportByBusiness = (initialPage, finalPage,fromDate,toDate,query) => async (dispatch, getState) => {
+export const fetchSalesReportByBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "invoice_issued_on", sortOrder = "desc") => async (dispatch, getState) => {
     let authToken = "";
-    const {pageNo} = getState().report;
     try {
         const value = await SecureStore.getItemAsync("authKey");
         if (value !== null) {
@@ -29,13 +23,13 @@ export const fetchSalesReportByBusiness = (initialPage, finalPage,fromDate,toDat
 
     try {
         const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesReportByBusiness?pageNo=${pageNo ?? 0}&pageSize=${finalPage ?? 10}`,
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesReportByBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
             {
                 business_id: `${await getBusinessId()}`,
                 fromDate: fromDate,
                 toDate: toDate,
-                sortItem: "net_total",
-                sortOrder: "desc",
+                sortItem: sortItem === null ? "invoice_issued_on" : sortItem,
+                sortOrder: sortOrder,
                 query: query !== undefined ? query : "",
             },
             {
@@ -44,15 +38,258 @@ export const fetchSalesReportByBusiness = (initialPage, finalPage,fromDate,toDat
                 },
             }
         );
-
-        console.log(response.data);
-        return response.data; // Return the data explicitly
+        return response.data;
     } catch (e) {
         console.error(e.response?.data || "Error fetching sales report");
-        throw e; // Optionally throw to propagate error
+        throw e;
     }
 };
 
+export const fetchSalesByServiceForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesByServiceForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchProductSalesSummaryReport = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getProductSalesSummaryReport?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchSalesByMembershipForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "cm.membership_name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesByMembershipForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchSalesByPackagesForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "cm.package_name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesByPackagesForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchSalesByPrepaidForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "bc.name", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getSalesByPrepaidForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchPaymentModeReportForBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "bc.name", sortOrder = "desc",modeFilter = undefined) => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getPaymentModeReportForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+                modeFilter: modeFilter
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
+export const fetchCancelledInvoiceReportByBusiness = (initialPage, finalPage, fromDate, toDate, query="", sortItem = "SUBSTRING(substring_index(business_invoice_no,'/',1),5)+0", sortOrder = "desc") => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getCancelledInvoiceReportByBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                fromDate: fromDate,
+                toDate: toDate,
+                sortItem: sortItem === null ? "name" : sortItem,
+                sortOrder: sortOrder,
+                query: query !== undefined ? query : "",
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
 
 const reportSlice = createSlice({
     name: 'report',
@@ -62,31 +299,31 @@ const reportSlice = createSlice({
             if (action.payload.type === 'update') {
                 state.total_count = action.payload.value;
             }
-            else if(action.payload.type === 'reset') {
+            else if (action.payload.type === 'reset') {
                 state.total_count = 10;
             }
         },
         updateTotalSalesValue(state, action) {
-            if(action.payload.type === 'update') {
+            if (action.payload.type === 'update') {
                 state.totalSalesValue = action.payload.value;
             }
-            else if(action.payload.type === 'reset') {
+            else if (action.payload.type === 'reset') {
                 state.totalSalesValue = 0;
             }
         },
         updateTotalNetSalesValue(state, action) {
-            if(action.payload.type === 'update') {
+            if (action.payload.type === 'update') {
                 state.totalNetSalesValue = action.payload.value;
             }
-            else if(action.payload.type === 'reset') {
+            else if (action.payload.type === 'reset') {
                 state.totalNetSalesValue = 0;
             }
         },
         updateSalesReportList(state, action) {
-            if(action.payload.type === 'update') {
+            if (action.payload.type === 'update') {
                 state.salesReportList = action.payload.value;
             }
-            else if(action.payload.type === 'reset') {
+            else if (action.payload.type === 'reset') {
                 state.salesReportList = [];
             }
         },

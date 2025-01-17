@@ -22,19 +22,13 @@ const ClientRewardPoints = (props) => {
 
   const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
 
-  const rewardDetails = useSelector(
-    (state) => state.clientInfo.customerRewardDetails
-  );
-  const rewardPoints = useSelector(
-    (state) => state.clientInfo.rewardPointBalance
-  );
+  const rewardDetails = useSelector((state) => state.clientInfo.customerRewardDetails);
+  const rewardPoints = useSelector((state) => state.clientInfo.rewardPointBalance);
   const maxEntry = useSelector((state) => state.clientInfo.rewardsMaxEntry);
-  const rewardsTotalSize = useSelector(
-    (state) => state.clientInfo.rewardsTotalSize
-  );
-  const isRewardFetching = useSelector(
-    (state) => state.clientInfo.rewardsIsFetching
-  );
+  const rewardsTotalSize = useSelector((state) => state.clientInfo.rewardsTotalSize);
+  const isRewardFetching = useSelector((state) => state.clientInfo.rewardsIsFetching);
+  const pageNo = useSelector( state => state.clientInfo.rewardsPageNo)
+
   useEffect(() => {
     async function initialCall() {
       await dispatch(resetRewardPageNo());
@@ -135,6 +129,7 @@ const ClientRewardPoints = (props) => {
             totalCount={rewardsTotalSize}
             resetPageNo={() => dispatch(resetRewardPageNo())}
             isFetching={isRewardFetching}
+            currentPage={pageNo}
           />
         </View>
       ) : null} 

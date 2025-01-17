@@ -8,30 +8,43 @@ export default function CustomPagination(props) {
 
     const [upperCount, setUpperCount] = useState(10);
     const [lowerCount, setLowerCount] = useState(1);
+    // console.log("-------------------------------------PAGINATION-----------------------------------");
     
+    // console.log("props.currentPage");
+    // console.log(props.currentPage);
+    // console.log("props.currentCount");
+    // console.log(props.currentCount);
+    // console.log("props.totalCount");
+    // console.log(props.totalCount);
+    // console.log("props.maxEntry");
+    // console.log(props.maxEntry);
+    
+    // console.log(`${props.currentPage * props.maxEntry} - ${Math.min((props.currentPage + 1) * props.maxEntry , props.totalCount )} of ${props.totalCount}`);
+    
+    const min = Math.min((props.currentPage + 1) * props.maxEntry , props.totalCount );
     useEffect(() => {
         props.refreshOnChange();
-        if (lowerCount === 1) {
+        if ((props.currentPage * props.maxEntry) + 1 === 1) {
             setIsBackwardButtonDisabled(true);
         } else {
             setIsBackwardButtonDisabled(false);
         }
 
-        if (upperCount === props.totalCount) {
+        if (min === props.totalCount) {
             setIsForwardButtonDisabled(true);
         } else {
             setIsForwardButtonDisabled(false);
         }
-    }, [lowerCount, upperCount]);
+    }, [props.currentPage * props.maxEntry, min]); 
 
     useEffect(() => {
         if(props.isFetching === false){
-            setLowerCount(1);
-            if (props.maxEntry > props.currentCount) {
-                setUpperCount(props.currentCount);
-            } else {
-                setUpperCount(props.maxEntry);
-            }
+            // setLowerCount(1);
+            // if (props.maxEntry > props.currentCount) {
+            //     setUpperCount(props.currentCount);
+            // } else {
+            //     setUpperCount(props.maxEntry);
+            // }
             // console.log("1");   
             props.resetPageNo();
             props.refreshOnChange();
@@ -45,47 +58,53 @@ export default function CustomPagination(props) {
 
     function forwardButtonHandler() {
         if (!isForwardButtonDisabled) {
-            let lowerCountAfter = lowerCount + props.maxEntry;
-            let upperCountAfter = upperCount + props.maxEntry;
+            // let lowerCountAfter = lowerCount + props.maxEntry;
+            // let upperCountAfter = upperCount + props.maxEntry;
 
-            if (upperCountAfter > props.totalCount && lowerCountAfter < 0) {
-                setLowerCount(props.totalCount - props.maxEntry);
-                setUpperCount(props.totalCount);
-            } else if (upperCountAfter <= props.totalCount && lowerCountAfter >= 0) {
-                setLowerCount(lowerCountAfter);
-                setUpperCount(upperCountAfter);
-                props.incrementPageNumber();
-            } else if (upperCountAfter > props.totalCount && upperCountAfter >= 0) {
-                props.incrementPageNumber();
-                setUpperCount(props.totalCount);
-                setLowerCount(lowerCountAfter)
-            } else if (lowerCountAfter < 0 && upperCountAfter < props.totalCount) {
-                props.incrementPageNumber();
-                setUpperCount(upperCountAfter)
-                setLowerCount(0)
-            }
+            // if (upperCountAfter > props.totalCount && lowerCountAfter < 0) {
+            //     setLowerCount(props.totalCount - props.maxEntry);
+            //     setUpperCount(props.totalCount);
+            // } else if (upperCountAfter <= props.totalCount && lowerCountAfter >= 0) {
+            //     setLowerCount(lowerCountAfter);
+            //     setUpperCount(upperCountAfter);
+            //     props.incrementPageNumber();
+            // } else if (upperCountAfter > props.totalCount && upperCountAfter >= 0) {
+            //     props.incrementPageNumber();
+            //     setUpperCount(props.totalCount);
+            //     setLowerCount(lowerCountAfter)
+            // } else if (lowerCountAfter < 0 && upperCountAfter < props.totalCount) {
+            //     props.incrementPageNumber();
+            //     setUpperCount(upperCountAfter)
+            //     setLowerCount(0)
+            // }
+
+            props.incrementPageNumber();
+
+
         }
     }
 
     function backwardButtonHandler() {
         if (!isBackwardButtonDisabled) {
-            let lowerCountAfter = lowerCount - props.maxEntry;
-            let upperCountAfter = upperCount - props.maxEntry;
+            // let lowerCountAfter = lowerCount - props.maxEntry;
+            // let upperCountAfter = upperCount - props.maxEntry;
 
-            if (lowerCountAfter === 1 && upperCountAfter < props.maxEntry) {
-                setLowerCount(1);
-                setUpperCount(props.maxEntry);
-                props.decrementPageNumber();
-            } else if (lowerCountAfter < 1 && upperCountAfter < props.maxEntry) {
-                setLowerCount(1);
-                setUpperCount(props.maxEntry);
-                props.decrementPageNumber();
-            }
-            else if (upperCountAfter >= 1 && upperCountAfter >= props.maxEntry) {
-                setLowerCount(lowerCountAfter);
-                setUpperCount(upperCountAfter - lowerCountAfter === props.maxEntry ? upperCountAfter : lowerCountAfter + props.maxEntry - 1);
-                props.decrementPageNumber();
-            }
+            // if (lowerCountAfter === 1 && upperCountAfter < props.maxEntry) {
+            //     setLowerCount(1);
+            //     setUpperCount(props.maxEntry);
+            //     props.decrementPageNumber();
+            // } else if (lowerCountAfter < 1 && upperCountAfter < props.maxEntry) {
+            //     setLowerCount(1);
+            //     setUpperCount(props.maxEntry);
+            //     props.decrementPageNumber();
+            // }
+            // else if (upperCountAfter >= 1 && upperCountAfter >= props.maxEntry) {
+            //     setLowerCount(lowerCountAfter);
+            //     setUpperCount(upperCountAfter - lowerCountAfter === props.maxEntry ? upperCountAfter : lowerCountAfter + props.maxEntry - 1);
+            //     props.decrementPageNumber();
+            // }
+            props.decrementPageNumber();
+        
         }
     }
 
@@ -106,7 +125,8 @@ export default function CustomPagination(props) {
 
             <View style={styles.paginationInnerContainer}>
                 <Text style={styles.pagingText}>
-                    {lowerCount < 0 ? 0 : lowerCount} - {props.totalCount > props.currentCount ? lowerCount + props.currentCount - 1 : props.currentCount } of {props.totalCount}
+                    {(props.currentPage * props.maxEntry) + 1} - { Math.min((props.currentPage + 1) * props.maxEntry , props.totalCount ) } of {props.totalCount}
+                    {/* {lowerCount < 0 ? 0 : props.currentPage lowerCount} - {props.totalCount > props.currentCount ? lowerCount + props.currentCount - 1 : props.currentCount } of {props.totalCount} */}
                 </Text>
                 <PrimaryButton
                     buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}
