@@ -15,7 +15,7 @@ import MoreOptionDropDownModal from "./MoreOptionDropDownModal";
 import UpdateClientModal from "./UpdateClientModal";
 import {useDispatch, useSelector} from "react-redux";
 import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
-import {clearClientInfo, loadClientInfoFromDb} from "../../store/clientInfoSlice";
+import {clearClientInfo, loadClientInfoFromDb, resetRewardPageNo, updateCustomerRewards, updateRewardsPointBalance} from "../../store/clientInfoSlice";
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
 import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
@@ -59,8 +59,9 @@ const getCategoryTitle =
         "memberships": "Memberships",
         "packageSales": "Package sales",
         "prepaidSales": "Prepaid sales",
-        "review": "Review",
-        "giftVoucher": "Gift Voucher",
+        "rewardpoints": "Reward Points",
+        // "review": "Review",
+        // "giftVoucher": "Gift Voucher",
         "seeMoreStats": "Statistics"
     }
 
@@ -106,7 +107,6 @@ export default function clientInfoModal(props) {
 
     }, [analyticDetails, details]);
 
-    console.log(JSON.stringify(salesData, null, 2));
 
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
@@ -344,10 +344,10 @@ export default function clientInfoModal(props) {
             </View>
 
     }
-        // else if (clientMoreDetails === "rewardpoints") {
-        //     content =
-        //         <ClientRewardPoints details={details} />
-    // }
+        else if (clientMoreDetails === "rewardpoints") {
+            content =
+                <ClientRewardPoints details={details} />
+    }
     else {
         content =
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming
@@ -356,8 +356,18 @@ export default function clientInfoModal(props) {
 
 
     return (
-        <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet"
-               onRequestClose={props.onClose}>
+        <Modal visible={props.visible}
+               animationType={"slide"}
+               presentationStyle="pageSheet"
+               onRequestClose={() => {
+                   if (clientMoreDetails === null) {
+                       props.onClose();
+                   }
+                   else {
+                       setClientMoreDetails(null);
+                   }
+               }}
+        >
             <Toast ref={toastRef}/>
 
 
@@ -368,7 +378,13 @@ export default function clientInfoModal(props) {
                         <PrimaryButton
                             buttonStyle={styles.backButton}
                             onPress={() => {
+                                if(clientMoreDetails === "rewardpoints"){
+                                    dispatch(resetRewardPageNo());
+                                    dispatch(updateCustomerRewards({customerRewardList:[],count:0}))
+                                    dispatch(updateRewardsPointBalance(0))
+                                }
                                 setClientMoreDetails(null);
+                                
                             }}
                         >
                             <AntDesign name="arrowleft" size={24} color="black"/>

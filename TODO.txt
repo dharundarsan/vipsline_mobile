@@ -1,0 +1,9 @@
+Refactor
+    // useEffect(()=>{
+    //     if(isSplitRewardActive){
+    //         setShownCount(prev => prev + 1);
+    //         setPaymentOrder(prev => [...prev, "Rewards"])
+    //         setRecentlyChanged(prev => [...prev, "Rewards"])
+    //     }
+    // },[isSplitRewardActive,splitUpState])
+      setShownCount(prev => prev + 1); split payment ShownCount will be 1 when reward points go to split payment

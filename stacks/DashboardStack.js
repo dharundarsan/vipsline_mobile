@@ -4,9 +4,12 @@ import SalesDashboard from "../components/DashboardScreen/SalesDashboard";
 import DashboardScreen from "../screens/DashboardScreen";
 import StaffDashboard from "../components/DashboardScreen/StaffDashboard";
 import ClientDashboard from "../components/DashboardScreen/ClientDashboard";
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Image } from 'react-native';
+import { BackButton } from './StaffManagementStack';
 
 
-const DashboardStack = ({route}) => {
+const DashboardStack = ({navigation,route}) => {
     const Stack = createNativeStackNavigator();
 
     return (
@@ -14,13 +17,23 @@ const DashboardStack = ({route}) => {
             initialRouteName="DashboardScreen"
             screenOptions={({route}) => ({
                 // headerTitleAlign: 'center',
-                // headerShown:false,
+                headerShown:true,
                 // animation:"ios"
             })}
         >
             <Stack.Screen name='DashboardScreen'
                           component={DashboardScreen}
-                          options={{headerTitle: "Dashboard", headerShown: false}}
+                          options={{
+                            headerShown: true,
+                            headerTitle: "Dashboard",
+                            headerTitleAlign: "center",
+                            headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+                              <Image
+                                  source={require('../assets/icons/drawerIcons/drawer.png')}
+                                  style={{width: 24, height: 24}}
+                              />
+                          </TouchableOpacity>,
+                          }}
             />
             <Stack.Screen
                 name="SalesScreen"
@@ -28,10 +41,9 @@ const DashboardStack = ({route}) => {
                 options={{
                     headerTitle: "Sales Dashboard",
                     headerTitleAlign: "center",
-                    headerShown:false,
-                    // headerLeft: () => <BackButton />,
+                    headerShown: true,
+                    headerLeft: () => <BackButton/>,
                     // animation:'ios_from_right'
-
                 }}
 
             />
@@ -40,8 +52,9 @@ const DashboardStack = ({route}) => {
                 component={StaffDashboard}
                 options={{
                     headerTitle: "Staff Dashboard",
-                    headerShown:false,
-                    // headerLeft:()=><BackButton/>,
+                    headerTitleAlign: "center",
+                    headerShown:true,
+                    headerLeft:()=><BackButton/>,
                     // animation:'ios_from_right'
                 }}
             />
@@ -50,8 +63,9 @@ const DashboardStack = ({route}) => {
                 component={ClientDashboard}
                 options={{
                     headerTitle: "Client Dashboard",
-                    headerShown:false
-                    // headerLeft:()=><BackButton/>,
+                    headerTitleAlign: "center",
+                    headerShown:true,
+                    headerLeft:()=><BackButton/>,
                     // animation:'ios_from_right'
                 }}
             />

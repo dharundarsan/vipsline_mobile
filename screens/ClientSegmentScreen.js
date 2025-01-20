@@ -19,7 +19,10 @@ import {
     clearClientInfo,
     loadAnalyticsClientDetailsFromDb,
     loadClientInfoFromDb,
-    updateClientId
+    resetRewardPageNo,
+    updateClientId,
+    updateCustomerRewards,
+    updateRewardsPointBalance
 } from "../store/clientInfoSlice";
 import {
     loadClientFiltersFromDb,
@@ -41,6 +44,7 @@ import Toast from "../ui/Toast";
 import AdvancedFilters from "../components/clientSegmentScreen/AdvancedFilters";
 import CustomTagFilter from "../ui/CustomTagFilter";
 import { Divider } from "react-native-paper";
+import {loadBusinessNotificationDetails} from "../store/listOfBusinessSlice";
 
 
 export default function ClientSegmentScreen(props) {
@@ -122,7 +126,7 @@ export default function ClientSegmentScreen(props) {
         dispatch(loadClientFiltersFromDb(10, "All"));
         getLocation("Clients");
         dispatch(clearClientInfo())
-
+        dispatch(loadBusinessNotificationDetails())
         // return () => {
         //     dispatch(clearClientInfo());
         // }
@@ -325,6 +329,9 @@ export default function ClientSegmentScreen(props) {
                         onClose={() => {
                             setIsClientInfoModalVisible(false)
                             dispatch(clearClientInfo())
+                            dispatch(resetRewardPageNo());
+                            dispatch(updateCustomerRewards({customerRewardList:[],count:0}))
+                            dispatch(updateRewardsPointBalance(0))
                         }}
                         deleteClientToast={() => {
                             clientSegmentToast("client deleted successfully.", 2000);

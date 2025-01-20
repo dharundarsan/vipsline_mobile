@@ -7,12 +7,13 @@ import {useNavigation} from "@react-navigation/native";
 import {useDispatch, useSelector} from "react-redux";
 
 import {AntDesign} from "@expo/vector-icons";
+import StaffInfo from "../screens/StaffInfo";
+import sample from "../components/staffManagementScreen/Sample";
+import Sample from "../components/staffManagementScreen/Sample";
 
 export const BackButton = () => {
-    const dispatch = useDispatch();
     const navigation = useNavigation();
-    const username = useSelector((state) => state.loginUser.details);
-    const page = useSelector((state) => state.dashboardDetails.dashboardName)
+
     return (
         <TouchableOpacity
             onPress={async () => {
@@ -25,20 +26,20 @@ export const BackButton = () => {
     );
 };
 
-const StaffManagementStack = ({route}) => {
+const StaffManagementStack = ({route, navigation}) => {
     const Stack = createNativeStackNavigator();
-    const navigation = useNavigation();
+    // const navigation = useNavigation();
 
 
     return (<Stack.Navigator
-        initialRouteName="Staff"
+        initialRouteName="Staffs"
         screenOptions={({route}) => ({
             // headerTitleAlign: 'center',
             headerShown:true,
             // animation:"ios"
         })}
     >
-        <Stack.Screen name='Staff'
+        <Stack.Screen name='Staffs'
                       component={StaffManagementScreen}
                       options={{
                           headerShown: true,
@@ -66,12 +67,13 @@ const StaffManagementStack = ({route}) => {
         />
         <Stack.Screen
             name="Shift Timing"
-            component={StaffListScreen}
+            component={Sample}
             options={{
                 headerShown: true,
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton />,
                 // animation:'ios_from_right'
+
 
             }}
 
@@ -135,6 +137,15 @@ const StaffManagementStack = ({route}) => {
 
             }}
 
+        />
+        <Stack.Screen
+            name="Staff Name"
+            component={StaffInfo}
+            options={{
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton />,
+            }}
         />
     </Stack.Navigator>)
 }

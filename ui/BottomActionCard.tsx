@@ -33,7 +33,7 @@ const BottomActionCard = ({
 
     useEffect(() => {
         console.log("Rendering");
-    }, []);
+    });
 
     return (
         <Modal

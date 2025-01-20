@@ -1,4 +1,4 @@
-import {Image, TouchableOpacity,} from 'react-native';
+import {Image, StatusBar, TouchableOpacity,} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import React, {useCallback, useState, useEffect, useRef} from 'react';
 import {Provider, useDispatch, useSelector} from 'react-redux';
@@ -99,6 +99,7 @@ const AppNavigator = (props) => {
 
     return (
         <NavigationContainer>
+            <StatusBar barStyle={"default"} />
             <SafeAreaProvider>
                 {/* {isAuth ? */}
                 <LocationProvider>

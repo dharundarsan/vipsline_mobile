@@ -12,7 +12,7 @@ export default function DashboardScreen() {
   const {setIsDashboardPage} = useDataContext();
   const {getLocation} = useLocationContext()
   useFocusEffect(useCallback(() => {
-    getLocation("Dashboard");
+    getLocation("DashboardScreen");
   }, []))
 
   return (
