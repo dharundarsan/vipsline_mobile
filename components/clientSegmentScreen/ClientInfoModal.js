@@ -106,7 +106,6 @@ export default function clientInfoModal(props) {
 
     }, [analyticDetails, details]);
 
-    console.log(JSON.stringify(salesData, null, 2));
 
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
@@ -356,8 +355,18 @@ export default function clientInfoModal(props) {
 
 
     return (
-        <Modal visible={props.visible} animationType={"slide"} presentationStyle="pageSheet"
-               onRequestClose={props.onClose}>
+        <Modal visible={props.visible}
+               animationType={"slide"}
+               presentationStyle="pageSheet"
+               onRequestClose={() => {
+                   if (clientMoreDetails === null) {
+                       props.onClose();
+                   }
+                   else {
+                       setClientMoreDetails(null);
+                   }
+               }}
+        >
             <Toast ref={toastRef}/>
 
 

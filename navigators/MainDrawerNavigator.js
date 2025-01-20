@@ -120,36 +120,48 @@ const MainDrawerNavigator = (props) => {
     const {isDashboardPage} = useDataContext();
     const Drawer = createDrawerNavigator();
 
+
+    const currentRoute = useSelector(state => state.navigation.current);
+
+
+
+
     useEffect(() => {
         const backAction = () => {
-            Alert.alert(
-                "Exit App",
-                "Are you sure you want to exit the app?",
-                [
-                    {
-                        text: "No",
-                        onPress: () => null,
-                        style: "cancel"
-                    },
-                    {
-                        text: "Yes",
-                        onPress: () => {
-
-                            clearCartAPI();
-                            dispatch(modifyClientMembershipId({type: "clear"}))
-                            dispatch(clearSalesNotes());
-                            dispatch(clearLocalCart());
-                            dispatch(clearClientInfo());
-                            dispatch(clearCalculatedPrice());
-                            BackHandler.exitApp();
-                            navigation.navigate("List of Business");
-
+            if(currentRoute !== "Staff Management") {
+                return
+            }
+            if(currentRoute === "Staff Management") {
+                // console.log("sdg")
+                Alert.alert(
+                    "Exit App",
+                    "Are you sure you want to exit the app?",
+                    [
+                        {
+                            text: "No",
+                            onPress: () => null,
+                            style: "cancel"
                         },
-                    }
-                ],
-                {cancelable: false}
-            );
-            return true;
+                        {
+                            text: "Yes",
+                            onPress: () => {
+
+                                clearCartAPI();
+                                dispatch(modifyClientMembershipId({type: "clear"}))
+                                dispatch(clearSalesNotes());
+                                dispatch(clearLocalCart());
+                                dispatch(clearClientInfo());
+                                dispatch(clearCalculatedPrice());
+                                BackHandler.exitApp();
+                                navigation.navigate("List of Business");
+
+                            },
+                        }
+                    ],
+                    {cancelable: false}
+                );
+                return true;
+            }
         };
 
         const backHandler = BackHandler.addEventListener(
@@ -185,7 +197,7 @@ const MainDrawerNavigator = (props) => {
         }
     }, [currentLocation])
     const wentToBusiness = useSelector(state => state.authDetails.inBusiness)
-    const currentRoute = useSelector(state => state.navigation.current);
+
     console.log(currentRoute)
     return (
         <>
@@ -351,11 +363,23 @@ const MainDrawerNavigator = (props) => {
                             {/*    drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(settings_icon).uri }}*/}
                             {/*        width={25} height={25} style={{ resizeMode: "contain" }} />*/}
                             {/*}} />*/}
-                            <Drawer.Screen name="Staffs" component={staffManagementStack} options={{
-                                headerShown: false,
-                                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}
-                                                         width={25} height={25} style={{resizeMode: "contain"}}/>
-                            }}/>
+                            <Drawer.Screen
+                                name="Staffs"
+                                component={staffManagementStack}
+                                options={{
+                                    headerShown: false,
+                                    drawerIcon: () => (
+                                        <Image
+                                            source={{
+                                                    uri: Image.resolveAssetSource(staffs_icon).uri
+                                            }}
+                                            width={25}
+                                            height={25}
+                                            style={{resizeMode: "contain"}}
+                                        />),
+                                    swipeEnabled: currentRoute === "Staff Management",
+                                }}
+                            />
                             <Drawer.Screen name="List of Business" component={ListOfBusinessesScreen} options={{
                                 headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
                                 headerLeft: () => null,
