@@ -19,7 +19,7 @@ const DashboardCard = (props) => {
         <View style={styles.header}>
           <Image source={props.icon} style={styles.icon} />
           {props.popoverText !== undefined ?
-            <PoppoverIconText popoverText={props.popoverText} title={props.title} popoverOffset={Platform.OS === "ios" ? 0 : -32} titleStyle={styles.title} />
+            <PoppoverIconText popoverText={props.popoverText} title={props.title} titleStyle={styles.title} />
             :
             <Text style={[styles.title]}>{props.title}</Text>
           }

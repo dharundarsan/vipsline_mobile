@@ -4,12 +4,12 @@ import SalesDashboard from "../components/DashboardScreen/SalesDashboard";
 import DashboardScreen from "../screens/DashboardScreen";
 import StaffDashboard from "../components/DashboardScreen/StaffDashboard";
 import ClientDashboard from "../components/DashboardScreen/ClientDashboard";
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {Image} from 'react-native';
-import {BackButton} from './StaffManagementStack';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Image } from 'react-native';
+import { BackButton } from './StaffManagementStack';
 
 
-const DashboardStack = ({navigation, route}) => {
+const DashboardStack = ({navigation,route}) => {
     const Stack = createNativeStackNavigator();
 
     return (
@@ -17,21 +17,22 @@ const DashboardStack = ({navigation, route}) => {
             initialRouteName="DashboardScreen"
             screenOptions={({route}) => ({
                 // headerTitleAlign: 'center',
-                headerShown: true,
+                headerShown:true,
                 // animation:"ios"
             })}
         >
             <Stack.Screen name='DashboardScreen'
                           component={DashboardScreen}
                           options={{
-                              headerShown: true,
-                              headerTitle: "Dashboard",
-                              headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
-                                  <Image
-                                      source={require('../assets/icons/drawerIcons/drawer.png')}
-                                      style={{width: 24, height: 24}}
-                                  />
-                              </TouchableOpacity>,
+                            headerShown: true,
+                            headerTitle: "Dashboard",
+                            headerTitleAlign: "center",
+                            headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+                              <Image
+                                  source={require('../assets/icons/drawerIcons/drawer.png')}
+                                  style={{width: 24, height: 24}}
+                              />
+                          </TouchableOpacity>,
                           }}
             />
             <Stack.Screen
@@ -51,8 +52,9 @@ const DashboardStack = ({navigation, route}) => {
                 component={StaffDashboard}
                 options={{
                     headerTitle: "Staff Dashboard",
-                    headerShown: true,
-                    headerLeft: () => <BackButton/>,
+                    headerTitleAlign: "center",
+                    headerShown:true,
+                    headerLeft:()=><BackButton/>,
                     // animation:'ios_from_right'
                 }}
             />
@@ -61,8 +63,9 @@ const DashboardStack = ({navigation, route}) => {
                 component={ClientDashboard}
                 options={{
                     headerTitle: "Client Dashboard",
-                    headerShown: true,
-                    headerLeft: () => <BackButton/>,
+                    headerTitleAlign: "center",
+                    headerShown:true,
+                    headerLeft:()=><BackButton/>,
                     // animation:'ios_from_right'
                 }}
             />

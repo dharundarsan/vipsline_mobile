@@ -341,7 +341,7 @@ const MainDrawerNavigator = (props) => {
                                                    style={{resizeMode: "contain", tintColor: Colors.white}}/>,
                                                headerTitleAlign: 'center',
                                            }}/>
-                            {/* <Drawer.Screen
+                            <Drawer.Screen
                                name="Reports"
                                component={ReportStack}
                                options={{
@@ -350,7 +350,7 @@ const MainDrawerNavigator = (props) => {
                                        source={{ uri: Image.resolveAssetSource(reports_icon).uri }} width={25} height={25}
                                        style={{ resizeMode: "contain" }} />
                                }}
-                            /> */}
+                            />
                             {/* <Drawer.Screen name="Catalogue" component={CheckoutStack} options={{
                                 drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(catalogue_icon).uri }}
                                     width={25} height={25} style={{ resizeMode: "contain" }} />
@@ -363,11 +363,11 @@ const MainDrawerNavigator = (props) => {
                                 drawerIcon: () => <Image source={{ uri: Image.resolveAssetSource(settings_icon).uri }}
                                     width={25} height={25} style={{ resizeMode: "contain" }} /> 
                             }} />  */}
-                            {/* <Drawer.Screen name="Staffs" component={staffManagementStack} options={{
+                            <Drawer.Screen name="Staffs" component={staffManagementStack} options={{
                                 headerShown: false,
                                 drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(staffs_icon).uri}}
                                                          width={25} height={25} style={{resizeMode: "contain"}}/>
-                            }}/> */}
+                            }}/>
                             <Drawer.Screen name="List of Business" component={ListOfBusinessesScreen} options={{
                                 headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
                                 headerLeft: () => null,

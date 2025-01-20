@@ -5,10 +5,10 @@ import TextTheme from '../../constants/TextTheme'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
 
-const ReportCard = ({title}) => {
+const ReportCard = ({ title, location }) => {
     const nav = useNavigation()
     return (
-        <TouchableOpacity onPress={()=>nav.navigate("Sales list report")}>
+        <TouchableOpacity onPress={() => nav.navigate(location)}>
             <View style={[styles.headerContainer, { justifyContent: 'space-between', paddingVertical: 12 }]}>
                 <Text style={TextTheme.bodyLarge}>{title}</Text>
                 <AntDesign name="right" size={20} color="black" />
