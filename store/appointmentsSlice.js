@@ -12,9 +12,9 @@ export const loadFutureBookingsFromDB = () => async (dispatch, getState) => {
     const response = await getFutureBookingsAPI(appointments.futureBookingsPageNo,
         appointments.futureBookingsMaxEntry,
         {
-            fromDate: "2025-01-16",
+            fromDate: moment(appointments.futureBookingsFilterDate).format("YYYY-MM-DD"),
             resource_id: "",
-            toDate: "2025-01-16"
+            toDate: moment(appointments.futureBookingsFilterDate).format("YYYY-MM-DD")
         })
     dispatch(updateFutureBookingsList(response.data.data))
     dispatch(updateFutureBookingsCount(response.data.data[0].total_bookings))
@@ -27,13 +27,13 @@ export const loadBookingsHistoryFromDB = () => async (dispatch, getState) => {
     const response = await getHistoryBookingsAPI(appointments.bookingsHistoryPageNo,
         appointments.bookingsHistoryMaxEntry,
         {
-            fromDate: "2025-01-07",
+            fromDate: moment(appointments.bookingsHistoryFilterDate).format("YYYY-MM-DD"),
             resource_id: "",
-            toDate: "2025-01-07",
+            toDate: moment(appointments.bookingsHistoryFilterDate).format("YYYY-MM-DD"),
         })
+    dispatch(updateBookingsHistoryFetchingState(false))
     dispatch(updateBookingsHistoryList(response.data.data))
     dispatch(updateBookingsHistoryCount(response.data.data[0].total_bookings))
-    dispatch(updateBookingsHistoryFetchingState(false))
     return response;
 }
 
@@ -81,7 +81,7 @@ export const appointmentsSlice = createSlice({
         },
         decrementFutureBookingsPageNumber(state, action) {
             const page_no = state.futureBookingsPageNo - 1;
-            if (page_no < 0) {
+            if (page_no <= 0) {
                 state.futureBookingsPageNo = 0;
             } else {
                 state.futureBookingsPageNo--;
@@ -107,17 +107,17 @@ export const appointmentsSlice = createSlice({
             state.bookingsHistoryMaxEntry = 10;
         },
         incrementBookingsHistoryPageNumber(state, action) {
-            state.bookingsHistoryMaxEntry++;
+            state.bookingsHistoryPageNo++;
         },
         resetBookingsHistoryPageNo(state, action) {
-            state.bookingsHistoryMaxEntry = 0;
+            state.bookingsHistoryPageNo = 0;
         },
         decrementBookingsHistoryPageNumber(state, action) {
-            const page_no = state.bookingsHistoryMaxEntry - 1;
-            if (page_no < 0) {
-                state.bookingsHistoryMaxEntry = 0;
+            const page_no = state.bookingsHistoryPageNo - 1;
+            if (page_no <= 0) {
+                state.bookingsHistoryPageNo = 0;
             } else {
-                state.bookingsHistoryMaxEntry--;
+                state.bookingsHistoryPageNo--;
             }
         },
         setBookingsHistoryFilterDate(state, action) {
