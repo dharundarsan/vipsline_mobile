@@ -2,9 +2,9 @@ import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 import {checkAPIError} from "../../util/Helpers";
 
-const getFutureBookingsAPI = async (data) => {
+const getFutureBookingsAPI = async (pageNo, maxEntry, data) => {
     try {
-        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/appointment/byBusiness/fromTo/futureBookings?pageSize=10&pageNo=0", {
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + `/appointment/byBusiness/fromTo/futureBookings?pageSize=${maxEntry}&pageNo=${pageNo}`, {
             business_id: await SecureStore.getItemAsync('businessId'),
             ...data
         }, {

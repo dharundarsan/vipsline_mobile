@@ -49,6 +49,9 @@ import StaffManagementScreen from "../screens/StaffManagementScreen";
 import staffManagementStack from "../stacks/StaffManagementStack";
 import CustomCancelSale from "../ui/CustomCancelSale";
 import ReportStack from "../stacks/ReportStack";
+import StaffCalendar from "../screens/AppointmentsScreen";
+import BookingHistory from "../screens/appointments/BookingHistory";
+import ActiveBookings from "../screens/appointments/ActiveBookings";
 
 function CustomDrawerIcon({navigation}) {
     return (
@@ -192,7 +195,7 @@ const MainDrawerNavigator = (props) => {
         <>
             {!props.auth ? <AuthNavigator/> :
                 isDelete ? <CustomCancelSale
-                isVisible={isDelete}
+                        isVisible={isDelete}
                         setVisible={setIsDelete}
                         onCloseModal={async () => {
                             setTimeout(() => {
@@ -220,13 +223,13 @@ const MainDrawerNavigator = (props) => {
                             }, 10);
                         }}
                         checkoutScreenToast={() => null}
-                        />
+                    />
                     :
                     wentToBusiness ?
                         <Drawer.Navigator
                             initialRouteName="Checkout"
                             drawerContent={(props) => <CustomDrawer {...props} />}
-                            screenOptions={({route,navigation}) => ({
+                            screenOptions={({route, navigation}) => ({
                                 drawerActiveTintColor: Colors.highlight,
                                 drawerInactiveTintColor: Colors.white,
                                 drawerStyle: {backgroundColor: Colors.darkBlue},
@@ -265,18 +268,19 @@ const MainDrawerNavigator = (props) => {
                                         source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25}
                                         height={25}
                                         style={{resizeMode: "contain"}}/>,
-                                    headerShown:false
+                                    headerShown: false
                                 })}
                             />
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Appointments"*/}
-                            {/*    component={AppointmentsScreen}*/}
-                            {/*    options={{*/}
-                            {/*        drawerIcon: () => <Image*/}
-                            {/*            source={{ uri: Image.resolveAssetSource(calender_icon).uri }} width={25} height={25}*/}
-                            {/*            style={{ resizeMode: "contain" }} />*/}
-                            {/*    }}*/}
-                            {/*/>*/}
+                            <Drawer.Screen
+                                name="Appointments"
+                                component={() => null}
+                                options={{
+                                    drawerIcon: () => <Image
+                                        source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25}
+                                        height={25}
+                                        style={{resizeMode: "contain"}}/>
+                                }}
+                            />
                             <Drawer.Screen
                                 name="Checkout"
                                 component={CheckoutStack}
@@ -388,6 +392,28 @@ const MainDrawerNavigator = (props) => {
                                                    width={25}
                                                    height={25}
                                                    style={{resizeMode: "contain", tintColor: Colors.white}}/>
+                                           }}/>
+
+
+                            <Drawer.Screen name="Booking History" component={BookingHistory}
+                                           options={{
+                                               headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
+                                               drawerIcon: () => <Image
+                                                   source={{uri: Image.resolveAssetSource(expenses_icon).uri}}
+                                                   width={25}
+                                                   height={25}
+                                                   style={{resizeMode: "contain", tintColor: Colors.white}}/>,
+                                               headerTitleAlign: 'center',
+                                           }}/>
+                            <Drawer.Screen name="Active Bookings" component={ActiveBookings}
+                                           options={{
+                                               headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
+                                               drawerIcon: () => <Image
+                                                   source={{uri: Image.resolveAssetSource(expenses_icon).uri}}
+                                                   width={25}
+                                                   height={25}
+                                                   style={{resizeMode: "contain", tintColor: Colors.white}}/>,
+                                               headerTitleAlign: 'center',
                                            }}/>
                         </Drawer.Navigator>
                         : <Drawer.Navigator initialRouteName="List Of Business"

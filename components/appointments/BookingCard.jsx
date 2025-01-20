@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderRadius: 6,
         marginBottom: 20,
+        borderColor:Colors.grey400,
     }
 })
 
