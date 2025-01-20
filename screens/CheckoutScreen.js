@@ -142,6 +142,7 @@ const CheckoutScreen = ({ navigation, route }) => {
                 <AddClientButton setSearchClientQuery={setSearchClientQuery}
                     searchClientQuery={searchClientQuery}
                     onPress={() => {
+                        dispatch(loadBusinessNotificationDetails());
                         setIsAddClientModalVisible(true)
                     }}
                     deleteClientToast={() => {

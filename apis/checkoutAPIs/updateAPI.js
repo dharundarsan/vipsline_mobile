@@ -3,7 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 
 export default async function updateAPI(response, mode_of_payment, splitUpState, clientInfo) {
     let authToken = "";
-    console.log(mode_of_payment);
+    console.log("response");
+    console.log(response);
     
     let businessId = "";
     try {
@@ -63,6 +64,7 @@ export default async function updateAPI(response, mode_of_payment, splitUpState,
         case "reward points":
             data = {
                 bookingId: response.booking_id,
+                prepaid_wallet_details: Object.keys(response.prepaid_wallet_details).length !== 0 ? response.prepaid_wallet_details : undefined,
                 mode_of_payment:"REWARDS",
                 status:"paid_at_venue",
                 transactionId : "",

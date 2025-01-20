@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import TextTheme from "../../constants/TextTheme";
-import ListIconData from "./ListIconData";
+import ListIconData from "../../ui/ListIconData";
 import {
   clientPieColorCode,
   lifetimeData,
@@ -25,6 +25,7 @@ import ContentLoader from "react-native-easy-content-loader";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocationContext } from "../../context/LocationContext";
 import { calculateTotalValue } from "./PieData";
+import ClientDashboardLoader from "./ClientDashboardLoader";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
@@ -128,7 +129,7 @@ const ClientDashboard = () => {
     getLocation("Client Dashboard");
   }, []))
   const prepaidVsRedemptionTotalValue = calculateTotalValue(revenuePrepaidData[0].chart_series);
-  
+
   const labelArray = useSelector((state) => state.dashboardDetails.toggleDateData);
 
   return (
@@ -139,31 +140,7 @@ const ClientDashboard = () => {
           <Text style={[TextTheme.bodyLarge, { textAlign: "center" }]}>
             Lifetime Client Statistics
           </Text>
-          {isPageLoading ?
-            <View style={{ marginVertical: "5%", rowGap: 20, width: '100%' }}>
-              <ContentLoader
-                pRows={1}
-                pHeight={[40]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[40]}
-                pWidth={["100%"]}
-                active
-                title={false}
-
-              />
-              <ContentLoader
-                pRows={1}
-                pHeight={[40]}
-                pWidth={["100%"]}
-                active
-                title={false}
-              />
-            </View>
+          {isPageLoading ? <ClientDashboardLoader />
             :
             <View style={styles.listDataContainer}>
               {lifetimeData.map((item, index) => {
@@ -174,6 +151,9 @@ const ClientDashboard = () => {
                     icon={item.icon}
                     title={item.title}
                     value={value}
+                    titlePopoverEnabled
+                    titlePopoverText={item.titlePopoverText}
+                    popoverContainerStyle={{ width: "100%" }}
                   />
                 );
               })}
@@ -217,5 +197,6 @@ const styles = StyleSheet.create({
   },
   listDataContainer: {
     width: "100%",
+    marginBottom: '3%'
   },
 });
