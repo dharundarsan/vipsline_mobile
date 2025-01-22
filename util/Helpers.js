@@ -14,9 +14,9 @@ export function capitalizeFirstLetters(str) {
 }
 
 export function formatTime(date, format) {
-    let hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
+    let hours = date?.getHours();
+    const minutes = date?.getMinutes();
+    const seconds = date?.getSeconds();
     const period = hours >= 12 ? 'PM' : 'AM';
 
     // Convert hours from 24-hour to 12-hour format for "hh:mm pp" format
@@ -28,7 +28,10 @@ export function formatTime(date, format) {
         return `${twelveHour}:${formattedMinutes} ${period}`;
     } else if (format === "hh:mm:ss") {
         return `${hours.toString().padStart(2, '0')}:${formattedMinutes}:${formattedSeconds}`;
-    } else {
+    } else if (format === "hh:mm") {
+        return `${hours.toString().padStart(2, '0')}:${formattedMinutes}`;
+    }
+    else {
         throw new Error("Unsupported format");
     }
 }

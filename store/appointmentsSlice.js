@@ -44,14 +44,14 @@ export const initialAppointmentsState = {
     futureBookingsMaxEntry: 10,
     futureBookingsCount: 0,
     futureBookingsIsFetching: false,
-    futureBookingsFilterDate: new Date(),
+    futureBookingsFilterDate: moment().toISOString(),
 
     bookingsHistory: [],
     bookingsHistoryPageNo: 0,
     bookingsHistoryMaxEntry: 10,
     bookingsHistoryCount: 0,
     bookingsHistoryIsFetching: false,
-    bookingsHistoryFilterDate: new Date(),
+    bookingsHistoryFilterDate: moment().toISOString(),
 };
 
 export const appointmentsSlice = createSlice({

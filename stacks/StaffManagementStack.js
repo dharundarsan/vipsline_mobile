@@ -1,15 +1,18 @@
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import React from "react";
-import StaffManagementScreen from "../screens/StaffManagementScreen";
-import StaffListScreen from "../screens/StaffListScreen";
+import StaffManagementScreen from "../screens/staffs/StaffManagementScreen";
+import StaffListScreen from "../screens/staffs/StaffListScreen";
 import {Image, TouchableOpacity} from "react-native";
 import {useNavigation} from "@react-navigation/native";
-import {useDispatch, useSelector} from "react-redux";
 
 import {AntDesign} from "@expo/vector-icons";
-import StaffInfo from "../screens/StaffInfo";
+import StaffInfo from "../screens/staffs/StaffInfo";
 import sample from "../components/staffManagementScreen/Sample";
 import Sample from "../components/staffManagementScreen/Sample";
+import StaffTiming from "../screens/staffs/ShiftTiming";
+import ShiftTiming from "../screens/staffs/ShiftTiming";
+import BusinessClosedDates from "../screens/staffs/BusinessClosedDates";
+import StaffTimeOffTypeScreen from "../screens/staffs/StaffTimeOffTypeScreen";
 
 export const BackButton = () => {
     const navigation = useNavigation();
@@ -67,7 +70,7 @@ const StaffManagementStack = ({route, navigation}) => {
         />
         <Stack.Screen
             name="Shift Timing"
-            component={Sample}
+            component={ShiftTiming}
             options={{
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -116,7 +119,7 @@ const StaffManagementStack = ({route, navigation}) => {
         />
         <Stack.Screen
             name="Business Closed Dates"
-            component={StaffListScreen}
+            component={BusinessClosedDates}
             options={{
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -127,8 +130,8 @@ const StaffManagementStack = ({route, navigation}) => {
 
         />
         <Stack.Screen
-            name="Staff Off Type"
-            component={StaffListScreen}
+            name="Time Off Type"
+            component={StaffTimeOffTypeScreen}
             options={{
                 headerShown: true,
                 headerTitleAlign: "center",

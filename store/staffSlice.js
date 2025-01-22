@@ -7,6 +7,9 @@ const initialStaffState = {
     staffs: [],
     allServices: [],
     isFetching: false,
+    shiftTiming: [],
+    businessClosedDates: [],
+    timeOffType: [],
 };
 
 
@@ -85,8 +88,6 @@ export const updateCartItemStaff = (res_list) => async (dispatch, getState) => {
 
 export const getAllServicesFromDb = (resource_id) => async (dispatch, getState) => {
     const {staff} = getState();
-
-    console.log(1)
     if(staff.isFetching) return;
 
     let authToken = ""
@@ -122,6 +123,112 @@ export const getAllServicesFromDb = (resource_id) => async (dispatch, getState) 
     }
 }
 
+export const loadShiftTiming = () => async (dispatch, getState) => {
+    const {staff} = getState();
+    if(staff.isFetching) return;
+    let authToken = ""
+    try {
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside staffSlice loadStaffsFromDb)" + e);
+    }
+
+
+    try {
+        dispatch(updateIsFetching(true));
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/staffschedule/getListOfShiftTimingsByBusiness`,
+            {
+                business_id: `${await getBusinessId()}`,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            }
+        );
+        dispatch(updateShiftTiming(response.data.data));
+        dispatch(updateIsFetching(false));
+    } catch (error) {
+        dispatch(updateIsFetching(false));
+    }
+}
+
+export const loadBusinessClosedDates = () => async (dispatch, getState) => {
+    const {staff} = getState();
+    if(staff.isFetching) return;
+    let authToken = ""
+    try {
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("auth token fetching error. (inside staffSlice loadStaffsFromDb)" + e);
+    }
+
+
+    try {
+        dispatch(updateIsFetching(true));
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/staffschedule/getListOfBusinessHolidaysByBusinessId`,
+            {
+                business_id: `${await getBusinessId()}`,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            }
+        );
+        dispatch(updateBusinessClosedDates(response.data.data));
+        dispatch(updateIsFetching(false));
+    } catch (error) {
+        dispatch(updateIsFetching(false));
+    }
+}
+
+export const loadTimeOffTypeFromDb = () => async (dispatch, getState) => {
+    const {staff} = getState();
+    if(staff.isFetching) return;
+    let authToken = ""
+    try {
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+
+        console.log("auth token fetching error. (inside staffSlice loadStaffsFromDb)" + e);
+    }
+
+
+    try {
+        dispatch(updateIsFetching(true));
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/staffschedule/getListOfTimeOffTypesByBusinessId`,
+            {
+                business_id: `${await getBusinessId()}`,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            }
+        );
+        dispatch(updateTimeOffType(response.data.data));
+        dispatch(updateIsFetching(false));
+    } catch (error) {
+        dispatch(updateIsFetching(false));
+    }
+}
+
 export const staffSlice = createSlice({
     name: "staffs",
     initialState: initialStaffState,
@@ -134,6 +241,15 @@ export const staffSlice = createSlice({
         },
         updateIsFetching(state, action) {
             state.isFetching = action.payload;
+        },
+        updateShiftTiming(state, action) {
+            state.shiftTiming = action.payload;
+        },
+        updateBusinessClosedDates: (state, action) => {
+            state.businessClosedDates = action.payload;
+        },
+        updateTimeOffType(state, action) {
+            state.timeOffType = action.payload;
         }
     }
 });
@@ -141,7 +257,10 @@ export const staffSlice = createSlice({
 export const {
     updateStaffs,
     updateAllServices,
-    updateIsFetching
+    updateIsFetching,
+    updateShiftTiming,
+    updateBusinessClosedDates,
+    updateTimeOffType
 } = staffSlice.actions;
 
 export default staffSlice.reducer;

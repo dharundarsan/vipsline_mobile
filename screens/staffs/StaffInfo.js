@@ -1,12 +1,11 @@
 import {View, StyleSheet, Text} from "react-native";
 import {useLayoutEffect, useState} from "react";
-import Swiper from 'react-native-swiper'
-import Colors from "../constants/Colors";
-import PrimaryButton from "../ui/PrimaryButton";
-import textTheme from "../constants/TextTheme";
-import StaffProfile from "../components/staffManagementScreen/StaffProfile";
-import Workspace from "../components/staffManagementScreen/Workspace";
-import CustomSwiper from "../components/common/CustomSwiper";
+import Colors from "../../constants/Colors";
+import PrimaryButton from "../../ui/PrimaryButton";
+import textTheme from "../../constants/TextTheme";
+import StaffProfile from "../../components/staffManagementScreen/StaffProfile";
+import Workspace from "../../components/staffManagementScreen/Workspace";
+import CustomSwiper from "../../components/common/CustomSwiper";
 
 export default function StaffInfo(props) {
     useLayoutEffect(() => {

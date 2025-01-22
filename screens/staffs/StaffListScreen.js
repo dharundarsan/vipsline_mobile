@@ -1,16 +1,16 @@
 import {Text, View, StyleSheet, FlatList} from "react-native";
-import PrimaryButton from "../ui/PrimaryButton";
-import Colors from "../constants/Colors";
-import textTheme from "../constants/TextTheme";
+import PrimaryButton from "../../ui/PrimaryButton";
+import Colors from "../../constants/Colors";
+import textTheme from "../../constants/TextTheme";
 import {useEffect, useRef, useState} from "react";
-import {updateNavigationState} from "../store/NavigationSlice";
+import {updateNavigationState} from "../../store/NavigationSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {FAB} from "react-native-paper";
 import {useNavigation} from "@react-navigation/native";
-import AddStaffModal from "../components/staffManagementScreen/addStaffModal";
-import {loadStaffsFromDB} from "../store/staffSlice";
-import Toast from "../ui/Toast";
-import {capitalizeFirstLetter} from "../util/Helpers";
+import AddStaffModal from "../../components/staffManagementScreen/addStaffModal";
+import {loadStaffsFromDB} from "../../store/staffSlice";
+import Toast from "../../ui/Toast";
+import {capitalizeFirstLetter} from "../../util/Helpers";
 
 const RADIUS = 50;
 
