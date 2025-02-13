@@ -99,6 +99,8 @@ export default function AddShiftTimingModal(props) {
         visible={props.visible}
         animationType="slide"
         style={styles.modal}
+        onRequestClose={props.onClose}
+        presentationStyle={"formSheet"}
     >
 
         <BottomActionCard isVisible={isConfirmStaffDeleteModalVisible}
