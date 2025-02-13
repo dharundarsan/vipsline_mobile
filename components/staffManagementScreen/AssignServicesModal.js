@@ -91,6 +91,8 @@ export default function AssignServicesModal(props) {
     return <Modal
         visible={props.visible}
         animationType={"slide"}
+        onRequestClose={props.onClose}
+        presentationStyle={"formSheet"}
     >
         <Toast ref={toastRef}/>
         <View style={styles.closeAndHeadingContainer}>

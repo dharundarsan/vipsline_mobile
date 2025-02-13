@@ -33,11 +33,14 @@ const ActiveBookings = () => {
     const dispatch = useDispatch()
     const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
 
+
+
     useLayoutEffect(() => {
         const apiCall = async () => {
             await dispatch(loadFutureBookingsFromDB())
         }
         apiCall()
+
     }, [futureBookingsFilterDate]);
 
     return <View style={{flex: 1, backgroundColor: "white"}}>
@@ -69,7 +72,9 @@ const ActiveBookings = () => {
                                     }}
                                     handleConfirm={(selectedDate) => {
                                         dispatch(setFutureBookingsFilterDate(moment(selectedDate).toISOString()))
-                                    }}/>
+                                    }}
+                                    range={"day"}
+            />
             {futureBookings.length === 0 ?
                 <View style={{height: 500}}>
                     <Text style={[textTheme.titleMedium, {flex: 1, textAlign: "center", textAlignVertical: "center"}]}>No
