@@ -32,7 +32,7 @@ const BottomActionCard = ({
     if (!isVisible) return null;
 
     useEffect(() => {
-        console.log("Rendering");
+        // console.log("Rendering");
     });
 
     return (

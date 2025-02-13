@@ -41,7 +41,7 @@ const InvoiceModal = (props) => {
     const invoiceDetails = useSelector(state => state.invoice.invoiceDetails);
 
     const selectedClientDetails = useSelector(state => state.clientInfo.details);
-    console.log(JSON.stringify(selectedClientDetails, null, 3));
+    // console.log(JSON.stringify(selectedClientDetails, null, 3));
 
     const dispatch = useDispatch();
 

@@ -1,20 +1,20 @@
 import {Text, View, StyleSheet, FlatList, Image} from "react-native";
-import PrimaryButton from "../ui/PrimaryButton";
-import {capitalizeFirstLetter, capitalizeFirstLetters} from "../util/Helpers";
+import PrimaryButton from "../../ui/PrimaryButton";
+import {capitalizeFirstLetter, capitalizeFirstLetters} from "../../util/Helpers";
 import {MaterialIcons} from "@expo/vector-icons";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import {Divider} from "react-native-paper";
-import staffListIcon from "../assets/icons/staffIcons/staff_list.png";
-import shiftTimingIcon from "../assets/icons/staffIcons/shift_timing.png";
-import workingHoursIcon from "../assets/icons/staffIcons/working_hours.png";
-import commissionProfileIcon from "../assets/icons/staffIcons/commission_profile.png";
-import staffCommissionIcon from "../assets/icons/staffIcons/staff_commission.png";
-import businessClosedDates from "../assets/icons/staffIcons/staff_commission.png";
-import staffOffTypeIcon from "../assets/icons/staffIcons/staff_off_type.png";
-import {useLocationContext} from "../context/LocationContext";
+import staffListIcon from "../../assets/icons/staffIcons/staff_list.png";
+import shiftTimingIcon from "../../assets/icons/staffIcons/shift_timing.png";
+import workingHoursIcon from "../../assets/icons/staffIcons/working_hours.png";
+import commissionProfileIcon from "../../assets/icons/staffIcons/commission_profile.png";
+import staffCommissionIcon from "../../assets/icons/staffIcons/staff_commission.png";
+import businessClosedDates from "../../assets/icons/staffIcons/business_closed_dates.png";
+import staffOffTypeIcon from "../../assets/icons/staffIcons/staff_off_type.png";
+import {useLocationContext} from "../../context/LocationContext";
 import {useFocusEffect} from "@react-navigation/native";
 import {useCallback, useEffect} from "react";
-import {updateNavigationState} from "../store/NavigationSlice";
+import {updateNavigationState} from "../../store/NavigationSlice";
 import {useDispatch} from "react-redux";
 
 export default function StaffManagementScreen({navigation}) {
@@ -64,7 +64,7 @@ export default function StaffManagementScreen({navigation}) {
             icon: businessClosedDates,
         },
         {
-            label: "Staff off type",
+            label: "Time off type",
             icon: staffOffTypeIcon,
         }
     ];

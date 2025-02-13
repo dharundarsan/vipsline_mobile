@@ -1,8 +1,10 @@
 import {Pressable, StyleSheet, Text, View, Platform} from "react-native";
 import Colors from "../constants/Colors";
 import TextTheme from "../constants/TextTheme";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import * as Haptics from "expo-haptics";
+import { Audio } from "expo-av";
+
 
 /**
  * PrimaryButton component for reusable styled button with custom text and press handling.
@@ -23,6 +25,26 @@ import * as Haptics from "expo-haptics";
  * @returns {React.ReactElement} A styled button component.
  */
 const PrimaryButton = (props) => {
+
+    const playClickSound = async () => {
+        try {
+            const { sound } = await Audio.Sound.createAsync(
+                require("../assets/sound/key_press.wav"), // Ensure this path is correct
+                { shouldPlay: true } // Ensures the sound plays immediately
+            );
+            await sound.setPositionAsync(0); // Reset sound position
+            await sound.playAsync();
+            sound.setOnPlaybackStatusUpdate(status => {
+                if (status.didJustFinish) {
+                    sound.unloadAsync(); // Unload to free memory after playback
+                }
+            });
+        } catch (error) {
+            console.error("Error playing sound:", error);
+        }
+    };
+
+
     const styles = StyleSheet.create({
         primaryButton: {
             justifyContent: "center",
@@ -49,6 +71,7 @@ const PrimaryButton = (props) => {
     return (
         <View style={[styles.primaryButton, props.buttonStyle]}>
             <Pressable
+
                 disabled={props.disabled}
                 style={({pressed}) => [
                     styles.pressable,
@@ -57,11 +80,12 @@ const PrimaryButton = (props) => {
                         ios: props.disableRipple ? {} : {opacity: pressed ? 0.3 : 1},
                     }),
                 ]}
-                onPress={() => {
-                    Haptics.selectionAsync()
-                    if (props.onPress !== undefined) props.onPress()
+                onPress={async () => {
+                    // await playClickSound(); // Play click sound
+                    if (props.onPress) props.onPress(); // Execute user-defined onPress
                 }}
                 android_ripple={props.disableRipple ? {} : {color: props.rippleColor ? props.rippleColor : 'rgba(0, 0, 0, 0.1)'}}
+                {...props}
             >
                 {props.children ? props.children :
                     <Text style={[TextTheme.titleSmall, styles.buttonLabel, props.textStyle]}>

@@ -11,6 +11,8 @@ import Toast from "../../ui/Toast";
 import {useSelector} from "react-redux";
 
 import { createSelector } from 'reselect';
+import resendEmailInvite from "../../apis/staffManagementAPIs/resendEmailInviteAPI";
+import toast from "../../ui/Toast";
 
 const selectStaffById = createSelector(
     (state) => state.staff.staffs, // Input selector
@@ -30,20 +32,24 @@ export default function StaffProfile(props) {
     const [editStaffModalVisibility, setEditStaffModalVisibility] = useState(false);
     const toastRef = useRef(null);
 
+    // console.log(JSON.stringify(details, null, 2));
 
 
 
 
 
 
-    return <ScrollView
+
+    return <View style={{flex: 1}}>
+        <Toast
+            ref={toastRef}
+        />
+    <ScrollView
         style={styles.staffProfile}
         contentContainerStyle={{alignItems: "center"}}
         showsVerticalScrollIndicator={false}
     >
-        <Toast
-            ref={toastRef}
-        />
+
         {
             editStaffModalVisibility &&
             <AddStaffModal
@@ -179,6 +185,16 @@ export default function StaffProfile(props) {
                             <TouchableOpacity
                                 activeOpacity={0.7}
                                 style={styles.resendEmailButton}
+                                onPress={async () => {
+                                    const response = await resendEmailInvite(details.id, details.user_id);
+                                    if(response.data.other_message === "") {
+                                        toastRef.current.show(response.data.message)
+                                    }
+                                    else {
+                                        toastRef.current.show(response.data.other_message);
+                                    }
+                                }}
+
                             >
                                 <Text style={[textTheme.bodyMedium, styles.resendEmailButtonLabel]}>
                                     Resend email Invite
@@ -194,6 +210,7 @@ export default function StaffProfile(props) {
 
         </View>
     </ScrollView>
+    </View>
 }
 
 const styles = StyleSheet.create({

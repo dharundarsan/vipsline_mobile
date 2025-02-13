@@ -113,6 +113,11 @@ const CustomTextInput = (props) => {
                 cursorColor={props.cursorColor}
                 onFocus={props.onFocus}
                 secureTextEntry={props.secureTextEntry}
+                scrollEnabled={props.scrollEnabled}
+                editable={props.editable}
+                selectTextOnFocus={props.selectTextOnFocus}
+                onPress={props.onPress}
+
             />
         );
     } else if (props.type === "email") {
@@ -246,18 +251,25 @@ const CustomTextInput = (props) => {
                     dropdownItems={props.dropdownItems}
                 />
                 <PrimaryButton
-                    buttonStyle={styles.dropdownButton}
-                    pressableStyle={styles.dropdownButtonPressable}
-                    onPress={() => props.dropdownOnPress !== undefined ? props.dropdownOnPress ? setIsDropdownModalVisible(true) : setIsDropdownModalVisible(false) : setIsDropdownModalVisible(true)}
+                    buttonStyle={[styles.dropdownButton, props.dropdownButton]}
+                    pressableStyle={[styles.dropdownButtonPressable, props.dropdownPressable]}
+                    onPress={() => (props.dropdownOnPress !== undefined ?
+                        props.dropdownOnPress ?
+                            setIsDropdownModalVisible(true) :
+                            setIsDropdownModalVisible(false) :
+                        setIsDropdownModalVisible(true))
+
+                }
                 >
 
                     {props.object ? <Text style={[textTheme.bodyLarge]}>
                         {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value.name}
-                    </Text> : <Text style={[textTheme.bodyLarge]}>
+                    </Text> : <Text style={[textTheme.bodyLarge, props.dropdownLabelTextStyle]}>
                         {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value}
                     </Text>}
                     <FontAwesome name="angle-down" size={24} color="black"/>
                 </PrimaryButton>
+                {props.children}
             </>
         );
     } else if (props.type === "date") {
@@ -298,6 +310,7 @@ const CustomTextInput = (props) => {
                     pressableStyle={styles.dateTimeButtonPressable}
                     disableRipple={props.readOnly}
                     onPress={ props.readOnly ? () => {} : () => setIsDateTimePickerVisible(true)}
+                    onLongPress={props.onLongPress}
                 >
                     <Text
                         style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>

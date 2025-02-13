@@ -1,9 +1,9 @@
 import {View, Text, StyleSheet} from 'react-native';
-import SignInHeader from "../components/authScreen/SignInHeader";
+import SignInHeader from "../../components/authScreen/SignInHeader";
 import {SafeAreaView} from "react-native-safe-area-context";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import {StatusBar} from "expo-status-bar";
-import VerificationCodeBody from "../components/verificationCodeScreen/VerificationCodeBody"
+import VerificationCodeBody from "../../components/verificationCodeScreen/VerificationCodeBody"
 
 
 

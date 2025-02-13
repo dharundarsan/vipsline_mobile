@@ -97,6 +97,7 @@ export default function AdvancedFilters(props) {
                        checkBoxSize={30}
                        selectedOptions={selectedOptions}
                        setSelectedOptions={setSelectedOptions}
+                       placeholder={"Choose filters"}
 
                    />
 

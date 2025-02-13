@@ -27,13 +27,13 @@ import ClientSegmentScreen from "../screens/ClientSegmentScreen";
 import clients_icon from "../assets/icons/drawerIcons/clients.png";
 import LeadManagementStack from "../stacks/LeadManagementStack";
 import lead_management_icon from "../assets/icons/drawerIcons/lead_management.png";
-import Expenses from "../screens/Expenses";
+import Expenses from "../screens/expenses/Expenses";
 import staffs_icon from "../assets/icons/drawerIcons/staffs.png";
 import reports_icon from "../assets/icons/drawerIcons/reports.png"
 import expenses_icon from "../assets/icons/drawerIcons/expenses.png";
 import ListOfBusinessesScreen from "../screens/ListOfBusinessesScreen";
 import list_of_businesses_icon from "../assets/icons/drawerIcons/list_of_businesses.png";
-import signOutScreen from "../screens/signOutScreen";
+import signOutScreen from "../screens/Auth/signOutScreen";
 import logout_icon from "../assets/icons/drawerIcons/logout.png";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import {
@@ -45,7 +45,7 @@ import {
 import {formatDateYYYYMMDD, formatDateYYYYMMDDD, getFirstDateOfCurrentMonthYYYYMMDD} from "../util/Helpers";
 import {AntDesign} from "@expo/vector-icons";
 import BottomActionCard from "../ui/BottomActionCard";
-import StaffManagementScreen from "../screens/StaffManagementScreen";
+import StaffManagementScreen from "../screens/staffs/StaffManagementScreen";
 import staffManagementStack from "../stacks/StaffManagementStack";
 import CustomCancelSale from "../ui/CustomCancelSale";
 import ReportStack from "../stacks/ReportStack";

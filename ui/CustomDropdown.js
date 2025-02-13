@@ -34,13 +34,22 @@ const CustomDropdown = (props) => {
 
     return (
         <View style={[styles.container, props.container]}>
+            {
+                props.label === undefined || props.labelEnabled === false ? <></> :
+                <Text style={[textTheme.bodyMedium, {marginVertical: 6}, props.labelStyle]}>{props.label}</Text>
+            }
             <TouchableOpacity
                 ref={dropdownButtonRef}
                 onLayout={onDropdownButtonLayout}
                 onPress={toggleDropdown}
                 style={styles.dropdownButton}
             >
-                <Text style={[textTheme.bodyLarge, {paddingLeft: 8}]}>Choose filters</Text>
+                <Text style={[textTheme.bodyLarge, {paddingLeft: 8}]}>
+                    {
+                        props.placeholder === undefined || props.placeholder === "" ?
+                            "Select " + props.label : props.placeholder
+                    }
+                </Text>
                 <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
             </TouchableOpacity>
 
@@ -65,6 +74,7 @@ const CustomDropdown = (props) => {
                             </TouchableOpacity>
                         )}
                         ItemSeparatorComponent={() => <Divider />}
+                        scrollEnabled={props.scrollEnabled}
                     />
                 </View>
             )}

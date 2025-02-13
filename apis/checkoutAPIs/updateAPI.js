@@ -3,8 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 
 export default async function updateAPI(response, mode_of_payment, splitUpState, clientInfo) {
     let authToken = "";
-    console.log("response");
-    console.log(response);
+    // console.log("response");
+    // console.log(response);
     
     let businessId = "";
     try {
