@@ -136,7 +136,7 @@ export const leadManagementSlice = createSlice({
             state.leadSources = action.payload;
         },
         updateAdvancedFilters(state, action) {
-            console.log(action.payload)
+            // console.log(action.payload)
             if (action.payload.field === "followupDate") {
                 state.followupDate = action.payload.value;
             } else if (action.payload.field === "followupEndDate") {

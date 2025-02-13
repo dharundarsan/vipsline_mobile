@@ -6,6 +6,22 @@ const ThreeDotActionIndicator = (props) => {
     const [scale2] = useState(new Animated.Value(1));
     const [scale3] = useState(new Animated.Value(1));
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        dot: {
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: props.color === undefined ? "white" : props.color,
+            marginHorizontal: 5,
+        },
+    });
+
     useEffect(() => {
         const animateDots = () => {
             Animated.sequence([
@@ -77,20 +93,6 @@ const ThreeDotActionIndicator = (props) => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    dot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: '#ffffff',
-        marginHorizontal: 5,
-    },
-});
+
 
 export default ThreeDotActionIndicator;

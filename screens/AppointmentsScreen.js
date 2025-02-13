@@ -83,7 +83,7 @@ export default function StaffCalendar() {
                         </Text>
                         <TouchableOpacity
                             onPress={() => {
-                                console.log(`Booking confirmed for ${selectedStaff?.name} at ${selectedTime?.toLocaleTimeString()}`)
+                                // console.log(`Booking confirmed for ${selectedStaff?.name} at ${selectedTime?.toLocaleTimeString()}`)
                                 setIsModalVisible(false)
                             }}
                             style={styles.confirmButton}

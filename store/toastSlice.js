@@ -10,7 +10,7 @@ export const toastSlice = createSlice({
     initialState: initialRefState,
     reducers: {
         updateToastRef(state, action) {
-            console.log(action.payload)
+            // console.log(action.payload)
             state.currentRef = action.payload;
         },
     }

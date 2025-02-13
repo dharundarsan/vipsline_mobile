@@ -1,29 +1,29 @@
 import {View, StyleSheet, Text, Image, FlatList} from "react-native";
-import textTheme from "../constants/TextTheme";
-import PrimaryButton from "../ui/PrimaryButton";
+import textTheme from "../../constants/TextTheme";
+import PrimaryButton from "../../ui/PrimaryButton";
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import RecordExpenses from "../components/expensesScreen/RecordExpenses";
-import SearchBar from "../ui/SearchBar";
-import Colors from "../constants/Colors";
+import RecordExpenses from "../../components/expensesScreen/RecordExpenses";
+import SearchBar from "../../ui/SearchBar";
+import Colors from "../../constants/Colors";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import ExpenseFilters from "../components/expensesScreen/ExpenseFilters";
+import ExpenseFilters from "../../components/expensesScreen/ExpenseFilters";
 import {useDispatch, useSelector} from "react-redux";
 import {
     loadExpensesFromDb,
     loadSearchExpensesFromDb, resetExpensesPageNo,
     updateCurrentExpense,
     updateCurrentExpensesId, updateFilters
-} from "../store/ExpensesSlice";
-import {capitalizeFirstLetter, dateFormatter} from "../util/Helpers";
-import ExpensesPagination from "../components/expensesScreen/ExpensesPagination";
-import EntryModal from "../components/expensesScreen/EntryModal";
+} from "../../store/ExpensesSlice";
+import {capitalizeFirstLetter, dateFormatter} from "../../util/Helpers";
+import ExpensesPagination from "../../components/expensesScreen/ExpensesPagination";
+import EntryModal from "../../components/expensesScreen/EntryModal";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import {useFocusEffect} from "@react-navigation/native";
-import SearchExpensesPagination from "../components/expensesScreen/SearchExpensesPagination";
-import {loadBusinessNotificationDetails} from "../store/listOfBusinessSlice";
+import SearchExpensesPagination from "../../components/expensesScreen/SearchExpensesPagination";
+import {loadBusinessNotificationDetails} from "../../store/listOfBusinessSlice";
 import {Col} from "react-native-table-component";
 import moment from "moment/moment";
-import Toast from "../ui/Toast";
+import Toast from "../../ui/Toast";
 
 
 export default function Expenses() {
@@ -202,7 +202,7 @@ export default function Expenses() {
 
                     <View style={styles.countContainer}>
                         <View style={styles.countInnerContainer}>
-                            <Image source={require("../assets/icons/menu.png")} style={styles.menuImage}/>
+                            <Image source={require("../../assets/icons/menu.png")} style={styles.menuImage}/>
                             <Text style={[textTheme.titleSmall]}>
                                 Total Count: <Text style={[textTheme.titleSmall, {color: Colors.highlight}]}>
                                 {totalExpensesCount}

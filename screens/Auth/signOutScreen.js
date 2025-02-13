@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
-import PrimaryButton from "../ui/PrimaryButton";
+import PrimaryButton from "../../ui/PrimaryButton";
 import {useDispatch} from "react-redux";
-import {clearBusinessId, clearInBusiness, updateAuthStatus} from "../store/authSlice";
-import { clearListOfBusiness } from '../store/listOfBusinessSlice';
-import { useLocationContext } from '../context/LocationContext';
+import {clearBusinessId, clearInBusiness, updateAuthStatus} from "../../store/authSlice";
+import { clearListOfBusiness } from '../../store/listOfBusinessSlice';
+import { useLocationContext } from '../../context/LocationContext';
 import { useFocusEffect } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store'
 
@@ -47,7 +47,7 @@ const SignOutPrompt = ({ navigation }) => {
             [
                 {
                     text: "No",
-                    onPress: () => console.log("Sign out canceled"),
+                    // onPress: () => console.log("Sign out canceled"),
                     style: "cancel"
                 },
                 { text: "Yes", onPress: handleSignOut }

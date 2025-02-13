@@ -1,18 +1,42 @@
 import {Text, View, StyleSheet, FlatList, Image} from "react-native";
-import PrimaryButton from "../ui/PrimaryButton";
-import {capitalizeFirstLetter, capitalizeFirstLetters} from "../util/Helpers";
+import PrimaryButton from "../../ui/PrimaryButton";
+import {capitalizeFirstLetter, capitalizeFirstLetters} from "../../util/Helpers";
 import {MaterialIcons} from "@expo/vector-icons";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import {Divider} from "react-native-paper";
-import staffListIcon from "../assets/icons/staffIcons/staff_list.png";
-import shiftTimingIcon from "../assets/icons/staffIcons/shift_timing.png";
-import workingHoursIcon from "../assets/icons/staffIcons/working_hours.png";
-import commissionProfileIcon from "../assets/icons/staffIcons/commission_profile.png";
-import staffCommissionIcon from "../assets/icons/staffIcons/staff_commission.png";
-import businessClosedDates from "../assets/icons/staffIcons/staff_commission.png";
-import staffOffTypeIcon from "../assets/icons/staffIcons/staff_off_type.png";
+import staffListIcon from "../../assets/icons/staffIcons/staff_list.png";
+import shiftTimingIcon from "../../assets/icons/staffIcons/shift_timing.png";
+import workingHoursIcon from "../../assets/icons/staffIcons/working_hours.png";
+import commissionProfileIcon from "../../assets/icons/staffIcons/commission_profile.png";
+import staffCommissionIcon from "../../assets/icons/staffIcons/staff_commission.png";
+import businessClosedDates from "../../assets/icons/staffIcons/business_closed_dates.png";
+import staffOffTypeIcon from "../../assets/icons/staffIcons/staff_off_type.png";
+import {useLocationContext} from "../../context/LocationContext";
+import {useFocusEffect} from "@react-navigation/native";
+import {useCallback, useEffect} from "react";
+import {updateNavigationState} from "../../store/NavigationSlice";
+import {useDispatch} from "react-redux";
 
 export default function StaffManagementScreen({navigation}) {
+
+    const dispatch = useDispatch();
+
+    // const { getLocation } = useLocationContext()
+    // useFocusEffect(useCallback(() => {
+    //     getLocation("Staff Management");
+    // }, []))
+
+    // useEffect(() => {
+    //     dispatch(updateNavigationState("Staff Management"));
+    // }, []);
+
+    useFocusEffect(useCallback(() => {
+        setTimeout(() => {
+            dispatch(updateNavigationState("Staff Management"));
+
+        }, 100)
+
+    }, []))
 
     const staffCategories = [
         {
@@ -40,14 +64,16 @@ export default function StaffManagementScreen({navigation}) {
             icon: businessClosedDates,
         },
         {
-            label: "Staff off type",
+            label: "Time off type",
             icon: staffOffTypeIcon,
         }
     ];
 
     function renderItem({item}) {
         return <PrimaryButton
-            onPress={() => navigation.navigate(capitalizeFirstLetters(item.label))}
+            onPress={() => {
+                navigation.navigate(capitalizeFirstLetters(item.label));
+            }}
             pressableStyle={styles.buttonStyle}
             rippleColor={Colors.ripple}
             buttonStyle={{backgroundColor: Colors.white}}

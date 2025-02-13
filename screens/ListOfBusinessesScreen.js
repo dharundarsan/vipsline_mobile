@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Platform, ScrollView, FlatList} from 'react-native';
+import {View, Text, StyleSheet, Platform, ScrollView, FlatList, RefreshControl} from 'react-native';
 import textTheme from "../constants/TextTheme";
 import Colors from "../constants/Colors";
 import Divider from "../ui/Divider";
@@ -6,6 +6,7 @@ import BusinessCard from "../components/listOfBusinessesScreen/BusinessCard";
 import {useDispatch, useSelector} from "react-redux";
 import {updateBusinessId, updateInBusiness} from "../store/authSlice";
 import {
+    loadBusinessesListFromDb,
     updateIsBusinessSelected,
     updateSelectedBusinessDetails
 } from "../store/listOfBusinessSlice";
@@ -33,6 +34,8 @@ export default function ListOfBusinessesScreen({navigation}) {
     const dispatch = useDispatch();
     const {getLocation, currentLocation, reload, setReload} = useLocationContext();
     const toastRef = useRef();
+
+    const [refreshing, setRefreshing] = useState(false)
 
 
     useFocusEffect(useCallback(() => {
@@ -131,7 +134,25 @@ export default function ListOfBusinessesScreen({navigation}) {
             <View style={{flex: 1}}>
 
                 <Toast ref={toastRef}/>
-                <ScrollView style={styles.listOfBusinesses} contentContainerStyle={{alignItems: "center"}}>
+                <ScrollView
+                    style={styles.listOfBusinesses}
+                    contentContainerStyle={{alignItems: "center"}}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                                onRefresh={() => {
+                                    setRefreshing(true);
+                                    dispatch(loadBusinessesListFromDb());
+                                    setTimeout(() => {
+                                        setRefreshing(false)
+                                    }, 1000)
+                                }}
+                        />
+                    }
+
+
+
+                >
 
                     <Divider/>
                     <View style={styles.body}>
@@ -148,6 +169,7 @@ export default function ListOfBusinessesScreen({navigation}) {
                             style={styles.listStyle}
                             scrollEnabled={false}
                             contentContainerStyle={{gap: 16, borderRadius: 8, overflow: 'hidden'}}
+
                         />
                     </View>
 
