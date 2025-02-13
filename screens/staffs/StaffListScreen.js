@@ -11,6 +11,7 @@ import AddStaffModal from "../../components/staffManagementScreen/addStaffModal"
 import {loadStaffsFromDB} from "../../store/staffSlice";
 import Toast from "../../ui/Toast";
 import {capitalizeFirstLetter} from "../../util/Helpers";
+import StaffCard from "../../components/staffManagementScreen/StaffCard";
 
 const RADIUS = 50;
 
@@ -32,16 +33,12 @@ export default function StaffListScreen() {
     const staffs = useSelector((state) => state.staff.staffs);
 
     const toastRef = useRef(null);
-
-    // console.log(staffs)
+    
 
 
 
     function renderItem({item}) {
-        return <PrimaryButton
-            buttonStyle={styles.staffCard}
-            pressableStyle={styles.staffCardPressable}
-            rippleColor={Colors.ripple}
+        return <StaffCard
             onPress={() => {
                 navigation.navigate("Staff Name", {
                     name: item.name,
@@ -49,14 +46,8 @@ export default function StaffListScreen() {
                 })
 
             }}
-        >
-            <View style={styles.staffAvatar} >
-                <Text style={[textTheme.titleMedium, {color: Colors.highlight, fontSize: 16, textAlign: "center"}]}>
-                    {item.name.charAt(0).toUpperCase()}
-                </Text>
-            </View>
-            <Text style={[textTheme.labelLarge]}>{capitalizeFirstLetter(item.name)}</Text>
-        </PrimaryButton>
+            name={item.name}
+        />
     }
 
 

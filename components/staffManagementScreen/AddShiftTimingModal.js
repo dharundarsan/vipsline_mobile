@@ -85,7 +85,7 @@ export default function AddShiftTimingModal(props) {
 
         if(response.data.other_message === "") {
             props.toastRef.current.show(response.data.message)
-
+            dispatch(loadShiftTiming());
             props.onClose();
         }
         else {

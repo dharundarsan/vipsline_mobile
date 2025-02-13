@@ -8,7 +8,7 @@ import {useEffect, useRef, useState} from "react";
 import AddAndUpdateTimeOffTypeModal from "../../components/staffManagementScreen/AddAndUpdateTimeOffTypeModal";
 import Toast from "../../ui/Toast";
 import {useDispatch, useSelector} from "react-redux";
-import {loadTimeOffTypeFromDb} from "../../store/staffSlice";
+import {loadTimeOffTypeFromDb, updateIsFetching} from "../../store/staffSlice";
 import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
 
 export default function StaffTimeOffTypeScreen(props) {
@@ -82,10 +82,10 @@ export default function StaffTimeOffTypeScreen(props) {
             ItemSeparatorComponent={() => <Divider />}
             refreshing={refresh}
             onRefresh={() => {
-                setRefresh(true);
+                dispatch(updateIsFetching(true));
                 dispatch(loadTimeOffTypeFromDb());
                 setTimeout(() => {
-                    setRefresh(false);
+                    dispatch(updateIsFetching(false));
                 }, 1000)
             }}
 

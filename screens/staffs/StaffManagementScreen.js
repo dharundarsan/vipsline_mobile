@@ -9,7 +9,7 @@ import shiftTimingIcon from "../../assets/icons/staffIcons/shift_timing.png";
 import workingHoursIcon from "../../assets/icons/staffIcons/working_hours.png";
 import commissionProfileIcon from "../../assets/icons/staffIcons/commission_profile.png";
 import staffCommissionIcon from "../../assets/icons/staffIcons/staff_commission.png";
-import businessClosedDates from "../../assets/icons/staffIcons/staff_commission.png";
+import businessClosedDates from "../../assets/icons/staffIcons/business_closed_dates.png";
 import staffOffTypeIcon from "../../assets/icons/staffIcons/staff_off_type.png";
 import {useLocationContext} from "../../context/LocationContext";
 import {useFocusEffect} from "@react-navigation/native";

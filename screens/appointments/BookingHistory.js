@@ -155,7 +155,9 @@ const BookingHistory = () => {
                                     }}
                                     handleConfirm={(selectedDate) => {
                                         dispatch(setBookingsHistoryFilterDate(new Date(selectedDate.getTime())))
-                                    }}/>
+                                    }}
+                                    range={"day"}
+            />
             {isFetching ? <View>
                     <ActivityIndicator/>
                 </View> :

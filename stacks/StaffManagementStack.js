@@ -13,14 +13,25 @@ import StaffTiming from "../screens/staffs/ShiftTiming";
 import ShiftTiming from "../screens/staffs/ShiftTiming";
 import BusinessClosedDates from "../screens/staffs/BusinessClosedDates";
 import StaffTimeOffTypeScreen from "../screens/staffs/StaffTimeOffTypeScreen";
+import WorkingHours from "../screens/staffs/WorkingHours";
+import {useDispatch} from "react-redux";
+import {clearSchedulesForStaff} from "../store/staffSlice";
+import CommissionProfileScreen from "../screens/staffs/CommissionProfileScreen";
+import StaffCommissionScreen from "../screens/staffs/StaffCommissionScreen";
 
-export const BackButton = () => {
+export const BackButton = (props) => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     return (
         <TouchableOpacity
             onPress={async () => {
                 navigation.goBack();
+                // console.log(props)
+                if(props.currentRouteName === "Working Hours") {
+                    // console.log(props.currentRouteName)
+                    dispatch(clearSchedulesForStaff());
+                }
             }}
         >
             <AntDesign name="arrowleft" size={24} color="black"/>
@@ -29,9 +40,11 @@ export const BackButton = () => {
     );
 };
 
-const StaffManagementStack = ({route, navigation}) => {
+const StaffManagementStack = () => {
     const Stack = createNativeStackNavigator();
     // const navigation = useNavigation();
+
+    const dispatch = useDispatch();
 
 
     return (<Stack.Navigator
@@ -44,7 +57,7 @@ const StaffManagementStack = ({route, navigation}) => {
     >
         <Stack.Screen name='Staffs'
                       component={StaffManagementScreen}
-                      options={{
+                      options={({navigation, route}) => ({
                           headerShown: true,
                           headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
                               <Image
@@ -54,101 +67,112 @@ const StaffManagementStack = ({route, navigation}) => {
                           </TouchableOpacity>,
                           headerTitleAlign: "center",
 
-        }}
+        })}
         />
         <Stack.Screen
             name="Staff List"
             component={StaffListScreen}
-            options={{
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
 
-            }}
+            })}
 
         />
         <Stack.Screen
             name="Shift Timing"
             component={ShiftTiming}
-            options={{
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
 
 
-            }}
+            })}
 
         />
         <Stack.Screen
             name="Working Hours"
-            component={StaffListScreen}
-            options={{
+            component={WorkingHours}
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
+                headerLeft: () => <TouchableOpacity
+                    onPress={() => {
+                        navigation.goBack();
+                        if(route.name === "Working Hours") {
+                            // console.log(route)
+                            dispatch(clearSchedulesForStaff());
+                        }
+                    }}
+                >
+                    <AntDesign name="arrowleft" size={24} color="black"/>
+                </TouchableOpacity>
+
                 // animation:'ios_from_right'
 
-            }}
+            })}
 
         />
         <Stack.Screen
             name="Commission Profile"
-            component={StaffListScreen}
-            options={{
+            component={CommissionProfileScreen}
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
 
-            }}
+            })}
 
         />
         <Stack.Screen
             name="Staff Commission"
-            component={StaffListScreen}
-            options={{
+            component={StaffCommissionScreen}
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
 
-            }}
+            })}
 
         />
         <Stack.Screen
             name="Business Closed Dates"
             component={BusinessClosedDates}
-            options={{
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
 
-            }}
+            })}
 
         />
         <Stack.Screen
             name="Time Off Type"
             component={StaffTimeOffTypeScreen}
-            options={{
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
 
-            }}
+            })}
 
         />
         <Stack.Screen
             name="Staff Name"
             component={StaffInfo}
-            options={{
+            options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <BackButton />,
-            }}
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+            })}
         />
     </Stack.Navigator>)
 }

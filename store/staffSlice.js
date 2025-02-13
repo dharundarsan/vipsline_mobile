@@ -3,13 +3,24 @@ import axios from "axios";
 import {loadCartFromDB} from "./cartSlice";
 import * as SecureStore from 'expo-secure-store';
 
-const initialStaffState = {
+export const initialStaffState = {
     staffs: [],
     allServices: [],
     isFetching: false,
     shiftTiming: [],
     businessClosedDates: [],
     timeOffType: [],
+    schedulesForStaff: [],
+    commissionProfile: [],
+    staffCommissionItem: {
+        Services: [],
+        Products: [],
+        Membership: [],
+        Packages: [],
+        Prepaid: [],
+        Custom_services: [],
+    },
+
 };
 
 
@@ -51,6 +62,7 @@ export const loadStaffsFromDB = () => async (dispatch, getState) => {
             }
         );
         dispatch(updateStaffs(response.data.data));
+        return response.data.data;
     } catch (error) {
     }
 }
@@ -229,6 +241,120 @@ export const loadTimeOffTypeFromDb = () => async (dispatch, getState) => {
     }
 }
 
+export const getSchedulesForStaffByDatesAPI = (resource_id, start_date, end_date, staff_index) => async (dispatch, getState) => {
+    const {staff} = getState();
+    try {
+        dispatch(updateIsFetching(true));
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/staffschedule/getScheduleForAStaffByDates", {
+            business_id: await SecureStore.getItemAsync('businessId'),
+            start_date: start_date,
+            end_date: end_date,
+            resource_id: resource_id,
+        }, {
+            headers: {
+                'Authorization': `Bearer ${await SecureStore.getItemAsync('authKey')}`
+            }
+        })
+        let staff_name = staff.staffs.find((staff) => staff.id === resource_id);
+        const staff_schedules = response.data.data[0];
+        // Object.assign(staff_schedules, {staff_index: staff_index});
+        // dispatch(updateSchedulesForStaff({[staff_name.name]: staff_schedules}));
+        // dispatch(updateIsFetching(false));
+        return response.data.data[0];
+    } catch (e) {
+        console.error("Error: Get Staff schedules API")
+        dispatch(updateIsFetching(false));
+        throw e.response;
+    }
+}
+
+export const getListOfDataToDisplayForStaffCommission = (
+    type,
+    commission_id = undefined,
+    commission_value = undefined,
+    commission_type = undefined,
+) => async (dispatch, getState) => {
+    const { staff } = getState();
+    try {
+        dispatch(updateIsFetching(true));
+
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/getListOfDatasToDisplay", {
+            business_id: await SecureStore.getItemAsync('businessId'),
+            commission_id: commission_id,
+            commission_value: commission_value,
+            commission_type: commission_type,
+            type: type,
+        }, {
+            headers: {
+                'Authorization': `Bearer ${await SecureStore.getItemAsync('authKey')}`
+            }
+        });
+
+        if (!response.data.data) {
+            dispatch(updateIsFetching(false));
+            return console.error("API response does not contain expected data");
+        }
+
+
+
+        const formattedData = response.data.data.flatMap(category =>
+            category.resource_categories.map(item => ({
+                ...item,
+                gender: category.gender
+            }))
+        );
+
+
+        // dispatch(updateListOfDataForStaffCommission({type: type, data: [] }));
+        //
+        //
+        // dispatch(updateListOfDataForStaffCommission({type: type, data: formattedData}));
+        dispatch(updateIsFetching(false));
+        return formattedData;
+
+    } catch (e) {
+        console.error("Error: Get Staff schedules API111");
+        dispatch(updateIsFetching(false));
+    }
+};
+
+export const getListOfCommissionProfile = () => async (dispatch, getState) => {
+    const {staff} = getState();
+    if(staff.isFetching) return;
+    let authToken = ""
+    try {
+        // const value = await AsyncStorage.getItem('authKey');
+        const value = await SecureStore.getItemAsync('authKey');
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+
+        console.log("auth token fetching error. (inside staffSlice loadStaffsFromDb)" + e);
+    }
+
+
+    try {
+        dispatch(updateIsFetching(true));
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/resource/getListOfCommissionProfile`,
+            {
+                business_id: `${await getBusinessId()}`,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            }
+        );
+        dispatch(updateCommissionProfile(response.data.data));
+        dispatch(updateIsFetching(false));
+        return response.data.data
+    } catch (error) {
+        dispatch(updateIsFetching(false));
+    }
+}
+
 export const staffSlice = createSlice({
     name: "staffs",
     initialState: initialStaffState,
@@ -250,7 +376,34 @@ export const staffSlice = createSlice({
         },
         updateTimeOffType(state, action) {
             state.timeOffType = action.payload;
+        },
+        updateSchedulesForStaff(state, action) {
+            state.schedulesForStaff[Object.values(action.payload)[0].staff_index] = action.payload;
+        },
+        clearSchedulesForStaff(state, action) {
+            state.schedulesForStaff = [];
+        },
+        updateListOfDataForStaffCommission(state, action) {
+            const { type, data } = action.payload;
+
+
+            // const updatedData = data.flatMap(category =>
+            //     category.resource_categories.map(item => ({
+            //         ...item,
+            //         gender: category.gender,
+            //     }))
+            // );
+
+            // state.staffCommissionItem[type] = data[type];
+
+        },
+        updateCommissionProfile(state, action) {
+            state.commissionProfile = action.payload;
+        },
+        updateListOfDataForStaffCommission1(state, action) {
+            state.staffCommissionItem = action.payload;
         }
+
     }
 });
 
@@ -260,7 +413,12 @@ export const {
     updateIsFetching,
     updateShiftTiming,
     updateBusinessClosedDates,
-    updateTimeOffType
+    updateTimeOffType,
+    updateSchedulesForStaff,
+    clearSchedulesForStaff,
+    updateCommissionProfile,
+    updateListOfDataForStaffCommission,
+    updateListOfDataForStaffCommission1
 } = staffSlice.actions;
 
 export default staffSlice.reducer;

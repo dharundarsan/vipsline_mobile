@@ -7,6 +7,7 @@ import {useState} from "react";
 import Divider from "./Divider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Platform } from "react-native";
+import {checkNullUndefined} from "../util/Helpers";
 
 /**
  * DropdownModal Component
@@ -41,11 +42,16 @@ const DropdownModal = (props) => {
             <TouchableOpacity style={[styles.modalContent, {
             paddingBottom: Platform.OS === "ios" ? insets.bottom : null
           }]} onPress={props.onCloseModal} activeOpacity={1}>
+                {
+                    checkNullUndefined(props.children) &&
+                    props.children
+                }
                 <FlatList
                     style={styles.dropdownList}
                     data={props.dropdownItems}
                     renderItem={({item, index}) => (
                         <>
+
                             <PrimaryButton
                                 label={props.object ? Object.entries(item).filter((arr) => arr[0] === props.objectName)[0][1] : item}
                                 buttonStyle={styles.closeButton}
@@ -119,7 +125,6 @@ const styles = StyleSheet.create({
         color: Colors.black,
     },
     modalContent: {
-        gap: 10,
         padding: 10,
         flex: 1,
         justifyContent: "flex-end",
@@ -129,6 +134,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         flexGrow: 0,
         borderRadius: 5,
+        marginBottom: 10
     },
     imageStyle: {
         // any global image styles can go here

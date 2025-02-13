@@ -5,7 +5,7 @@ import textTheme from "../../constants/TextTheme";
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect, useRef, useState} from "react";
 import {getBusinessId} from "../../store/cartSlice";
-import {loadBusinessClosedDates} from "../../store/staffSlice";
+import {loadBusinessClosedDates, updateIsFetching} from "../../store/staffSlice";
 import {FAB} from "react-native-paper";
 import AddAndUpdateClosedDatesModal from "../../components/staffManagementScreen/AddAndUpdateClosedDatesModal";
 import Toast from "../../ui/Toast";
@@ -26,9 +26,7 @@ export default function BusinessClosedDates() {
     const toastRef = useRef(null);
 
     useEffect(() => {
-        setLoading(true);
         dispatch(loadBusinessClosedDates());
-        setLoading(false);
     }, [])
 
 
@@ -83,12 +81,12 @@ export default function BusinessClosedDates() {
             data={ businessClosedDates }
             renderItem={renderItem}
             contentContainerStyle={{gap: 6}}
-            refreshing={refreshing}
+            refreshing={isFetching}
             onRefresh={() => {
-                setRefreshing(true);
+                dispatch(updateIsFetching(true));
                 dispatch(loadBusinessClosedDates());
                 setTimeout(() => {
-                    setRefreshing(false);
+                    dispatch(updateIsFetching(false));
                 }, 1000)
             }}
         />

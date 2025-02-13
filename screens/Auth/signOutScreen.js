@@ -47,7 +47,7 @@ const SignOutPrompt = ({ navigation }) => {
             [
                 {
                     text: "No",
-                    onPress: () => console.log("Sign out canceled"),
+                    // onPress: () => console.log("Sign out canceled"),
                     style: "cancel"
                 },
                 { text: "Yes", onPress: handleSignOut }
