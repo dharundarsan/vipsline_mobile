@@ -32,6 +32,7 @@ const BookingHistory = () => {
     const dispatch = useDispatch()
     const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
 
+
     useLayoutEffect(() => {
         const apiCall = async () => {
             await dispatch(loadBookingsHistoryFromDB())
@@ -70,7 +71,9 @@ const BookingHistory = () => {
                                     }}
                                     handleConfirm={(selectedDate) => {
                                         dispatch(setBookingsHistoryFilterDate(moment(selectedDate).toISOString()))
-                                    }}/>
+                                    }}
+                                    range={"day"}
+            />
         </View>
 
         <InfiniteScrollerList
