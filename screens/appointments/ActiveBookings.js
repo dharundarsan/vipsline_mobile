@@ -1,8 +1,8 @@
 import {ActivityIndicator, FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import React, {useEffect, useLayoutEffect, useState} from "react";
 import {
-    decrementFutureBookingsPageNumber,
-    incrementFutureBookingsPageNumber,
+    decrementFutureBookingsPageNumber, incrementBookingsHistoryPageNumber,
+    incrementFutureBookingsPageNumber, loadBookingsHistoryFromDB,
     loadFutureBookingsFromDB,
     resetFutureBookingsPageNo,
     setFutureBookingsFilterDate,
@@ -20,6 +20,8 @@ import DatePickerForwardBackward from "../../ui/DatePickerForwardBackward";
 import AppointmentsDatePicker from "../../components/appointments/AppointmentsDatePicker";
 import CustomPagination from "../../components/common/CustomPagination";
 import EntryPicker from "../../components/common/EntryPicker";
+import LazyLoader from "../../ui/LazyLoader";
+import moment from "moment";
 
 const ActiveBookings = () => {
     const futureBookings = useSelector(state => state.appointments.futureBookings);
@@ -52,55 +54,45 @@ const ActiveBookings = () => {
             />
         )}
 
-        <ScrollView style={{flex: 1, padding: 20, marginBottom:30}}>
-            <AppointmentsDatePicker date={futureBookingsFilterDate}
+        <ScrollView style={{flex: 1, padding: 20, marginBottom: 30}}>
+            <AppointmentsDatePicker date={new Date(futureBookingsFilterDate)}
                                     minimumDate={new Date()}
                                     onRightArrowPress={() => {
-                                        const nextDate = new Date(futureBookingsFilterDate.getTime());
+                                        const nextDate = moment(futureBookingsFilterDate).toDate();
                                         nextDate.setDate(nextDate.getDate() + 1); // Add 1 day
-                                        dispatch(setFutureBookingsFilterDate(nextDate));
+                                        dispatch(setFutureBookingsFilterDate(moment(nextDate).toISOString()));
                                     }}
                                     onLeftArrowPress={() => {
-                                        const prevDay = new Date(futureBookingsFilterDate.getTime());
+                                        const prevDay = moment(futureBookingsFilterDate).toDate();
                                         prevDay.setDate(prevDay.getDate() - 1); // Subtract 1 day
-                                        dispatch(setFutureBookingsFilterDate(prevDay));
+                                        dispatch(setFutureBookingsFilterDate(moment(prevDay).toISOString()));
                                     }}
                                     handleConfirm={(selectedDate) => {
-                                        dispatch(setFutureBookingsFilterDate(new Date(selectedDate.getTime())))
+                                        dispatch(setFutureBookingsFilterDate(moment(selectedDate).toISOString()))
                                     }}/>
-            {isFetching ? <View>
-                    <ActivityIndicator/>
-                </View> :
-                futureBookings.length === 0 ? <View style={{
-                        height: 600, alignItems: "center", justifyContent: "center"
-                    }}>
-                        <Text style={[textTheme.titleMedium]}>No Active Bookings</Text>
-                    </View> :
-                    <View style={{}}>
-                        {futureBookings.map(item => <BookingCard data={item}/>)}
-                    </View>}
-            {futureBookingsCount > 10 && <CustomPagination
-                setIsModalVisible={setIsEntryModalVisible}
-                maxEntry={futureBookingsMaxEntry}
-                incrementPageNumber={() => dispatch(incrementFutureBookingsPageNumber())}
-                decrementPageNumber={() => dispatch(decrementFutureBookingsPageNumber())}
-                refreshOnChange={async () =>
-                    dispatch(loadFutureBookingsFromDB())
-                }
-                currentCount={futureBookings.length}
-                totalCount={futureBookingsCount}
-                resetPageNo={() => {
-                    dispatch(resetFutureBookingsPageNo())
-                }}
-                isFetching={false}
-                currentPage={futureBookingsPageNo}
-            />}
+            {futureBookings.length === 0 ?
+                <View style={{height: 500}}>
+                    <Text style={[textTheme.titleMedium, {flex: 1, textAlign: "center", textAlignVertical: "center"}]}>No
+                        Active
+                        Bookings</Text>
+                </View> : <LazyLoader
+                    scrollEventThrottle={100}
+                    style={{paddingHorizontal: 15}}
+                    onFetchTrigger={() => {
+                        dispatch(incrementFutureBookingsPageNumber())
+                        dispatch(loadFutureBookingsFromDB())
+                    }}
+                    fallbackTextOnEmptyData={"No Active Bookings"}
+                    triggerThreshold={100}
+                    totalLength={futureBookingsCount}
+                    data={futureBookings}
+                    isLoading={isFetching}
+                    renderItem={({item}) => <BookingCard data={item}/>}
+                />}
         </ScrollView>
     </View>
 };
 
-const styles = StyleSheet.create({
-
-})
+const styles = StyleSheet.create({})
 
 export default ActiveBookings;

@@ -44,14 +44,14 @@ export const initialAppointmentsState = {
     futureBookingsMaxEntry: 10,
     futureBookingsCount: 0,
     futureBookingsIsFetching: false,
-    futureBookingsFilterDate: new Date(),
+    futureBookingsFilterDate: moment().toISOString(),
 
     bookingsHistory: [],
     bookingsHistoryPageNo: 0,
     bookingsHistoryMaxEntry: 10,
     bookingsHistoryCount: 0,
     bookingsHistoryIsFetching: false,
-    bookingsHistoryFilterDate: new Date(),
+    bookingsHistoryFilterDate: moment().toISOString(),
 };
 
 export const appointmentsSlice = createSlice({
@@ -92,7 +92,7 @@ export const appointmentsSlice = createSlice({
         },
 
         updateBookingsHistoryList(state, action) {
-            state.bookingsHistory = action.payload;
+            state.bookingsHistory = [...state.bookingsHistory, ...action.payload];
         },
         updateBookingsHistoryCount(state, action) {
             state.bookingsHistoryCount = action.payload;
@@ -121,7 +121,10 @@ export const appointmentsSlice = createSlice({
             }
         },
         setBookingsHistoryFilterDate(state, action) {
+            state.bookingsHistory = [];
             state.bookingsHistoryFilterDate = action.payload;
+            state.bookingsHistoryPageNo = 0;
+            // loadBookingsHistoryFromDB()
         },
     }
 });

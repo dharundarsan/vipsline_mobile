@@ -21,7 +21,6 @@ export function MembershipDetails(props) {
     }
 
 
-
     return <View style={styles.membershipDetails}>
         <Text style={[textTheme.titleMedium, styles.title]}>Memberships</Text>
 

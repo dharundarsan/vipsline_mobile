@@ -17,6 +17,10 @@ import DatePickerForwardBackward from "../../ui/DatePickerForwardBackward";
 import AppointmentsDatePicker from "../../components/appointments/AppointmentsDatePicker";
 import CustomPagination from "../../components/common/CustomPagination";
 import EntryPicker from "../../components/common/EntryPicker";
+import isCloseToBottom from "../../util/isCloseToBottom";
+import moment from "moment";
+import LazyLoader from "../../ui/LazyLoader";
+import {InfiniteScrollerList} from "react-native-infinite-scroller";
 
 const BookingHistory = () => {
     const bookingsHistory = useSelector(state => state.appointments.bookingsHistory);
@@ -35,12 +39,7 @@ const BookingHistory = () => {
         apiCall()
     }, [bookingsHistoryFilterDate]);
 
-    useEffect(() => {
-        console.log(isFetching)
-    }, [isFetching]);
-
-
-    return <View style={{flex: 1, backgroundColor: "white"}}>
+    return <View style={{flex: 1, backgroundColor: "white", paddingVertical: 15}}>
         {isEntryModalVisible && (
             <EntryPicker
                 setIsModalVisible={setIsEntryModalVisible}
@@ -54,51 +53,42 @@ const BookingHistory = () => {
             />
         )}
 
-        <ScrollView style={{flex: 1, padding: 20, marginBottom:30}}>
-            <AppointmentsDatePicker date={bookingsHistoryFilterDate}
+        {/*<ScrollView style={{flex: 1, padding: 20, marginBottom: 30}}>*/}
+        <View style={{paddingHorizontal: 15}}>
+            <AppointmentsDatePicker date={new Date(bookingsHistoryFilterDate)}
                                     maximumDate={new Date()}
                 // minimumDate={new Date(new Date().setDate(16))}
                                     onRightArrowPress={() => {
-                                        const nextDate = new Date(bookingsHistoryFilterDate.getTime());
+                                        const nextDate = moment(bookingsHistoryFilterDate).toDate();
                                         nextDate.setDate(nextDate.getDate() + 1); // Add 1 day
-                                        dispatch(setBookingsHistoryFilterDate(nextDate));
+                                        dispatch(setBookingsHistoryFilterDate(moment(nextDate).toISOString()));
                                     }}
                                     onLeftArrowPress={() => {
-                                        const prevDay = new Date(bookingsHistoryFilterDate.getTime());
+                                        const prevDay = moment(bookingsHistoryFilterDate).toDate();
                                         prevDay.setDate(prevDay.getDate() - 1); // Subtract 1 day
-                                        dispatch(setBookingsHistoryFilterDate(prevDay));
+                                        dispatch(setBookingsHistoryFilterDate(moment(prevDay).toISOString()));
                                     }}
                                     handleConfirm={(selectedDate) => {
-                                        dispatch(setBookingsHistoryFilterDate(new Date(selectedDate.getTime())))
+                                        dispatch(setBookingsHistoryFilterDate(moment(selectedDate).toISOString()))
                                     }}/>
-            {isFetching ? <View>
-                    <ActivityIndicator/>
-                </View> :
-                bookingsHistory.length === 0 ? <View style={{
-                        height: 600, alignItems: "center", justifyContent: "center"
-                    }}>
-                        <Text style={[textTheme.titleMedium]}>No Bookings History</Text>
-                    </View> :
-                    <View style={{}}>
-                        {bookingsHistory.map(item => <BookingCard data={item}/>)}
-                    </View>}
-            {bookingsHistoryCount > 10 && <CustomPagination
-                setIsModalVisible={setIsEntryModalVisible}
-                maxEntry={bookingsHistoryMaxEntry}
-                incrementPageNumber={() => dispatch(incrementBookingsHistoryPageNumber())}
-                decrementPageNumber={() => dispatch(decrementBookingsHistoryPageNumber())}
-                refreshOnChange={async () =>
-                    dispatch(loadBookingsHistoryFromDB())
-                }
-                currentCount={bookingsHistory.length}
-                totalCount={bookingsHistoryCount}
-                resetPageNo={() => {
-                    dispatch(resetBookingsHistoryPageNo())
-                }}
-                isFetching={false}
-                currentPage={bookingsHistoryPageNo}
-            />}
-        </ScrollView>
+        </View>
+
+        <InfiniteScrollerList
+            scrollEventThrottle={100}
+            style={{paddingHorizontal: 15}}
+            onFetchTrigger={() => {
+                dispatch(incrementBookingsHistoryPageNumber())
+                dispatch(loadBookingsHistoryFromDB())
+            }}
+            fallbackTextOnEmptyData={"No Bookings History"}
+            triggerThreshold={100}
+            totalLength={bookingsHistoryCount}
+            data={bookingsHistory}
+            isLoading={isFetching}
+            fallbackTextContainerStyle={{height: 500}}
+            fallbackTextStyle={{color: "black", ...textTheme.titleMedium}}
+            renderItem={({item}) => <BookingCard data={item}/>}
+        />
     </View>
 };
 

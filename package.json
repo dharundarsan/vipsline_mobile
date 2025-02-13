@@ -5,7 +5,6 @@
     "start": "expo start --dev-client",
     "dev": "node -e \"const ip = require('ip'); console.log('Current IP address: ' + ip.address());\" && for /f \"tokens=*\" %i in ('node -e \"const ip = require('ip'); console.log(ip.address());\"') do set REACT_NATIVE_PACKAGER_HOSTNAME=%i && npx expo start",
     "android": "expo run:android",
-    "dev": "node -e \"const ip = require('ip'); console.log('Current IP address: ' + ip.address());\" && for /f \"tokens=*\" %i in ('node -e \"const ip = require('ip'); console.log(ip.address());\"') do set REACT_NATIVE_PACKAGER_HOSTNAME=%i && npx expo start",
     "ios": "expo run:ios",
     "web": "expo start --web"
   },
@@ -56,6 +55,7 @@
     "react-native-graph-kit": "^1.0.1",
     "react-native-highcharts": "^1.0.2",
     "react-native-highcharts-wrapper2": "^1.0.2",
+    "react-native-infinite-scroller": "file:../react-native-infinite-scroller/react-native-infinite-scroller-0.1.0.tgz",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-otp-entry": "^1.7.0",

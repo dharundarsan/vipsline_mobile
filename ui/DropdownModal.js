@@ -5,8 +5,8 @@ import colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
 import {useState} from "react";
 import Divider from "./Divider";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Platform } from "react-native";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {Platform} from "react-native";
 
 /**
  * DropdownModal Component
@@ -39,8 +39,9 @@ const DropdownModal = (props) => {
     return (
         <Modal transparent={true} animationType={"fade"} visible={props.isVisible} style={styles.dropdownModal}>
             <TouchableOpacity style={[styles.modalContent, {
-            paddingBottom: Platform.OS === "ios" ? insets.bottom : null
-          }]} onPress={props.onCloseModal} activeOpacity={1}>
+                paddingTop: Platform.OS === "ios" ? insets.top : null,
+                paddingBottom: Platform.OS === "ios" ? insets.bottom : null
+            }]} onPress={props.onCloseModal} activeOpacity={1}>
                 <FlatList
                     style={styles.dropdownList}
                     data={props.dropdownItems}
@@ -79,7 +80,10 @@ const DropdownModal = (props) => {
                                             style={[
                                                 textTheme.bodyLarge,
                                                 styles.closeButtonText,
-                                                props.selectedValue === item ? {color: Colors.highlight, fontWeight: 500} : {}
+                                                props.selectedValue === item ? {
+                                                    color: Colors.highlight,
+                                                    fontWeight: 500
+                                                } : {}
                                             ]}
                                         >
                                             {props.object ? Object.entries(item).filter((arr) => arr[0] === props.objectName)[0][1] : item}
@@ -110,7 +114,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
         borderBottomWidth: 1,
         borderBottomColor: Colors.grey250,
-        borderRadius:0
+        borderRadius: 0
     },
     closeButtonPressable: {
         paddingVertical: 15
