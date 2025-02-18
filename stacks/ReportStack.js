@@ -1,4 +1,4 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {BackHandler, Image, StyleSheet, TouchableOpacity, View} from 'react-native'
 import React, {useState} from 'react'
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import SalesListReport from '../screens/Reports/SalesListReport';
@@ -9,10 +9,36 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Colors from "../constants/Colors";
 import {setIsFilterModalVisible} from "../store/reportSlice";
 import {useDispatch} from "react-redux";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 
 const ReportStack = ({navigation}) => {
     const Stack = createNativeStackNavigator();
     const dispatch = useDispatch()
+
+    // HOC to handle back button press in ReportStack screens
+    const withReportBackHandler = (WrappedComponent) => {
+        return (props) => {
+            const navigation = useNavigation();
+
+            useFocusEffect(
+                React.useCallback(() => {
+                    const onBackPress = () => {
+                        navigation.popToTop(); // Navigate to the initial screen
+                        return true; // Prevent default back action
+                    };
+
+                    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+                    return () => {
+                        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+                    };
+                }, [navigation])
+            );
+
+            return <WrappedComponent {...props} />;
+        };
+    };
+
     return (
         <Stack.Navigator initialRouteName='ReportScreen' screenOptions={{headerShown: true}}>
             <Stack.Screen name='ReportScreen' component={SalesListReport} options={{
@@ -27,7 +53,7 @@ const ReportStack = ({navigation}) => {
             }}/>
             {
                 reportStackDisplay.map((item) => item.data.map((dataItem, index) => (
-                    <Stack.Screen name={dataItem.navigation} key={index} component={dataItem.component} options={{
+                    <Stack.Screen name={dataItem.navigation} key={index} component={withReportBackHandler(dataItem.component)} options={{
                         headerTitle: dataItem.title,
                         headerTitleAlign: 'center',
                         headerShown: true,

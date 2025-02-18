@@ -6,7 +6,7 @@ import PrimaryButton from "../../../ui/PrimaryButton";
 import Colors from "../../../constants/Colors";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import {checkAPIError} from "../../../util/Helpers";
+import {checkAPIError, formatDateYYYYMMDD} from "../../../util/Helpers";
 import CustomPagination from "../../../components/common/CustomPagination";
 import EntryPicker from "../../../components/common/EntryPicker";
 import TextTheme from "../../../constants/TextTheme";
@@ -54,6 +54,13 @@ const TaxesSummaryReportsReportScreen = () => {
             taxSummaryReportAPI(firstDate, SecondDate)
         },
     });
+
+    useEffect(() => {
+        const fetchData = () => {
+            taxSummaryReportAPI(currentFromDate, currentToDate)
+        }
+        fetchData()
+    }, [])
 
     const taxSummaryReportAPI = async (fromDate, toDate) => {
         try {
