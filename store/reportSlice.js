@@ -151,7 +151,7 @@ export const fetchSalesByMembershipForBusiness = (initialPage, finalPage, fromDa
     }
 };
 
-export const fetchSalesByPackagesForBusiness = (initialPage, finalPage, fromDate, toDate, query = "", sortItem = "cm.package_name", sortOrder = "desc") => async (dispatch, getState) => {
+export const fetchSalesByPackagesForBusiness = (initialPage, finalPage, fromDate, toDate, query = "", sortItem = "cm.package_name", sortOrder = "desc", filterData) => async (dispatch, getState) => {
     let authToken = "";
     try {
         const value = await SecureStore.getItemAsync("authKey");
@@ -161,6 +161,9 @@ export const fetchSalesByPackagesForBusiness = (initialPage, finalPage, fromDate
     } catch (e) {
         console.log("Auth token fetching error: ", e);
     }
+
+    console.log("filterData")
+    console.log(filterData)
 
     try {
         const response = await axios.post(
@@ -172,6 +175,10 @@ export const fetchSalesByPackagesForBusiness = (initialPage, finalPage, fromDate
                 sortItem: sortItem === null ? "name" : sortItem,
                 sortOrder: sortOrder,
                 query: query !== undefined ? query : "",
+                ...filterData.reduce((acc, filter) => {
+                    acc[filter.apiName] = filter.selectedValue.value;
+                    return acc;
+                }, {})
             },
             {
                 headers: {

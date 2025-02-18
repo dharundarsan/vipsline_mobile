@@ -53,7 +53,7 @@ const ServiceSalesReportScreen = () => {
             item.service_price.toString(),
             item.service_count.toString(),
             "₹ " + item.discounts.toString(),
-            "₹ " + item.gross_sales.toString(),
+            "₹ " + item.net_sales.toString(),
             "₹ " + item.gst.toString(),
             "₹ " + item.total_sales.toString(),
           ]);
@@ -72,7 +72,7 @@ const ServiceSalesReportScreen = () => {
             item.service_price.toString(),
             item.service_count.toString(),
             "₹ " + item.discounts.toString(),
-            "₹ " + item.gross_sales.toString(),
+            "₹ " + item.net_sales.toString(),
             "₹ " + item.gst.toString(),
             "₹ " + item.total_sales.toString(),
           ]);
@@ -92,7 +92,7 @@ const ServiceSalesReportScreen = () => {
             item.service_price.toString(),
             item.service_count.toString(),
             "₹ " + item.discounts.toString(),
-            "₹ " + item.gross_sales.toString(),
+            "₹ " + item.net_sales.toString(),
             "₹ " + item.gst.toString(),
             "₹ " + item.total_sales.toString(),
           ]);
@@ -111,7 +111,7 @@ const ServiceSalesReportScreen = () => {
             item.service_price.toString(),
             item.service_count.toString(),
             "₹ " + item.discounts.toString(),
-            "₹ " + item.gross_sales.toString(),
+            "₹ " + item.net_sales.toString(),
             "₹ " + item.gst.toString(),
             "₹ " + item.total_sales.toString(),
           ]);
@@ -130,7 +130,7 @@ const ServiceSalesReportScreen = () => {
             item.service_price.toString(),
             item.service_count.toString(),
             "₹ " + item.discounts.toString(),
-            "₹ " + item.gross_sales.toString(),
+            "₹ " + item.net_sales.toString(),
             "₹ " + item.gst.toString(),
             "₹ " + item.total_sales.toString(),
           ]);
@@ -147,7 +147,7 @@ const ServiceSalesReportScreen = () => {
       item.service_price.toString(),
       item.service_count.toString(),
       "₹ " + item.discounts.toString(),
-      "₹ " + item.gross_sales.toString(),
+      "₹ " + item.net_sales.toString(),
       "₹ " + item.gst.toString(),
       "₹ " + item.total_sales.toString(),
     ]);
@@ -180,7 +180,7 @@ const ServiceSalesReportScreen = () => {
             item.service_price.toString(),
             item.service_count.toString(),
             "₹ " + item.discounts.toString(),
-            "₹ " + item.gross_sales.toString(),
+            "₹ " + item.net_sales.toString(),
             "₹ " + item.gst.toString(),
             "₹ " + item.total_sales.toString(),
           ]);
@@ -218,7 +218,7 @@ const ServiceSalesReportScreen = () => {
               item.service_price.toString(),
               item.service_count.toString(),
               "₹ " + item.discounts.toString(),
-              "₹ " + item.gross_sales.toString(),
+              "₹ " + item.net_sales.toString(),
               "₹ " + item.gst.toString(),
               "₹ " + item.total_sales.toString(),
             ]);

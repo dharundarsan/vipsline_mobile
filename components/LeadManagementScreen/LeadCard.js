@@ -14,13 +14,13 @@ const LeadCard = (props) => {
         leadCardPressable: {
             flexDirection: "row",
             justifyContent: "spaceBetween",
-            borderBottomWidth:1,
+            borderBottomWidth: 1,
             borderBottomColor: Colors.grey200,
             paddingVertical: 12,
             paddingHorizontal: 25,
         },
         detailsContainer: {
-            flex:1,
+            flex: 1,
             gap: 3,
         },
         nameText: {
@@ -33,6 +33,7 @@ const LeadCard = (props) => {
             letterSpacing: 0.5,
         },
         badgeContainer: {
+            alignSelf: "center",
             minWidth: 80,
             paddingHorizontal: 10,
             backgroundColor: getLeadStatusColor(props.lead.lead_status).background,
@@ -44,11 +45,14 @@ const LeadCard = (props) => {
         }
     })
     return <PrimaryButton buttonStyle={{backgroundColor: "white"}}
-                          pressableStyle={styles.leadCardPressable}
+        // pressableStyle={styles.leadCardPressable}
                           onPress={() => {
-                              navigation.navigate("Lead Profile", { leadDetails: props.lead, leadManagementToastRef:props.leadManagementToastRef })
+                              navigation.navigate("Lead Profile", {
+                                  leadDetails: props.lead,
+                                  leadManagementToastRef: props.leadManagementToastRef
+                              })
                               console.log(props.leadManagementToastRef)
-                          }} style={styles.leadCard}>
+                          }} style={styles.leadCardPressable}>
         <View style={styles.detailsContainer}>
             <Text style={[styles.nameText]}>{props.lead.name}</Text>
             <Text style={[styles.phoneNoText]}>{props.lead.mobile}</Text>

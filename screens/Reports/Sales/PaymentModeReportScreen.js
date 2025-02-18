@@ -260,6 +260,36 @@ const PaymentModeReportScreen = ({ route }) => {
         .then((res) => {
           setMaxPageCount(res.data[0].total_payment_count)
           const transformedData = transformTableData(res.data[0].payment_report_summary)
+          const changedData = cardValue.current.map(desired => {
+            const matchingEntry = res.data[0].paymentTotalData.find(item =>
+                item.mode_of_payment === desired.mode_of_payment
+            );
+
+            if (matchingEntry) {
+              if (desired.mode_of_payment === undefined) {
+                return { ...desired, value: matchingEntry.total_amount || 0 };
+              }
+              if (desired.mode_of_payment === "CASH") {
+                return { ...desired, value: matchingEntry.cash_amount || 0 };
+              }
+              if (desired.mode_of_payment === "CARD") {
+                return { ...desired, value: matchingEntry.card_amount || 0 };
+              }
+              if (desired.mode_of_payment === "REWARDS") {
+                return { ...desired, value: matchingEntry.rewards_amount || 0 }
+              }
+              if (desired.mode_of_payment === "DIGITAL PAYMENTS") {
+                return { ...desired, value: matchingEntry.digital_amount || 0 }
+              }
+              if (desired.mode_of_payment === "PREPAID") {
+                return { ...desired, value: matchingEntry.amount || 0 }
+              }
+              // return { ...desired, value: matchingEntry.amount || 0 };
+            }
+            return desired;
+          });
+          cardValue.current = res.data[0].paymentTotalData.length > 1 ? changedData : cardInitialValue;
+
           setDataList(transformedData);
         })
     }
