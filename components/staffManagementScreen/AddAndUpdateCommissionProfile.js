@@ -167,8 +167,23 @@ export default function AddAndUpdateCommissionProfile(props) {
             f()
         }
 
-        console.log("kuyftdrgfgthyujikohugyfd")
     }, [itemType, itemOrTarget])
+
+    useEffect(() => {
+        const commission_to_array = (targetMapping.map((item, index) => item.commission_to));
+
+        for(let commission_to = 0; commission_to < commission_to_array.length; commission_to++) {
+            if(commission_to === 0) continue
+
+            if(commission_to_array[commission_to] < commission_to_array[commission_to - 1]) {
+                setIsLesserThenPrev(true);
+                break
+            }
+            else
+                setIsLesserThenPrev(false);
+            break
+        }
+    }, [targetMapping]);
 
 
 
@@ -188,11 +203,19 @@ export default function AddAndUpdateCommissionProfile(props) {
                 toastRef.current.show("target mapping is required");
             }
             return
+
         }
 
-        if(selectedOptions.length === 0) {
+        if(selectedOptions.length === 0 && itemOrTarget === 2) {
             toastRef.current.show("qualifying item is required");
             return
+        }
+
+        if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev) {
+            return;
+        }
+        else if(itemOrTarget === 2 && isFieldsEmpty) {
+            return;
         }
 
 
@@ -206,7 +229,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                     type: item,
                     type_id: null
                 })),
-                target_tier: itemOrTarget === 1 ? "" : targetTier || "ZERO BASED",
+                target_tier: itemOrTarget === 1 ? "" : targetTier.toUpperCase() || "ZERO BASED",
                 target_mapping: itemOrTarget === 1 ? [] : targetMapping.map(({ commission_from, commission_to, commission_percentage, type_id }) => ({
                     commission_from,
                     commission_to: commission_to.toString(),
@@ -287,11 +310,19 @@ export default function AddAndUpdateCommissionProfile(props) {
                 toastRef.current.show("target mapping is required");
             }
             return
+
         }
 
-        if(selectedOptions.length === 0) {
+        if(selectedOptions.length === 0 && itemOrTarget === 2) {
             toastRef.current.show("qualifying item is required");
             return
+        }
+
+        if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev) {
+            return;
+        }
+        else if(itemOrTarget === 2 && isFieldsEmpty) {
+            return;
         }
 
         const response = await updateCommissionProfileAPI(
@@ -338,7 +369,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                     type_id
                 })) : [],
                 qualifying_items: itemOrTarget === 1 ? [] : transformDataForQualifyingItem(currentDataForTarget.qualifying_items, selectedOptions),
-                target_tier: itemOrTarget === 1 ? "" : targetTier,
+                target_tier: itemOrTarget === 1 ? "" : targetTier.toUpperCase(),
                 target_mapping:  itemOrTarget === 1 ? [] :  transformData(currentDataForTarget.target_mapping, targetMapping),
                 computation_interval: itemOrTarget === 1 ? null : computationalInterval
             }

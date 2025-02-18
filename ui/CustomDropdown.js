@@ -1,11 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import CustomCheckbox from './CustomCheckbox';
-// import Divider from "./Divider";
 import { MaterialIcons } from "@expo/vector-icons";
 import textTheme from "../constants/TextTheme";
-import {useSelector} from "react-redux";
-import {checkNullUndefined} from "../util/Helpers";
 import { Divider } from 'react-native-paper';
 
 
