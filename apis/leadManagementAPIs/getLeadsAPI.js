@@ -4,8 +4,8 @@ import {checkAPIError} from "../../util/Helpers";
 import moment from "moment";
 
 const getLeadsAPI = async (pageNo, pageSize, search_term, advancedFilters,) => {
-    console.log("advancedFilters");
-    console.log(advancedFilters);
+    // console.log("advancedFilters");
+    // console.log(advancedFilters);
     try {
         const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/leads/getLeadsByBusiness?pageNo=" + pageNo + "&pageSize=" + pageSize, {
             business_id: await SecureStore.getItemAsync('businessId'),

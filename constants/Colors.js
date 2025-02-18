@@ -29,6 +29,8 @@ const Colors = {
     grey700: "#616161",
     grey800: "#424242",
     grey900: "#212121",
+    highlight50: "#f0eefe",
+    highlight80: "#e1dcfd",
     highlight100: "#c3b9fa",
     highlight: "#6950F3",
     inactiveClient: "#d5d7da",
@@ -49,6 +51,7 @@ const Colors = {
     white: "#FFFFFF",
     booked: "#96d4d7",
     confirmed: "#d5c6f5",
-    inService: "#fac5dc"
+    inService: "#fac5dc",
+    lightBlue: "#95e8f2"
 };
 export default Colors;

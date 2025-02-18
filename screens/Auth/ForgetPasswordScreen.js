@@ -1,12 +1,12 @@
 import {View, StyleSheet} from "react-native";
-import SignInHeader from "../components/authScreen/SignInHeader";
+import SignInHeader from "../../components/authScreen/SignInHeader";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {StatusBar} from "expo-status-bar";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import {useRef, useState} from "react";
-import ForgetPasswordEmailOrNumber from "../components/forgetPasswordScreen/ForgetPasswordEmailOrNumber";
-import ForgetPasswordOTP from "../components/forgetPasswordScreen/ForgetPasswordOTP";
-import Toast from "../ui/Toast";
+import ForgetPasswordEmailOrNumber from "../../components/forgetPasswordScreen/ForgetPasswordEmailOrNumber";
+import ForgetPasswordOTP from "../../components/forgetPasswordScreen/ForgetPasswordOTP";
+import Toast from "../../ui/Toast";
 
 export default function ForgetPasswordScreen() {
     function sendOtpHandler(message) {

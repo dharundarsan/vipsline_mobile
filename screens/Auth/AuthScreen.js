@@ -1,30 +1,30 @@
 import {View, Text, StyleSheet, Pressable, KeyboardAvoidingView, ScrollView} from "react-native";
-import Colors from "../constants/Colors";
-import SignInHeader from "../components/authScreen/SignInHeader";
+import Colors from "../../constants/Colors";
+import SignInHeader from "../../components/authScreen/SignInHeader";
 import {SafeAreaView} from "react-native-safe-area-context";
-import PrimaryButton from "../ui/PrimaryButton";
+import PrimaryButton from "../../ui/PrimaryButton";
 import {Entypo} from '@expo/vector-icons';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import MobileOtp from "../components/authScreen/MobileOtp";
-import EmailLogin from "../components/authScreen/EmailLogin";
+import MobileOtp from "../../components/authScreen/MobileOtp";
+import EmailLogin from "../../components/authScreen/EmailLogin";
 import {useEffect, useRef, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import axios from "axios";
-import textTheme from "../constants/TextTheme";
+import textTheme from "../../constants/TextTheme";
 import { StatusBar } from 'expo-status-bar';
 import {
     loadMembershipsDataFromDb,
     loadPackagesDataFromDb,
     loadProductsDataFromDb,
     loadServicesDataFromDb
-} from "../store/catalogueSlice";
-import {loadClientCountFromDb, loadClientsFromDb} from "../store/clientSlice";
-import {loadClientFiltersFromDb} from "../store/clientFilterSlice";
-import {loadBusinessesListFromDb} from "../store/listOfBusinessSlice";
-import {loadLoginUserDetailsFromDb} from "../store/loginUserSlice";
+} from "../../store/catalogueSlice";
+import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
+import {loadClientFiltersFromDb} from "../../store/clientFilterSlice";
+import {loadBusinessesListFromDb} from "../../store/listOfBusinessSlice";
+import {loadLoginUserDetailsFromDb} from "../../store/loginUserSlice";
 import {useDispatch} from "react-redux";
-import Toast from "../ui/Toast";
-import {checkNullUndefined} from "../util/Helpers";
+import Toast from "../../ui/Toast";
+import {checkNullUndefined} from "../../util/Helpers";
 
 function AuthScreen(props) {
     const navigate = useNavigation();

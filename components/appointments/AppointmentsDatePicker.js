@@ -6,15 +6,50 @@ import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
 import React, {useState} from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import {checkNullUndefined} from "../../util/Helpers";
 
 
 const AppointmentsDatePicker = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
-    return <View style={{
+    const rangeSelector = {
+        "day" : [
+            "Past",
+            "Today",
+            "Upcoming"
+        ],
+        "week" : [
+            "Past Week",
+            "This Week",
+            "Upcoming Week",
+        ]
+        ,
+        "month" : [
+            "Past Month",
+            "This Month",
+            "Upcoming Month",
+        ],
+        "year" : [
+            "Past Year",
+            "This Year",
+            "Upcoming Year",
+        ]
+    }
+
+    moment.updateLocale('en', {
+        week: {
+            dow: 0, // Sunday is the first day of the week
+        },
+    });
+
+    function forwardOrBackwardPress() {
+
+    }
+
+    return <View style={[{
         flexDirection: "row",
         alignItems: "center",
         marginBottom:10,
-    }}>
+    }, props.containerStyle]}>
         {isDatePickerVisible &&
             <DateTimePickerModal
                 isVisible={isDatePickerVisible}
@@ -43,6 +78,7 @@ const AppointmentsDatePicker = (props) => {
 
                 if (!minimumDate || currentDate > minimumDate) {
                     props.onLeftArrowPress();
+                    forwardOrBackwardPress();
                 }
             }}
             buttonStyle={{
@@ -68,17 +104,27 @@ const AppointmentsDatePicker = (props) => {
                 backgroundColor: "#E7E8FF",
                 width: "100%",
                 textAlign: "center",
-            }, textTheme.bodyLarge]}>{new Date(props.date.getFullYear(), props.date.getMonth(), props.date.getDate())
+            }, textTheme.bodyLarge]}>
+                {
+                    new Date(props.date.getFullYear(), props.date.getMonth(), props.date.getDate())
             < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
-                ? "Past"
+                ? rangeSelector[props.range][0] // past
                 : new Date(props.date.getFullYear(), props.date.getMonth(), props.date.getDate())
                 > new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
-                    ? "Upcoming"
-                    : "Today"}</Text>
+                    ? rangeSelector[props.range][2] // present
+                    : rangeSelector[props.range][1]  //   future
+                }
+            </Text>
+
         </View>
         <Pressable
             onPress={() => {
-                setIsDatePickerVisible(true)
+                if(props.type === undefined || props.type === "display") {
+                    return null
+                }
+                else {
+                    setIsDatePickerVisible(true);
+                }
             }}
             android_ripple={{color: Colors.ripple}}
             style={{
@@ -92,7 +138,13 @@ const AppointmentsDatePicker = (props) => {
             <Text style={[{
                 textAlignVertical: "center",
                 flex: 1
-            }, textTheme.bodyLarge]}>{moment(props.date).format("DD MMM, YYYY")}</Text>
+            }, textTheme.bodyLarge]}>{
+                props.range === "day" ?
+                    moment(props.date).format("DD MMM, YYYY") :
+                    props.range === "week" ?
+                        moment(props.date).startOf('week').format('DD') + " - " + moment(props.date).endOf("week").format("DD MMM, YYYY") :
+                        moment(props.date).format("DD MMM, YYYY") // right now ui is not clear for me
+            }</Text>
         </Pressable>
 
         <PrimaryButton
@@ -104,6 +156,7 @@ const AppointmentsDatePicker = (props) => {
 
                 if (!maximumDate || currentDate < maximumDate) {
                     props.onRightArrowPress();
+                    forwardOrBackwardPress();
                 }
             }}
             buttonStyle={{

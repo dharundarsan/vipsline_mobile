@@ -5,8 +5,9 @@ import colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
 import {useState} from "react";
 import Divider from "./Divider";
-import {useSafeAreaInsets} from "react-native-safe-area-context";
-import {Platform} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Platform } from "react-native";
+import {checkNullUndefined} from "../util/Helpers";
 
 /**
  * DropdownModal Component
@@ -41,7 +42,11 @@ const DropdownModal = (props) => {
             <TouchableOpacity style={[styles.modalContent, {
                 paddingTop: Platform.OS === "ios" ? insets.top : null,
                 paddingBottom: Platform.OS === "ios" ? insets.bottom : null
-            }]} onPress={props.onCloseModal} activeOpacity={1}>
+          }]} onPress={props.onCloseModal} activeOpacity={1}>
+                {
+                    checkNullUndefined(props.children) &&
+                    props.children
+                }
                 <FlatList
                     style={styles.dropdownList}
                     data={props.dropdownItems}

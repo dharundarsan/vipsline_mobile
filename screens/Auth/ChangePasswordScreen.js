@@ -1,16 +1,16 @@
 import {View, Text, StyleSheet, StatusBar, TouchableWithoutFeedback, Keyboard} from "react-native";
-import SignInHeader from "../components/authScreen/SignInHeader";
-import Toast from "../ui/Toast";
-import ForgetPasswordOTP from "../components/forgetPasswordScreen/ForgetPasswordOTP";
-import ForgetPasswordEmailOrNumber from "../components/forgetPasswordScreen/ForgetPasswordEmailOrNumber";
+import SignInHeader from "../../components/authScreen/SignInHeader";
+import Toast from "../../ui/Toast";
+import ForgetPasswordOTP from "../../components/forgetPasswordScreen/ForgetPasswordOTP";
+import ForgetPasswordEmailOrNumber from "../../components/forgetPasswordScreen/ForgetPasswordEmailOrNumber";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {useRef, useState} from "react";
-import textTheme from "../constants/TextTheme";
-import Colors from "../constants/Colors";
-import CustomTextInput from "../ui/CustomTextInput";
-import {checkNullUndefined} from "../util/Helpers";
-import PrimaryButton from "../ui/PrimaryButton";
-import resetPasswordAPI from "../apis/authAPIs/resetPasswordAPI";
+import textTheme from "../../constants/TextTheme";
+import Colors from "../../constants/Colors";
+import CustomTextInput from "../../ui/CustomTextInput";
+import {checkNullUndefined} from "../../util/Helpers";
+import PrimaryButton from "../../ui/PrimaryButton";
+import resetPasswordAPI from "../../apis/authAPIs/resetPasswordAPI";
 import {useNavigation} from "@react-navigation/native";
 
 export default function ChangePasswordScreen(props) {

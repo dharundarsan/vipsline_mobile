@@ -1,7 +1,7 @@
-import AuthScreen from "../screens/AuthScreen";
-import ForgetPasswordScreen from "../screens/ForgetPasswordScreen";
-import VerificationCodeScreen from "../screens/VerificationCodeScreen";
-import ChangePasswordScreen from "../screens/ChangePasswordScreen";
+import AuthScreen from "../screens/Auth/AuthScreen";
+import ForgetPasswordScreen from "../screens/Auth/ForgetPasswordScreen";
+import VerificationCodeScreen from "../screens/Auth/VerificationCodeScreen";
+import ChangePasswordScreen from "../screens/Auth/ChangePasswordScreen";
 import React from "react";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 

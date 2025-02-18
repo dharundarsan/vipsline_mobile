@@ -1,11 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import CustomCheckbox from './CustomCheckbox';
-// import Divider from "./Divider";
 import { MaterialIcons } from "@expo/vector-icons";
 import textTheme from "../constants/TextTheme";
-import {useSelector} from "react-redux";
-import {checkNullUndefined} from "../util/Helpers";
 import { Divider } from 'react-native-paper';
 
 
@@ -34,13 +31,22 @@ const CustomDropdown = (props) => {
 
     return (
         <View style={[styles.container, props.container]}>
+            {
+                props.label === undefined || props.labelEnabled === false ? <></> :
+                <Text style={[textTheme.bodyMedium, {marginVertical: 6}, props.labelStyle]}>{props.label}</Text>
+            }
             <TouchableOpacity
                 ref={dropdownButtonRef}
                 onLayout={onDropdownButtonLayout}
                 onPress={toggleDropdown}
                 style={styles.dropdownButton}
             >
-                <Text style={[textTheme.bodyLarge, {paddingLeft: 8}]}>Choose filters</Text>
+                <Text style={[textTheme.bodyLarge, {paddingLeft: 8}]}>
+                    {
+                        props.placeholder === undefined || props.placeholder === "" ?
+                            "Select " + props.label : props.placeholder
+                    }
+                </Text>
                 <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
             </TouchableOpacity>
 
@@ -65,6 +71,7 @@ const CustomDropdown = (props) => {
                             </TouchableOpacity>
                         )}
                         ItemSeparatorComponent={() => <Divider />}
+                        scrollEnabled={props.scrollEnabled}
                     />
                 </View>
             )}

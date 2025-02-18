@@ -332,7 +332,7 @@ export const calculateAmountForRewardPoints = (clientId,rp,tp) => async (dispatc
         }
     }
     catch(e){
-        console.log(JSON.stringify(e.response.data,null,3));
+        // console.log(JSON.stringify(e.response.data,null,3));
         
         dispatch(updateRewardAmount({data:e.response.data.data,status_code:e.response.data.status_code,error:e.response.data.other_message}));
         console.error("Error Occurred in calculateAmountForRewardPoints");

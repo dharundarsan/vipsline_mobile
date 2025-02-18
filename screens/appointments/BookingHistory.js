@@ -20,7 +20,7 @@ import EntryPicker from "../../components/common/EntryPicker";
 import isCloseToBottom from "../../util/isCloseToBottom";
 import moment from "moment";
 import LazyLoader from "../../ui/LazyLoader";
-import {InfiniteScrollerList} from "react-native-infinite-scroller";
+import InfiniteScrollerList from "../../ui/InfiniteScrollerList";
 
 const BookingHistory = () => {
     const bookingsHistory = useSelector(state => state.appointments.bookingsHistory);
@@ -31,6 +31,7 @@ const BookingHistory = () => {
     const bookingsHistoryPageNo = useSelector(state => state.appointments.bookingsHistoryPageNo);
     const dispatch = useDispatch()
     const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
+
 
     useLayoutEffect(() => {
         const apiCall = async () => {
@@ -70,7 +71,9 @@ const BookingHistory = () => {
                                     }}
                                     handleConfirm={(selectedDate) => {
                                         dispatch(setBookingsHistoryFilterDate(moment(selectedDate).toISOString()))
-                                    }}/>
+                                    }}
+                                    range={"day"}
+            />
         </View>
 
         <InfiniteScrollerList

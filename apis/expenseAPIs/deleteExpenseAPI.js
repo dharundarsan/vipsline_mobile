@@ -26,7 +26,7 @@ export default async function deleteExpenseAPI(id) {
         console.log("businessId fetching error.  (inside clientFilterAPI)" + e);
     }
 
-    console.log(id)
+    // console.log(id)
 
     try {
         const response = await axios.post(

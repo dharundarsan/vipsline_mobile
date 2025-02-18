@@ -1,16 +1,15 @@
 import {Text, View, StyleSheet} from "react-native";
 
-export default function StaffListScreen() {
-    return <View styles={styles.staffListScreen}>
+export default function Week(props) {
+    return  <View style={styles.week}>
         <Text>
-            Staff List Screen
+            Week
         </Text>
     </View>
 }
 
 const styles = StyleSheet.create({
-    staffListScreen: {
+    week: {
         flex: 1,
-
     }
 })
