@@ -41,6 +41,8 @@ export default function CommissionByTarget({
 
 }) {
 
+
+
     const addTier = () => {
         if (targetMapping.length === 0) return;
 
@@ -87,7 +89,8 @@ export default function CommissionByTarget({
                     i === index ? { ...tier, commission_to: newValue } : tier
                 )
             );
-            if(targetMapping[index].commission_from > text) {
+
+            if(index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.1) >= text) {
                 setIsLesserThenPrev(true);
             }
             else {
@@ -111,39 +114,8 @@ export default function CommissionByTarget({
 
 
 
-        // function transformData(originalData, editedData) {
-        //
-        //     if (originalData === undefined || originalData === null) return;
-        //     if (editedData === undefined || editedData === null) return;
-        //     // Extract existing type_ids from editedData
-        //     const existingTypeIds = new Set(editedData.map(item => item.type_id).filter(id => id !== null));
-        //
-        //     // Create a transformed array without "commission_id" and add activation: true
-        //     let transformed = originalData.map(({ commission_id, ...rest }) => ({
-        //         ...rest,
-        //         activation: true
-        //     }));
-        //
-        //     // Check for missing type_ids and add them with activation: false while keeping old values
-        //     originalData.forEach(item => {
-        //         if (!existingTypeIds.has(item.type_id)) {
-        //             transformed.push({
-        //                 type_id: item.type_id,
-        //                 commission_from: item.commission_from,
-        //                 commission_to: item.commission_to,
-        //                 commission_percentage: item.commission_percentage,
-        //                 activation: false
-        //             });
-        //         }
-        //     });
-        //
-        //     return transformed;
-        // }
-        // console.log(targetMapping)
-        // console.log(JSON.stringify(transformData(currentDataForTarget.target_mapping, targetMapping), null, 2));
 
 
-        // console.log(item)
         return <View style={styles.renderItemStyle}>
             <CustomPriceInput
                 priceToggle={"VALUE"}
@@ -151,6 +123,7 @@ export default function CommissionByTarget({
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 readOnly
                 value={index === 0 ? "0" : (targetMapping[index - 1].commission_to + 0.1).toString()}
+                onOnchangeText={updateCommissionTo}
             />
             <CustomPriceInput
                 priceToggle={"VALUE"}
@@ -158,6 +131,8 @@ export default function CommissionByTarget({
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 onOnchangeText={updateCommissionTo}
                 value={item.commission_to.toString()}
+
+
             />
             <CustomPriceInput
                 priceToggle={"PERCENTAGE"}
