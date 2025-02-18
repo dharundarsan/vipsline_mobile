@@ -191,6 +191,8 @@ export default function AddAndUpdateTimeOffForStaff(props) {
         visible={props.visible}
         animationType={"slide"}
         style={styles.modal}
+        onRequestClose={props.onClose}
+        presentationStyle={"formSheet"}
     >
         <Toast ref={toastRef}/>
         {

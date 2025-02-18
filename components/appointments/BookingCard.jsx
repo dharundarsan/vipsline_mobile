@@ -15,9 +15,9 @@ const BookingCard = (props) => {
         statusColor = "#9DDDE0"
     } else if (props.data.status === "CONFIRMED") {
         statusColor = "#D5C6F5"
-    } else if (props.data.status === "NO SHOW") {
+    } else if (props.data.status === "NO_SHOW") {
         statusColor = "#F67A6F"
-    } else if (props.data.status === "IN-SERVICE") {
+    } else if (props.data.status === "IN_SERVICE") {
         statusColor = "#FAC5DC"
     } else if (props.data.status === "CANCELLED") {
         statusColor = "#D1373F"

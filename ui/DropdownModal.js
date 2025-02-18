@@ -40,7 +40,8 @@ const DropdownModal = (props) => {
     return (
         <Modal transparent={true} animationType={"fade"} visible={props.isVisible} style={styles.dropdownModal}>
             <TouchableOpacity style={[styles.modalContent, {
-            paddingBottom: Platform.OS === "ios" ? insets.bottom : null
+                paddingTop: Platform.OS === "ios" ? insets.top : null,
+                paddingBottom: Platform.OS === "ios" ? insets.bottom : null
           }]} onPress={props.onCloseModal} activeOpacity={1}>
                 {
                     checkNullUndefined(props.children) &&
@@ -51,7 +52,6 @@ const DropdownModal = (props) => {
                     data={props.dropdownItems}
                     renderItem={({item, index}) => (
                         <>
-
                             <PrimaryButton
                                 label={props.object ? Object.entries(item).filter((arr) => arr[0] === props.objectName)[0][1] : item}
                                 buttonStyle={styles.closeButton}
@@ -85,7 +85,10 @@ const DropdownModal = (props) => {
                                             style={[
                                                 textTheme.bodyLarge,
                                                 styles.closeButtonText,
-                                                props.selectedValue === item ? {color: Colors.highlight, fontWeight: 500} : {}
+                                                props.selectedValue === item ? {
+                                                    color: Colors.highlight,
+                                                    fontWeight: 500
+                                                } : {}
                                             ]}
                                         >
                                             {props.object ? Object.entries(item).filter((arr) => arr[0] === props.objectName)[0][1] : item}
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
         borderBottomWidth: 1,
         borderBottomColor: Colors.grey250,
-        borderRadius:0
+        borderRadius: 0
     },
     closeButtonPressable: {
         paddingVertical: 15
@@ -125,6 +128,7 @@ const styles = StyleSheet.create({
         color: Colors.black,
     },
     modalContent: {
+        gap: 10,
         padding: 10,
         flex: 1,
         justifyContent: "flex-end",
@@ -134,7 +138,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         flexGrow: 0,
         borderRadius: 5,
-        marginBottom: 10
     },
     imageStyle: {
         // any global image styles can go here

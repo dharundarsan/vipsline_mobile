@@ -15,193 +15,83 @@ import RadioButton from "../../ui/RadioButton";
 import textTheme from "../../constants/TextTheme";
 import DatePickerForwardBackward from "../../ui/DatePickerForwardBackward";
 import AppointmentsDatePicker from "../../components/appointments/AppointmentsDatePicker";
+import CustomPagination from "../../components/common/CustomPagination";
+import EntryPicker from "../../components/common/EntryPicker";
+import isCloseToBottom from "../../util/isCloseToBottom";
+import moment from "moment";
+import LazyLoader from "../../ui/LazyLoader";
+import InfiniteScrollerList from "../../ui/InfiniteScrollerList";
 
 const BookingHistory = () => {
     const bookingsHistory = useSelector(state => state.appointments.bookingsHistory);
     const isFetching = useSelector(state => state.appointments.bookingsHistoryIsFetching);
-    const totalCount = useSelector(state => state.appointments.bookingsHistoryCount);
-    const maxEntry = useSelector(state => state.appointments.bookingsHistoryMaxEntry);
+    const bookingsHistoryCount = useSelector(state => state.appointments.bookingsHistoryCount);
+    const bookingsHistoryMaxEntry = useSelector(state => state.appointments.bookingsHistoryMaxEntry);
     const bookingsHistoryFilterDate = useSelector(state => state.appointments.bookingsHistoryFilterDate);
+    const bookingsHistoryPageNo = useSelector(state => state.appointments.bookingsHistoryPageNo);
     const dispatch = useDispatch()
+    const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
 
-    const [upperCount, setUpperCount] = useState(10);
-    const [lowerCount, setLowerCount] = useState(1);
-    const [isBackwardButtonDisabled, setIsBackwardButtonDisabled] = useState(false);
-    const [isForwardButtonDisabled, setIsForwardButtonDisabled] = useState(false);
-    const [isPaginationModalVisible, setIsPaginationModalVisible] = useState(false);
-
-    const options = [
-        {label: '10', value: 10},
-        {label: '25', value: 25},
-        {label: '50', value: 50},
-        {label: '100', value: 100},
-    ];
 
     useLayoutEffect(() => {
-        dispatch(loadBookingsHistoryFromDB())
-    }, []);
-
-    useEffect(() => {
-        if (lowerCount === 1) {
-            setIsBackwardButtonDisabled(true);
-        } else {
-            setIsBackwardButtonDisabled(false);
+        const apiCall = async () => {
+            await dispatch(loadBookingsHistoryFromDB())
         }
+        apiCall()
+    }, [bookingsHistoryFilterDate]);
 
-        if (upperCount >= totalCount) {
-            setIsForwardButtonDisabled(true);
-        } else {
-            setIsForwardButtonDisabled(false);
-        }
-    }, [lowerCount, upperCount, maxEntry, totalCount]);
+    return <View style={{flex: 1, backgroundColor: "white", paddingVertical: 15}}>
+        {isEntryModalVisible && (
+            <EntryPicker
+                setIsModalVisible={setIsEntryModalVisible}
+                onPress={(number) => {
+                    console.log(number)
+                    dispatch(updateBookingsHistoryMaxEntry(number))
+                    setIsEntryModalVisible(false);
+                }}
+                maxEntry={bookingsHistoryMaxEntry}
+                isVisible={isEntryModalVisible}
+            />
+        )}
 
-    function backwardButtonHandler() {
-        if (!isBackwardButtonDisabled) {
-            let lowerCountAfter = lowerCount - maxEntry;
-            let upperCountAfter = upperCount - maxEntry;
-
-            if (lowerCountAfter === 1 && upperCountAfter < maxEntry) {
-                dispatch(decrementBookingsHistoryPageNumber())
-                dispatch(loadBookingsHistoryFromDB())
-                setLowerCount(1);
-                setUpperCount(maxEntry);
-            } else if (lowerCountAfter < 1 && upperCountAfter < maxEntry) {
-                dispatch(decrementBookingsHistoryPageNumber())
-                dispatch(loadBookingsHistoryFromDB())
-                setLowerCount(1);
-                setUpperCount(maxEntry);
-            } else if (upperCountAfter >= 1 && upperCountAfter >= maxEntry) {
-                dispatch(decrementBookingsHistoryPageNumber())
-                dispatch(loadBookingsHistoryFromDB())
-                setLowerCount(lowerCountAfter);
-                setUpperCount(lowerCountAfter - upperCountAfter === maxEntry ? upperCountAfter : lowerCountAfter + maxEntry - 1);
-            }
-        }
-    }
-
-    function forwardButtonHandler() {
-        if (!isForwardButtonDisabled) {
-            let lowerCountAfter = lowerCount + maxEntry;
-            let upperCountAfter = upperCount + maxEntry;
-
-            if (upperCountAfter > totalCount && lowerCountAfter < 0) {
-                setLowerCount(totalCount - maxEntry);
-                setUpperCount(totalCount);
-            } else if (upperCountAfter <= totalCount && lowerCountAfter >= 0) {
-                dispatch(incrementBookingsHistoryPageNumber())
-                dispatch(loadBookingsHistoryFromDB())
-                setLowerCount(lowerCountAfter);
-                setUpperCount(upperCountAfter);
-            } else if (upperCountAfter > totalCount && upperCountAfter >= 0) {
-                dispatch(incrementBookingsHistoryPageNumber())
-                dispatch(loadBookingsHistoryFromDB())
-                setUpperCount(totalCount);
-                setLowerCount(lowerCountAfter)
-            } else if (lowerCountAfter < 0 && upperCountAfter < totalCount) {
-                dispatch(incrementBookingsHistoryPageNumber())
-                dispatch(loadBookingsHistoryFromDB())
-                setUpperCount(upperCountAfter)
-                setLowerCount(0)
-            }
-        }
-    }
-
-    return <View style={{flex: 1, backgroundColor: "white"}}>
-        {
-            isPaginationModalVisible &&
-            <Modal
-                visible={isPaginationModalVisible}
-                animationType="fade"
-                transparent={true}
-            >
-                <TouchableOpacity
-                    activeOpacity={1}
-                    style={styles.overlay}
-                    onPress={() => setIsPaginationModalVisible(false)}
-                >
-                    <View style={styles.modalContainer}>
-                        <Text style={styles.modalTitle}>Select Max Count</Text>
-                        <View style={styles.innerContainer}>
-                            <RadioButton
-                                options={options}
-                                value={maxEntry}
-                                onPress={(value) => {
-                                    setIsPaginationModalVisible(false);
-                                    dispatch(resetBookingsHistoryPageNo());
-                                    dispatch(updateBookingsHistoryMaxEntry(value));
-                                    setLowerCount(1)
-                                    setUpperCount(value)
-                                    dispatch(loadBookingsHistoryFromDB())
-                                }}
-                            />
-                        </View>
-                    </View>
-                </TouchableOpacity>
-            </Modal>
-        }
-        <ScrollView style={{flex: 1, padding: 20}}>
-            <AppointmentsDatePicker date={bookingsHistoryFilterDate}
+        {/*<ScrollView style={{flex: 1, padding: 20, marginBottom: 30}}>*/}
+        <View style={{paddingHorizontal: 15}}>
+            <AppointmentsDatePicker date={new Date(bookingsHistoryFilterDate)}
                                     maximumDate={new Date()}
                 // minimumDate={new Date(new Date().setDate(16))}
                                     onRightArrowPress={() => {
-                                        const nextDate = new Date(bookingsHistoryFilterDate.getTime());
+                                        const nextDate = moment(bookingsHistoryFilterDate).toDate();
                                         nextDate.setDate(nextDate.getDate() + 1); // Add 1 day
-                                        dispatch(setBookingsHistoryFilterDate(nextDate));
+                                        dispatch(setBookingsHistoryFilterDate(moment(nextDate).toISOString()));
                                     }}
                                     onLeftArrowPress={() => {
-                                        const prevDay = new Date(bookingsHistoryFilterDate.getTime());
+                                        const prevDay = moment(bookingsHistoryFilterDate).toDate();
                                         prevDay.setDate(prevDay.getDate() - 1); // Subtract 1 day
-                                        dispatch(setBookingsHistoryFilterDate(prevDay));
+                                        dispatch(setBookingsHistoryFilterDate(moment(prevDay).toISOString()));
                                     }}
                                     handleConfirm={(selectedDate) => {
-                                        dispatch(setBookingsHistoryFilterDate(new Date(selectedDate.getTime())))
+                                        dispatch(setBookingsHistoryFilterDate(moment(selectedDate).toISOString()))
                                     }}
                                     range={"day"}
             />
-            {isFetching ? <View>
-                    <ActivityIndicator/>
-                </View> :
-                bookingsHistory.length === 0 ? <View style={{
-                        height: 600, alignItems: "center", justifyContent: "center"
-                    }}>
-                        <Text style={[textTheme.titleMedium]}>No Bookings History</Text>
-                    </View> :
-                    <View style={{marginBottom: 20}}>
-                        {bookingsHistory.map(item => <BookingCard data={item}/>)}
-                        {totalCount < 10 ? null : <View style={styles.pagination}>
-                            <PrimaryButton
-                                pressableStyle={styles.entryButton}
-                                buttonStyle={styles.entryButtonContainer}
-                                onPress={() => setIsPaginationModalVisible(true)}
-                            >
-                                <View style={styles.buttonInnerContainer}>
-                                    <Text style={styles.entryText}>
-                                        {maxEntry}
-                                    </Text>
-                                    <AntDesign name="caretdown" size={14} color="black" style={{marginLeft: 16}}/>
-                                </View>
-                            </PrimaryButton>
+        </View>
 
-                            <View style={styles.paginationInnerContainer}>
-                                <Text style={styles.pagingText}>
-                                    {lowerCount < 0 ? 0 : lowerCount} - {upperCount} of {totalCount}
-                                </Text>
-                                <PrimaryButton
-                                    buttonStyle={[isBackwardButtonDisabled ? [styles.pageBackwardButton, styles.disabled] : [styles.pageBackwardButton]]}
-                                    onPress={backwardButtonHandler}
-                                >
-                                    <FontAwesome6 name="angle-left" size={24} color="black"/>
-                                </PrimaryButton>
-                                <PrimaryButton
-                                    buttonStyle={[isForwardButtonDisabled ? [styles.pageForwardButton, styles.disabled] : [styles.pageForwardButton]]}
-                                    onPress={forwardButtonHandler}
-                                >
-                                    <FontAwesome6 name="angle-right" size={24} color="black"/>
-                                </PrimaryButton>
-                            </View>
-                        </View>}
-                    </View>}
-        </ScrollView>
+        <InfiniteScrollerList
+            scrollEventThrottle={100}
+            style={{paddingHorizontal: 15}}
+            onFetchTrigger={() => {
+                dispatch(incrementBookingsHistoryPageNumber())
+                dispatch(loadBookingsHistoryFromDB())
+            }}
+            fallbackTextOnEmptyData={"No Bookings History"}
+            triggerThreshold={100}
+            totalLength={bookingsHistoryCount}
+            data={bookingsHistory}
+            isLoading={isFetching}
+            fallbackTextContainerStyle={{height: 500}}
+            fallbackTextStyle={{color: "black", ...textTheme.titleMedium}}
+            renderItem={({item}) => <BookingCard data={item}/>}
+        />
     </View>
 };
 
@@ -263,7 +153,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: Colors.primary,
+        // color: Colors.primary,
         marginBottom: 10,
     },
     innerContainer: {

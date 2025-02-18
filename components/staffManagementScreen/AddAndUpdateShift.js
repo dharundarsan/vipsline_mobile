@@ -57,6 +57,8 @@ export default function AddAndUpdateShift(props) {
         style={[styles.modal, props.style]}
         visible={props.visible}
         animationType={"slide"}
+        presentationStyle={"formSheet"}
+        onRequestClose={props.onClose}
     >
         <View style={styles.closeAndHeadingContainer}>
             <Text style={[textTheme.titleLarge, styles.titleText]}>{capitalizeFirstLetters(props.currentDayWorkingData.name) + " - " + moment(props.currentDayWorkingData.date).toDate().toLocaleDateString('en-GB', {

@@ -94,6 +94,8 @@ export default function AddAndUpdateClosedDatesModal(props) {
         visible={props.visible}
         animationType="slide"
         style={styles.modal}
+        onRequestClose={props.onClose}
+        presentationStyle={"formSheet"}
     >
         <Toast ref={toastRef}/>
 

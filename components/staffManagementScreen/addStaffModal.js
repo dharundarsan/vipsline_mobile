@@ -154,7 +154,9 @@ const AddStaffModal = (props) => {
     }
 
     return <Modal style={styles.createLeadModal} visible={props.isVisible} animationType={"slide"}
-                  presentationStyle={"pageSheet"}>
+                  presentationStyle={"pageSheet"}
+                  onRequestClose={props.onClose}
+    >
         <Toast
             ref={toastRef}
         />
