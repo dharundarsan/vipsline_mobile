@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, FlatList} from "react-native";
+import {View, Text, StyleSheet, FlatList, Dimensions} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
@@ -10,7 +10,7 @@ import {FAB} from "react-native-paper";
 import AddAndUpdateClosedDatesModal from "../../components/staffManagementScreen/AddAndUpdateClosedDatesModal";
 import Toast from "../../ui/Toast";
 import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
-
+const windowHeight = Dimensions.get("window").height;
 export default function BusinessClosedDates() {
     const dispatch = useDispatch();
 
@@ -88,6 +88,11 @@ export default function BusinessClosedDates() {
                 setTimeout(() => {
                     dispatch(updateIsFetching(false));
                 }, 1000)
+            }}
+            ListEmptyComponent={() => {
+                return<Text style={[textTheme.titleMedium, {textAlign: 'center', marginTop: windowHeight / 2.2}]}>
+                    No Business Closed Dates
+                </Text>
             }}
         />
         <FAB

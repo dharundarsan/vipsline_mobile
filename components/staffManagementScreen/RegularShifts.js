@@ -43,6 +43,8 @@ const RegularShifts = (props) => {
     const [scheduleTypeChangeTracker, setScheduleTypeChangeTracker] = useState("");
     const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState();
 
+    const [create, setCreate] = useState(false);
+
     useLayoutEffect(() => {
         const fetchSchedule = async () => {
             const response = await getRegularShiftsAPI(props.currentDayWorkingData.resource_id);
@@ -51,6 +53,19 @@ const RegularShifts = (props) => {
         };
 
         fetchSchedule().then((response1) => {
+            if(Object.keys(response1.data.data[0]).length === 0) {
+                console.log("sdgsj")
+                setCreate(true)
+                getDefaultStaffSchedulePatternAPI(1).then((response2) => {
+                    setResponse(response2.data.data[0]);
+                    setScheduleType("Weekly");
+                    setEnds(response2.end_date === null ? "never" : "Select end date")
+                    setEndDate(response2.end_date !== null ? moment(response2.end_date).toDate() : null);
+                    setStartDate(moment(response2.start_date).toDate());
+                })
+                return;
+            }
+
             const response = response1.data.data[0];
             setScheduleType(mappingWeekNames[response.schedule_type]);
             setEnds(response.end_date === null ? "never" : "Select end date")
@@ -199,6 +214,7 @@ const RegularShifts = (props) => {
                         toastRefTop={toastRef}
                         toastRef={props.toastRef}
                         onClose={props.onClose}
+                        create={create}
 
                     />
 

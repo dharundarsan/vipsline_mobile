@@ -107,6 +107,7 @@ const AddStaffModal = (props) => {
     }
 
 
+
     const handleEdit = async () => {
         const firstNameValid = firstNameRef.current();
         const phoneNoValid = phoneNoRef.current();
@@ -129,8 +130,8 @@ const AddStaffModal = (props) => {
                 mobile: phoneNo[1],
                 name: firstName + " " + lastName,
                 services: [],
-                start_date: formatDate(startDate, "yyyy-mm-dd"),
-                termination_date: endDate !== "" ? formatDate(endDate, "yyyy-mm-dd") : "",
+                start_date: startDate === null || startDate === "" ? "" : formatDate(startDate, "yyyy-mm-dd"),
+                termination_date: endDate === "" || endDate === null ? "" : formatDate(endDate, "yyyy-mm-dd"),
                 title: staffTitle === "" ? "" : staffTitle,
                 business_id: await SecureStore.getItemAsync('businessId'),
             }, props.data.id)

@@ -21,6 +21,10 @@ export default function AddAndUpdateShift(props) {
 
     // console.log(shiftTimingList);
 
+    const staffs = useSelector(state => state.staff.staffs);
+
+
+
 
 
 
@@ -61,11 +65,19 @@ export default function AddAndUpdateShift(props) {
         onRequestClose={props.onClose}
     >
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{capitalizeFirstLetters(props.currentDayWorkingData.name) + " - " + moment(props.currentDayWorkingData.date).toDate().toLocaleDateString('en-GB', {
+            <Text style={[textTheme.titleLarge, styles.titleText]}>{capitalizeFirstLetters(
+                props.regularShifts ?
+                (staffs.find((item, index) => {
+                    if(item.id === props.resourceId) {
+                        return item;
+                    }
+                })).name :
+                    props.currentDayWorkingData.name
+            ) + (props.regularShifts ? "" :  " - " + moment(props.currentDayWorkingData.date).toDate().toLocaleDateString('en-GB', {
                 weekday: 'short',
                 day: '2-digit',
                 month: 'short'
-            })}</Text>
+            }))}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}

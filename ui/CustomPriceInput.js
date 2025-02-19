@@ -10,7 +10,9 @@ const PriceInput = ({
                         onOnchangeText,
                         innerContainerStyle,
                         readOnly,
-                        value
+                        value,
+                        defaultValue,
+                        onEndEditing
 }) => {
     const borderLeftWidthColor = {
         borderLeftWidth: 1,
@@ -41,6 +43,8 @@ const PriceInput = ({
                 onChangeText={(text) => onOnchangeText === undefined ? {} : onOnchangeText(text)}
                 readOnly={readOnly}
                 value={value}
+                defaultValue={defaultValue}
+                onEndEditing={onEndEditing}
 
             />
             <View
