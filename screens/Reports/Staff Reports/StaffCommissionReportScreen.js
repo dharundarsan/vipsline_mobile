@@ -1,5 +1,5 @@
 import {ActivityIndicator, Pressable, StyleSheet, Text, View} from 'react-native'
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {ScrollView} from 'react-native';
 import {Table, TableWrapper, Col, Cols, Cell, Row, Rows} from 'react-native-table-component';
 import PrimaryButton from "../../../ui/PrimaryButton";
@@ -51,6 +51,19 @@ const StaffCommissionReportScreen = () => {
             staffCommissionReportAPI(firstDate, SecondDate)
         },
     });
+    //
+    // useLayoutEffect(() => {
+    //     handleSelection({label: "This month", value: "Current month", day1: 0, day2: 0});
+    // }, []);
+
+
+    useEffect(() => {
+        handleSelection({label: "This month", value: "Current month", day1: 0, day2: 0}).then(() => {
+
+            staffCommissionReportAPI(currentFromDate, currentToDate);
+        })
+        // handleSelection({label: "This month", value: "Current month", day1: 0, day2: 0});
+    }, [currentFromDate, currentToDate]);
 
     const staffCommissionReportAPI = async (fromDate, toDate) => {
         try {

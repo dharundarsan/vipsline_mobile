@@ -1173,13 +1173,13 @@ const staffWorkHourListKey = [
 
 const staffWorkHourListWithSort = staffWorkHourListKey.map((item, index) => ({
     ...item,
-    title: staffSummaryListHeader[index]
+    title: staffWorkHourListHeader[index]
 }))
 
 const formatStaffWorkHourListTableData = (dataList) => {
     return dataList.map((item) => [
         item.date,
-        item.start_time,
+        item.start_time,git
         item.end_time,
         item.working_hours,
     ])
