@@ -9,7 +9,7 @@ export default async function getListOfDataToDisplayForStaffCommissionProfile(
 ) {
     try {
 
-        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/getListOfDatasToDisplay", {
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/getListOfDatasToDisplayForMobileApp", {
             business_id: await SecureStore.getItemAsync('businessId'),
             commission_id: commission_id,
             commission_value: commission_value,
@@ -27,12 +27,7 @@ export default async function getListOfDataToDisplayForStaffCommissionProfile(
 
 
 
-        return response.data.data.flatMap(category =>
-            category.resource_categories.map(item => ({
-                ...item,
-                gender: category.gender
-            }))
-        );
+        return response.data.data;
 
     } catch (e) {
         console.error("Error: Get Staff schedules API111");

@@ -43,6 +43,7 @@ export default function CommissionByTarget({
 
 
 
+
     const addTier = () => {
         if (targetMapping.length === 0) return;
 
@@ -77,44 +78,47 @@ export default function CommissionByTarget({
         setTargetMapping(targetMapping.slice(0, targetMapping.length - 1));
     };
 
+
+    const updateCommissionPercentage = (text, index) => {
+        // Convert text input to a number
+        const newValue = parseFloat(text) || 0;
+
+
+        setTargetMapping((prev) =>
+            prev.map((tier, i) =>
+                i === index ? { ...tier, commission_percentage: newValue } : tier
+            )
+        );
+
+    };
+
+    const updateCommissionTo = (text,index) => {
+        // Convert text input to a number
+        const newValue = parseFloat(text) || 0;
+
+
+        setTargetMapping((prev) =>
+            prev.map((tier, i) =>
+                i === index ? { ...tier, commission_to: newValue } : tier
+            )
+        );
+
+
+
+
+        // if((targetMapping[index].commission_from > newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) > newValue)) {
+        //     setIsLesserThenPrev(true);
+        //     console.log("exec")
+        // }
+        // else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
+        //     setIsLesserThenPrev(false);
+        // }
+
+    };
+
+
+
     function renderItem({item, index}) {
-
-        const updateCommissionTo = (text) => {
-            // Convert text input to a number
-            const newValue = parseFloat(text) || 0;
-
-
-            setTargetMapping((prev) =>
-                prev.map((tier, i) =>
-                    i === index ? { ...tier, commission_to: newValue } : tier
-                )
-            );
-
-            if(index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.1) >= text) {
-                setIsLesserThenPrev(true);
-            }
-            else {
-                setIsLesserThenPrev(false);
-            }
-
-        };
-
-        const updateCommissionPercentage = (text) => {
-            // Convert text input to a number
-            const newValue = parseFloat(text) || 0;
-
-
-            setTargetMapping((prev) =>
-                prev.map((tier, i) =>
-                    i === index ? { ...tier, commission_percentage: newValue } : tier
-                )
-            );
-
-        };
-
-
-
-
 
         return <View style={styles.renderItemStyle}>
             <CustomPriceInput
@@ -122,23 +126,43 @@ export default function CommissionByTarget({
                 container={{marginRight: 16}}
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 readOnly
-                value={index === 0 ? "0" : (targetMapping[index - 1].commission_to + 0.1).toString()}
-                onOnchangeText={updateCommissionTo}
+                value={index === 0 ? "0" : (targetMapping[index - 1].commission_to + 0.01).toString()}
+                onOnchangeText={(text) => {
+                    updateCommissionTo(text, index)
+                }}
+
             />
             <CustomPriceInput
                 priceToggle={"VALUE"}
                 container={{marginRight: 16}}
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
-                onOnchangeText={updateCommissionTo}
-                value={item.commission_to.toString()}
+                onOnchangeText={(text) => {
+                    updateCommissionTo(text, index)
+                }}
+                defaultValue={item.commission_to.toString()}
+                onEndEditing={(newValue) => {
+                    if((targetMapping[index].commission_from > newValue) ||
+                        ((index === 0 ? 0 : targetMapping[index - 1].commission_to + 0.01) > newValue)) {
+                        setIsLesserThenPrev("Enter a higher value in the 'To' field than the 'From' field.");
+                    }
+                    else if((targetMapping.length - 1 > index && targetMapping[index + 1].commission_to <= newValue)) {
+                        setIsLesserThenPrev(`'Commission to' value in ${index + 1} is higher than the ${index + 2}`)
+
+                    }
+                    else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
+                        setIsLesserThenPrev("");
+                    }
+                }}
 
 
             />
             <CustomPriceInput
                 priceToggle={"PERCENTAGE"}
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
-                onOnchangeText={updateCommissionPercentage}
-                value={item.commission_percentage.toString()}
+                onOnchangeText={(text) => {
+                    updateCommissionPercentage(text, index)
+                }}
+                defaultValue={item.commission_percentage.toString()}
             />
             <TouchableOpacity style={{alignItems: "center", justifyContent:"center", width: "8%"}}>
                 {
@@ -150,6 +174,8 @@ export default function CommissionByTarget({
             </TouchableOpacity>
             </View>
     }
+
+
 
     const allItems = [
         { type: "Services", type_id: null },
@@ -244,8 +270,7 @@ export default function CommissionByTarget({
         />
         {
              targetMapping.length > 1 && isLesserThenPrev  ?
-                <Text style={[textTheme.bodyMedium, {color: Colors.error}]}>Enter a higher value in the 'To' field than the
-                    'From' field.</Text> : <></>
+                <Text style={[textTheme.bodyMedium, {color: Colors.error}]}>{isLesserThenPrev}</Text> : <></>
         }
         {
             isFieldsEmpty ?

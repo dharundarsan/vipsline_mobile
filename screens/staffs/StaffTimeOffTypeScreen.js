@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, FlatList} from "react-native";
+import {View, Text, StyleSheet, FlatList, Dimensions} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {Ionicons} from "@expo/vector-icons";
 import textTheme from "../../constants/TextTheme";
@@ -10,7 +10,7 @@ import Toast from "../../ui/Toast";
 import {useDispatch, useSelector} from "react-redux";
 import {loadTimeOffTypeFromDb, updateIsFetching} from "../../store/staffSlice";
 import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
-
+const windowHeight = Dimensions.get("window").height;
 export default function StaffTimeOffTypeScreen(props) {
     const dispatch = useDispatch();
 
@@ -51,6 +51,7 @@ export default function StaffTimeOffTypeScreen(props) {
 
 
 
+
     return isFetching ? <ThreeDotActionIndicator color={Colors.highlight}/> :
     <View style={styles.staffTimeOffType}>
         {
@@ -73,9 +74,12 @@ export default function StaffTimeOffTypeScreen(props) {
             />
         }
         <Toast ref={toastRef}/>
-        <View style={styles.labelContainer}>
-            <Text> Time off types - Set specific reasons for when you add time off. </Text>
-        </View>
+        {
+            timeOffType.length > 0 ?
+            <View style={styles.labelContainer}>
+                <Text> Time off types - Set specific reasons for when you add time off. </Text>
+            </View> : <></>
+        }
         <FlatList
             data={timeOffType}
             renderItem={renderItem}
@@ -87,6 +91,12 @@ export default function StaffTimeOffTypeScreen(props) {
                 setTimeout(() => {
                     dispatch(updateIsFetching(false));
                 }, 1000)
+            }}
+            ListEmptyComponent={() => {
+                console.log("sdf")
+                return<Text style={[textTheme.titleMedium, {textAlign: 'center', marginTop: windowHeight / 2.2}]}>
+                    No Time off type
+                </Text>
             }}
 
         />

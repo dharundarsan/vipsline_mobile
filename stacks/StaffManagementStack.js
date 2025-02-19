@@ -95,7 +95,7 @@ const StaffManagementStack = () => {
 
         />
         <Stack.Screen
-            name="Working Hours"
+            name="Schedules"
             component={WorkingHours}
             options={({navigation, route}) => ({
                 headerShown: true,

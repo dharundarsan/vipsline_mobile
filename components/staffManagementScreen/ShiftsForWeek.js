@@ -14,6 +14,7 @@ import * as SecureStore from "expo-secure-store";
 import updateSchedulePatternAPI from "../../apis/staffManagementAPIs/updateSchedulePatternAPI";
 import moment from "moment";
 import AddAndUpdateShift from "./AddAndUpdateShift";
+import createSchedulePatternAPI from "../../apis/staffManagementAPIs/createSchedulePatternAPI";
 
 export default function ShiftsForWeek(props) {
 
@@ -56,11 +57,16 @@ export default function ShiftsForWeek(props) {
 
     useEffect(() => {
 
+
+
         parseSchedule(props.data);
     }, []);
 
 
     useEffect(() => {
+
+
+
         if(props.scheduleTypeChangeTracker === "" || props.scheduleTypeChangeTracker === 0) {
             return;
         }
@@ -151,7 +157,7 @@ export default function ShiftsForWeek(props) {
         const payload = {
             business_id: await SecureStore.getItemAsync('businessId'),
             resource_id: props.currentDayWorkingData.resource_id,
-            staff_schedule_id: props.data.staff_schedule_id,
+            staff_schedule_id: props.create ? undefined : props.data.staff_schedule_id,
             start_date: moment(props.startDate).format("YYYY-MM-DD"),
             end_date: props.ends === "Select end date" ? moment(props.endDate).format("YYYY-MM-DD") : 'never',
             schedule_type: mappingWeekNames[props.scheduleType],
@@ -169,15 +175,35 @@ export default function ShiftsForWeek(props) {
             ).flat()
         };
 
-        const response =  updateSchedulePatternAPI(payload).then((response) => {
-            if(response.data.other_message === "") {
-                props.toastRef.current.show(response.data.message);
-                props.onClose();
-            }
-            else {
-                props.toastRefTop.current.show(response.data.message);
-            }
-        });
+        console.log(props.create)
+
+        if(props.create) {
+            const response =  createSchedulePatternAPI(payload).then((response) => {
+                if(response.data.other_message === "") {
+                    props.toastRef.current.show(response.data.message);
+                    props.onClose();
+                }
+                else {
+                    props.toastRefTop.current.show(response.data.message);
+                }
+            });
+        }
+        else {
+            const response =  updateSchedulePatternAPI(payload).then((response) => {
+                if(response.data.other_message === "") {
+                    props.toastRef.current.show(response.data.message);
+                    props.onClose();
+                }
+                else {
+                    props.toastRefTop.current.show(response.data.message);
+                }
+            });
+        }
+
+
+
+
+
         setLoading(false);
 
     }
@@ -259,7 +285,9 @@ export default function ShiftsForWeek(props) {
         });
     };
 
-    return (
+
+
+    return (Object.values(props.data).length > 0 &&
         <View>
             {
                 addShiftVisibility &&
@@ -277,6 +305,7 @@ export default function ShiftsForWeek(props) {
                             [`${week}-${day}`]: shifts
                         }))
                     }}
+                    resourceId={props.currentDayWorkingData.resource_id}
                 />
             }
             {schedule.map((weekItem, weekIndex) => (

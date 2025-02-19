@@ -48,7 +48,7 @@ export default function StaffManagementScreen({navigation}) {
             icon: shiftTimingIcon,
         },
         {
-            label: "Working hours",
+            label: "Schedules",
             icon: workingHoursIcon,
         },
         {
