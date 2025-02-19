@@ -1,4 +1,4 @@
-import {Text, View, StyleSheet, FlatList} from "react-native";
+import {Text, View, StyleSheet, FlatList, Dimensions} from "react-native";
 import {Divider, FAB} from "react-native-paper";
 import Colors from "../../constants/Colors";
 import AddAndUpdateCommissionProfile from "../../components/staffManagementScreen/AddAndUpdateCommissionProfile";
@@ -11,6 +11,7 @@ import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
 import Toast from "../../ui/Toast";
 
 const paddingForAddCommissionButton = 30;
+const windowHeight = Dimensions.get("window").height;
 
 export default function CommissionProfileScreen(props) {
     const dispatch = useDispatch();
@@ -57,15 +58,7 @@ export default function CommissionProfileScreen(props) {
 
 
     return <View style={styles.commissionProfile}>
-        <FAB
-            icon={"plus"}
-            style={styles.addCommissionProfileButton}
-            color={Colors.white}
-            onPress={() => {
-                setEditCommission(false)
-                setAddAndUpdateCommissionVisibility(true)
-            }}
-        />
+
         <Toast ref={toastRef}/>
 
         {
@@ -109,10 +102,25 @@ export default function CommissionProfileScreen(props) {
                             setRefresh(false)
                         }, 1000)
                     }}
+                    ListEmptyComponent={() => {
+                        return<Text style={[textTheme.titleMedium, {textAlign: 'center', marginTop: windowHeight / 2.2}]}>
+                            No Commission profile
+                        </Text>
+                    }}
+                    style={styles.flatList}
 
                 />
         }
 
+        <FAB
+            icon={"plus"}
+            style={styles.addCommissionProfileButton}
+            color={Colors.white}
+            onPress={() => {
+                setEditCommission(false)
+                setAddAndUpdateCommissionVisibility(true)
+            }}
+        />
 
 
 
@@ -147,5 +155,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         justifyContent: 'space-between'
+    },
+    flatList: {
+        width: '100%',
     }
 })

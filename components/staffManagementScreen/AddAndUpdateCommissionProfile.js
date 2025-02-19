@@ -57,7 +57,7 @@ export default function AddAndUpdateCommissionProfile(props) {
     const [targetTier, setTargetTier] = useState("");
     const [computationalInterval, setComputationalInterval] = useState("");
 
-    const [isLesserThenPrev, setIsLesserThenPrev] = useState(false);
+    const [isLesserThenPrev, setIsLesserThenPrev] = useState("");
     const [isFieldsEmpty, setIsFieldsEmpty] = useState(false);
 
     const [services, setServices] = useState([]);
@@ -169,21 +169,21 @@ export default function AddAndUpdateCommissionProfile(props) {
 
     }, [itemType, itemOrTarget])
 
-    useEffect(() => {
-        const commission_to_array = (targetMapping.map((item, index) => item.commission_to));
-
-        for(let commission_to = 0; commission_to < commission_to_array.length; commission_to++) {
-            if(commission_to === 0) continue
-
-            if(commission_to_array[commission_to] < commission_to_array[commission_to - 1]) {
-                setIsLesserThenPrev(true);
-                break
-            }
-            else
-                setIsLesserThenPrev(false);
-            break
-        }
-    }, [targetMapping]);
+    // useEffect(() => {
+    //     const commission_to_array = (targetMapping.map((item, index) => item.commission_to));
+    //
+    //     for(let commission_to = 0; commission_to < commission_to_array.length; commission_to++) {
+    //         if(commission_to === 0) continue
+    //
+    //         if(commission_to_array[commission_to] < commission_to_array[commission_to - 1]) {
+    //             setIsLesserThenPrev(true);
+    //             break
+    //         }
+    //         else
+    //             setIsLesserThenPrev(false);
+    //         break
+    //     }
+    // }, [targetMapping]);
 
 
 
@@ -211,7 +211,7 @@ export default function AddAndUpdateCommissionProfile(props) {
             return
         }
 
-        if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev) {
+        if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev.length > 0) {
             return;
         }
         else if(itemOrTarget === 2 && isFieldsEmpty) {
@@ -318,7 +318,7 @@ export default function AddAndUpdateCommissionProfile(props) {
             return
         }
 
-        if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev) {
+        if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev.length > 0) {
             return;
         }
         else if(itemOrTarget === 2 && isFieldsEmpty) {
@@ -616,7 +616,13 @@ export default function AddAndUpdateCommissionProfile(props) {
         <Divider/>
 
         <View style={styles.modalContent}>
-            <ScrollView showsVerticalScrollIndicator={false} style={{}}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={{}}
+                removeClippedSubviews
+                nestedScrollEnabled
+
+            >
                 <PrimaryButton
                     buttonStyle={styles.radioButtonStyle}
                     pressableStyle={styles.radioButtonPressable}
@@ -684,7 +690,12 @@ export default function AddAndUpdateCommissionProfile(props) {
 
                         <CheckBoxContainer />
 
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        removeClippedSubviews
+                        nestedScrollEnabled
+                    >
 
                         <Table
 
@@ -703,11 +714,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                                                 setItemType(item)
                                             }}
                                             labelEnabled={false}
-
                                             container={{marginBottom: 0, width: "70%"}}
-
-
-
                                         />
                                     </View>,
                                     <View style={{flexDirection: "row", alignItems: 'center', gap: 8, borderWidth: 0}}>
@@ -722,8 +729,6 @@ export default function AddAndUpdateCommissionProfile(props) {
                                             }}
                                             container={{marginBottom: 0, width: "50%"}}
                                             cursorColor={Colors.black}
-
-
                                         />
                                     </View>,
                                     <View style={{flexDirection: "row", gap: 6}}>
@@ -749,7 +754,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                                                 if(itemOrTarget === 1) {
                                                     const key = itemType === "Custom services" ? "Custom_services" : itemType;
 
-                                                    const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/getListOfDatasToDisplay", {
+                                                    const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/getListOfDatasToDisplayForMobileApp", {
                                                         business_id: await SecureStore.getItemAsync('businessId'),
                                                         commission_id: props.data.id,
                                                         commission_value: value.toString(),
@@ -765,12 +770,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                                                         return console.error("API response does not contain expected data");
                                                     }
 
-                                                    const formattedData = response.data.data.flatMap(category =>
-                                                        category.resource_categories.map(item => ({
-                                                            ...item,
-                                                            gender: category.gender
-                                                        }))
-                                                    );
+                                                    const formattedData = response.data.data;
 
 
 

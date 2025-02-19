@@ -4,7 +4,7 @@ import React, {useEffect, useRef, useState} from "react";
 import moment from "moment";
 import CustomDropdown from "../common/CustomDropdown";
 import StaffCard from "./StaffCard";
-import {MaterialIcons} from "@expo/vector-icons";
+import {Feather, MaterialIcons} from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {useDispatch, useSelector} from "react-redux";
@@ -65,7 +65,7 @@ export default function Team(props) {
         >
 
             <View>
-                <Text>
+                <Text style={[textTheme.titleSmall]}>
                     {new Intl.DateTimeFormat("en-US", { weekday: "short", day: "2-digit", month: "short" }).format(moment(dataItem.item.date).toDate())}
                 </Text>
             </View>
@@ -75,7 +75,7 @@ export default function Team(props) {
                     dataItem.item.businessHoliday ?
                         <View style={[styles.timeDurationCard, {backgroundColor: Colors.white, position: 'relative', overflow:"scroll"}]}>
                         {/*<SlantingLines />*/}
-                            <Text>{"Holiday"}</Text>
+                            <Text style={[textTheme.bodySmall]}>{"Holiday"}</Text>
                         </View> :
                         dataItem.item.permission ?
                             <View style={[styles.timeDurationCard, {backgroundColor: Colors.grey150}]}>
@@ -85,18 +85,18 @@ export default function Team(props) {
                                 <View style={[styles.timeDurationCard, {backgroundColor: Colors.grey150}]}>
                                     <Text style={[textTheme.bodyMedium, {textAlign: "center"}]}>{"Leave"}</Text>
 
-                                    </View> : <></>
+                                    </View> : dataItem.item.shiftsWorkingList.length === 0 &&  dataItem.item.timeOffRequestId === -1?
+                                    <View style={[styles.timeDurationCard]}>
+                                        <Text style={[textTheme.bodyMedium]}>No Shift</Text>
+                                    </View> :
+                                    dataItem.item.shiftsWorkingList.map((innerItem, index) => {
+                                        return <View style={styles.timeDurationCard} key={index}>
+                                            <Text>{innerItem.start_time + " - " + (innerItem.end_time)}</Text>
+                                        </View>
+                                    })
                 }
                 {
-                    dataItem.item.shiftsWorkingList.length === 0 &&  dataItem.item.timeOffRequestId === -1?
-                            <View style={[styles.timeDurationCard, {backgroundColor: Colors.white}]}>
-                                <Text>{"Not working"}</Text>
-                            </View> :
-                    dataItem.item.shiftsWorkingList.map((innerItem, index) => {
-                    return <View style={styles.timeDurationCard} key={index}>
-                        <Text>{innerItem.start_time + " - " + (innerItem.end_time)}</Text>
-                        </View>
-                    })
+
                 }
             </View>
         </PrimaryButton>
