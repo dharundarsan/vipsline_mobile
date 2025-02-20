@@ -970,7 +970,7 @@ const appointmentStaffSelection = [
         component: CommonReportSaleScreen,
         listName: "appointment_sales_summary",
         cardEnabled: true,
-        cardTitleData: ["No of Services", "Total Revenue"],
+        cardTitleData: ["No of Services", "Total Value"],
         cardValueList: ["total_appointment_count", "total_appointment_revenue"],
         cardCurrencyList: ["total_appointment_revenue"],
         // initialCardValue: cancelledListInitialCardValue,
@@ -1173,7 +1173,7 @@ const staffWorkHourListKey = [
 
 const staffWorkHourListWithSort = staffWorkHourListKey.map((item, index) => ({
     ...item,
-    title: staffSummaryListHeader[index]
+    title: staffWorkHourListHeader[index]
 }))
 
 const formatStaffWorkHourListTableData = (dataList) => {
@@ -1532,7 +1532,7 @@ const membershipStaffSelection = [
         cardEnabled: true,
         cardTitleData: ["Active Membership Count", "New Membership this month", "Membership expired this month"],
         cardValueList: ["total_count", "new_members", "expired_members"],
-        // cardCurrencyList: ["net_revenue", "total_revenue"],
+        cardCurrencyList: [],
         // initialCardValue: cancelledListInitialCardValue,
         searchEnabled: false,
         searchPlaceholder: "",
@@ -1541,6 +1541,7 @@ const membershipStaffSelection = [
         salesListWidthHeader: activeMembershipListHeader,
         tableHeader: activeMembershipListWithSort,
         transformTableData: formatActiveMembershipListTableData,
+        disableDate: true
     },
     {
         title: "Active Individual Membership",
@@ -1582,6 +1583,7 @@ const membershipStaffSelection = [
         // cardValueList: ["total_count", "new_members", "expired_members"],
         // cardCurrencyList: ["net_revenue", "total_revenue"],
         // initialCardValue: cancelledListInitialCardValue,
+        disableDate: true,
         searchEnabled: false,
         searchPlaceholder: "",
         apiFunction: fetchAboutToExpireMembershipReport,
@@ -1594,6 +1596,7 @@ const membershipStaffSelection = [
         title: "Expired Membership",
         component: CommonReportSaleScreen,
         listName: "expiredMembershipData",
+        disableDate: true,
         // cardEnabled: true,
         // cardTitleData: ["Active Membership Count", "New Membership this month", "Membership expired this month"],
         // cardValueList: ["total_count", "new_members", "expired_members"],
@@ -2227,6 +2230,7 @@ const businessStaffSelection = [
         title: "Reward points",
         component: CommonReportSaleScreen,
         listName: "customerRewardList",
+        disableDate: true,
         // cardEnabled: true,
         // cardTitleData: ["Total Items", "Total Net Value", "Total Value"],
         // cardValueList: ["total_staff_summary_count", "net_revenue", "total_revenue"],

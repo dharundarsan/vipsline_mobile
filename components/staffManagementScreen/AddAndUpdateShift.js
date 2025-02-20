@@ -174,13 +174,13 @@ export default function AddAndUpdateShift(props) {
                 }
                 {
                     shiftTimingList.length === 0 ?
-                    <Text style={[textTheme.bodyLarge, {textAlign: "center", paddingVertical: 32}]}>
+                    <Text style={[textTheme.bodyLarge, {textAlign: "center", paddingVertical: 32, marginTop: 8}]}>
                         No Shift Data
                     </Text> : <></>
                 }
 
                 <PrimaryButton
-                    buttonStyle={[styles.addShiftButton, {alignSelf: shiftTimingList.length === 0 ? "center" : undefined}]}
+                    buttonStyle={[styles.addShiftButton, {alignSelf: shiftTimingList.length === 0 ? "center" : undefined, marginTop:shiftTimingList.length === 0 ? 24 : undefined}]}
                     pressableStyle={styles.addShiftButtonPressable}
                     onPress={addShift}
                 >
@@ -189,7 +189,7 @@ export default function AddAndUpdateShift(props) {
                         Add a shift
                     </Text>
                 </PrimaryButton>
-                <Text style={[textTheme.bodyLarge, {textAlign: "center", marginTop: 16}]}>
+                <Text style={[textTheme.bodyLarge, {textAlign: "center", marginTop: 64, opacity: 0.6}]}>
                     You are editing this day's shifts only. To set regular shifts, go to
                     <Text
                         style={{color: Colors.highlight}}

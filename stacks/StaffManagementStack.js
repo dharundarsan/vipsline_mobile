@@ -2,8 +2,8 @@ import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import React from "react";
 import StaffManagementScreen from "../screens/staffs/StaffManagementScreen";
 import StaffListScreen from "../screens/staffs/StaffListScreen";
-import {Image, TouchableOpacity} from "react-native";
-import {useNavigation} from "@react-navigation/native";
+import {BackHandler, Image, TouchableOpacity} from "react-native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 
 import {AntDesign} from "@expo/vector-icons";
 import StaffInfo from "../screens/staffs/StaffInfo";
@@ -22,6 +22,9 @@ import StaffCommissionScreen from "../screens/staffs/StaffCommissionScreen";
 export const BackButton = (props) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
+
+
+
 
     return (
         <TouchableOpacity
@@ -45,6 +48,29 @@ const StaffManagementStack = () => {
     // const navigation = useNavigation();
 
     const dispatch = useDispatch();
+
+    const staffBackHandler = (WrappedComponent) => {
+        return (props) => {
+            const navigation = useNavigation();
+
+            useFocusEffect(
+                React.useCallback(() => {
+                    const onBackPress = () => {
+                        navigation.goBack(); // Navigate to the initial screen
+                        return true; // Prevent default back action
+                    };
+
+                    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+                    return () => {
+                        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+                    };
+                }, [navigation])
+            );
+
+            return <WrappedComponent {...props} />;
+        };
+    };
 
 
     return (<Stack.Navigator
@@ -70,8 +96,8 @@ const StaffManagementStack = () => {
         })}
         />
         <Stack.Screen
-            name="Staff List"
-            component={StaffListScreen}
+            name="Manage Staff"
+            component={staffBackHandler(StaffListScreen)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -83,7 +109,7 @@ const StaffManagementStack = () => {
         />
         <Stack.Screen
             name="Shift Timing"
-            component={ShiftTiming}
+            component={staffBackHandler(ShiftTiming)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -96,7 +122,7 @@ const StaffManagementStack = () => {
         />
         <Stack.Screen
             name="Schedules"
-            component={WorkingHours}
+            component={staffBackHandler(WorkingHours)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -119,7 +145,7 @@ const StaffManagementStack = () => {
         />
         <Stack.Screen
             name="Commission Profile"
-            component={CommissionProfileScreen}
+            component={staffBackHandler(CommissionProfileScreen)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -131,7 +157,7 @@ const StaffManagementStack = () => {
         />
         <Stack.Screen
             name="Staff Commission"
-            component={StaffCommissionScreen}
+            component={staffBackHandler(StaffCommissionScreen)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -143,7 +169,7 @@ const StaffManagementStack = () => {
         />
         <Stack.Screen
             name="Business Closed Dates"
-            component={BusinessClosedDates}
+            component={staffBackHandler(BusinessClosedDates)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -155,7 +181,7 @@ const StaffManagementStack = () => {
         />
         <Stack.Screen
             name="Time Off Type"
-            component={StaffTimeOffTypeScreen}
+            component={staffBackHandler(StaffTimeOffTypeScreen)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
@@ -167,7 +193,7 @@ const StaffManagementStack = () => {
         />
         <Stack.Screen
             name="Staff Name"
-            component={StaffInfo}
+            component={staffBackHandler(StaffInfo)}
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",

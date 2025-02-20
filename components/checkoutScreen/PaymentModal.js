@@ -1190,7 +1190,7 @@ const PaymentModal = (props) => {
                 } : null]}
                 onPress={async () => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                    if (!isZeroPayment && selectedPaymentOption === null) {
+                    if (!isZeroPayment && (selectedPaymentOption === null || selectedPaymentOption === undefined || selectedPaymentOption === "")) {
                         toastRef.current.show("Please select any payment method", 2000);
                         return;
                     }

@@ -220,8 +220,8 @@ const CommonReportSaleScreen = ({route}) => {
         return salesListWidthHeader.map((header, index) => {
             const headerWidth = header.length * 14;
             const maxDataWidth = dataList.reduce((maxWidth, row) => {
-                const cellContent = row[index] || '';
-                return Math.max(maxWidth, cellContent.length * 16);
+                const cellContent = row[index]?.toString() || '';
+                return Math.max(maxWidth, cellContent.length * 14);
             }, 0);
             return Math.max(headerWidth, maxDataWidth);
         });
@@ -452,7 +452,8 @@ const CommonReportSaleScreen = ({route}) => {
                                         additionalRowEnabled && <Row
                                             data={additionalRowDataList.current.map((cell, cellIndex) => {
                                                 return (
-                                                    <Text style={[styles.text, TextTheme.titleSmall, {paddingHorizontal: 10}]}>
+                                                    <Text
+                                                        style={[styles.text, TextTheme.titleSmall, {paddingHorizontal: 10}]}>
                                                         {cell}
                                                     </Text>
                                                 );

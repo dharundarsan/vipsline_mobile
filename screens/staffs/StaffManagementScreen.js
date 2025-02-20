@@ -40,7 +40,7 @@ export default function StaffManagementScreen({navigation}) {
 
     const staffCategories = [
         {
-            label: "Staff list",
+            label: "Manage Staff",
             icon: staffListIcon,
         },
         {

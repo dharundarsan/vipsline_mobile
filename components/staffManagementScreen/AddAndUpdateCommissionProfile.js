@@ -109,35 +109,32 @@ export default function AddAndUpdateCommissionProfile(props) {
                                     itemType === "Packages" ?
                                         packages : custom_services
                 )?.length === 0) {
-                    const response = await getListOfDataToDisplayForStaffCommissionProfile(itemType === "Custom services" ? "Custom_services" : itemType, props.edit ? props.data.id : undefined)
+                    getListOfDataToDisplayForStaffCommissionProfile(itemType === "Custom services" ? "Custom_services" : itemType, props.edit ? props.data.id : undefined).then((response) => {
+                        if(itemType === "Services") {
+                            setServices(response);
+                        }
+                        if (itemType === "Products") {
+                            setProducts(response);
+                        }
+                        if (itemType === "Membership") {
+                            setMembership(response);
+                        }
+                        if (itemType === "Packages") {
+                            setPackages(response);
+                        }
+                        if (itemType === "Prepaid") {
+                            setPrepaid(response[0].resource_categories);
+                        }
+                        if(itemType === "Custom services") {
+                            // console.log(response)
+                            setCustom_services(response[0].resource_categories);
+                        }
 
 
-                    if(itemType === "Services") {
-                        setServices(response);
-                    }
-                    if (itemType === "Products") {
-                        setProducts(response);
-                    }
-                    if (itemType === "Membership") {
-                        setMembership(response);
-                    }
-                    if (itemType === "Packages") {
-                        setPackages(response);
-                    }
-                    if (itemType === "Prepaid") {
-                        setPrepaid(response);
-                    }
-                    if(itemType === "Custom services") {
-                        setCustom_services(response);
-                    }
-
-                    // console.log(JSON.stringify(response, null, 2));
-
-
-
-                    if(Object.keys(response[0]).length > 0) {
-                        setPriceToggle(response[0].commission_type)
-                    }
+                        if(response.length > 0 && Object.keys(response[0]).length > 0) {
+                            setPriceToggle(response[0].commission_type)
+                        }
+                    })
                 }
             }
 
@@ -181,7 +178,7 @@ export default function AddAndUpdateCommissionProfile(props) {
     async function onSave() {
         const profileNameValid = profileNameRef.current();
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
-        const targetTierValid = itemOrTarget === 2 ? targetTierRef !== "" : true;
+        const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
         const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_percentage !== 0 && targetMapping[0].commission_to !== 0 : true;
 
         if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
@@ -191,6 +188,7 @@ export default function AddAndUpdateCommissionProfile(props) {
             else if(!targetMappingValid) {
                 toastRef.current.show("target mapping is required");
             }
+
             return
 
         }
@@ -207,7 +205,6 @@ export default function AddAndUpdateCommissionProfile(props) {
             return;
         }
 
-
         try {
             const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/addCommissionProfile", {
                 profile_name: profileName,
@@ -218,7 +215,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                     type: item,
                     type_id: null
                 })),
-                target_tier: itemOrTarget === 1 ? "" : targetTier.toUpperCase() || "ZERO BASED",
+                target_tier: itemOrTarget === 1 ? "" : targetTier.toUpperCase(),
                 target_mapping: itemOrTarget === 1 ? [] : targetMapping.map(({ commission_from, commission_to, commission_percentage, type_id }) => ({
                     commission_from,
                     commission_to: commission_to.toString(),
@@ -288,7 +285,7 @@ export default function AddAndUpdateCommissionProfile(props) {
     async function onEdit() {
         const profileNameValid = profileNameRef.current();
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
-        const targetTierValid = itemOrTarget === 2 ? targetTierRef !== "" : true;
+        const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
         const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_percentage !== 0 && targetMapping[0].commission_to !== 0 : true;
 
         if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
@@ -699,6 +696,19 @@ export default function AddAndUpdateCommissionProfile(props) {
                                             dropdownItems={["Services", "Products", "Prepaid", "Packages", "Membership", "Custom services"]}
                                             value={itemType}
                                             onChangeValue={(item) => {
+                                                // const resetFunctions = {
+                                                //     Services: setServices,
+                                                //     Products: setProducts,
+                                                //     Membership: setMembership,
+                                                //     Packages: setPackages,
+                                                //     Prepaid: setPrepaid,
+                                                //     "Custom services": setCustom_services,
+                                                // };
+                                                //
+                                                // if (item !== itemType && resetFunctions[itemType]) {
+                                                //     resetFunctions[itemType]([]);
+                                                // }
+
                                                 setItemType(item)
                                             }}
                                             labelEnabled={false}
@@ -821,9 +831,12 @@ export default function AddAndUpdateCommissionProfile(props) {
                                                     packages : custom_services
                             )}
                                       renderItem={renderItem}
-                                      keyExtractor ={(item) => item.data_id.toString()}
-scrollEnabled={false}
-                                       // estimatedItemSize={600}
+                                      scrollEnabled={false}
+                                      ListEmptyComponent={() => <View style={{alignItems: "center", marginTop: 15}}>
+                                          <Text style={[textTheme.titleSmall]}>No data</Text>
+                                      </View>
+                                      }
+
 
                             />
                             </View>
