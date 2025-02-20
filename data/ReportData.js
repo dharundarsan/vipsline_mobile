@@ -2370,10 +2370,10 @@ const businessStaffSelection = [
         tableHeader: feedbackListWithSort,
         transformTableData: formatfeedbackListTableData,
     },
-    {
-        title: "Attendance Report",
-        component: AttendanceReportScreen
-    },
+    // {
+    //     title: "Attendance Report",
+    //     component: AttendanceReportScreen
+    // },
 ].map((item, index) => ({
     ...item,
     id: index + 1,
