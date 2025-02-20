@@ -41,7 +41,7 @@ const PriceInput = ({
                 textInputStyle={{marginVertical: 0, borderRadius: 0, borderWidth: 0,}}
                 flex
                 onChangeText={(text) => onOnchangeText === undefined ? {} : onOnchangeText(text)}
-                readOnly={readOnly}
+                readOnly={!!readOnly}
                 value={value}
                 defaultValue={defaultValue}
                 onEndEditing={onEndEditing}

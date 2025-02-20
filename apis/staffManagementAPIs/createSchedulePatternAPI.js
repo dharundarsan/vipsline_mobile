@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 const createSchedulePatternAPI = async (payload) => {
 
     try {
-        const response = await axios.put(process.env.EXPO_PUBLIC_API_URI + "/staffschedule/createSchedulePattern", {
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/staffschedule/createSchedulePattern", {
             ...payload
         }, {
             headers: {

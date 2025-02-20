@@ -54,7 +54,6 @@ const RegularShifts = (props) => {
 
         fetchSchedule().then((response1) => {
             if(Object.keys(response1.data.data[0]).length === 0) {
-                console.log("sdgsj")
                 setCreate(true)
                 getDefaultStaffSchedulePatternAPI(1).then((response2) => {
                     setResponse(response2.data.data[0]);

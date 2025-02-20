@@ -109,6 +109,7 @@ export default function StaffCommissionScreen() {
         <FlatList
             data={staffCommissionPair}
             renderItem={renderItem}
+            removeClippedSubviews={false}
 
         />
 
