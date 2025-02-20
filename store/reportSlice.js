@@ -883,6 +883,46 @@ export const fetchClientListReport = (initialPage, finalPage, fromDate, toDate, 
     }
 };
 
+
+export const fetchAttendanceReport = (initialPage, finalPage, fromDate, toDate, query = "", sortItem = "r.name", sortOrder = "asc", filterData) => async (dispatch, getState) => {
+    let authToken = "";
+    try {
+        const value = await SecureStore.getItemAsync("authKey");
+        if (value !== null) {
+            authToken = value;
+        }
+    } catch (e) {
+        console.log("Auth token fetching error: ", e);
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URI}/analytics/getDailyAttendanceReportForBusiness?pageNo=${initialPage ?? 0}&pageSize=${finalPage ?? 10}`,
+            {
+                business_id: `${await getBusinessId()}`,
+                sortItem: sortItem === null ? "r.name" : sortItem,
+                sortOrder: sortOrder,
+                fromDate: fromDate,
+                search_term: "",
+                toDate: toDate,
+                ...filterData.reduce((acc, filter) => {
+                    acc[filter.apiName] = filter.selectedValue.value;
+                    return acc;
+                }, {})
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (e) {
+        console.error(e.response?.data || "Error fetching sales report");
+        throw e;
+    }
+};
+
 const reportSlice = createSlice({
     name: 'report',
     initialState,
