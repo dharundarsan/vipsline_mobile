@@ -62,7 +62,9 @@ export default function AssignAndReAssignCommissionProfileModal(props) {
         const response = await updateCommissionProfileMappingAPI(props.data.resource_id, commissionId)
 
         if(response.data.other_message === null || response.data.other_message === "") {
-            props.toastRef.current.show(response.data.message);
+            if(response.data.message === "Resource updated") {
+                props.toastRef.current.show("Commission profile mapped successfully.");
+            }
             props.onClose();
             props.setToggle(prevState => !prevState);
         }
@@ -92,7 +94,9 @@ export default function AssignAndReAssignCommissionProfileModal(props) {
                                   const response = await updateCommissionProfileMappingAPI(props.data.resource_id, null)
 
                                   if(response.data.other_message === null || response.data.other_message === "") {
-                                      props.toastRef.current.show(response.data.message);
+                                      if(response.data.message === "Resource updated") {
+                                          props.toastRef.current.show("Commission profile deleted.");
+                                      }
                                       props.onClose();
                                       props.setToggle(prevState => !prevState);
                                   }
