@@ -30,6 +30,8 @@ import deleteStaffCommissionAPI from "../../apis/staffManagementAPIs/deleteStaff
 import getListOfDataToDisplayForStaffCommissionProfile
     from "../../apis/staffManagementAPIs/getDataToDisplayForStaffCommissionProfile";
 
+const screenWidth = Dimensions.get("screen").width;
+
 
 export default function AddAndUpdateCommissionProfile(props) {
 
@@ -75,7 +77,7 @@ export default function AddAndUpdateCommissionProfile(props) {
 
     const [currentDataForTarget, setCurrentDataForTarget] = useState({});
 
-    const widthArr = [200, 120 ,200, 80];
+    const widthArr = (screenWidth > 500 ? [screenWidth*0.4, screenWidth*0.2, screenWidth*0.3, screenWidth*0.1] : [200, 120 ,200, 80]);
 
     const profileNameRef = useRef(null);
     const computationalIntervalRef = useRef(null);
@@ -129,9 +131,11 @@ export default function AddAndUpdateCommissionProfile(props) {
                         setCustom_services(response);
                     }
 
+                    // console.log(JSON.stringify(response, null, 2));
 
 
-                    if(response[key] && response[key].length > 0) {
+
+                    if(Object.keys(response[0]).length > 0) {
                         setPriceToggle(response[0].commission_type)
                     }
                 }
@@ -169,21 +173,6 @@ export default function AddAndUpdateCommissionProfile(props) {
 
     }, [itemType, itemOrTarget])
 
-    // useEffect(() => {
-    //     const commission_to_array = (targetMapping.map((item, index) => item.commission_to));
-    //
-    //     for(let commission_to = 0; commission_to < commission_to_array.length; commission_to++) {
-    //         if(commission_to === 0) continue
-    //
-    //         if(commission_to_array[commission_to] < commission_to_array[commission_to - 1]) {
-    //             setIsLesserThenPrev(true);
-    //             break
-    //         }
-    //         else
-    //             setIsLesserThenPrev(false);
-    //         break
-    //     }
-    // }, [targetMapping]);
 
 
 
@@ -238,37 +227,37 @@ export default function AddAndUpdateCommissionProfile(props) {
                 })),
                 Services: itemOrTarget === 1 ? services.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Products: itemOrTarget === 1 ? (products).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Membership: itemOrTarget === 1 ? (membership).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Packages: itemOrTarget === 1 ? (packages).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Prepaid: itemOrTarget === 1 ? (prepaid).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Custom_services: itemOrTarget === 1 ? (custom_services).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
@@ -334,37 +323,37 @@ export default function AddAndUpdateCommissionProfile(props) {
                 business_id: await SecureStore.getItemAsync('businessId'),
                 Services: itemOrTarget === 1 ? services.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Products: itemOrTarget === 1 ? products.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Membership: itemOrTarget === 1 ? membership.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Packages: itemOrTarget === 1 ? packages.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Prepaid: itemOrTarget === 1 ? prepaid.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
                 Custom_services: itemOrTarget === 1 ? custom_services.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
-                    commission_type,
+                    commission_type: priceToggle,
                     commission_value,
                     type_id
                 })) : [],
@@ -619,7 +608,6 @@ export default function AddAndUpdateCommissionProfile(props) {
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 style={{}}
-                removeClippedSubviews
                 nestedScrollEnabled
 
             >

@@ -72,6 +72,7 @@ const CustomDropdown = (props) => {
                         )}
                         ItemSeparatorComponent={() => <Divider />}
                         scrollEnabled={props.scrollEnabled}
+                        removeClippedSubviews={false}
                     />
                 </View>
             )}
