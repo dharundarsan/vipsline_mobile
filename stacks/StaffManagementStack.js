@@ -28,6 +28,7 @@ export const BackButton = (props) => {
 
     return (
         <TouchableOpacity
+            hitSlop={40}
             onPress={async () => {
                 navigation.goBack();
                 // console.log(props)
@@ -85,7 +86,7 @@ const StaffManagementStack = () => {
                       component={StaffManagementScreen}
                       options={({navigation, route}) => ({
                           headerShown: true,
-                          headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+                          headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()} hitSlop={40}>
                               <Image
                                   source={require('../assets/icons/drawerIcons/drawer.png')}
                                   style={{width: 24, height: 24}}
