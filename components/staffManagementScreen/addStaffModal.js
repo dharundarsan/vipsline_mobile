@@ -43,7 +43,7 @@ const AddStaffModal = (props) => {
     const [gender, setGender] = useState(props.edit ? props.data.gender : "");
 
     const [staffTitle, setStaffTitle] = useState(props.edit ? props.data.title : "");
-    const [startDate, setStartDate] = useState(props.edit ? props.data.start_date === "" ? null : props.data.start_date : new Date());
+    const [startDate, setStartDate] = useState(props.edit ? props.data.start_date === "" ? null : props.data.start_date : null);
     const [endDate, setEndDate] = useState(props.edit ? props.data.termination_date === "" ? null : props.data.termination_date : null);
 
 
@@ -62,7 +62,7 @@ const AddStaffModal = (props) => {
     const toastRef = useRef(null);
 
 
-
+    console.log(props.data)
 
     useEffect(() => {
         if (scrollViewRef.current) {
@@ -93,7 +93,7 @@ const AddStaffModal = (props) => {
                 mobile: phoneNo[1],
                 resource_name: firstName + " " + lastName,
                 services: [],
-                start_date: formatDate(startDate, "yyyy-mm-dd"),
+                start_date: startDate !== null ? formatDate(startDate, "yyyy-mm-dd"): "",
                 termination_date: endDate !== null ? formatDate(endDate, "yyyy-mm-dd") : "",
                 title: staffTitle === "" && null,
             })
@@ -353,7 +353,7 @@ const AddStaffModal = (props) => {
                                              pressableStyle={{paddingHorizontal: 8, paddingVertical: 8}}>
                     <MaterialIcons name="delete-outline" size={28} color={Colors.error}/>
                 </PrimaryButton> : null}
-                <PrimaryButton onPress={props.edit ? handleEdit : handleSave} label="Update" buttonStyle={{flex: 1}}/>
+                <PrimaryButton onPress={props.edit ? handleEdit : handleSave} label={props.edit ? "Update": "Create"} buttonStyle={{flex: 1}}/>
             </View>
         </KeyboardAvoidingView>
     </Modal>

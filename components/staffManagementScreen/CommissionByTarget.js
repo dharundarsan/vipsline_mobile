@@ -94,12 +94,15 @@ export default function CommissionByTarget({
 
     const updateCommissionTo = (text,index) => {
         // Convert text input to a number
-        const newValue = parseFloat(text) || 0;
 
+
+        const newValue = parseFloat(text) || 0;
 
         setTargetMapping((prev) =>
             prev.map((tier, i) =>
-                i === index ? { ...tier, commission_to: newValue } : tier
+                i === index && tier.commission_to !== newValue
+                    ? { ...tier, commission_to: newValue }
+                    : tier
             )
         );
 
@@ -127,41 +130,34 @@ export default function CommissionByTarget({
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 readOnly
                 value={index === 0 ? "0" : (targetMapping[index - 1].commission_to + 0.01).toString()}
-                onOnchangeText={(text) => {
-                    updateCommissionTo(text, index)
-                }}
 
             />
             <CustomPriceInput
                 priceToggle={"VALUE"}
                 container={{marginRight: 16}}
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
-                onOnchangeText={(text) => {
-                    updateCommissionTo(text, index)
-                }}
+                onOnchangeText={(text) => updateCommissionTo(text, index)}
                 defaultValue={item.commission_to.toString()}
-                onEndEditing={(newValue) => {
-                    if((targetMapping[index].commission_from > newValue) ||
-                        ((index === 0 ? 0 : targetMapping[index - 1].commission_to + 0.01) > newValue)) {
-                        setIsLesserThenPrev("Enter a higher value in the 'To' field than the 'From' field.");
-                    }
-                    else if((targetMapping.length - 1 > index && targetMapping[index + 1].commission_to <= newValue)) {
-                        setIsLesserThenPrev(`'Commission to' value in ${index + 1} is higher than the ${index + 2}`)
-
-                    }
-                    else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
-                        setIsLesserThenPrev("");
-                    }
-                }}
+                // onEndEditing={(newValue) => {
+                //     if((targetMapping[index].commission_from > newValue) ||
+                //         ((index === 0 ? 0 : targetMapping[index - 1].commission_to + 0.01) > newValue)) {
+                //         setIsLesserThenPrev("Enter a higher value in the 'To' field than the 'From' field.");
+                //     }
+                //     else if((targetMapping.length - 1 > index && targetMapping[index + 1].commission_to <= newValue)) {
+                //         setIsLesserThenPrev(`'Commission to' value in ${index + 1} is higher than the ${index + 2}`)
+                //
+                //     }
+                //     else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
+                //         setIsLesserThenPrev("");
+                //     }
+                // }}
 
 
             />
             <CustomPriceInput
                 priceToggle={"PERCENTAGE"}
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
-                onOnchangeText={(text) => {
-                    updateCommissionPercentage(text, index)
-                }}
+                onOnchangeText={(text) => updateCommissionPercentage(text, index)}
                 defaultValue={item.commission_percentage.toString()}
             />
             <TouchableOpacity style={{alignItems: "center", justifyContent:"center", width: "8%"}}>
@@ -267,6 +263,8 @@ export default function CommissionByTarget({
             renderItem={renderItem}
             scrollEnabled={false}
             contentContainerStyle={{gap: 16}}
+            removeClippedSubviews={false}
+
         />
         {
              targetMapping.length > 1 && isLesserThenPrev  ?

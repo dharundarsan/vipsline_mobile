@@ -133,7 +133,7 @@ export default function StaffProfile(props) {
                     Start date
                 </Text>
                 <Text style={[textTheme.bodyLarge]}>
-                    {(details.start_date, "short") === "" ? "Not Provided" : dateFormatter(details.start_date, 'short')}
+                    {(details.start_date) === "" ? "Not Provided" : dateFormatter(details.start_date, 'short')}
                 </Text>
             </View>
                 <View>
