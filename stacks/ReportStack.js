@@ -101,6 +101,7 @@ const ReportStack = ({navigation}) => {
                                       useEffectFunction: dataItem?.useEffectFunction,
                                       isFilterEnabled: dataItem?.isFilterEnabled,
                                       disableDate: dataItem?.disableDate,
+                                      rowComponents: dataItem?.rowComponents,
                                   }}
                     />
                 )))

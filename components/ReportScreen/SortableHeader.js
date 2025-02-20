@@ -19,7 +19,8 @@ const SortableHeader = ({
     onChangeData,
     setGetSortOrderKey,
     sortOrderKey,
-    onChangeFunction
+    onChangeFunction,
+    filterData
 }) => {
     // const [sortOrderKey, setSortOrderKey] = useState(1);
     const [sortComponentOrderKey, setComponentSortOrderKey] = useState(1);
@@ -41,7 +42,8 @@ const SortableHeader = ({
                             toDate,
                             query,
                             sortKey,
-                            sortOrder
+                            sortOrder,
+                            filterData
                         )
                     ).then((res) => {
                         onChangeData(res)

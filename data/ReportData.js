@@ -64,6 +64,9 @@ import ClientListReportScreen from "../screens/Reports/Client Reports/ClientList
 import {useSelector} from "react-redux";
 import {useLayoutEffect} from "react";
 import {loadLeadStatusesFromDb} from "../store/leadManagementSlice";
+import {Text, View} from "react-native";
+import getLeadStatusColor from "../util/getLeadStatusColor";
+import AttendanceReportScreen from "../screens/Reports/Business/AttendanceReportScreen";
 
 const globalState = {staffs: []};
 
@@ -2224,7 +2227,96 @@ const businessStaffSelection = [
                 ],
                 appendingFilterItems: [],
             },
-        ]
+        ],
+        rowComponents: [{
+            "index": 8, "component": (data) => {
+                if (data === "Expired") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#fce6eb",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}>
+                        <Text style={[{
+                            textAlign: 'left',
+                            fontWeight: "bold",
+                            paddingVertical: 5,
+                            fontSize: 14,
+                            color: "#a43e44"
+                        }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+                } else if (data === "redeemed") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#efe9fd",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}><Text style={[{
+                        textAlign: 'left',
+                        fontWeight: "bold",
+                        paddingVertical: 5,
+                        fontSize: 14,
+                        color: "#815fbe",
+                    }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+
+                } else if (data === "Cancelled") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#fdf3e8",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}>
+                        <Text style={[{
+                            textAlign: 'left',
+                            fontWeight: "bold",
+                            paddingVertical: 5,
+                            color: "#daa352",
+                            fontSize: 14,
+                        }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+
+                } else if (data === "Active") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#ecf7f1",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}><Text style={[{
+                        textAlign: 'left',
+                        fontWeight: "bold",
+                        paddingVertical: 5,
+                        fontSize: 14,
+                        color: "#6daa97"
+                    }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+
+                } else {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#fdf3e8",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}><Text style={[{
+                        textAlign: 'left',
+                        fontWeight: "bold",
+                        paddingVertical: 5,
+                        fontSize: 14,
+                    }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+                }
+            }
+        }]
     },
     {
         title: "Reward points",
@@ -2277,6 +2369,10 @@ const businessStaffSelection = [
         salesListWidthHeader: feedbackListHeader,
         tableHeader: feedbackListWithSort,
         transformTableData: formatfeedbackListTableData,
+    },
+    {
+        title: "Attendance Report",
+        component: AttendanceReportScreen
     },
 ].map((item, index) => ({
     ...item,

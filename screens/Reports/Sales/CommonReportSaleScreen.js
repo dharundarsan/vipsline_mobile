@@ -29,7 +29,7 @@ const CommonReportSaleScreen = ({route}) => {
         transformTableData, searchEnabled, searchPlaceholder,
         initialTotalRow, additionalRowEnabled = false,
         formatMandatoryFields, filterItems, useEffectFunction,
-        isFilterEnabled, disableDate
+        isFilterEnabled, disableDate, rowComponents
     } = route.params;
 
     const dispatch = useDispatch();
@@ -423,6 +423,7 @@ const CommonReportSaleScreen = ({route}) => {
                                         onChangeData={onChangeData}
                                         setGetSortOrderKey={setGetSortOrderKey}
                                         sortOrderKey={getSortOrderKey}
+                                        filterData={filterData}
                                     />
                                 ))
                             }
@@ -437,11 +438,22 @@ const CommonReportSaleScreen = ({route}) => {
                                             <Row
                                                 key={rowIndex}
                                                 data={rowData.map((cell, cellIndex) => {
+                                                    if (rowComponents) {
+                                                        const customComponent = rowComponents.find(item => {
+                                                            return item.index === cellIndex
+                                                        })
+                                                        if (customComponent) {
+                                                            console.log(customComponent)
+                                                            console.log(typeof customComponent)
+                                                            return customComponent.component(cell);
+                                                        }
+                                                    }
                                                     return (
                                                         <Text style={[styles.text, {paddingHorizontal: 10}]}>
                                                             {cell}
                                                         </Text>
                                                     );
+
                                                 })}
                                                 widthArr={widthArr}
                                                 style={styles.tableBorder}
