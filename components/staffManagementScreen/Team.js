@@ -217,8 +217,6 @@ export default function Team(props) {
             type={"display"}
             range={"week"}
             containerStyle={{marginTop: 32, marginHorizontal: 8}}
-
-
         />
 
         <ScrollView>
