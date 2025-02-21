@@ -127,7 +127,7 @@ const StaffManagementStack = () => {
             options={({navigation, route}) => ({
                 headerShown: true,
                 headerTitleAlign: "center",
-                headerLeft: () => <TouchableOpacity
+                headerLeft: () => <TouchableOpacity hitSlop={40}
                     onPress={() => {
                         navigation.goBack();
                         if(route.name === "Working Hours") {

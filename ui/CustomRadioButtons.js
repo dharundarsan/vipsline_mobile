@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { RadioButton } from "react-native-paper";
 import textTheme from "../constants/TextTheme";
@@ -15,8 +15,29 @@ export const CustomRadioButton = ({
                                       uncheckedColor,
                                       checkedColor,
                                       selectedKey,
-                                      setSelectedKey
+                                      setSelectedKey,
+                                      defaultValue
 }) => {
+
+    useEffect(() => {
+        if (!selectedKey && options.length > 0) {
+            // Find if defaultValue matches any key in the options
+            const matchingOption = options.find(item => Object.keys(item)[0] === defaultValue);
+
+            if (matchingOption) {
+                setSelectedKey(defaultValue);
+            } else {
+                // If no match, select the first option
+                const firstKey = Object.keys(options[0])[0];
+                setSelectedKey(firstKey);
+            }
+        }
+    }, [options, defaultValue]);
+
+
+
+
+
     return (
         <View style={styles.container}>
             <Text style={[textTheme.bodyMedium, {marginLeft: 6}, labelStyle]}>{label && label}</Text>
