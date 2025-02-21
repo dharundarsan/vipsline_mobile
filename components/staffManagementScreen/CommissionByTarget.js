@@ -37,7 +37,8 @@ export default function CommissionByTarget({
                                                selectedOptions,
                                                currentDataForTarget,
       computationalIntervalRef,
-    targetTierRef
+    targetTierRef,
+    qualifyingItemRef
 
 }) {
 
@@ -81,6 +82,7 @@ export default function CommissionByTarget({
 
     const updateCommissionPercentage = (text, index) => {
         // Convert text input to a number
+        setIsLesserThenPrev("")
         const newValue = parseFloat(text) || 0;
 
 
@@ -94,6 +96,8 @@ export default function CommissionByTarget({
 
     const updateCommissionTo = (text,index) => {
         // Convert text input to a number
+
+        setIsLesserThenPrev("")
 
 
         const newValue = parseFloat(text) || 0;
@@ -138,19 +142,19 @@ export default function CommissionByTarget({
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 onOnchangeText={(text) => updateCommissionTo(text, index)}
                 defaultValue={item.commission_to.toString()}
-                // onEndEditing={(newValue) => {
-                //     if((targetMapping[index].commission_from > newValue) ||
-                //         ((index === 0 ? 0 : targetMapping[index - 1].commission_to + 0.01) > newValue)) {
-                //         setIsLesserThenPrev("Enter a higher value in the 'To' field than the 'From' field.");
-                //     }
-                //     else if((targetMapping.length - 1 > index && targetMapping[index + 1].commission_to <= newValue)) {
-                //         setIsLesserThenPrev(`'Commission to' value in ${index + 1} is higher than the ${index + 2}`)
-                //
-                //     }
-                //     else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
-                //         setIsLesserThenPrev("");
-                //     }
-                // }}
+                onEndEditing={(newValue) => {
+                    if((targetMapping[index].commission_from > newValue) ||
+                        ((index === 0 ? 0 : targetMapping[index - 1].commission_to + 0.01) > newValue)) {
+                        setIsLesserThenPrev("Enter a higher value in the 'To' field than the 'From' field.");
+                    }
+                    else if((targetMapping.length - 1 > index && targetMapping[index + 1].commission_to <= newValue)) {
+                        setIsLesserThenPrev(`'Commission to' value in ${index + 1} is higher than the ${index + 2}`)
+
+                    }
+                    else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
+                        setIsLesserThenPrev("");
+                    }
+                }}
 
 
             />
@@ -193,33 +197,17 @@ export default function CommissionByTarget({
             selectedOptions={selectedOptions}
             setSelectedOptions={(item1) => {
                 setSelectedOptions(item1);
-                // const qualifyingItems1 = currentDataForTarget.qualifying_items;
-                //
-                //
-                // const previousItemsMap = Object.fromEntries(
-                //     qualifyingItems1.map(item => [item.type, { activation: item.activation, type_id: item.type_id }])
-                // );
-                //
-                // const updatedItems = allItems
-                //     .map(item => ({
-                //         ...item,
-                //         type_id: previousItemsMap[item.type]?.type_id ?? item.type_id,
-                //         activation: item1.includes(item.type)
-                //             ? true
-                //             : previousItemsMap[item.type] !== undefined
-                //                 ? false
-                //                 : undefined
-                //     }))
-                //     .filter(item => item.activation !== undefined);
-                //
-                // setQualifyingItems(updatedItems);
-
-                // console.log(JSON.stringify(item1, null, 2));
-
-
             }}
             scrollEnabled={false}
             label={"Qualifying Item"}
+            validator={(text) => {
+                if(text.length === 0) {
+                    return "qualifying item is required";
+                }
+                else return true;
+            }}
+            onSave={(callback) => qualifyingItemRef.current = callback}
+
         />
         <CustomTextInput
             type={"dropdown"}
@@ -250,6 +238,7 @@ export default function CommissionByTarget({
             checkedColor={Colors.highlight}
             selectedKey={targetTier}
             setSelectedKey={setTargetTier}
+            defaultValue={"Zero based"}
         />
         <View style={styles.addCommissionTableHeaderContainer}>
             <Text>From</Text>
@@ -267,7 +256,7 @@ export default function CommissionByTarget({
 
         />
         {
-             targetMapping.length > 1 && isLesserThenPrev  ?
+             isLesserThenPrev  !== ""  ?
                 <Text style={[textTheme.bodyMedium, {color: Colors.error}]}>{isLesserThenPrev}</Text> : <></>
         }
         {

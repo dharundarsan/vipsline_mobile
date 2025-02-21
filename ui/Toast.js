@@ -1,5 +1,6 @@
 import {Text, StyleSheet, Animated, Dimensions, Platform, View, ToastAndroid} from 'react-native';
 import React, { useRef, useImperativeHandle, forwardRef, useState } from 'react';
+import Colors from "../constants/Colors";
 
 const { width } = Dimensions.get('window');
 
@@ -7,9 +8,10 @@ const Toast = forwardRef((_, ref) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const translateY = useRef(new Animated.Value(-100)).current; // Start from above the screen
     const [message, setMessage] = useState(''); // Use state for message
+    const [isError, setIsError] = useState(false)
 
     useImperativeHandle(ref, () => ({
-        show: (msg, duration = 2000) => {
+        show: (msg, error = false,duration = 2000) => {
             // if (Platform.OS === 'android') {
             //     // Use Android Toast
             //     ToastAndroid.showWithGravityAndOffset(
@@ -22,6 +24,7 @@ const Toast = forwardRef((_, ref) => {
             //
             // } else {
                 setMessage(msg);
+                setIsError(error)
                 fadeAnim.setValue(0); // Reset fade to 0
                 translateY.setValue(-100); // Reset position above the visible area
 
@@ -69,6 +72,7 @@ const Toast = forwardRef((_, ref) => {
                     top: 50, // Fixed position from the top
                     alignSelf: 'center',
                 },
+                {backgroundColor: isError ? Colors.error : 'black'}
             ]}
         >
             <Text style={styles.toastMessage}>

@@ -1,51 +1,108 @@
-import React, {useState, useRef, useEffect} from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import CustomCheckbox from './CustomCheckbox';
 import { MaterialIcons } from "@expo/vector-icons";
 import textTheme from "../constants/TextTheme";
 import { Divider } from 'react-native-paper';
+import Colors from "../constants/Colors";
 
-
+/**
+ * CustomDropdown - A reusable dropdown component that supports multiple selections.
+ *
+ * @param {Object} props - Props for the CustomDropdown component.
+ * @param {string} props.label - The label text displayed above the dropdown.
+ * @param {boolean} [props.labelEnabled=true] - Whether to show the label.
+ * @param {string} props.placeholder - Placeholder text shown when no option is selected.
+ * @param {Array<string>} props.options - The list of options available in the dropdown.
+ * @param {Array<string>} props.selectedOptions - The currently selected options.
+ * @param {Function} props.setSelectedOptions - Function to update selected options.
+ * @param {Function} [props.validator] - Function to validate the selected options.
+ * @param {Function} [props.onSave] - Function triggered when saving, validating the input.
+ * @param {boolean} [props.scrollEnabled=true] - Whether the dropdown list should be scrollable.
+ * @param {Object} [props.container] - Custom styles for the dropdown container.
+ * @param {Object} [props.labelStyle] - Custom styles for the label.
+ * @param {string} [props.borderColor='#ccc'] - Border color for the dropdown.
+ * @param {string} [props.highlightColor] - Highlight color for the checkboxes.
+ * @param {number} [props.checkBoxSize=20] - Size of the checkboxes.
+ *
+ * @returns {React.ReactElement} A dropdown component with multiple selection support.
+ */
 const CustomDropdown = (props) => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [dropdownWidth, setDropdownWidth] = useState(0); // Store dropdown width
-    const dropdownButtonRef = useRef(); // Reference to the dropdown button
+    const [dropdownWidth, setDropdownWidth] = useState(0);
+    const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const dropdownButtonRef = useRef();
 
     const toggleDropdown = () => {
         setDropdownVisible(!dropdownVisible);
     };
 
     const toggleOption = (option) => {
+        let newSelectedOptions;
+
         if (props.selectedOptions.includes(option)) {
-            const newSelectedOptions = props.selectedOptions.filter(opt => opt !== option);
-            props.setSelectedOptions(newSelectedOptions);
+            newSelectedOptions = props.selectedOptions.filter(opt => opt !== option);
         } else {
-            const newSelectedOptions = [...props.selectedOptions, option];
-            props.setSelectedOptions(newSelectedOptions);
+            newSelectedOptions = [...props.selectedOptions, option];
+        }
+
+        props.setSelectedOptions(newSelectedOptions);
+
+        // Clear error if validator passes
+        if (error && props.validator && props.validator(newSelectedOptions) === true) {
+            setError(false);
+            setErrorMessage("");
         }
     };
+
     const onDropdownButtonLayout = (event) => {
         const { width } = event.nativeEvent.layout;
         setDropdownWidth(width);
     };
 
+    const handleSave = () => {
+        if (props.validator) {
+            const validationResult = props.validator(props.selectedOptions);
+            if (validationResult === true) {
+                setError(false);
+                setErrorMessage("");
+                return true;
+            } else {
+                setError(true);
+                setErrorMessage(validationResult);
+                return false;
+            }
+        }
+        return true;
+    };
+
+    useEffect(() => {
+        if (props.onSave) {
+            props.onSave(handleSave);
+        }
+    }, [props.onSave]);
+
     return (
         <View style={[styles.container, props.container]}>
-            {
-                props.label === undefined || props.labelEnabled === false ? <></> :
-                <Text style={[textTheme.bodyMedium, {marginVertical: 6}, props.labelStyle]}>{props.label}</Text>
-            }
+            {props.label !== undefined && props.labelEnabled !== false && (
+                <Text style={[textTheme.bodyMedium, { marginVertical: 6 }, props.labelStyle]}>
+                    {props.label}
+                </Text>
+            )}
+
             <TouchableOpacity
+                activeOpacity={0.5}
                 ref={dropdownButtonRef}
                 onLayout={onDropdownButtonLayout}
                 onPress={toggleDropdown}
-                style={styles.dropdownButton}
+                style={[styles.dropdownButton, error ? styles.errorBorder : {}]}
             >
-                <Text style={[textTheme.bodyLarge, {paddingLeft: 8}]}>
-                    {
-                        props.placeholder === undefined || props.placeholder === "" ?
-                            "Select " + props.label : props.placeholder
-                    }
+                <Text style={[textTheme.bodyLarge, { paddingLeft: 8 }]}>
+                    {props.selectedOptions.length > 0
+                        ? props.selectedOptions.join(", ") // Show selected values
+                        : props.placeholder || `Select ${props.label}`}
                 </Text>
                 <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
             </TouchableOpacity>
@@ -56,10 +113,7 @@ const CustomDropdown = (props) => {
                         data={props.options}
                         keyExtractor={(item) => item}
                         renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={styles.optionButton}
-                                onPress={() => toggleOption(item)}
-                            >
+                            <TouchableOpacity style={styles.optionButton} onPress={() => toggleOption(item)}>
                                 <CustomCheckbox
                                     isChecked={props.selectedOptions.includes(item)}
                                     onPress={() => toggleOption(item)}
@@ -76,6 +130,8 @@ const CustomDropdown = (props) => {
                     />
                 </View>
             )}
+
+            {error && <Text style={[textTheme.bodyMedium, {color: Colors.error, marginTop: 4}]}>{errorMessage}</Text>}
         </View>
     );
 };
@@ -83,7 +139,7 @@ const CustomDropdown = (props) => {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        position: 'relative',  // Ensures dropdown is positioned relative to this parent
+        position: 'relative',
     },
     dropdownButton: {
         padding: 10,
@@ -95,26 +151,31 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     dropdownContainer: {
-        // position: 'absolute', // Makes the dropdown overlay
-        // top: '100%',  // Positions the dropdown just below the button
-        zIndex: 999,  // Brings the dropdown to the front
+        zIndex: 999,
         marginTop: 10,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
         backgroundColor: 'white',
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
     optionButton: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
         borderRadius: 5,
-        backgroundColor: 'transparent',
     },
     optionText: {
         marginLeft: 10,
     },
+    errorText: {
+        color: Colors.error,
+        fontSize: 12,
+        marginTop: 4,
+    },
+    errorBorder: {
+        borderColor: Colors.error,
+    }
 });
 
 export default CustomDropdown;

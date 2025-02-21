@@ -1,101 +1,116 @@
-import {Text, View, StyleSheet} from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import {AntDesign} from "@expo/vector-icons";
-import {useEffect, useState} from "react";
-import CustomDropdown from "../../components/common/CustomDropdown";
-import CustomSwiper from "../../components/common/CustomSwiper";
+import * as React from 'react';
+import {View, useWindowDimensions, Pressable, Text, StyleSheet, Animated} from 'react-native';
+import {TabView, SceneMap} from 'react-native-tab-view';
 import Team from "../../components/staffManagementScreen/Team";
 import Week from "../../components/staffManagementScreen/Week";
 import Colors from "../../constants/Colors";
 import textTheme from "../../constants/TextTheme";
-import {getSchedulesForStaffByDatesAPI, updateIsFetching, updateSchedulesForStaff} from "../../store/staffSlice";
-import {useDispatch, useSelector} from "react-redux";
-import moment from "moment/moment";
-import {log} from "expo/build/devtools/logger";
 
-export default function WorkingHours(props) {
+const renderScene = SceneMap({
+    first: Team,
+    second: Week,
+});
 
-    const dispatch = useDispatch();
-    const [date, setDate] = useState(moment());
-    const [loading, setLoading] = useState(false)
-    const [onUpdate, setOnUpdate] = useState(true);
-
-
-    const staffs = useSelector(state => state.staff.staffs);
-    useEffect(() => {
-        async function f() {
-            for(let staff_index = 0; staff_index < staffs.length; staff_index++) {
-
-                dispatch(
-                    getSchedulesForStaffByDatesAPI(staffs[staff_index].id,
-                        moment(date).startOf('week').format('YYYY-MM-DD'),
-                        moment(date).endOf("week").format("YYYY-MM-DD"),
-                        staff_index
-                    )
-                ).then((response) => {
-                    let staff_name = staffs.find((staff) => staff.id === staffs[staff_index].id);
-                    Object.assign(response, {staff_index: staff_index});
-                    dispatch(updateSchedulesForStaff({[staff_name.name]: response}));
-                })
-            }
-        }
+const routes = [
+    {key: 'first', title: 'Teams'},
+    {key: 'second', title: 'Week'},
+];
 
 
-        f().then(() => {
-            dispatch(updateIsFetching(false));
-        });
+export default function TabViewExample() {
 
-    }, [date, onUpdate]);
+    const layout = useWindowDimensions();
+    const [index, setIndex] = React.useState(0);
+    const [tabBarWidth, setTabBarWidth] = React.useState(0);
+    const translateX = React.useRef(new Animated.Value(0)).current;
+
+    React.useEffect(() => {
+        Animated.spring(translateX, {
+            toValue: (index * tabBarWidth) / routes.length,
+            useNativeDriver: true,
+        }).start();
+    }, [index, tabBarWidth]);
+    const handleTabPress = (i) => {
+        setIndex(i);
+    };
+
+    const styles = StyleSheet.create({
+        tabBar: {
+            backgroundColor: 'white',
+            flexDirection: 'row',
+            elevation: 4,
+            position: 'relative',
+        },
+        tabItem: {
+            flex: 1,
+            paddingVertical: 12,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderBottomWidth: 3,
+            borderBottomColor: 'transparent',
+        },
+        activeTab: {
+            // backgroundColor: '#e6f0ff', // Light background on active tab
+        },
+        tabText: {
+
+            color: Colors.grey500, // Default text color
+        },
+        activeTabText: {
+            color: Colors.highlight,
+        },
+        tabIndicator: {
+            position: 'absolute',
+            bottom: 0,
+            left: index === 0 ? 0 : "50%",
+            height: 3,
+            backgroundColor: Colors.highlight, // Color for the active tab indicator
+            width: '50%'
+        },
+    });
+
+    return (
+        <TabView
+            navigationState={{index, routes}}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{width: layout.width}}
+            renderTabBar={(props) => (
+                <View
+                    style={styles.tabBar}
+                    onLayout={(e) => setTabBarWidth(e.nativeEvent.layout.width)} // Calculate width
+                >
+                    {props.navigationState.routes.map((route, i) => (
+                        <Pressable
+                            key={route.key}
+                            style={[
+                                styles.tabItem,
+                                index === i && styles.activeTab, // Active tab style
+                            ]}
+                            onPress={() => handleTabPress(i)}
+                        >
+                            <Text
+                                style={[
+                                    textTheme.titleMedium,
+                                    styles.tabText,
+                                    index === i && styles.activeTabText, // Active tab text color
+                                ]}
+                            >
+                                {route.title}
+                            </Text>
+                        </Pressable>
+                    ))}
+                    {/* Animated indicator for active tab */}
+                    <View
+                        style={[
+                            styles.tabIndicator,
+                        ]}
+                    />
+                </View>
+            )}
+        />
+    );
 
 
-
-    return <View style={{flex: 1}}>
-
-        <CustomSwiper
-
-            tabTextStyle={[textTheme.titleMedium, {color: Colors.black}]}
-            tabContainerStyle={{backgroundColor: Colors.white}}
-
-        >
-
-            <Team
-                tabLabel={"Teams"}
-                staffs={staffs}
-                date={date}
-                setDate={setDate}
-                loading={loading}
-                setOnUpdate={setOnUpdate}
-            />
-            <Week tabLabel={"Week"}/>
-        </CustomSwiper>
-
-
-
-    </View>
 }
 
-const styles = StyleSheet.create({
-    dropdown: {
-        margin: 16,
-        height: 50,
-        borderBottomColor: 'gray',
-        borderBottomWidth: 0.5,
-    },
-    icon: {
-        marginRight: 5,
-    },
-    placeholderStyle: {
-        fontSize: 16,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-    iconStyle: {
-        width: 20,
-        height: 20,
-    },
-    inputSearchStyle: {
-        height: 40,
-        fontSize: 16,
-    },
-})

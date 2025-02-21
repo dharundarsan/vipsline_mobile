@@ -11,21 +11,25 @@ import {useDispatch, useSelector} from "react-redux";
 import {capitalizeFirstLetter, capitalizeFirstLetters, checkNullUndefined} from "../../util/Helpers";
 import SlantingLines from "../../ui/SlantingLines";
 import Toast from "../../ui/Toast";
-import {clearSchedulesForStaff, loadShiftTiming, loadTimeOffTypeFromDb} from "../../store/staffSlice";
+import {
+    clearSchedulesForStaff,
+    getSchedulesForStaffByDatesAPI,
+    loadShiftTiming,
+    loadTimeOffTypeFromDb, updateIsFetching, updateSchedulesForStaff
+} from "../../store/staffSlice";
 import {Bullets} from "react-native-easy-content-loader";
 import DropdownModal from "../../ui/DropdownModal";
 import textTheme from "../../constants/TextTheme";
 import AddAndUpdateShift from "./AddAndUpdateShift";
 import AddAndUpdateTimeOffForStaff from "./AddAndUpdateTimeOffForStaff";
 import RegularShifts from "./RegularShifts";
-export default function Team(props) {
+export default function Team() {
 
     moment.updateLocale('en', {
         week: {
             dow: 0, // Sunday is the first day of the week
         },
     });
-
     const dataNew = useSelector(state => state.staff.schedulesForStaff);
     const toastRef = useRef(null);
     const dispatch = useDispatch();
@@ -38,6 +42,38 @@ export default function Team(props) {
     const [addStaffTimeOffVisibility, setAddStaffTimeOffVisibility] = useState(false);
     const [timeOffTypeEdit, setTimeOffTypeEdit] = useState(false);
     const [regularShiftsVisibility, setRegularShiftsVisibility] = useState(false);
+
+
+    const [date, setDate] = useState(moment());
+    const [loading, setLoading] = useState(false)
+    const [onUpdate, setOnUpdate] = useState(true);
+
+
+    const staffs = useSelector(state => state.staff.staffs);
+    useEffect(() => {
+        async function f() {
+            for(let staff_index = 0; staff_index < staffs.length; staff_index++) {
+
+                dispatch(
+                    getSchedulesForStaffByDatesAPI(staffs[staff_index].id,
+                        moment(date).startOf('week').format('YYYY-MM-DD'),
+                        moment(date).endOf("week").format("YYYY-MM-DD"),
+                        staff_index
+                    )
+                ).then((response) => {
+                    let staff_name = staffs.find((staff) => staff.id === staffs[staff_index].id);
+                    Object.assign(response, {staff_index: staff_index});
+                    dispatch(updateSchedulesForStaff({[staff_name.name]: response}));
+                })
+            }
+        }
+
+
+        f().then(() => {
+            dispatch(updateIsFetching(false));
+        });
+
+    }, [date, onUpdate]);
 
 
     const [edit, setEdit] = useState()
@@ -166,9 +202,9 @@ export default function Team(props) {
                 onClose={() => setAddShiftVisibility(false)}
                 currentDayWorkingData={currentDayWorkingData}
                 toastRef={toastRef}
-                setOnUpdate={props.setOnUpdate}
-                startDate={moment(props.date).startOf('week').format('YYYY-MM-DD')}
-                endDate={moment(props.date).endOf('week').format('YYYY-MM-DD')}
+                setOnUpdate={setOnUpdate}
+                startDate={moment(date).startOf('week').format('YYYY-MM-DD')}
+                endDate={moment(date).endOf('week').format('YYYY-MM-DD')}
             />
         }
         {
@@ -179,7 +215,7 @@ export default function Team(props) {
                 edit={timeOffTypeEdit}
                 currentDayWorkingData={currentDayWorkingData}
                 toastRef={toastRef}
-                setOnUpdate={props.setOnUpdate}
+                setOnUpdate={setOnUpdate}
 
             />
         }
@@ -195,14 +231,14 @@ export default function Team(props) {
         }
 
         <AppointmentsDatePicker
-            date={props.date.toDate()}
+            date={date.toDate()}
             onRightArrowPress={() => {
                 if(isFetching) {
                     toastRef.current.show("Fetching Please wait...");
                 }
                 else {
                     dispatch(clearSchedulesForStaff())
-                    props.setDate(props.date.clone().add(1, "week")); // Correct argument order
+                    setDate(date.clone().add(1, "week")); // Correct argument order
                 }
             }}
             onLeftArrowPress={() => {
@@ -211,7 +247,7 @@ export default function Team(props) {
                 }
                 else {
                     dispatch(clearSchedulesForStaff())
-                    props.setDate(props.date.clone().subtract(1, "week")); // Correct argument order
+                    setDate(date.clone().subtract(1, "week")); // Correct argument order
                 }
             }}
             type={"display"}
@@ -223,7 +259,7 @@ export default function Team(props) {
 
             {
 
-            dataNew.length >= props.staffs.length ?
+            dataNew.length >= staffs.length ?
 
         <FlatList
             data={dataNew.filter(item => item)}
@@ -262,7 +298,7 @@ export default function Team(props) {
         /> : <Bullets
                     tHeight={35}
                     tWidth={"75%"}
-                    listSize={props.staffs.length}
+                    listSize={staffs.length}
                     aSize={35}
                     animationDuration={500}
                     containerStyles={{
@@ -312,7 +348,6 @@ const styles = StyleSheet.create({
     dropdownInnerContainer: {
     flexDirection: 'row-reverse',
         justifyContent: 'space-between',
-        // borderWidth: 1,
         width: '100%',
         paddingLeft: 8
     },
