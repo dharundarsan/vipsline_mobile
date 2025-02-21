@@ -29,6 +29,7 @@ import {
 import deleteStaffCommissionAPI from "../../apis/staffManagementAPIs/deleteStaffCommissionAPI";
 import getListOfDataToDisplayForStaffCommissionProfile
     from "../../apis/staffManagementAPIs/getDataToDisplayForStaffCommissionProfile";
+import {loadBookingsHistoryFromDB} from "../../store/appointmentsSlice";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -82,6 +83,7 @@ export default function AddAndUpdateCommissionProfile(props) {
     const profileNameRef = useRef(null);
     const computationalIntervalRef = useRef(null);
     const targetTierRef = useRef(null);
+    const qualifyingItemRef = useRef(null);
 
 
 
@@ -178,15 +180,12 @@ export default function AddAndUpdateCommissionProfile(props) {
     async function onSave() {
         const profileNameValid = profileNameRef.current();
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
-        const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
         const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_percentage !== 0 && targetMapping[0].commission_to !== 0 : true;
+        const qualifyingItemsValid = selectedOptions.length !== 0;
 
-        if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
-            if(!targetTierValid) {
-                toastRef.current.show("target tier is required");
-            }
-            else if(!targetMappingValid) {
-                toastRef.current.show("target mapping is required");
+        if(!profileNameValid || !computationalIntervalValid || !targetMappingValid || !qualifyingItemsValid) {
+            if(!targetMappingValid) {
+                toastRef.current.show("target mapping is required", true);
             }
 
             return
@@ -194,7 +193,7 @@ export default function AddAndUpdateCommissionProfile(props) {
         }
 
         if(selectedOptions.length === 0 && itemOrTarget === 2) {
-            toastRef.current.show("qualifying item is required");
+            toastRef.current.show("qualifying item is required", true);
             return
         }
 
@@ -204,6 +203,7 @@ export default function AddAndUpdateCommissionProfile(props) {
         else if(itemOrTarget === 2 && isFieldsEmpty) {
             return;
         }
+        console.log("jhdbfkjsbdgkbsdgkbskdbvkhsd ")
 
         try {
             const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/addCommissionProfile", {
@@ -268,6 +268,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                 });
 
 
+                console.log(response)
             if(response.data.other_message === "" || response.data.other_message === null ) {
                 props.toastRef.current.show(response.data.message)
                 props.onClose();
@@ -279,10 +280,12 @@ export default function AddAndUpdateCommissionProfile(props) {
             }
         }
         catch (e) {
+            toastRef.current.show(e.response.data.other_message, true);
 
         }
     }
     async function onEdit() {
+
         const profileNameValid = profileNameRef.current();
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
         const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
@@ -290,7 +293,7 @@ export default function AddAndUpdateCommissionProfile(props) {
 
         if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
             if(!targetTierValid) {
-                toastRef.current.show("target tier is required");
+                toastRef.current.show("target tier is required", true);
             }
             else if(!targetMappingValid) {
                 toastRef.current.show("target mapping is required");
@@ -309,6 +312,15 @@ export default function AddAndUpdateCommissionProfile(props) {
         }
         else if(itemOrTarget === 2 && isFieldsEmpty) {
             return;
+        }
+        if(targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0) {
+            toastRef.current.show("Target mapping should not left empty", true);
+            setIsLesserThenPrev("Target mapping should not left empty")
+
+            return;
+        }
+        else {
+            setIsLesserThenPrev("")
         }
 
         const response = await updateCommissionProfileAPI(
@@ -866,6 +878,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                             currentDataForTarget={currentDataForTarget}
                             computationalIntervalRef={computationalIntervalRef}
                             targetTierRef={targetTierRef}
+                            qualifyingItemRef={qualifyingItemRef}
 
                         />
                 }
