@@ -20,6 +20,9 @@ import {Ionicons} from "@expo/vector-icons";
 import {clearAdvancedFilters, loadLeadsFromDb} from "../../../store/leadManagementSlice";
 import CustomTextInput from "../../../ui/CustomTextInput";
 import {setIsFilterModalVisible} from "../../../store/reportSlice";
+import {clearSchedulesForStaff} from "../../../store/staffSlice";
+import AppointmentsDatePicker from "../../../components/appointments/AppointmentsDatePicker";
+import AttendanceReportDatePicker from "../../../components/ReportScreen/AttendanceReportDatePicker";
 
 const CommonReportSaleScreen = ({route}) => {
     const {
@@ -29,7 +32,8 @@ const CommonReportSaleScreen = ({route}) => {
         transformTableData, searchEnabled, searchPlaceholder,
         initialTotalRow, additionalRowEnabled = false,
         formatMandatoryFields, filterItems, useEffectFunction,
-        isFilterEnabled, disableDate, rowComponents
+        isFilterEnabled, disableDate, rowComponents,
+        CustomDateComponent, formatCustomFromDate, formatCustomToDate
     } = route.params;
 
     const dispatch = useDispatch();
@@ -115,6 +119,8 @@ const CommonReportSaleScreen = ({route}) => {
     const cardValue = useRef(initialCardValue ?? []);
     const additionalRowDataList = useRef(initialTotalRow ?? []);
     const sortName = toggleSortItem !== "" ? toggleSortItem : undefined
+
+    const [customDate, setCustomDate] = useState(new Date());
 
     const {
         isCustomRange,
@@ -229,31 +235,32 @@ const CommonReportSaleScreen = ({route}) => {
 
     const widthArr = calculateColumnWidths;
 
+    const fetchData = () => {
+        dispatch(apiFunction(0, 10, CustomDateComponent ? formatCustomFromDate(customDate) : formatDateYYYYMMDD(0), CustomDateComponent ? formatCustomToDate(customDate) : formatDateYYYYMMDD(0), undefined, undefined, undefined, filterData))
+            .then((res) => {
+                setMaxPageCount(res.data[0][apiCountName])
+                const transformedData = transformTableData(res.data[0][listName])
+                if (cardEnabled) {
+                    cardValue.current = formatAndFilterCardData(res.data[0], cardValueList, cardCurrencyList);
+                }
+                if (additionalRowEnabled) {
+                    additionalRowDataList.current = formatMandatoryFields(res.data[0])
+                }
+                setDataList(transformedData);
+                console.log("c8");
+            })
+    }
     useEffect(() => {
-        console.log("c7");
-        const fetchData = () => {
-            dispatch(apiFunction(0, 10, formatDateYYYYMMDD(0), formatDateYYYYMMDD(0), undefined, undefined, undefined, filterData))
-                .then((res) => {
-                    setMaxPageCount(res.data[0][apiCountName])
-                    const transformedData = transformTableData(res.data[0][listName])
-                    if (cardEnabled) {
-                        cardValue.current = formatAndFilterCardData(res.data[0], cardValueList, cardCurrencyList);
-                    }
-                    if (additionalRowEnabled) {
-                        additionalRowDataList.current = formatMandatoryFields(res.data[0])
-                    }
-                    setDataList(transformedData);
-                    console.log("c8");
-                })
-        }
         fetchData()
-    }, [])
+    }, [customDate])
 
     // useEffect(() => {
     //     console.log(filterData);
     // }, [filterData]);
     console.log("getSortOrderKey123123")
     console.log(getSortOrderKey)
+    console.log(CustomDateComponent)
+
     return (
         <ScrollView style={{backgroundColor: 'white'}}>
             {isFilterEnabled && isFilterModalVisible && <Modal visible={isFilterModalVisible}
@@ -321,7 +328,7 @@ const CommonReportSaleScreen = ({route}) => {
                     {/*</PrimaryButton>*/}
                     <PrimaryButton onPress={() => {
                         setIsFilterModalVisible(false)
-                        dispatch(apiFunction(0, maxPageCount === 0 ? 10 : maxPageCount, currentFromDate, currentToDate, query, undefined, undefined, filterData))
+                        dispatch(apiFunction(0, maxPageCount === 0 ? 10 : maxPageCount, CustomDateComponent ? formatCustomFromDate(customDate) : currentFromDate, CustomDateComponent ? formatCustomToDate(customDate) : currentToDate, query, undefined, undefined, filterData))
                             .then(res => {
                                 setMaxPageCount(res.data[0][apiCountName])
                                 const transformedData = transformTableData(res.data[0][listName])
@@ -349,6 +356,10 @@ const CommonReportSaleScreen = ({route}) => {
                     selectedToCustomDate={selectedToCustomDate}
                     selectedFromCustomDate={selectedFromCustomDate}
                 />}
+                {CustomDateComponent ? <CustomDateComponent
+                    date={customDate}
+                    setSelectedDate={setCustomDate}
+                /> : <></>}
             </View>
             {
                 cardEnabled &&
@@ -376,7 +387,7 @@ const CommonReportSaleScreen = ({route}) => {
                 <SearchBar
                     onChangeText={(text) => {
                         setQuery(text)
-                        dispatch(apiFunction(0, maxPageCount, currentFromDate, currentToDate, text, undefined, undefined, filterData))
+                        dispatch(apiFunction(0, maxPageCount, CustomDateComponent ? formatCustomFromDate(customDate) : currentFromDate, CustomDateComponent ? formatCustomToDate(customDate) : currentToDate, text, undefined, undefined, filterData))
                             .then(res => {
                                 setMaxPageCount(res.data[0][apiCountName])
                                 const transformedData = transformTableData(res.data[0][listName])
@@ -489,7 +500,7 @@ const CommonReportSaleScreen = ({route}) => {
                     incrementPageNumber={() => setPageNo(prev => prev + 1)}
                     decrementPageNumber={() => setPageNo(prev => prev - 1)}
                     refreshOnChange={async () =>
-                        dispatch(apiFunction(pageNo, maxEntry, currentFromDate, currentToDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc", filterData))
+                        dispatch(apiFunction(pageNo, maxEntry, CustomDateComponent ? formatCustomFromDate(customDate) : currentFromDate, CustomDateComponent ? formatCustomToDate(customDate) : currentToDate, query, sortName, getSortOrderKey === 1 ? "desc" : getSortOrderKey === 2 ? "asc" : "desc", filterData))
                             .then(res => {
                                 console.log("c9")
                                 console.log("getSortOrderKey")

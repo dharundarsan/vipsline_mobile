@@ -220,7 +220,8 @@ const AttendanceReportScreen = () => {
                 maxEntry={maxEntry}
                 incrementPageNumber={() => setPageNo(prev => prev + 1)}
                 decrementPageNumber={() => setPageNo(prev => prev - 1)}
-                refreshOnChange={() => {}}
+                refreshOnChange={() => {
+                }}
                 currentCount={dataList?.length ?? 1}
                 totalCount={maxPageCount}
                 resetPageNo={() => {

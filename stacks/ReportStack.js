@@ -53,7 +53,8 @@ const ReportStack = ({navigation}) => {
             }}/>
             {
                 reportStackDisplay.map((item) => item.data.map((dataItem, index) => (
-                    <Stack.Screen name={dataItem.navigation} key={index} component={withReportBackHandler(dataItem.component)} options={{
+                    <Stack.Screen name={dataItem.navigation} key={index}
+                                  component={withReportBackHandler(dataItem.component)} options={{
                         headerTitle: dataItem.title,
                         headerTitleAlign: 'center',
                         headerShown: true,
@@ -101,7 +102,10 @@ const ReportStack = ({navigation}) => {
                                       useEffectFunction: dataItem?.useEffectFunction,
                                       isFilterEnabled: dataItem?.isFilterEnabled,
                                       disableDate: dataItem?.disableDate,
+                                      CustomDateComponent: dataItem?.CustomDateComponent,
                                       rowComponents: dataItem?.rowComponents,
+                                      formatCustomFromDate: dataItem?.formatCustomFromDate,
+                                      formatCustomToDate: dataItem?.formatCustomToDate
                                   }}
                     />
                 )))

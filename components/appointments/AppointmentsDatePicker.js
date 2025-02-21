@@ -21,8 +21,7 @@ const AppointmentsDatePicker = (props) => {
             "Past Week",
             "This Week",
             "Upcoming Week",
-        ]
-        ,
+        ],
         "month": [
             "Past Month",
             "This Month",
@@ -40,6 +39,8 @@ const AppointmentsDatePicker = (props) => {
             dow: 0, // Sunday is the first day of the week
         },
     });
+
+    console.log(props)
 
     function forwardOrBackwardPress() {
 

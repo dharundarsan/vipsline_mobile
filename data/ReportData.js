@@ -5,6 +5,7 @@ import staffReportIcon from "../assets/icons/reportIcons/staffReports.png"
 import membershipIcon from "../assets/icons/reportIcons/membership.png"
 import clientReportIcon from "../assets/icons/reportIcons/clientReports.png"
 import businessIcon from "../assets/icons/reportIcons/business.png"
+import attendance from "../assets/icons/reportIcons/attendance.png"
 import ServiceSalesReportScreen from '../screens/Reports/Sales/ServiceSalesReportScreen';
 import ProductSalesReportScreen from '../screens/Reports/Sales/ProductSalesReportScreen';
 import MembershipSalesReportScreen from '../screens/Reports/Sales/MembershipSalesReportScreen';
@@ -42,9 +43,9 @@ import {
     fetchCancelledInvoiceReportByBusiness,
     fetchClientListReport,
     fetchClientServiceListReport,
-    fetchClientSourceListReport,
+    fetchClientSourceListReport, fetchDailyAttendanceReport,
     fetchExpiredMembershipReport,
-    fetchFeedbackReport,
+    fetchFeedbackReport, fetchMonthlyAttendanceReport,
     fetchPackageReport,
     fetchPrepaidReport,
     fetchProductSalesSummaryReport,
@@ -67,6 +68,10 @@ import {loadLeadStatusesFromDb} from "../store/leadManagementSlice";
 import {Text, View} from "react-native";
 import getLeadStatusColor from "../util/getLeadStatusColor";
 import AttendanceReportScreen from "../screens/Reports/Business/AttendanceReportScreen";
+import {Ionicons} from "@expo/vector-icons";
+import AppointmentsDatePicker from "../components/appointments/AppointmentsDatePicker";
+import AttendanceReportDatePicker from "../components/ReportScreen/AttendanceReportDatePicker";
+import moment from "moment";
 
 const globalState = {staffs: []};
 
@@ -2380,7 +2385,153 @@ const businessStaffSelection = [
     navigation: camelCase(item.title),
     headerTitle: toPascalCase(item.title)
 }));
-export const titleToDisplay = ["SALES", "APPOINTMENTS", "TAX", "STAFF REPORTS", "MEMBERSHIP", "CLIENT REPORTS", "BUSINESS"]
+
+const dailyAttendanceHeader = [
+    "STAFF NAME",
+    "SHIFT TIME",
+    "FIRST CHECK-IN",
+    "LAST CHECK-OUT",
+    "TOTAL HOURS",
+    "STATUS",
+]
+
+const dailyAttendanceKey = [
+    {
+        key: "r.name",
+        sortKey: "r.name",
+    },
+    {
+        key: "shift",
+        sortKey: "shift",
+    },
+    {
+        key: "firstCheckinTime",
+        sortKey: "firstCheckinTime",
+    },
+    {
+        key: "lastCheckoutTime",
+        sortKey: "lastCheckoutTime",
+    },
+    {
+        key: "duration",
+        sortKey: "duration",
+    },
+    {
+        key: "status",
+        sortKey: "",
+    },
+]
+
+const dailyAttendanceWithSort = dailyAttendanceKey.map((item, index) => ({
+    ...item,
+    title: dailyAttendanceHeader[index]
+}))
+
+const formatDailyAttendanceListTableData = (dataList) => {
+    return dataList.map((item) => [
+        item.staffName,
+        item.shiftDetails,
+        item.firstCheckIn,
+        item.lastCheckOut,
+        item.totalHours,
+        item.status,
+    ])
+};
+
+const monthlyAttendanceHeader = [
+    "STAFF NAME",
+    "WORKING DAYS",
+    "NON-WORKING DAYS",
+    "TOTAL WORKING HOURS",
+]
+
+const monthlyAttendanceKey = [
+    {
+        key: "r.name",
+        sortKey: "r.name",
+    },
+    {
+        key: "working_days",
+        sortKey: "working_days",
+    },
+    {
+        key: "non_working_days",
+        sortKey: "non_working_days",
+    },
+    {
+        key: "total_duration",
+        sortKey: "total_duration",
+    },
+]
+
+const monthlyAttendanceWithSort = monthlyAttendanceKey.map((item, index) => ({
+    ...item,
+    title: monthlyAttendanceHeader[index]
+}))
+
+const formatMonthlyAttendanceListTableData = (dataList) => {
+    return dataList.map((item) => [
+        item.staffName,
+        item.workingDays,
+        item.nonWorkingDays,
+        item.totalDuration,
+    ])
+};
+
+
+const attendanceSelection = [
+    {
+        title: "Daily Attendance",
+        component: CommonReportSaleScreen,
+        listName: "attendance_summary_data",
+        searchEnabled: false,
+        searchPlaceholder: "",
+        apiFunction: fetchDailyAttendanceReport,
+        apiCountName: "total_count",
+        salesListWidthHeader: dailyAttendanceHeader,
+        tableHeader: dailyAttendanceWithSort,
+        transformTableData: formatDailyAttendanceListTableData,
+        disableDate: true,
+        CustomDateComponent: (props) => {
+            return <AttendanceReportDatePicker {...props} range={"day"}/>
+        },
+        formatCustomFromDate: (date) => {
+            return moment(date).format("YYYY-MM-DD")
+        },
+        formatCustomToDate: (date) => {
+            return moment(date).format("YYYY-MM-DD")
+        }
+    },
+    {
+        title: "Monthly Attendance",
+        component: CommonReportSaleScreen,
+        listName: "attendance_summary_report",
+        searchEnabled: false,
+        searchPlaceholder: "",
+        apiFunction: fetchMonthlyAttendanceReport,
+        apiCountName: "total_count",
+        salesListWidthHeader: monthlyAttendanceHeader,
+        tableHeader: monthlyAttendanceWithSort,
+        transformTableData: formatMonthlyAttendanceListTableData,
+        disableDate: true,
+        CustomDateComponent: (props) => {
+            return <AttendanceReportDatePicker {...props} range={"month"}/>
+        },
+        formatCustomFromDate: (date) => {
+            return moment(new Date(date.setDate(0))).format("YYYY-MM-DD")
+        },
+        formatCustomToDate: (date) => {
+            return moment(date).endOf('month').format("YYYY-MM-DD")
+        }
+    },
+].map((item, index) => ({
+    ...item,
+    id: index + 1,
+    navigation: camelCase(item.title),
+    headerTitle: toPascalCase(item.title)
+}));
+
+export const titleToDisplay = ["SALES", "APPOINTMENTS", "TAX", "STAFF REPORTS", "MEMBERSHIP", "CLIENT REPORTS", "BUSINESS", "ATTENDANCE"]
 
 export const cardTitleData = [
     {
@@ -2429,6 +2580,11 @@ export const reportStackDisplay = [
         icon: businessIcon,
         title: "BUSINESS",
         data: businessStaffSelection
+    },
+    {
+        icon: attendance,
+        title: "ATTENDANCE",
+        data: attendanceSelection
     },
 ]
 
