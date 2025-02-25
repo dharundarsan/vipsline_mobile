@@ -380,11 +380,13 @@ export default function AddAndUpdateTimeOffForStaff(props) {
                                     startTimeRef.current = callback;
                                 }
                                 else {
-                                    console.log("asdg")
                                     startTimeRef.current = true;
                                 }
 
                             }}
+                            labelTextStyle={{flex: 1}}
+                            placeholder={"Start time"}
+
                         />
                         <CustomTextInput
                         label={"End time"}
@@ -414,6 +416,8 @@ export default function AddAndUpdateTimeOffForStaff(props) {
                                 endTimeRef.current = () => true;
                             }
                         }}
+                        labelTextStyle={{flex: 1}}
+                        placeholder={"End time"}
                     />
                     </View>
             }
