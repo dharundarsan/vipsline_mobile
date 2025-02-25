@@ -46,6 +46,7 @@ export default function CommissionByTarget({
 
 
     const addTier = () => {
+
         if (targetMapping.length === 0) return;
 
         if(isLesserThenPrev) {
@@ -54,9 +55,9 @@ export default function CommissionByTarget({
 
         const lastItem = targetMapping[targetMapping.length - 1];
 
-        if(lastItem.commission_to === 0 || lastItem.commission_percentage === 0) {
+        if(lastItem.commission_to === 0) {
             setIsFieldsEmpty(true);
-            toastRef.current.show("'To' field and 'Commission percentage' field should not left empty");
+            toastRef.current.show("'To' field field should not left empty");
 
             return;
         }
@@ -77,12 +78,13 @@ export default function CommissionByTarget({
 
     const removeTier = () => {
         setTargetMapping(targetMapping.slice(0, targetMapping.length - 1));
+        setIsLesserThenPrev("")
+
     };
 
 
     const updateCommissionPercentage = (text, index) => {
         // Convert text input to a number
-        setIsLesserThenPrev("")
         const newValue = parseFloat(text) || 0;
 
 
@@ -97,8 +99,7 @@ export default function CommissionByTarget({
     const updateCommissionTo = (text,index) => {
         // Convert text input to a number
 
-        setIsLesserThenPrev("")
-
+        setIsFieldsEmpty(false);
 
         const newValue = parseFloat(text) || 0;
 
@@ -109,6 +110,18 @@ export default function CommissionByTarget({
                     : tier
             )
         );
+
+        if((targetMapping[index].commission_from > newValue) ||
+            ((index === 0 ? 0 : targetMapping[index - 1].commission_to + 0.01) >= newValue)) {
+            setIsLesserThenPrev("Enter a higher value in the 'To' field than the 'From' field.");
+        }
+        else if((targetMapping.length - 1 > index && targetMapping[index + 1].commission_to <= newValue)) {
+            setIsLesserThenPrev(`'Commission to' value in ${index + 1} is higher than the ${index + 2}`)
+
+        }
+        else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
+            setIsLesserThenPrev("");
+        }
 
 
 
@@ -142,21 +155,6 @@ export default function CommissionByTarget({
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 onOnchangeText={(text) => updateCommissionTo(text, index)}
                 defaultValue={item.commission_to.toString()}
-                onEndEditing={(newValue) => {
-                    if((targetMapping[index].commission_from > newValue) ||
-                        ((index === 0 ? 0 : targetMapping[index - 1].commission_to + 0.01) > newValue)) {
-                        setIsLesserThenPrev("Enter a higher value in the 'To' field than the 'From' field.");
-                    }
-                    else if((targetMapping.length - 1 > index && targetMapping[index + 1].commission_to <= newValue)) {
-                        setIsLesserThenPrev(`'Commission to' value in ${index + 1} is higher than the ${index + 2}`)
-
-                    }
-                    else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
-                        setIsLesserThenPrev("");
-                    }
-                }}
-
-
             />
             <CustomPriceInput
                 priceToggle={"PERCENTAGE"}
@@ -260,8 +258,8 @@ export default function CommissionByTarget({
                 <Text style={[textTheme.bodyMedium, {color: Colors.error}]}>{isLesserThenPrev}</Text> : <></>
         }
         {
-            isFieldsEmpty ?
-                <Text style={[textTheme.bodyMedium, {color: Colors.error}]}>'To' and 'Commission percentage' should not left empty</Text> :
+            isLesserThenPrev  === "" && isFieldsEmpty ?
+                <Text style={[textTheme.bodyMedium, {color: Colors.error}]}>'To' field should not left empty</Text> :
                 <></>
         }
         <PrimaryButton
