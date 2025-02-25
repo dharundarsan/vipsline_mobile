@@ -85,6 +85,15 @@ export default function AddAndUpdateCommissionProfile(props) {
     const targetTierRef = useRef(null);
     const qualifyingItemRef = useRef(null);
 
+    const [isValueChanged, setIsValueChanged] = useState({
+        Services: false,
+        Products: false,
+        Prepaid: false,
+        "Custom services": false,
+        Membership: false,
+        Packages: false,
+    })
+
 
 
 
@@ -180,30 +189,47 @@ export default function AddAndUpdateCommissionProfile(props) {
     async function onSave() {
         const profileNameValid = profileNameRef.current();
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
+        const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
         const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_percentage !== 0 && targetMapping[0].commission_to !== 0 : true;
-        const qualifyingItemsValid = selectedOptions.length !== 0;
 
-        if(!profileNameValid || !computationalIntervalValid || !targetMappingValid || !qualifyingItemsValid) {
-            if(!targetMappingValid) {
-                toastRef.current.show("target mapping is required", true);
+        if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
+            if(!targetTierValid) {
+                toastRef.current.show("target tier is required", true);
             }
-
+            else if(!targetMappingValid) {
+                toastRef.current.show("target mapping is required");
+            }
             return
 
         }
 
+        if(itemOrTarget === 1 && (Object.values(isValueChanged)).every((value) => value === false)) {
+            toastRef.current.show("Please enter a commission value");
+            return;
+        }
+
         if(selectedOptions.length === 0 && itemOrTarget === 2) {
-            toastRef.current.show("qualifying item is required", true);
+            toastRef.current.show("qualifying item is required");
             return
         }
 
         if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev.length > 0) {
+            toastRef.current.show(isLesserThenPrev);
             return;
         }
-        else if(itemOrTarget === 2 && isFieldsEmpty) {
+        else if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0)) {
+            toastRef.current.show("target tier entry can't be zero");
             return;
         }
-        console.log("jhdbfkjsbdgkbsdgkbskdbvkhsd ")
+        if(itemOrTarget === 2 && targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0) {
+            toastRef.current.show("Target mapping should not left empty", true);
+            setIsLesserThenPrev("Target mapping should not left empty")
+
+            return;
+        }
+        else {
+            setIsLesserThenPrev("")
+        }
 
         try {
             const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/addCommissionProfile", {
@@ -217,47 +243,47 @@ export default function AddAndUpdateCommissionProfile(props) {
                 })),
                 target_tier: itemOrTarget === 1 ? "" : targetTier.toUpperCase(),
                 target_mapping: itemOrTarget === 1 ? [] : targetMapping.map(({ commission_from, commission_to, commission_percentage, type_id }) => ({
-                    commission_from,
-                    commission_to: commission_to.toString(),
-                    commission_percentage: commission_percentage.toString(),
+                    commission_from: commission_from,
+                    commission_to: commission_to,
+                    commission_percentage: commission_percentage,
                     type_id: type_id || null
                 })),
-                Services: itemOrTarget === 1 ? services.map(({ data_id, commission_type, commission_value, type_id }) => ({
+                Services: itemOrTarget === 1 ? isValueChanged[itemType] ? services.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Products: itemOrTarget === 1 ? (products).map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Products: itemOrTarget === 1 ? isValueChanged[itemType] ? (products).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Membership: itemOrTarget === 1 ? (membership).map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Membership: itemOrTarget === 1 ? isValueChanged[itemType] ? (membership).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Packages: itemOrTarget === 1 ? (packages).map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Packages: itemOrTarget === 1 ? isValueChanged[itemType] ? (packages).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Prepaid: itemOrTarget === 1 ? (prepaid).map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Prepaid: itemOrTarget === 1 ? isValueChanged[itemType] ? (prepaid).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Custom_services: itemOrTarget === 1 ? (custom_services).map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Custom_services: itemOrTarget === 1 ? isValueChanged[itemType] ? (custom_services).map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
+                })) : [] : [],
                 computation_interval: itemOrTarget === 1 ? null : computationalInterval || "MONTHLY"
 
             },
@@ -268,7 +294,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                 });
 
 
-                console.log(response)
+                // console.log(response)
             if(response.data.other_message === "" || response.data.other_message === null ) {
                 props.toastRef.current.show(response.data.message)
                 props.onClose();
@@ -276,7 +302,6 @@ export default function AddAndUpdateCommissionProfile(props) {
             }
             else {
                 toastRef.current.show(response.data.other_message);
-
             }
         }
         catch (e) {
@@ -284,6 +309,8 @@ export default function AddAndUpdateCommissionProfile(props) {
 
         }
     }
+
+    // console.log(isValueChanged)
     async function onEdit() {
 
         const profileNameValid = profileNameRef.current();
@@ -302,18 +329,25 @@ export default function AddAndUpdateCommissionProfile(props) {
 
         }
 
+        if(itemOrTarget === 1 && (Object.values(isValueChanged)).every((value) => value === false)) {
+            toastRef.current.show("Please enter a commission value");
+            return;
+        }
+
         if(selectedOptions.length === 0 && itemOrTarget === 2) {
             toastRef.current.show("qualifying item is required");
             return
         }
 
         if(itemOrTarget === 2 && targetMapping.length > 1 && isLesserThenPrev.length > 0) {
+            toastRef.current.show(isLesserThenPrev);
             return;
         }
-        else if(itemOrTarget === 2 && isFieldsEmpty) {
+        else if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0)) {
+            toastRef.current.show("target tier entry can't be zero");
             return;
         }
-        if(targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0) {
+        if(itemOrTarget === 2 && targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0) {
             toastRef.current.show("Target mapping should not left empty", true);
             setIsLesserThenPrev("Target mapping should not left empty")
 
@@ -323,6 +357,7 @@ export default function AddAndUpdateCommissionProfile(props) {
             setIsLesserThenPrev("")
         }
 
+
         const response = await updateCommissionProfileAPI(
             {
                 id: props.data.id,
@@ -330,42 +365,42 @@ export default function AddAndUpdateCommissionProfile(props) {
                 tax_enabled: includeTax,
                 profile_type: itemOrTarget === 1 ? "commission by item" : "commission by target",
                 business_id: await SecureStore.getItemAsync('businessId'),
-                Services: itemOrTarget === 1 ? services.map(({ data_id, commission_type, commission_value, type_id }) => ({
+                Services: itemOrTarget === 1 ? isValueChanged[itemType] ? services.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Products: itemOrTarget === 1 ? products.map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Products: itemOrTarget === 1 ? isValueChanged[itemType] ? products.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Membership: itemOrTarget === 1 ? membership.map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Membership: itemOrTarget === 1 ? isValueChanged[itemType] ? membership.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Packages: itemOrTarget === 1 ? packages.map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Packages: itemOrTarget === 1 ? isValueChanged[itemType] ? packages.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Prepaid: itemOrTarget === 1 ? prepaid.map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Prepaid: itemOrTarget === 1 ? isValueChanged[itemType] ? prepaid.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
-                Custom_services: itemOrTarget === 1 ? custom_services.map(({ data_id, commission_type, commission_value, type_id }) => ({
+                })) : [] : [],
+                Custom_services: itemOrTarget === 1 ? isValueChanged[itemType] ? custom_services.map(({ data_id, commission_type, commission_value, type_id }) => ({
                     data_id: String(data_id),
                     commission_type: priceToggle,
                     commission_value,
                     type_id
-                })) : [],
+                })) : [] : [],
                 qualifying_items: itemOrTarget === 1 ? [] : transformDataForQualifyingItem(currentDataForTarget.qualifying_items, selectedOptions),
                 target_tier: itemOrTarget === 1 ? "" : targetTier.toUpperCase(),
                 target_mapping:  itemOrTarget === 1 ? [] :  transformData(currentDataForTarget.target_mapping, targetMapping),
@@ -443,11 +478,13 @@ export default function AddAndUpdateCommissionProfile(props) {
                         container={{marginBottom: 0, width: "70%"}}
                         textInputStyle={{marginVertical: 0, borderRadius: 0, borderWidth: 0}}
                         defaultValue={item.commission_value}
-                        onChangeText={() => {}}
+                        onChangeText={(text) => {
+                            setIsValueChanged(prevState => ({...prevState, [itemType]: true, })
+                            )}}
                         onEndEditing={async (value) => {
 
-                            const item_type = itemType === "Custom services" ? "Custom_services" : itemType;
 
+const item_type = itemType === "Custom services" ? "Custom_services" : itemType;
 
                             const serviceIndex = (itemType === "Services" ?
                                     services :
@@ -583,6 +620,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                               onCancel={() => {
                                   setIsConfirmStaffDeleteModalVisible(false);
                               }}
+                              headerTextStyle={{fontSize: 20, fontWeight: "600"}}
 
             />
         }
@@ -708,18 +746,18 @@ export default function AddAndUpdateCommissionProfile(props) {
                                             dropdownItems={["Services", "Products", "Prepaid", "Packages", "Membership", "Custom services"]}
                                             value={itemType}
                                             onChangeValue={(item) => {
-                                                // const resetFunctions = {
-                                                //     Services: setServices,
-                                                //     Products: setProducts,
-                                                //     Membership: setMembership,
-                                                //     Packages: setPackages,
-                                                //     Prepaid: setPrepaid,
-                                                //     "Custom services": setCustom_services,
-                                                // };
-                                                //
-                                                // if (item !== itemType && resetFunctions[itemType]) {
-                                                //     resetFunctions[itemType]([]);
-                                                // }
+                                                const resetFunctions = {
+                                                    Services: setServices,
+                                                    Products: setProducts,
+                                                    Membership: setMembership,
+                                                    Packages: setPackages,
+                                                    Prepaid: setPrepaid,
+                                                    "Custom services": setCustom_services,
+                                                };
+
+                                                if (item !== itemType && resetFunctions[itemType] && !isValueChanged[itemType]) {
+                                                    resetFunctions[itemType]([]);
+                                                }
 
                                                 setItemType(item)
                                             }}
