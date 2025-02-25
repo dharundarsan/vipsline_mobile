@@ -190,13 +190,14 @@ export default function AddAndUpdateCommissionProfile(props) {
         const profileNameValid = profileNameRef.current();
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
         const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
-        const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_percentage !== 0 && targetMapping[0].commission_to !== 0 : true;
+        const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_to !== 0 : true;
+        const qualifyingItemsValid = qualifyingItemRef.current();
 
         if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
-            if(!targetTierValid) {
+            if(itemOrTarget === 2 && !targetTierValid) {
                 toastRef.current.show("target tier is required", true);
             }
-            else if(!targetMappingValid) {
+            else if(itemOrTarget === 2 && !targetMappingValid) {
                 toastRef.current.show("target mapping is required");
             }
             return
@@ -217,11 +218,11 @@ export default function AddAndUpdateCommissionProfile(props) {
             toastRef.current.show(isLesserThenPrev);
             return;
         }
-        else if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0)) {
+        else if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0)) {
             toastRef.current.show("target tier entry can't be zero");
             return;
         }
-        if(itemOrTarget === 2 && targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0) {
+        if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0)) {
             toastRef.current.show("Target mapping should not left empty", true);
             setIsLesserThenPrev("Target mapping should not left empty")
 
@@ -238,7 +239,7 @@ export default function AddAndUpdateCommissionProfile(props) {
                 profile_type: itemOrTarget === 1 ? "commission by item" : "commission by target",
                 business_id: await SecureStore.getItemAsync('businessId'),
                 qualifying_items: itemOrTarget === 1 ? [] : selectedOptions.map((item) => ({
-                    type: item,
+                    type: item === "Custom services" ? "Custom_services" : item,
                     type_id: null
                 })),
                 target_tier: itemOrTarget === 1 ? "" : targetTier.toUpperCase(),
@@ -316,13 +317,16 @@ export default function AddAndUpdateCommissionProfile(props) {
         const profileNameValid = profileNameRef.current();
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
         const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
-        const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_percentage !== 0 && targetMapping[0].commission_to !== 0 : true;
+        const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_to !== 0 : true;
+
+
+
 
         if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
-            if(!targetTierValid) {
+            if(itemOrTarget === 2 && !targetTierValid) {
                 toastRef.current.show("target tier is required", true);
             }
-            else if(!targetMappingValid) {
+            else if(itemOrTarget === 2 && !targetMappingValid) {
                 toastRef.current.show("target mapping is required");
             }
             return
@@ -343,11 +347,11 @@ export default function AddAndUpdateCommissionProfile(props) {
             toastRef.current.show(isLesserThenPrev);
             return;
         }
-        else if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0)) {
+        else if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0)) {
             toastRef.current.show("target tier entry can't be zero");
             return;
         }
-        if(itemOrTarget === 2 && targetMapping[targetMapping.length - 1].commission_to === 0 || targetMapping[targetMapping.length - 1].commission_percentage === 0) {
+        if(itemOrTarget === 2 && (targetMapping[targetMapping.length - 1].commission_to === 0)) {
             toastRef.current.show("Target mapping should not left empty", true);
             setIsLesserThenPrev("Target mapping should not left empty")
 
@@ -786,14 +790,26 @@ const item_type = itemType === "Custom services" ? "Custom_services" : itemType;
                                                 buttonStyle={[styles.toggleButton, {backgroundColor: priceToggle === "AMOUNT" ? Colors.highlight80 : Colors.white}]}
                                                 pressableStyle={styles.toggleButtonPressable}
                                                 textStyle={{color: Colors.black}}
-                                                onPress={() => setPriceToggle("AMOUNT")}
+                                                onPress={() => {
+                                                    setPriceToggle("AMOUNT")
+                                                    setIsValueChanged(prevState => ({
+                                                        ...prevState,
+                                                        [itemType]: true,
+                                                    }))
+                                                }}
                                             />
                                             <PrimaryButton
                                                 label={"%"}
                                                 buttonStyle={[styles.toggleButton, {backgroundColor: priceToggle === "PERCENTAGE" ? Colors.highlight80 : Colors.white}]}
                                                 pressableStyle={styles.toggleButtonPressable}
                                                 textStyle={{color: Colors.black}}
-                                                onPress={() => setPriceToggle("PERCENTAGE")}
+                                                onPress={() => {
+                                                    setPriceToggle("PERCENTAGE")
+                                                    setIsValueChanged(prevState => ({
+                                                        ...prevState,
+                                                        [itemType]: true,
+                                                    }))
+                                                }}
                                             />
                                         </View>
                                         <PrimaryButton
@@ -853,6 +869,10 @@ const item_type = itemType === "Custom services" ? "Custom_services" : itemType;
 
 
                                                 }
+                                                setIsValueChanged(prevState => ({
+                                                    ...prevState,
+                                                    [itemType]: true,
+                                                }))
                                             }}
                                         />
                                     </View>,
