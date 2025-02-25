@@ -7,7 +7,7 @@ import {
     StyleSheet,
 } from 'react-native';
 
-import type { FlatListProps, TextStyle, ViewStyle } from 'react-native';
+import type {FlatListProps, TextStyle, ViewStyle} from 'react-native';
 import React from 'react';
 
 type InfiniteScrollerListProps<T> = FlatListProps<T> & {
@@ -93,10 +93,10 @@ type InfiniteScrollerListProps<T> = FlatListProps<T> & {
     endOfListMessageStyle?: TextStyle;
 };
 
-export type { InfiniteScrollerListProps };
+export type {InfiniteScrollerListProps};
 
 const isCloseToBottom = (
-    { layoutMeasurement, contentOffset, contentSize }: NativeScrollEvent,
+    {layoutMeasurement, contentOffset, contentSize}: NativeScrollEvent,
     triggerThreshold: number
 ) => {
     return (
@@ -124,20 +124,20 @@ const isCloseToBottom = (
  * @returns {JSX.Element} - The rendered component.
  */
 
-const InfiniteScrollerList = <T,>({
-                                      data,
-                                      isLoading = false,
-                                      triggerThreshold = 100,
-                                      onFetchTrigger,
-                                      totalLength = 0,
-                                      fallbackTextOnEmptyData = 'No data available.',
-                                      customLoader = <ActivityIndicator size="large" />,
-                                      fallbackTextContainerStyle = {},
-                                      fallbackTextStyle = {},
-                                      endOfListMessage = 'Page End Reached',
-                                      endOfListMessageStyle = {},
-                                      ...restFlatListProps
-                                  }: InfiniteScrollerListProps<T>): JSX.Element => {
+const InfiniteScrollerList = <T, >({
+                                       data,
+                                       isLoading = false,
+                                       triggerThreshold = 100,
+                                       onFetchTrigger,
+                                       totalLength = 0,
+                                       fallbackTextOnEmptyData = 'No data available.',
+                                       customLoader = <ActivityIndicator size="large"/>,
+                                       fallbackTextContainerStyle = {},
+                                       fallbackTextStyle = {},
+                                       endOfListMessage = 'Page End Reached',
+                                       endOfListMessageStyle = {},
+                                       ...restFlatListProps
+                                   }: InfiniteScrollerListProps<T>): JSX.Element => {
     return (
         <FlatList
             data={data}
@@ -145,13 +145,6 @@ const InfiniteScrollerList = <T,>({
             ListFooterComponent={() => {
                 if (isLoading) {
                     return customLoader;
-                }
-                if (totalLength === data?.length) {
-                    return (
-                        <Text style={[styles.endOfListText, endOfListMessageStyle]}>
-                            {endOfListMessage}
-                        </Text>
-                    );
                 }
                 if (!data || data.length === 0) {
                     return (
@@ -164,9 +157,16 @@ const InfiniteScrollerList = <T,>({
                         </View>
                     );
                 }
+                if (totalLength === data?.length) {
+                    return (
+                        <Text style={[styles.endOfListText, endOfListMessageStyle]}>
+                            {endOfListMessage}
+                        </Text>
+                    );
+                }
                 return null;
             }}
-            onScroll={({ nativeEvent }) => {
+            onScroll={({nativeEvent}) => {
                 if (
                     isCloseToBottom(nativeEvent, triggerThreshold) &&
                     !isLoading &&

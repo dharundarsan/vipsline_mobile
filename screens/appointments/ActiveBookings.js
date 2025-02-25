@@ -1,5 +1,5 @@
 import {ActivityIndicator, FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import React, {useEffect, useLayoutEffect, useState} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useState} from "react";
 import {
     decrementFutureBookingsPageNumber, incrementBookingsHistoryPageNumber,
     incrementFutureBookingsPageNumber, loadBookingsHistoryFromDB,
@@ -22,6 +22,8 @@ import CustomPagination from "../../components/common/CustomPagination";
 import EntryPicker from "../../components/common/EntryPicker";
 import LazyLoader from "../../ui/LazyLoader";
 import moment from "moment";
+import {useFocusEffect} from "@react-navigation/native";
+import InfiniteScrollerList from "../../ui/InfiniteScrollerList";
 
 const ActiveBookings = () => {
     const futureBookings = useSelector(state => state.appointments.futureBookings);
@@ -34,7 +36,6 @@ const ActiveBookings = () => {
     const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
 
 
-
     useLayoutEffect(() => {
         const apiCall = async () => {
             await dispatch(loadFutureBookingsFromDB())
@@ -42,6 +43,12 @@ const ActiveBookings = () => {
         apiCall()
 
     }, [futureBookingsFilterDate]);
+
+    useFocusEffect(
+        useCallback(() => {
+            dispatch(setFutureBookingsFilterDate(moment().toISOString()));
+        }, [dispatch])
+    );
 
     return <View style={{flex: 1, backgroundColor: "white"}}>
         {isEntryModalVisible && (
@@ -80,13 +87,14 @@ const ActiveBookings = () => {
                     <Text style={[textTheme.titleMedium, {flex: 1, textAlign: "center", textAlignVertical: "center"}]}>No
                         Active
                         Bookings</Text>
-                </View> : <LazyLoader
+                </View> : <InfiniteScrollerList
                     scrollEventThrottle={100}
-                    style={{paddingHorizontal: 15}}
+                    style={{paddingHorizontal: 0}}
                     onFetchTrigger={() => {
                         dispatch(incrementFutureBookingsPageNumber())
                         dispatch(loadFutureBookingsFromDB())
                     }}
+                    endOfListMessage={""}
                     fallbackTextOnEmptyData={"No Active Bookings"}
                     triggerThreshold={100}
                     totalLength={futureBookingsCount}

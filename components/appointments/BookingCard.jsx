@@ -80,6 +80,7 @@ const BookingCard = (props) => {
                 backgroundColor: statusColor,
                 borderRadius: 6,
                 paddingVertical: 3,
+                fontWeight:"bold",
                 paddingHorizontal: 8
             }}>
                 <Text style={[textTheme.bodyMedium, {fontSize: 14}]}>{props.data.status}</Text>
