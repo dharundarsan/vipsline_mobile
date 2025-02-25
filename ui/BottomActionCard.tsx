@@ -15,6 +15,7 @@ interface BottomActionCardProps extends ModalProps {
     onCancel: () => void;
     confirmLabel: string;
     cancelLabel: string;
+    headerTextStyle?: any
 }
 
 const BottomActionCard = ({
@@ -26,6 +27,7 @@ const BottomActionCard = ({
                               onClose,
                               onConfirm,
                               onCancel,
+                              headerTextStyle,
                               ...modalProps
                           }: BottomActionCardProps) => {
     // Only render the Modal if isVisible is true
@@ -48,7 +50,7 @@ const BottomActionCard = ({
                 activeOpacity={1}
             >
                 <View style={styles.label}>
-                    <Text style={[textTheme.titleLarge, styles.deleteClientText]}>{header}</Text>
+                    <Text style={[textTheme.titleLarge, styles.deleteClientText, headerTextStyle]}>{header}</Text>
 
                     <PrimaryButton
                         buttonStyle={styles.closeButton}

@@ -358,16 +358,16 @@ const CustomTextInput = (props) => {
                 )}
                 <PrimaryButton
                     buttonStyle={[styles.dateTimeButtom, props.dateInputContainer, error ? {borderColor: Colors.error} : {}]}
-                    pressableStyle={styles.dateTimeButtonPressable}
+                    pressableStyle={[styles.dateTimeButtonPressable]}
                     disableRipple={props.readOnly}
                     onPress={props.readOnly ? () => {} : () => setIsDateTimePickerVisible(true)}
                 >
                     <Text
-                        style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}]}>
-                        {props.value === undefined || props.value === null ? "Select " + props.label : formatTime(new Date(props.value), "hh:mm pp")}
+                        style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}, props.labelTextStyle]}>
+                        {props.value === undefined || props.value === null ? props.placeholder ? props.placeholder : "Select " + props.label : formatTime(new Date(props.value), "hh:mm pp")}
                     </Text>
                     <MaterialCommunityIcons
-                        style={styles.dateTimeButtonIcon}
+                        style={[styles.dateTimeButtonIcon]}
                         name="clock-outline"
                         size={24}
                         color={Colors.grey600}
