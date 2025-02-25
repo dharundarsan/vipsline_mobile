@@ -2518,10 +2518,11 @@ const attendanceSelection = [
             return <AttendanceReportDatePicker {...props} range={"month"}/>
         },
         formatCustomFromDate: (date) => {
-            return moment(new Date(date.setDate(0))).format("YYYY-MM-DD")
+
+            return moment(new Date(date.toDate().setDate(0))).format("YYYY-MM-DD")
         },
         formatCustomToDate: (date) => {
-            return moment(date).endOf('month').format("YYYY-MM-DD")
+            return moment(date.toDate()).endOf('month').format("YYYY-MM-DD")
         }
     },
 ].map((item, index) => ({

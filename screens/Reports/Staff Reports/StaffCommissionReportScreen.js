@@ -42,13 +42,13 @@ const StaffCommissionReportScreen = () => {
             staffCommissionReportAPI(firstDate, SecondDate)
         },
         onFirstCustomRangeSelected: (firstDate, SecondDate) => {
-
+            staffCommissionReportAPI(moment(firstDate).format("YYYY-MM-DD"), moment(SecondDate).format("YYYY-MM-DD"))
         },
         onFirstOptionCustomChange: (firstDate, SecondDate) => {
-            staffCommissionReportAPI(firstDate, SecondDate)
+            staffCommissionReportAPI(moment(firstDate).format("YYYY-MM-DD"), moment(SecondDate).format("YYYY-MM-DD"))
         },
         onSecondOptionCustomChange: (firstDate, SecondDate) => {
-            staffCommissionReportAPI(firstDate, SecondDate)
+            staffCommissionReportAPI(moment(firstDate).format("YYYY-MM-DD"), moment(SecondDate).format("YYYY-MM-DD"))
         },
     });
     //
@@ -58,12 +58,11 @@ const StaffCommissionReportScreen = () => {
 
 
     useEffect(() => {
-        handleSelection({label: "This month", value: "Current month", day1: 0, day2: 0}).then(() => {
-
-            staffCommissionReportAPI(currentFromDate, currentToDate);
-        })
+        // handleSelection({label: "This month", value: "Current month", day1: 0, day2: 0}).then(() => {
+        staffCommissionReportAPI(currentFromDate, currentToDate);
+        // })
         // handleSelection({label: "This month", value: "Current month", day1: 0, day2: 0});
-    }, [currentFromDate, currentToDate]);
+    }, []);
 
     const staffCommissionReportAPI = async (fromDate, toDate) => {
         try {
@@ -82,7 +81,7 @@ const StaffCommissionReportScreen = () => {
             setResponse(response.data.data)
             setFormatedData(response.data.data.map(item => [
                 item.resource_name,
-                [item.commission_type, "₹" + item.service_value.toString(), "₹" + item.total_commission.toString()],
+                [item.commission_type, "₹" + item.total_price.toString(), "₹" + item.total_commission.toString()],
                 "₹" + item.total_commission.toString()
             ]))
             return response;

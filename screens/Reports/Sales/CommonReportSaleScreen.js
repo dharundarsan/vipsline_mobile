@@ -120,7 +120,7 @@ const CommonReportSaleScreen = ({route}) => {
     const additionalRowDataList = useRef(initialTotalRow ?? []);
     const sortName = toggleSortItem !== "" ? toggleSortItem : undefined
 
-    const [customDate, setCustomDate] = useState(new Date());
+    const [customDate, setCustomDate] = useState(moment());
 
     const {
         isCustomRange,

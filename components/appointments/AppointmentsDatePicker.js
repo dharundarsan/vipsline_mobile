@@ -40,12 +40,6 @@ const AppointmentsDatePicker = (props) => {
         },
     });
 
-    console.log(props)
-
-    function forwardOrBackwardPress() {
-
-    }
-
     return <View style={[{
         flexDirection: "row",
         alignItems: "center",
@@ -79,7 +73,6 @@ const AppointmentsDatePicker = (props) => {
 
                 if (!minimumDate || currentDate > minimumDate) {
                     props.onLeftArrowPress();
-                    forwardOrBackwardPress();
                 }
             }}
             buttonStyle={{
@@ -144,7 +137,7 @@ const AppointmentsDatePicker = (props) => {
                         moment(props.date).format("DD MMM, YYYY") :
                         props.range === "week" ?
                             moment(props.date).startOf('week').format('DD') + " - " + moment(props.date).endOf("week").format("DD MMM, YYYY") :
-                            moment(props.date).format("DD MMM, YYYY") // right now ui is not clear for me
+                            props.range === "month" ? moment(props.date).format("MMM YYYY") : moment(props.date).format("DD MMM, YYYY") // right now ui is not clear for me
             }</Text>
         </Pressable>
 
@@ -157,7 +150,6 @@ const AppointmentsDatePicker = (props) => {
 
                 if (!maximumDate || currentDate < maximumDate) {
                     props.onRightArrowPress();
-                    forwardOrBackwardPress();
                 }
             }}
             buttonStyle={{

@@ -23,6 +23,7 @@ import DashboardStack from "../stacks/DashboardStack";
 import calender_icon from "../assets/icons/drawerIcons/calendar.png";
 import CheckoutStack from "../stacks/CheckoutStack";
 import checkout_icon from "../assets/icons/drawerIcons/checkout.png";
+import dashboard_icon from "../assets/icons/drawerIcons/Dashboard.png";
 import ClientSegmentScreen from "../screens/ClientSegmentScreen";
 import clients_icon from "../assets/icons/drawerIcons/clients.png";
 import LeadManagementStack from "../stacks/LeadManagementStack";
@@ -265,7 +266,7 @@ const MainDrawerNavigator = (props) => {
                                     swipeEnabled: currentLocation !== "DashboardScreen" ? false : true,
                                     // headerShown: isDashboardPage,
                                     drawerIcon: () => <Image
-                                        source={{uri: Image.resolveAssetSource(calender_icon).uri}} width={25}
+                                        source={{uri: Image.resolveAssetSource(dashboard_icon).uri}} width={25}
                                         height={25}
                                         style={{resizeMode: "contain"}}/>,
                                     headerShown: false
