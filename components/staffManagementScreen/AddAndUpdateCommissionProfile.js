@@ -191,7 +191,6 @@ export default function AddAndUpdateCommissionProfile(props) {
         const computationalIntervalValid = itemOrTarget === 2 ? computationalIntervalRef.current() : true;
         const targetTierValid = itemOrTarget === 2 ? targetTier !== "" : true;
         const targetMappingValid = itemOrTarget === 2 ? targetMapping[0].commission_to !== 0 : true;
-        const qualifyingItemsValid = qualifyingItemRef.current();
 
         if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
             if(itemOrTarget === 2 && !targetTierValid) {
@@ -209,7 +208,7 @@ export default function AddAndUpdateCommissionProfile(props) {
             return;
         }
 
-        if(selectedOptions.length === 0 && itemOrTarget === 2) {
+        if(itemOrTarget === 2 && selectedOptions.length === 0) {
             toastRef.current.show("qualifying item is required");
             return
         }
