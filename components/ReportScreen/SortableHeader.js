@@ -62,7 +62,7 @@ const SortableHeader = ({
             <View style={styles.headerContainer}>
                 <Text
                     style={[
-                        TextTheme.bodyMedium,
+                        TextTheme.bodySmall,
                         {
                             color: currentSortKey === sortKey ? sortComponentOrderKey !== 1 ? Colors.highlight : Colors.black : Colors.black,
                             textAlign: 'start',
