@@ -26,8 +26,8 @@ export default function StaffProfile(props) {
 
     const details = useSelector((state) => selectStaffById(state, props.id));
 
-    const [calenderBookingSwitch, setCalenderBookingSwitch] = useState(details.calendar_bookings);
-    const [loginAccessSwitch, setLoginAccessSwitch] = useState(details.login_access);
+    // const [calenderBookingSwitch, setCalenderBookingSwitch] = useState(details.calendar_bookings);
+    // const [loginAccessSwitch, setLoginAccessSwitch] = useState(details.login_access);
 
     const [editStaffModalVisibility, setEditStaffModalVisibility] = useState(false);
     const toastRef = useRef(null);
@@ -153,7 +153,7 @@ export default function StaffProfile(props) {
                 <View style={{gap: 18, marginTop: 18}}>
                     <View style={{ flexDirection: 'row', }}>
                         <CustomSwitch
-                            isOn={calenderBookingSwitch}
+                            isOn={details.calendar_bookings}
                             display
                             color={Colors.highlight}
                         />
@@ -170,7 +170,7 @@ export default function StaffProfile(props) {
 
                     <View style={{flexDirection: 'row'}}>
                         <CustomSwitch
-                            isOn={loginAccessSwitch}
+                            isOn={details.login_access}
                             color={Colors.highlight}
                             display
                         />

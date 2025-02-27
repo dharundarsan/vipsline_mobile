@@ -76,7 +76,7 @@ export default function StaffManagementScreen({navigation}) {
             }}
             pressableStyle={styles.buttonStyle}
             rippleColor={Colors.ripple}
-            buttonStyle={{backgroundColor: Colors.white}}
+            buttonStyle={{backgroundColor: Colors.white, borderRadius: 0}}
         >
             <View style={{flexDirection: 'row', gap: 8}}>
                 <Image
@@ -117,7 +117,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         backgroundColor: "white",
-        borderRadius: 0
+        borderRadius: 0,
+        paddingVertical: 12
     },
     listStyle: {
         borderWidth: 1,
