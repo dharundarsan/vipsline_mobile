@@ -32,8 +32,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.business.vipsline",
-      "newArchEnabled": true
+      "bundleIdentifier": "com.business.vipsline"
     },
     "android": {
       "versionCode": 1,

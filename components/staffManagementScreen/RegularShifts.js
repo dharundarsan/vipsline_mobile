@@ -41,7 +41,9 @@ const RegularShifts = (props) => {
     const [ends, setEnds] = useState("never");
 
     const [scheduleTypeChangeTracker, setScheduleTypeChangeTracker] = useState("");
-    const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState();
+    const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState(false);
+
+    // console.log(endDate)
 
     const [create, setCreate] = useState(false);
 
@@ -80,13 +82,12 @@ const RegularShifts = (props) => {
     const toastRef = useRef(null);
 
     const handleConfirm = (selectedDate) => {
-        setEndDate(selectedDate);
         setIsDateTimePickerVisible(false);
+        setEndDate(selectedDate);
 
     };
 
     const handleCancel = () => {
-        setEndDate(null);
         setIsDateTimePickerVisible(false);
     };
 
@@ -107,7 +108,7 @@ const RegularShifts = (props) => {
         >
             <Toast ref={toastRef}/>
             {
-                isDateTimePickerVisible &&
+                // isDateTimePickerVisible &&
                 <DateTimePickerModal
                     isVisible={isDateTimePickerVisible}
                     mode="date"
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
     dateTimeButtonPressable: {
         paddingVertical: 0,
         paddingHorizontal: 9,
+        flex: 1
     },
     dateTimeButtonIcon: {
 

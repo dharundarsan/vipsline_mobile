@@ -150,7 +150,7 @@ export default function AssignServicesModal(props) {
                         data={services}
                         keyExtractor={(item, index) => `${item.main_service_name}-${index}`}
                         renderItem={({ item, index }) => (
-                            <View style={styles.mainServices}>
+                            item.sub_services.length > 0 && <View style={styles.mainServices}>
                                 {/* Main Service */}
                                 <Divider />
                                 <Pressable
@@ -218,7 +218,7 @@ export default function AssignServicesModal(props) {
                                         id: parseInt(subService.staff_id) || -1,
                                         activation: subService.staff_activation === 1 ? 1 : 0,
                                         price: subService.staff_price,
-                                        resource_category: parseInt(subService.staff_resource_category),
+                                        resource_category: parseInt(subService.sub_service_id),
                                         service_time: subService.staff_service_time,
                                     }))
                                 );
@@ -240,7 +240,6 @@ export default function AssignServicesModal(props) {
                             props.onClose();
                         }
                         else {
-                            console.log("sdf")
                             toastRef.current.show(res.data.other_message);
                         }
 

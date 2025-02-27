@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, TouchableWithoutFeedback, Animated, StyleSheet } from "react-native";
 
 const CustomSwitch = ({ isOn, onToggle, color, display }) => {
-    const [animatedValue] = useState(new Animated.Value(isOn ? 1 : 0));
+    const animatedValue = useRef(new Animated.Value(isOn ? 1 : 0)).current;
 
-    const toggleSwitch = () => {
-        if (display) return; // Prevent toggle when display is true
-
+    useEffect(() => {
         Animated.timing(animatedValue, {
-            toValue: isOn ? 0 : 1,
+            toValue: isOn ? 1 : 0,
             duration: 200,
             useNativeDriver: false,
         }).start();
+    }, [isOn]); // Runs animation whenever `isOn` prop changes
 
+    const toggleSwitch = () => {
+        if (display) return; // Prevent toggle when display is true
         onToggle(!isOn);
     };
 
@@ -32,9 +33,7 @@ const CustomSwitch = ({ isOn, onToggle, color, display }) => {
                 <Animated.View
                     style={[
                         styles.circle,
-                        {
-                            transform: [{ translateX: circleTranslate }],
-                        },
+                        { transform: [{ translateX: circleTranslate }] },
                     ]}
                 />
             </Animated.View>
@@ -44,14 +43,14 @@ const CustomSwitch = ({ isOn, onToggle, color, display }) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 50, // Adjust width to match the design
-        height: 28, // Adjust height to match the design
+        width: 50,
+        height: 28,
         borderRadius: 20,
         padding: 2,
         justifyContent: "center",
     },
     circle: {
-        width: 22, // Adjust size to match the design
+        width: 22,
         height: 22,
         borderRadius: 11,
         backgroundColor: "white",
