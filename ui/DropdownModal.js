@@ -42,13 +42,13 @@ const DropdownModal = (props) => {
             <TouchableOpacity style={[styles.modalContent, {
                 paddingTop: Platform.OS === "ios" ? insets.top : null,
                 paddingBottom: Platform.OS === "ios" ? insets.bottom : null
-          }]} onPress={props.onCloseModal} activeOpacity={1}>
+          }, props.modelContent]} onPress={props.onCloseModal} activeOpacity={1}>
                 {
                     checkNullUndefined(props.children) &&
                     props.children
                 }
                 <FlatList
-                    style={styles.dropdownList}
+                    style={[styles.dropdownList, props.dropdownList]}
                     data={props.dropdownItems}
                     renderItem={({item, index}) => (
                         <>

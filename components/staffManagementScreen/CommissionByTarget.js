@@ -1,16 +1,27 @@
-import {View, StyleSheet, Text, FlatList, VirtualizedList, Pressable, TouchableOpacity} from "react-native";
+import {View, StyleSheet, Text, FlatList, VirtualizedList, Pressable, TouchableOpacity, ScrollView} from "react-native";
 import CustomTextInput from "../../ui/CustomTextInput";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import CustomDropdown from "../../ui/CustomDropdown";
 import Colors from "../../constants/Colors";
-import {Divider} from "react-native-paper";
+import {Checkbox, Divider} from "react-native-paper";
 import {CustomRadioButton} from "../../ui/CustomRadioButtons";
-import {default as And} from "../../ui/Divider";
 import CustomPriceInput from "../../ui/CustomPriceInput";
 import textTheme from "../../constants/TextTheme";
 import {AntDesign, MaterialIcons} from "@expo/vector-icons";
 import PrimaryButton from "../../ui/PrimaryButton";
 import getCommissionProfileDetailsAPI from "../../apis/staffManagementAPIs/getCommissionProfileDetailsAPI";
+import {capitalizeFirstLetter} from "../../util/Helpers";
+import {getListOfCommissionProfile} from "../../store/staffSlice";
+import axios from "axios";
+import {
+    transformData,
+    transformDataForQualifyingItem
+} from "../../apis/staffManagementAPIs/staffCommissionsHelperFunctions";
+import * as SecureStore from "expo-secure-store";
+import updateCommissionProfileAPI from "../../apis/staffManagementAPIs/updateCommissionProfileAPI";
+import {useDispatch} from "react-redux";
+import BottomActionCard from "../../ui/BottomActionCard";
+import deleteStaffCommissionAPI from "../../apis/staffManagementAPIs/deleteStaffCommissionAPI";
 
 
 const options = [
@@ -18,29 +29,230 @@ const options = [
     { "Progressive": "Percentage only apply to their respective tiers", }
 ];
 
-export default function CommissionByTarget({
-                                               toastRef,
-                                               checkBox,
-                                               setComputationalInterval,
-                                               computationalInterval,
-                                               setTargetTier,
-                                               targetTier,
-                                               setQualifyingItems,
-                                               qualifyingItems,
-                                               setIsFieldsEmpty,
-                                               isFieldsEmpty,
-                                               setIsLesserThenPrev,
-                                               isLesserThenPrev,
-                                               setTargetMapping,
-                                               targetMapping,
-                                               setSelectedOptions,
-                                               selectedOptions,
-                                               currentDataForTarget,
-      computationalIntervalRef,
-    targetTierRef,
-    qualifyingItemRef
+export default function CommissionByTarget(props) {
 
-}) {
+
+    const dispatch = useDispatch();
+
+    const [profileName, setProfileName] = useState(props.edit ? props.data.profile_name : "");
+    const [includeTax, setIncludeTax] = useState(props.edit ? props.data.tax_enabled : false);
+
+    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [targetMapping, setTargetMapping] = useState([
+        {
+            type_id: null,
+            commission_from: 0,
+            commission_to: "",
+            commission_percentage: "",
+            activation: true,
+        },
+    ]);
+    // const [qualifyingItems, setQualifyingItems] = useState([]);
+    const [targetTier, setTargetTier] = useState("");
+    const [computationalInterval, setComputationalInterval] = useState("");
+
+    const [isLesserThenPrev, setIsLesserThenPrev] = useState("");
+    const [isFieldsEmpty, setIsFieldsEmpty] = useState(false);
+
+    const profileNameRef = useRef(null);
+    const computationalIntervalRef = useRef(null);
+    const targetTierRef = useRef(null);
+    const qualifyingItemRef = useRef(null);
+    const [currentDataForTarget, setCurrentDataForTarget] = useState({});
+    const [isConfirmStaffDeleteModalVisible, setIsConfirmStaffDeleteModalVisible] = useState();
+
+
+    async function onSave() {
+        const profileNameValid = profileNameRef.current();
+        const computationalIntervalValid = computationalIntervalRef.current();
+        const targetTierValid = targetTier !== "";
+        const targetMappingValid = targetMapping[0].commission_to !== 0 ;
+
+        if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
+            if(!targetTierValid) {
+                props.toastRef.current.show("target tier is required", true);
+            }
+            else if(!targetMappingValid) {
+                props.toastRef.current.show("target mapping is required");
+            }
+            return
+
+        }
+
+        if(selectedOptions.length === 0) {
+            props.toastRef.current.show("qualifying item is required");
+            return
+        }
+
+        if(targetMapping.length > 1 && isLesserThenPrev.length > 0) {
+            props.toastRef.current.show(isLesserThenPrev);
+            return;
+        }
+        else if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
+            props.toastRef.current.show("target tier entry can't be zero");
+            return;
+        }
+        if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
+            props.toastRef.current.show("Target mapping should not left empty", true);
+            setIsLesserThenPrev("Target mapping should not left empty")
+
+            return;
+        }
+        else {
+            setIsLesserThenPrev("")
+        }
+
+        try {
+            const response = await axios.post(process.env.EXPO_PUBLIC_API_URI + "/resource/addCommissionProfile", {
+                    profile_name: profileName,
+                    tax_enabled: includeTax,
+                    profile_type: "commission by target",
+                    business_id: await SecureStore.getItemAsync('businessId'),
+                    qualifying_items: selectedOptions.map((item) => ({
+                        type: item === "Custom services" ? "Custom_services" : item,
+                        type_id: null
+                    })),
+                    target_tier: targetTier.toUpperCase(),
+                    target_mapping: targetMapping.map(({ commission_from, commission_to, commission_percentage, type_id }) => ({
+                        commission_from: commission_from,
+                        commission_to: commission_to,
+                        commission_percentage: commission_percentage,
+                        type_id: type_id || null
+                    })),
+                    Services: [],
+                    Products: [],
+                    Membership: [],
+                    Packages: [],
+                    Prepaid: [],
+                    Custom_services: [],
+                    computation_interval: computationalInterval
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${await SecureStore.getItemAsync('authKey')}`
+                    }
+                });
+
+
+            // console.log(response)
+            if(response.data.other_message === "" || response.data.other_message === null ) {
+                props.toastRef.current.show(response.data.message)
+                props.onClose();
+                dispatch(getListOfCommissionProfile());
+            }
+            else {
+                props.toastRef.current.show(response.data.other_message);
+            }
+        }
+        catch (e) {
+
+            props.toastRef.current.show(e.response.data.other_message, true);
+
+        }
+    }
+
+    async function onEdit() {
+
+        const profileNameValid = profileNameRef.current();
+        const computationalIntervalValid = computationalIntervalRef.current();
+        const targetTierValid = targetTier !== "";
+        const targetMappingValid = targetMapping[0].commission_to !== 0;
+
+
+
+
+        if(!profileNameValid || !computationalIntervalValid || !targetTierValid || !targetMappingValid) {
+            if(!targetTierValid) {
+                props.toastRef.current.show("target tier is required", true);
+            }
+            else if(!targetMappingValid) {
+                props.toastRef.current.show("target mapping is required");
+            }
+            return
+
+        }
+
+
+
+        if(selectedOptions.length === 0) {
+            props.toastRef.current.show("qualifying item is required");
+            return
+        }
+
+        if(targetMapping.length > 1 && isLesserThenPrev.length > 0) {
+            props.toastRef.current.show(isLesserThenPrev);
+            return;
+        }
+        else if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
+            props.toastRef.current.show("target tier entry can't be zero");
+            return;
+        }
+        if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
+            props.toastRef.current.show("Target mapping should not left empty", true);
+            setIsLesserThenPrev("Target mapping should not left empty")
+
+            return;
+        }
+        else {
+            setIsLesserThenPrev("")
+        }
+
+
+        const response = await updateCommissionProfileAPI(
+            {
+                id: props.data.id,
+                profile_name: profileName,
+                tax_enabled: includeTax,
+                profile_type: "commission by target",
+                business_id: await SecureStore.getItemAsync('businessId'),
+                Services: [],
+                Products:  [] ,
+                Membership:  [] ,
+                Packages: [] ,
+                Prepaid: [] ,
+                Custom_services:  [] ,
+                qualifying_items: transformDataForQualifyingItem(currentDataForTarget.qualifying_items, selectedOptions),
+                target_tier: targetTier.toUpperCase(),
+                target_mapping: transformData(currentDataForTarget.target_mapping, targetMapping),
+                computation_interval: computationalInterval
+            }
+        );
+
+        if(response.data.other_message === "" || response.data.other_message === null) {
+            props.toastRef.current.show(response.data.message)
+            props.onClose();
+            dispatch(getListOfCommissionProfile());
+        }
+        else {
+            props.toastRef.current.show(response.data.other_message);
+        }
+    }
+
+
+    useEffect(() => {
+        async function f() {
+            const response = await getCommissionProfileDetailsAPI(props.data.id);
+
+            if(response.data.other_message === null || response.data.other_message === "") {
+                const data = response.data.data[0];
+                setCurrentDataForTarget(data);
+                const qualifying_items = data.qualifying_items
+                // setQualifyingItems(qualifying_items);
+                setSelectedOptions(qualifying_items.map((item, index) => item.type === "Custom_services" ? "Custom services" : item.type ));
+                setComputationalInterval(capitalizeFirstLetter(props.data.computation_interval))
+                setIncludeTax(data.tax_enabled);
+                setTargetTier(data.target_tier === "ZERO BASED" ? "Zero based" : "Progressive");
+                setTargetMapping(data.target_mapping)
+            }
+            else {
+                toastRef.current.show(response.data.other_message)
+            }
+        }
+
+        if(props.edit) {
+            f()
+        }
+    }, []);
 
 
 
@@ -64,12 +276,11 @@ export default function CommissionByTarget({
         else {
             setIsFieldsEmpty(false);
         }
-
         const newTier = {
             type_id: null, // Increment type_id
             commission_from: lastItem.commission_to + 0.01, // Ensure sequential range
-            commission_to: 0, // Increment range
-            commission_percentage: 0, // Default percentage
+            commission_to: "", // Increment range
+            commission_percentage: "", // Default percentage
             activation: true,
         };
 
@@ -85,8 +296,7 @@ export default function CommissionByTarget({
 
     const updateCommissionPercentage = (text, index) => {
         // Convert text input to a number
-        const newValue = parseFloat(text) || 0;
-
+        const newValue = text === "0" ? 0 : parseFloat(text) || "";
 
         setTargetMapping((prev) =>
             prev.map((tier, i) =>
@@ -101,7 +311,7 @@ export default function CommissionByTarget({
 
         setIsFieldsEmpty(false);
 
-        const newValue = parseFloat(text) || 0;
+        const newValue = parseFloat(text) || "";
 
         setTargetMapping((prev) =>
             prev.map((tier, i) =>
@@ -122,17 +332,6 @@ export default function CommissionByTarget({
         else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
             setIsLesserThenPrev("");
         }
-
-
-
-
-        // if((targetMapping[index].commission_from > newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) > newValue)) {
-        //     setIsLesserThenPrev(true);
-        //     console.log("exec")
-        // }
-        // else if((targetMapping[index].commission_from <= newValue) || (index === 0 ? 0 : (targetMapping[index - 1].commission_to + 0.01) <= newValue)){
-        //     setIsLesserThenPrev(false);
-        // }
 
     };
 
@@ -161,6 +360,7 @@ export default function CommissionByTarget({
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 onOnchangeText={(text) => updateCommissionPercentage(text, index)}
                 defaultValue={item.commission_percentage.toString()}
+                // value={item.commission_percentage.toString()}
             />
             <TouchableOpacity style={{alignItems: "center", justifyContent:"center", width: "8%"}}>
                 {
@@ -173,19 +373,52 @@ export default function CommissionByTarget({
             </View>
     }
 
+    return <>
+        {
+            isConfirmStaffDeleteModalVisible &&
+            <BottomActionCard isVisible={isConfirmStaffDeleteModalVisible}
+                              header={"Delete Commission Profile"}
+                              content={"Are you sure? This action cannot be undone."}
+                              onClose={() => setIsConfirmStaffDeleteModalVisible(false)}
+                              onConfirm={async () => {
+                                  const response = await deleteStaffCommissionAPI(props.data.id);
+                                  if(response.data.other_message === "") {
+                                      props.toastRef.current.show(response.data.message)
+                                      props.onClose();
+                                      dispatch(getListOfCommissionProfile());
+                                  }
+                                  else {
+                                      toastRef.current.show(response.data.other_message);
+                                  }
+                                  setIsConfirmStaffDeleteModalVisible(false);
 
+                              }}
+                              onCancel={() => {
+                                  setIsConfirmStaffDeleteModalVisible(false);
+                              }}
+                              headerTextStyle={{fontSize: 20, fontWeight: "600"}}
 
-    const allItems = [
-        { type: "Services", type_id: null },
-        { type: "Products", type_id: null },
-        { type: "Memberships", type_id: null },
-        { type: "Prepaid", type_id: null },
-        { type: "Custom services", type_id: null },
-    ];
-
-
-
-    return <View style={styles.commissionByTarget}>
+            />
+        }
+        <ScrollView
+            showsVerticalScrollIndicator={false}
+        >
+    <View style={styles.commissionByTarget}>
+        <CustomTextInput
+            type={"text"}
+            label={"Profile name"}
+            value={profileName}
+            onChangeText={(text) => {
+                setProfileName(text);
+            }}
+            placeholder={"Profile name"}
+            validator={(text) => {
+                if(text === undefined || text === "" || text.length === 0) return "Profile name is required";
+                else return true
+            }}
+            onSave={(callback) => profileNameRef.current = callback}
+            container={{marginBottom: 0}}
+        />
         <CustomDropdown
             options={["Services", "Products", "Prepaid", "Membership", "Packages", "Custom services"]}
             highlightColor={Colors.highlight}
@@ -204,7 +437,9 @@ export default function CommissionByTarget({
                 }
                 else return true;
             }}
-            onSave={(callback) => qualifyingItemRef.current = callback}
+            onSave={(callback) => {
+                qualifyingItemRef.current = callback;
+            }}
 
         />
         <CustomTextInput
@@ -223,9 +458,21 @@ export default function CommissionByTarget({
             }}
             onSave={(callback) => computationalIntervalRef.current = callback}
         />
-        {
-            checkBox
-        }
+        <View style={{flexDirection: "row", alignItems: "center"}}>
+        <Checkbox
+            status={includeTax ? "checked" : "unchecked"}
+            onPress={() => {setIncludeTax(prev => !prev)}}
+            uncheckedColor={Colors.highlight}
+            color={Colors.highlight}
+
+        />
+        <Text
+            style={[textTheme.bodyMedium]}
+            onPress={() => {setIncludeTax(prev => !prev)}}>
+            Calculate by item sale price including tax
+        </Text>
+    </View>
+
         <Divider />
 
         <CustomRadioButton
@@ -275,6 +522,32 @@ export default function CommissionByTarget({
             </Text>
         </PrimaryButton>
     </View>
+        </ScrollView>
+        <View style={styles.bottomContainer}>
+            {
+                props.edit ?
+                    <PrimaryButton
+                        onPress={async () => {
+                            setIsConfirmStaffDeleteModalVisible(true);
+                        }}
+                        buttonStyle={{
+                            backgroundColor: "white",
+                            borderWidth: 1,
+                            borderColor: Colors.grey400
+                        }}
+                        pressableStyle={{paddingHorizontal: 8, paddingVertical: 8}}>
+                        <MaterialIcons name="delete-outline" size={28} color={Colors.error}/>
+                    </PrimaryButton>  : <></>
+            }
+
+            <PrimaryButton
+                label={props.edit ? "Update" : "Create"}
+                buttonStyle={styles.saveButton}
+                onPress={props.edit ? onEdit : onSave}
+            />
+        </View>
+    </>
+
 }
 
 const styles = StyleSheet.create({
@@ -327,6 +600,24 @@ const styles = StyleSheet.create({
         paddingRight: 12
 
     },
+    bottomContainer: {
+        paddingHorizontal: 16,
+        flexDirection: "row",
+        gap: 18,
+        marginBottom: 12
+    },
+    cancelButton: {
+        flex: 1,
+        backgroundColor: Colors.white,
+        borderWidth: 1,
+        borderColor: Colors.grey500,
+    },
+    cancelButtonText: {
+        color: Colors.black,
+    },
+    saveButton: {
+        flex: 1,
+    }
 })
 
 

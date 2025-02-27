@@ -159,7 +159,7 @@ export default function ShiftsForWeek(props) {
             resource_id: props.currentDayWorkingData.resource_id,
             staff_schedule_id: props.create ? undefined : props.data.staff_schedule_id,
             start_date: moment(props.startDate).format("YYYY-MM-DD"),
-            end_date: props.ends === "Select end date" ? moment(props.endDate).format("YYYY-MM-DD") : 'never',
+            end_date: props.endDate !== null ? moment(props.endDate).format("YYYY-MM-DD") : 'never',
             schedule_type: mappingWeekNames[props.scheduleType],
             schedule_pattern: schedule.map(weekItem =>
                 weekItem.days.map(day => ({

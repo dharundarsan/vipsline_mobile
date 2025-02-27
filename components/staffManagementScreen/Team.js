@@ -170,6 +170,9 @@ export default function Team() {
                     dispatch(loadTimeOffTypeFromDb());
                 }
             }}
+            modelContent={{gap: 0}}
+            dropdownList={{marginBottom: 8}}
+
         >
             <View style={styles.bottomStaffProfileContainer}>
                 <StaffCard
@@ -293,6 +296,7 @@ export default function Team() {
             }}
             scrollEnabled={false}
             style={{marginTop: 8}}
+            // ItemSeparatorComponent={() => <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: 'red', width: '100%' }} />}
 
 
         /> : <Bullets
