@@ -89,7 +89,14 @@ export default function CommissionByTarget(props) {
             return;
         }
         else if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
-            props.toastRef.current.show("target tier entry can't be zero");
+            props.toastRef.current.show("target mapping entry can't be zero");
+            return;
+        }
+        else if((typeof targetMapping[targetMapping.length - 1].commission_to === "string" && targetMapping[targetMapping.length - 1].commission_to.trim() === "") ||
+            (typeof targetMapping[targetMapping.length - 1].commission_percentage === "string" && targetMapping[targetMapping.length - 1].commission_percentage.trim() === "")
+        ) {
+            props.toastRef.current.show("Target mapping should not left empty");
+            setIsLesserThenPrev("")
             return;
         }
         if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
@@ -185,6 +192,13 @@ export default function CommissionByTarget(props) {
         }
         else if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
             props.toastRef.current.show("target tier entry can't be zero");
+            return;
+        }
+        else if((typeof targetMapping[targetMapping.length - 1].commission_to === "string" && targetMapping[targetMapping.length - 1].commission_to.trim() === "") ||
+            (typeof targetMapping[targetMapping.length - 1].commission_percentage === "string" && targetMapping[targetMapping.length - 1].commission_percentage.trim() === "")
+        ) {
+            props.toastRef.current.show("Target mapping should not left empty");
+            setIsLesserThenPrev("")
             return;
         }
         if((targetMapping[targetMapping.length - 1].commission_to === 0)) {
@@ -346,6 +360,8 @@ export default function CommissionByTarget(props) {
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 readOnly
                 value={index === 0 ? "0" : (targetMapping[index - 1].commission_to + 0.01).toString()}
+                textInputStyle={{fontSize: 13}}
+
 
             />
             <CustomPriceInput
@@ -354,6 +370,7 @@ export default function CommissionByTarget(props) {
                 innerContainerStyle={{backgroundColor: Colors.grey100}}
                 onOnchangeText={(text) => updateCommissionTo(text, index)}
                 defaultValue={item.commission_to.toString()}
+                textInputStyle={{fontSize: 13}}
             />
             <CustomPriceInput
                 priceToggle={"PERCENTAGE"}
@@ -361,6 +378,7 @@ export default function CommissionByTarget(props) {
                 onOnchangeText={(text) => updateCommissionPercentage(text, index)}
                 defaultValue={item.commission_percentage.toString()}
                 // value={item.commission_percentage.toString()}
+                textInputStyle={{fontSize: 13}}
             />
             <TouchableOpacity style={{alignItems: "center", justifyContent:"center", width: "8%"}}>
                 {

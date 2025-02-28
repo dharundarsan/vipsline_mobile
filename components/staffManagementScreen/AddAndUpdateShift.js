@@ -65,7 +65,7 @@ export default function AddAndUpdateShift(props) {
         onRequestClose={props.onClose}
     >
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{capitalizeFirstLetters(
+            <Text style={[textTheme.titleMedium, {fontSize: 20,}, styles.titleText]}>{capitalizeFirstLetters(
                 props.regularShifts ?
                 (staffs.find((item, index) => {
                     if(item.id === props.resourceId) {

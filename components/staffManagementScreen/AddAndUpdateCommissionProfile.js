@@ -405,7 +405,7 @@ export default function AddAndUpdateCommissionProfile(props) {
         <Toast ref={toastRef}/>
 
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Update Commission Profile" : "Add Commission Profile"}</Text>
+            <Text style={[textTheme.titleMedium,{fontSize: 20,}, styles.titleText]}>{props.edit ? "Update Commission Profile" : "Add Commission Profile"}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}

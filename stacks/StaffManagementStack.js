@@ -18,6 +18,7 @@ import {useDispatch} from "react-redux";
 import {clearSchedulesForStaff} from "../store/staffSlice";
 import CommissionProfileScreen from "../screens/staffs/CommissionProfileScreen";
 import StaffCommissionScreen from "../screens/staffs/StaffCommissionScreen";
+import textTheme from "../constants/TextTheme";
 
 export const BackButton = (props) => {
     const navigation = useNavigation();
@@ -93,6 +94,11 @@ const StaffManagementStack = () => {
                               />
                           </TouchableOpacity>,
                           headerTitleAlign: "center",
+                          headerTitleStyle: {
+                              ...textTheme.titleMedium,
+                              fontSize: 20,
+
+                          }
 
         })}
         />
@@ -104,6 +110,11 @@ const StaffManagementStack = () => {
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
 
             })}
 
@@ -116,6 +127,11 @@ const StaffManagementStack = () => {
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
 
 
             })}
@@ -137,9 +153,14 @@ const StaffManagementStack = () => {
                     }}
                 >
                     <AntDesign name="arrowleft" size={24} color="black"/>
-                </TouchableOpacity>
+                </TouchableOpacity>,
 
                 // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
 
             })}
 
@@ -152,6 +173,11 @@ const StaffManagementStack = () => {
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
 
             })}
 
@@ -164,6 +190,11 @@ const StaffManagementStack = () => {
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
 
             })}
 
@@ -176,6 +207,11 @@ const StaffManagementStack = () => {
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
 
             })}
 
@@ -188,6 +224,11 @@ const StaffManagementStack = () => {
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton currentRouteName={route.name}/>,
                 // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
 
             })}
 
@@ -199,6 +240,11 @@ const StaffManagementStack = () => {
                 headerShown: true,
                 headerTitleAlign: "center",
                 headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
             })}
         />
     </Stack.Navigator>)

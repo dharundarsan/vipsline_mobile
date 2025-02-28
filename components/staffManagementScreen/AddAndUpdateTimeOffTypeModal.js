@@ -100,7 +100,7 @@ export default function AddAndUpdateTimeOffTypeModal(props) {
 
         />
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Staff Time Off Type" : "Add Staff Time Off Type"}</Text>
+            <Text style={[textTheme.titleMedium, styles.titleText]}>{props.edit ? "Edit Staff Time Off Type" : "Add Staff Time Off Type"}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}

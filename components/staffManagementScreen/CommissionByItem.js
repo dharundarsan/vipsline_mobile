@@ -47,7 +47,7 @@ export default function CommissionByItem(props) {
     const [priceToggle, setPriceToggle] = useState("PERCENTAGE");
 
 
-    const widthArr = (screenWidth > 500 ? [screenWidth*0.4, screenWidth*0.2, screenWidth*0.3, screenWidth*0.1] : [200, 120 ,200, 80]);
+    const widthArr = (screenWidth > 500 ? [screenWidth*0.4, screenWidth*0.2, screenWidth*0.3, screenWidth*0.1] : [220, 120 ,200, 80]);
 
     const profileNameRef = useRef(null);
 
@@ -100,7 +100,12 @@ export default function CommissionByItem(props) {
 
 
                     if(response.length > 0 && Object.keys(response[0]).length > 0) {
-                        setPriceToggle(response[0].commission_type)
+                        if (itemType === "Prepaid" || itemType === "Custom services") {
+                            setPriceToggle(response[0].resource_categories[0].commission_type);
+                        }
+                        else {
+                            setPriceToggle(response[0].commission_type)
+                        }
                     }
                 })
             }
@@ -194,6 +199,7 @@ export default function CommissionByItem(props) {
 
         }
     }
+
 
 
 
@@ -296,7 +302,7 @@ export default function CommissionByItem(props) {
                 </View>
                 ,
                 <Text style={[textTheme.bodyMedium]}>
-                    ₹ {item.price}
+                    {itemType === "Prepaid" || itemType === "Custom services" ? "" :  "₹ " + item.price}
                 </Text>,
                 <View style={[
                     styles.percentOrValueForItemContainer,
@@ -501,6 +507,10 @@ export default function CommissionByItem(props) {
                             <View >
                                 <CustomTextInput
                                     textInputStyle={{marginVertical:0}}
+                                    dropdownLabelTextProps={{
+                                        numberOfLines: 1,
+                                        ellipsizeMode: "tail",
+                                    }}
 
                                     type={"dropdown"}
                                     dropdownItems={["Services", "Products", "Prepaid", "Packages", "Membership", "Custom services"]}
@@ -523,6 +533,7 @@ export default function CommissionByItem(props) {
                                     }}
                                     labelEnabled={false}
                                     container={{marginBottom: 0, width: "70%"}}
+                                    dropdownLabelTextStyle={{flex: 1}}
                                 />
                             </View>,
                             <View style={{flexDirection: "row", alignItems: 'center', gap: 8, borderWidth: 0}}>
@@ -616,10 +627,12 @@ export default function CommissionByItem(props) {
                                                 setPackages(formattedData);
                                             }
                                             if (itemType === "Prepaid") {
-                                                setPrepaid(formattedData);
+
+                                                setPrepaid([{...(formattedData[0].resource_categories[0]), commission_value: value}]);
                                             }
                                             if(itemType === "Custom services") {
-                                                setCustom_services(formattedData);
+                                                // console.log(response)
+                                                setCustom_services([{...(formattedData[0].resource_categories[0]), commission_value: value}]);
                                             }
 
                                         setIsValueChanged(prevState => ({

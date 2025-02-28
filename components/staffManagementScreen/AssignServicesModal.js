@@ -96,7 +96,7 @@ export default function AssignServicesModal(props) {
     >
         <Toast ref={toastRef}/>
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{props.staffName}</Text>
+            <Text style={[textTheme.titleMedium, {fontSize: 20,}, styles.titleText]}>{props.staffName}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}

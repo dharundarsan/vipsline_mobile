@@ -119,7 +119,7 @@ export default function AddShiftTimingModal(props) {
 
         />
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Shit Timings" : "Add Shift Timings"}</Text>
+            <Text style={[textTheme.titleMedium, {fontSize: 20}, styles.titleText]}>{props.edit ? "Edit Shit Timings" : "Add Shift Timings"}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}
