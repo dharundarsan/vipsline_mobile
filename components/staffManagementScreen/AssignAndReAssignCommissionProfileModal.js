@@ -113,7 +113,7 @@ export default function AssignAndReAssignCommissionProfileModal(props) {
             />
         }
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Re-Assign Commission Profile" : "Assign Commission Profile"}</Text>
+            <Text style={[textTheme.titleMedium, {fontSize: 20,}, styles.titleText]}>{props.edit ? "Re-Assign Commission Profile" : "Assign Commission Profile"}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}
