@@ -5,13 +5,25 @@ import {Provider, useDispatch, useSelector} from 'react-redux';
 import store from './store/store';
 import {enableScreens} from "react-native-screens";
 import * as SplashScreen from 'expo-splash-screen';
-import {useFonts} from "expo-font";
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {updateAuthStatus} from "./store/authSlice";
 import {LocationProvider} from './context/LocationContext';
 import * as SecureStore from 'expo-secure-store';
 import {DataProvider} from './context/DataFlowContext';
 import MainDrawerNavigator from "./navigators/MainDrawerNavigator";
+import AppLoading from 'expo-app-loading';
+import {
+    useFonts,
+    Inter_100Thin,
+    Inter_200ExtraLight,
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
+} from '@expo-google-fonts/inter';
 
 SplashScreen.preventAutoHideAsync();
 enableScreens();
@@ -21,6 +33,20 @@ export default function App() {
         'Inter-Regular': require('./assets/fonts/Inter/static/Inter_18pt-Regular.ttf'),
         'Inter-Bold': require('./assets/fonts/Inter/static/Inter_18pt-Bold.ttf')
     });
+
+    let [fontsLoaded] = useFonts({
+        Inter_100Thin,
+        Inter_200ExtraLight,
+        Inter_300Light,
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+        Inter_800ExtraBold,
+        Inter_900Black,
+    });
+
+
     const [isAuth, setIsAuth] = useState(false)
 
     useEffect(() => {
@@ -28,7 +54,7 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        if (loaded || error) {
+        if (loaded || error || fontsLoaded) {
             SplashScreen.hideAsync();
         }
 
@@ -40,9 +66,9 @@ export default function App() {
         // const subscription = AppState.addEventListener('change', handleAppStateChange);
         // return () => subscription.remove();
 
-    }, [loaded, error]);
+    }, [loaded, error, fontsLoaded]);
 
-    if (!loaded && !error) {
+    if (!loaded && !error && !fontsLoaded) {
         return null;
     }
 
@@ -99,7 +125,7 @@ const AppNavigator = (props) => {
 
     return (
         <NavigationContainer>
-            <StatusBar barStyle={"default"} />
+            <StatusBar barStyle={"default"}/>
             <SafeAreaProvider>
                 {/* {isAuth ? */}
                 <LocationProvider>

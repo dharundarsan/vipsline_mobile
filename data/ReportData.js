@@ -6,34 +6,10 @@ import membershipIcon from "../assets/icons/reportIcons/membership.png"
 import clientReportIcon from "../assets/icons/reportIcons/clientReports.png"
 import businessIcon from "../assets/icons/reportIcons/business.png"
 import attendance from "../assets/icons/reportIcons/attendance.png"
-import ServiceSalesReportScreen from '../screens/Reports/Sales/ServiceSalesReportScreen';
-import ProductSalesReportScreen from '../screens/Reports/Sales/ProductSalesReportScreen';
-import MembershipSalesReportScreen from '../screens/Reports/Sales/MembershipSalesReportScreen';
-import PackageSalesReportScreen from '../screens/Reports/Sales/PackageSalesReportScreen';
 import PaymentModeReportScreen from '../screens/Reports/Sales/PaymentModeReportScreen';
-import CancelledInvoiceReportScreen from '../screens/Reports/Sales/CancelledInvoiceReportScreen';
-import AppointmentListReportScreen from '../screens/Reports/Appointments/AppointmentListReportScreen';
-import AppointmentByServiceReportScreen from '../screens/Reports/Appointments/AppointmentByServiceReportScreen';
-import AppointmentByStaffReportScreen from '../screens/Reports/Appointments/AppointmentByStaffReportScreen';
 import TaxesSummaryReportsReportScreen from '../screens/Reports/Tax/TaxesSummaryReportsReportScreen';
 import StaffSalesSummaryReportScreen from '../screens/Reports/Staff Reports/StaffSalesSummaryReportScreen';
-import StaffSummaryReportScreen from '../screens/Reports/Staff Reports/StaffSummaryReportScreen';
-import StaffWorkingHoursReportScreen from '../screens/Reports/Staff Reports/StaffWorkingHoursReportScreen';
 import StaffCommissionReportScreen from '../screens/Reports/Staff Reports/StaffCommissionReportScreen';
-import AllActiveMembershipReportScreen from '../screens/Reports/Membership/AllActiveMembershipReportScreen';
-import ActiveIndividualMembershipReportScreen
-    from '../screens/Reports/Membership/ActiveIndividualMembershipReportScreen';
-import AboutToExpireReportScreen from '../screens/Reports/Membership/AboutToExpireReportScreen';
-import ExpiredMembershipReportScreen from '../screens/Reports/Membership/ExpiredMembershipReportScreen';
-import ClientServiceListReportScreen from '../screens/Reports/Client Reports/ClientServiceListReportScreen';
-import ClientSourceListReportScreen from '../screens/Reports/Client Reports/ClientSourceListReportScreen';
-import PrepaidReportScreen from '../screens/Reports/Business/PrepaidReportScreen';
-import PackagesReportScreen from '../screens/Reports/Business/PackagesReportScreen';
-import RewardPointsReportScreen from '../screens/Reports/Business/RewardPointsReportScreen';
-import NotificationsReportScreen from '../screens/Reports/Business/NotificationsReportScreen';
-import FeedbackReportScreen from '../screens/Reports/Business/FeedbackReportScreen';
-import PrepaidSalesReportScreen from "../screens/Reports/Sales/PrepaidSalesReportScreen"
-import SalesListReportScreen from "../screens/Reports/Sales/SalesListReportScreen"
 import CommonReportSaleScreen from "../screens/Reports/Sales/CommonReportSaleScreen"
 import {
     fetchAboutToExpireMembershipReport, fetchActiveIndividualMembershipReport,
@@ -60,16 +36,9 @@ import {
     fetchStaffWorkHourReport,
     fetchWANotificationReport
 } from "../store/reportSlice"
-import commonReportSaleScreen from "../screens/Reports/Sales/CommonReportSaleScreen";
-import ClientListReportScreen from "../screens/Reports/Client Reports/ClientListReportScreen";
 import {useSelector} from "react-redux";
 import {useLayoutEffect} from "react";
-import {loadLeadStatusesFromDb} from "../store/leadManagementSlice";
 import {Text, View} from "react-native";
-import getLeadStatusColor from "../util/getLeadStatusColor";
-import AttendanceReportScreen from "../screens/Reports/Business/AttendanceReportScreen";
-import {Ionicons} from "@expo/vector-icons";
-import AppointmentsDatePicker from "../components/appointments/AppointmentsDatePicker";
 import AttendanceReportDatePicker from "../components/ReportScreen/AttendanceReportDatePicker";
 import moment from "moment";
 
@@ -2500,7 +2469,8 @@ const attendanceSelection = [
         },
         formatCustomToDate: (date) => {
             return moment(date).format("YYYY-MM-DD")
-        }
+        },
+        headerText: "Shows staffs daily attendance report"
     },
     {
         title: "Monthly Attendance",
@@ -2523,7 +2493,8 @@ const attendanceSelection = [
         },
         formatCustomToDate: (date) => {
             return moment(date.toDate()).endOf('month').format("YYYY-MM-DD")
-        }
+        },
+        headerText: "Shows staffs monthly attendance report"
     },
 ].map((item, index) => ({
     ...item,

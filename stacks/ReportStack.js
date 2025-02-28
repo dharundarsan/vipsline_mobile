@@ -44,6 +44,7 @@ const ReportStack = ({navigation}) => {
             <Stack.Screen name='ReportScreen' component={SalesListReport} options={{
                 headerTitle: 'Reports',
                 headerTitleAlign: 'center',
+                headerTitleStyle: {fontFamily: "Inter_600SemiBold", fontSize: 16},
                 headerShown: true, headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
                     <Image
                         source={require('../assets/icons/drawerIcons/drawer.png')}
@@ -105,7 +106,8 @@ const ReportStack = ({navigation}) => {
                                       CustomDateComponent: dataItem?.CustomDateComponent,
                                       rowComponents: dataItem?.rowComponents,
                                       formatCustomFromDate: dataItem?.formatCustomFromDate,
-                                      formatCustomToDate: dataItem?.formatCustomToDate
+                                      formatCustomToDate: dataItem?.formatCustomToDate,
+                                      headerText: dataItem?.headerText
                                   }}
                     />
                 )))

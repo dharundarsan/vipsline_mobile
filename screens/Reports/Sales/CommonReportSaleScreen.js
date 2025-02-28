@@ -33,7 +33,7 @@ const CommonReportSaleScreen = ({route}) => {
         initialTotalRow, additionalRowEnabled = false,
         formatMandatoryFields, filterItems, useEffectFunction,
         isFilterEnabled, disableDate, rowComponents,
-        CustomDateComponent, formatCustomFromDate, formatCustomToDate
+        CustomDateComponent, formatCustomFromDate, formatCustomToDate, headerText
     } = route.params;
 
     const dispatch = useDispatch();
@@ -348,8 +348,9 @@ const CommonReportSaleScreen = ({route}) => {
                 </View>
             </Modal>}
             <View style={{marginTop: 20, paddingHorizontal: 20}}>
-                <Text style={[TextTheme.bodyMedium, {alignSelf: 'center', marginBottom: 20}]}>Shows complete list of all
-                    sales transactions.</Text>
+                <Text style={[TextTheme.bodyMedium, {alignSelf: 'center', marginBottom: 20}]}>
+                    {headerText ? headerText : "Shows complete list of all sales transactions."}
+                </Text>
                 {disableDate ? <></> : <DatePicker
                     isCustomRange={isCustomRange}
                     handleSelection={handleSelection}

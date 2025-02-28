@@ -7,6 +7,7 @@ const AttendanceReportDatePicker = (props) => {
     return (
         <AppointmentsDatePicker
             date={props.date.toDate()}
+            maximumDate={new Date()}
             onRightArrowPress={() => {
                 if (props.range === "day") {
                     props.setSelectedDate(prev =>
