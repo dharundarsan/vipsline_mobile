@@ -10,6 +10,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {checkNullUndefined, formatDate, formatTime} from "../util/Helpers";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import RequiredSymbol from "./RequiredSymbol";
+import dropdown from "react-native-element-dropdown/src/components/Dropdown";
 
 /**
  * CustomTextInput component for various types of text inputs, including text, email, phone number, date and dropdown.
@@ -263,8 +264,9 @@ const CustomTextInput = (props) => {
                 >
 
                     {props.object ? <Text style={[textTheme.bodyLarge]}>
+
                         {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value.name}
-                    </Text> : <Text style={[textTheme.bodyLarge, props.dropdownLabelTextStyle]}>
+                    </Text> : <Text style={[textTheme.bodyLarge, props.dropdownLabelTextStyle]} {...props.dropdownLabelTextProps} >
                         {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value}
                     </Text>}
                     <FontAwesome name="angle-down" size={24} color="black"/>

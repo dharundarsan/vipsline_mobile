@@ -221,7 +221,7 @@ export default function AddAndUpdateTimeOffForStaff(props) {
             />
         }
         <View style={styles.closeAndHeadingContainer}>
-            <Text style={[textTheme.titleLarge, styles.titleText]}>{props.edit ? "Edit Time Off" : "Add Time Off"}</Text>
+            <Text style={[textTheme.titleMedium, {fontSize: 20,}, styles.titleText]}>{props.edit ? "Edit Time Off" : "Add Time Off"}</Text>
             <PrimaryButton
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}

@@ -120,7 +120,7 @@ const RegularShifts = (props) => {
                 />
             }
             <View style={styles.closeAndHeadingContainer}>
-                <Text style={[textTheme.titleLarge, styles.titleText]}>Set Regular Shifts</Text>
+                <Text style={[textTheme.titleMedium, {fontSize: 20,}, styles.titleText]}>Set Regular Shifts</Text>
                 <PrimaryButton buttonStyle={styles.closeButton} pressableStyle={styles.closeButtonPressable} onPress={props.onClose}>
                     <Ionicons name="close" size={25} color="black" />
                 </PrimaryButton>

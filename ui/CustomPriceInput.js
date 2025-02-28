@@ -12,7 +12,8 @@ const PriceInput = ({
                         readOnly,
                         value,
                         defaultValue,
-                        onEndEditing
+                        onEndEditing,
+                        textInputStyle
 }) => {
     const borderLeftWidthColor = {
         borderLeftWidth: 1,
@@ -38,13 +39,14 @@ const PriceInput = ({
                 type={"number"}
                 labelEnabled={false}
                 container={{ marginBottom: 0, width: "70%" }}
-                textInputStyle={{marginVertical: 0, borderRadius: 0, borderWidth: 0,}}
+                textInputStyle={[{marginVertical: 0, borderRadius: 0, borderWidth: 0,}, textInputStyle]}
                 flex
                 onChangeText={(text) => onOnchangeText === undefined ? {} : onOnchangeText(text)}
                 readOnly={!!readOnly}
                 value={value}
                 defaultValue={defaultValue}
                 onEndEditing={onEndEditing}
+
 
             />
             <View
