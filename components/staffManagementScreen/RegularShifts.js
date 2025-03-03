@@ -55,13 +55,14 @@ const RegularShifts = (props) => {
         };
 
         fetchSchedule().then((response1) => {
+            // console.log("create mode")
             if(Object.keys(response1.data.data[0]).length === 0) {
                 setCreate(true)
                 getDefaultStaffSchedulePatternAPI(1).then((response2) => {
                     setResponse(response2.data.data[0]);
                     setScheduleType("Weekly");
-                    setEnds(response2.end_date === null ? "never" : "Select end date")
-                    setEndDate(response2.end_date !== null ? moment(response2.end_date).toDate() : null);
+                    setEnds("never")
+                    setEndDate(null);
                     setStartDate(moment(response2.start_date).toDate());
                 })
                 return;
@@ -90,6 +91,8 @@ const RegularShifts = (props) => {
     const handleCancel = () => {
         setIsDateTimePickerVisible(false);
     };
+
+    // console.log(endDate)
 
 
 
@@ -215,6 +218,7 @@ const RegularShifts = (props) => {
                         toastRef={props.toastRef}
                         onClose={props.onClose}
                         create={create}
+                        setOnUpdate={props.setOnUpdate}
 
                     />
 

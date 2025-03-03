@@ -87,7 +87,7 @@ export default function StaffProfile(props) {
                     Last name
                 </Text>
                 <Text style={[textTheme.bodyLarge, ]}>
-                    Not Provided
+                    -
                 </Text>
             </View>
             <View>
@@ -95,7 +95,7 @@ export default function StaffProfile(props) {
                     Email
                 </Text>
                 <Text style={[textTheme.bodyLarge, ]}>
-                    {details.email === "" || details.email === null ? "Not provided" : details.email}
+                    {details.email === "" || details.email === null ? "-" : details.email}
                 </Text>
             </View>
             <View>
@@ -103,7 +103,7 @@ export default function StaffProfile(props) {
                     Mobile
                 </Text>
                 <Text style={[textTheme.bodyLarge, ]}>
-                    {details.mobile === "" ? "Not provided" : details.mobile}
+                    {details.mobile === "" ? "-" : details.mobile}
                 </Text>
             </View>
             <View>
@@ -111,7 +111,7 @@ export default function StaffProfile(props) {
                     Staff title
                 </Text>
                 <Text style={[textTheme.bodyLarge, ]}>
-                    {details.title === "" ? "Not provided" : details.title}
+                    {details.title === "" ? "-" : details.title}
                 </Text>
             </View>
             <View>
@@ -119,7 +119,7 @@ export default function StaffProfile(props) {
                     Gender
                 </Text>
                 <Text style={[textTheme.bodyLarge, ]}>
-                    {details.gender === "" ? "Not provided" : details.gender}
+                    {details.gender === "" ? "-" : details.gender}
                 </Text>
             </View>
             <View>
@@ -133,7 +133,7 @@ export default function StaffProfile(props) {
                     Start date
                 </Text>
                 <Text style={[textTheme.bodyLarge]}>
-                    {(details.start_date) === "" ? "Not Provided" : dateFormatter(details.start_date, 'short')}
+                    {(details.start_date) === "" ? "-" : dateFormatter(details.start_date, 'short')}
                 </Text>
             </View>
                 <View>
@@ -141,7 +141,7 @@ export default function StaffProfile(props) {
                         End Date
                     </Text>
                     <Text style={[textTheme.bodyLarge, ]}>
-                        {details.termination_date === "" ? "Not Provided" : dateFormatter(details.termination_date, 'short')}
+                        {details.termination_date === "" ? "-" : dateFormatter(details.termination_date, 'short')}
                     </Text>
                 </View>
                 <View>
