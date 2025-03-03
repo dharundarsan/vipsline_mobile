@@ -12,23 +12,22 @@ import {checkNullUndefined} from "../../util/Helpers";
 const AppointmentsDatePicker = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
     const rangeSelector = {
-        "day" : [
+        "day": [
             "Past",
             "Today",
             "Upcoming"
         ],
-        "week" : [
+        "week": [
             "Past Week",
             "This Week",
             "Upcoming Week",
-        ]
-        ,
-        "month" : [
+        ],
+        "month": [
             "Past Month",
             "This Month",
             "Upcoming Month",
         ],
-        "year" : [
+        "year": [
             "Past Year",
             "This Year",
             "Upcoming Year",
@@ -41,14 +40,10 @@ const AppointmentsDatePicker = (props) => {
         },
     });
 
-    function forwardOrBackwardPress() {
-
-    }
-
     return <View style={[{
         flexDirection: "row",
         alignItems: "center",
-        marginBottom:10,
+        marginBottom: 10,
     }, props.containerStyle]}>
         {isDatePickerVisible &&
             <DateTimePickerModal
@@ -78,7 +73,6 @@ const AppointmentsDatePicker = (props) => {
 
                 if (!minimumDate || currentDate > minimumDate) {
                     props.onLeftArrowPress();
-                    forwardOrBackwardPress();
                 }
             }}
             buttonStyle={{
@@ -107,22 +101,21 @@ const AppointmentsDatePicker = (props) => {
             }, textTheme.bodyLarge]}>
                 {
                     new Date(props.date.getFullYear(), props.date.getMonth(), props.date.getDate())
-            < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
-                ? rangeSelector[props.range][0] // past
-                : new Date(props.date.getFullYear(), props.date.getMonth(), props.date.getDate())
-                > new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
-                    ? rangeSelector[props.range][2] // present
-                    : rangeSelector[props.range][1]  //   future
+                    < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+                        ? rangeSelector[props.range][0] // past
+                        : new Date(props.date.getFullYear(), props.date.getMonth(), props.date.getDate())
+                        > new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+                            ? rangeSelector[props.range][2] // present
+                            : rangeSelector[props.range][1]  //   future
                 }
             </Text>
 
         </View>
         <Pressable
             onPress={() => {
-                if(props.type === undefined || props.type === "display") {
+                if (props.type === undefined || props.type === "display") {
                     return null
-                }
-                else {
+                } else {
                     setIsDatePickerVisible(true);
                 }
             }}
@@ -139,11 +132,12 @@ const AppointmentsDatePicker = (props) => {
                 textAlignVertical: "center",
                 flex: 1
             }, textTheme.bodyLarge]}>{
-                props.range === "day" ?
-                    moment(props.date).format("DD MMM, YYYY") :
-                    props.range === "week" ?
-                        moment(props.date).startOf('week').format('DD') + " - " + moment(props.date).endOf("week").format("DD MMM, YYYY") :
-                        moment(props.date).format("DD MMM, YYYY") // right now ui is not clear for me
+                props.displayText ? props.displayText :
+                    props.range === "day" ?
+                        moment(props.date).format("DD MMM, YYYY") :
+                        props.range === "week" ?
+                            moment(props.date).startOf('week').format('DD') + " - " + moment(props.date).endOf("week").format("DD MMM, YYYY") :
+                            props.range === "month" ? moment(props.date).format("MMM YYYY") : moment(props.date).format("DD MMM, YYYY") // right now ui is not clear for me
             }</Text>
         </Pressable>
 
@@ -156,7 +150,6 @@ const AppointmentsDatePicker = (props) => {
 
                 if (!maximumDate || currentDate < maximumDate) {
                     props.onRightArrowPress();
-                    forwardOrBackwardPress();
                 }
             }}
             buttonStyle={{

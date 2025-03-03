@@ -229,6 +229,7 @@ export default function Team() {
                 visible={regularShiftsVisibility}
                 onClose={() => setRegularShiftsVisibility(false)}
                 toastRef={toastRef}
+                setOnUpdate={setOnUpdate}
 
             />
         }
@@ -256,8 +257,6 @@ export default function Team() {
             type={"display"}
             range={"week"}
             containerStyle={{marginTop: 32, marginHorizontal: 8}}
-
-
         />
 
         <ScrollView>
@@ -337,7 +336,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white
     },
     timeDurationCard: {
-        borderWidth: 1,
         borderColor: Colors.grey600,
         borderRadius: 6,
         backgroundColor: Colors.highlight80,

@@ -1,9 +1,13 @@
 import {ActivityIndicator, FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import React, {useEffect, useLayoutEffect, useState} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useState} from "react";
 import {
     decrementBookingsHistoryPageNumber,
     incrementBookingsHistoryPageNumber,
-    loadBookingsHistoryFromDB, resetBookingsHistoryPageNo, setBookingsHistoryFilterDate, updateBookingsHistoryMaxEntry
+    loadBookingsHistoryFromDB,
+    resetBookingsHistoryPageNo,
+    setBookingsHistoryFilterDate,
+    setFutureBookingsFilterDate,
+    updateBookingsHistoryMaxEntry
 } from "../../store/appointmentsSlice";
 import {useDispatch, useSelector} from "react-redux";
 import BookingCard from "../../components/appointments/BookingCard";
@@ -21,6 +25,7 @@ import isCloseToBottom from "../../util/isCloseToBottom";
 import moment from "moment";
 import LazyLoader from "../../ui/LazyLoader";
 import InfiniteScrollerList from "../../ui/InfiniteScrollerList";
+import {useFocusEffect} from "@react-navigation/native";
 
 const BookingHistory = () => {
     const bookingsHistory = useSelector(state => state.appointments.bookingsHistory);
@@ -39,6 +44,12 @@ const BookingHistory = () => {
         }
         apiCall()
     }, [bookingsHistoryFilterDate]);
+
+    useFocusEffect(
+        useCallback(() => {
+            dispatch(setBookingsHistoryFilterDate(moment().toISOString()));
+        }, [dispatch])
+    );
 
     return <View style={{flex: 1, backgroundColor: "white", paddingVertical: 15}}>
         {isEntryModalVisible && (
@@ -88,6 +99,7 @@ const BookingHistory = () => {
             totalLength={bookingsHistoryCount}
             data={bookingsHistory}
             isLoading={isFetching}
+            endOfListMessage={""}
             fallbackTextContainerStyle={{height: 500}}
             fallbackTextStyle={{color: "black", ...textTheme.titleMedium}}
             renderItem={({item}) => <BookingCard data={item}/>}

@@ -6,9 +6,18 @@ import textTheme from "../../constants/TextTheme";
 import CustomSwitch from "../../ui/CustomSwitch";
 import {AntDesign} from "@expo/vector-icons";
 import AssignServicesModal from "./AssignServicesModal";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {getAllServicesFromDb} from "../../store/staffSlice";
 import Toast from "../../ui/Toast";
+import {createSelector} from "reselect";
+import PermissionsModal from "./PermissionsModal";
+
+const selectStaffById = createSelector(
+    (state) => state.staff.staffs, // Input selector
+    (_, id) => id, // Input selector for the ID
+    (staffs, id) => staffs.find((staff) => staff.id === id) // Compute the result
+);
+
 
 export default function Workspace(props) {
 
@@ -16,9 +25,14 @@ export default function Workspace(props) {
     const [loginAccessSwitch, setLoginAccessSwitch] = useState(false);
 
     const [assignServicesModalVisibility, setAssignServicesModalVisibility] = useState(false);
+    const [permissionsModalVisibility, setPermissionsModalVisibility] = useState(false)
+
+    const details = useSelector((state) => selectStaffById(state, props.id));
 
     const dispatch = useDispatch();
     const toastRef = useRef(null);
+
+    // console.log(JSON.stringify(details, null, 2));
 
 
     return <ScrollView
@@ -33,6 +47,16 @@ export default function Workspace(props) {
                 onClose={() => setAssignServicesModalVisibility(false)}
                 staffName={props.staffName}
                 id={props.id}
+                toastRef={toastRef}
+            />
+        }
+        {
+            permissionsModalVisibility &&
+            <PermissionsModal
+                visible={permissionsModalVisibility}
+                onClose={() => setPermissionsModalVisibility(false)}
+                staffName={props.staffName}
+                resourceId={props.id}
                 toastRef={toastRef}
             />
         }
@@ -57,7 +81,7 @@ export default function Workspace(props) {
                     <Text style={[textTheme.bodyLarge,{color: Colors.grey500}]}>
                         Provider
                     </Text>
-                    <Text style={[textTheme.bodyLarge, ]}>
+                    <Text style={[textTheme.bodyLarge, {marginTop: 4}]}>
                         No services
                     </Text>
                 </View>
@@ -65,18 +89,22 @@ export default function Workspace(props) {
                     <Text style={[textTheme.titleMedium]}>
                         Permissions
                     </Text>
-                    <PrimaryButton
-                        label={"Edit"}
-                        buttonStyle={styles.editButton}
-                        textStyle={styles.editButtonText}
-                    />
+                    {
+                        details.login_access ?
+                        <PrimaryButton
+                            label={"Edit"}
+                            buttonStyle={styles.editButton}
+                            textStyle={styles.editButtonText}
+                            onPress={() => setPermissionsModalVisibility(true)}
+                        /> : <></>
+                    }
                 </View>
                 <View>
                     <Text style={[textTheme.bodyLarge,{color: Colors.grey500}]}>
                         Access control
                     </Text>
-                    <Text style={[textTheme.bodyLarge, ]}>
-                        Disabled
+                    <Text style={[textTheme.bodyLarge, {marginTop: 4}]}>
+                        {details.login_access ? "Enabled" : "Disabled"}
                     </Text>
                 </View>
 

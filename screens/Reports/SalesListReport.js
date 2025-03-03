@@ -5,6 +5,7 @@ import {reportStackDisplay, titleToDisplay} from '../../data/ReportData';
 import {Divider} from 'react-native-paper';
 import Colors from '../../constants/Colors';
 import ReportCard from '../../components/ReportScreen/ReportCard';
+import {Inter_600SemiBold} from "@expo-google-fonts/inter";
 
 const SalesListReport = () => {
     return (
@@ -17,7 +18,11 @@ const SalesListReport = () => {
                             paddingBottom: 5
                         } : null]}>
                             <Image source={section.icon} style={styles.icon}/>
-                            <Text style={TextTheme.titleSmall}>{section.title}</Text>
+                            <Text style={{
+                                fontFamily: "Inter_600SemiBold",
+                                fontSize: 16,
+                                // lineHeight: 16
+                            }}>{section.title}</Text>
                         </View>
                         <View style={{
                             backgroundColor: 'white',

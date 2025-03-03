@@ -5,34 +5,11 @@ import staffReportIcon from "../assets/icons/reportIcons/staffReports.png"
 import membershipIcon from "../assets/icons/reportIcons/membership.png"
 import clientReportIcon from "../assets/icons/reportIcons/clientReports.png"
 import businessIcon from "../assets/icons/reportIcons/business.png"
-import ServiceSalesReportScreen from '../screens/Reports/Sales/ServiceSalesReportScreen';
-import ProductSalesReportScreen from '../screens/Reports/Sales/ProductSalesReportScreen';
-import MembershipSalesReportScreen from '../screens/Reports/Sales/MembershipSalesReportScreen';
-import PackageSalesReportScreen from '../screens/Reports/Sales/PackageSalesReportScreen';
+import attendance from "../assets/icons/reportIcons/attendance.png"
 import PaymentModeReportScreen from '../screens/Reports/Sales/PaymentModeReportScreen';
-import CancelledInvoiceReportScreen from '../screens/Reports/Sales/CancelledInvoiceReportScreen';
-import AppointmentListReportScreen from '../screens/Reports/Appointments/AppointmentListReportScreen';
-import AppointmentByServiceReportScreen from '../screens/Reports/Appointments/AppointmentByServiceReportScreen';
-import AppointmentByStaffReportScreen from '../screens/Reports/Appointments/AppointmentByStaffReportScreen';
 import TaxesSummaryReportsReportScreen from '../screens/Reports/Tax/TaxesSummaryReportsReportScreen';
 import StaffSalesSummaryReportScreen from '../screens/Reports/Staff Reports/StaffSalesSummaryReportScreen';
-import StaffSummaryReportScreen from '../screens/Reports/Staff Reports/StaffSummaryReportScreen';
-import StaffWorkingHoursReportScreen from '../screens/Reports/Staff Reports/StaffWorkingHoursReportScreen';
 import StaffCommissionReportScreen from '../screens/Reports/Staff Reports/StaffCommissionReportScreen';
-import AllActiveMembershipReportScreen from '../screens/Reports/Membership/AllActiveMembershipReportScreen';
-import ActiveIndividualMembershipReportScreen
-    from '../screens/Reports/Membership/ActiveIndividualMembershipReportScreen';
-import AboutToExpireReportScreen from '../screens/Reports/Membership/AboutToExpireReportScreen';
-import ExpiredMembershipReportScreen from '../screens/Reports/Membership/ExpiredMembershipReportScreen';
-import ClientServiceListReportScreen from '../screens/Reports/Client Reports/ClientServiceListReportScreen';
-import ClientSourceListReportScreen from '../screens/Reports/Client Reports/ClientSourceListReportScreen';
-import PrepaidReportScreen from '../screens/Reports/Business/PrepaidReportScreen';
-import PackagesReportScreen from '../screens/Reports/Business/PackagesReportScreen';
-import RewardPointsReportScreen from '../screens/Reports/Business/RewardPointsReportScreen';
-import NotificationsReportScreen from '../screens/Reports/Business/NotificationsReportScreen';
-import FeedbackReportScreen from '../screens/Reports/Business/FeedbackReportScreen';
-import PrepaidSalesReportScreen from "../screens/Reports/Sales/PrepaidSalesReportScreen"
-import SalesListReportScreen from "../screens/Reports/Sales/SalesListReportScreen"
 import CommonReportSaleScreen from "../screens/Reports/Sales/CommonReportSaleScreen"
 import {
     fetchAboutToExpireMembershipReport, fetchActiveIndividualMembershipReport,
@@ -42,9 +19,9 @@ import {
     fetchCancelledInvoiceReportByBusiness,
     fetchClientListReport,
     fetchClientServiceListReport,
-    fetchClientSourceListReport,
+    fetchClientSourceListReport, fetchDailyAttendanceReport,
     fetchExpiredMembershipReport,
-    fetchFeedbackReport,
+    fetchFeedbackReport, fetchMonthlyAttendanceReport,
     fetchPackageReport,
     fetchPrepaidReport,
     fetchProductSalesSummaryReport,
@@ -59,11 +36,11 @@ import {
     fetchStaffWorkHourReport,
     fetchWANotificationReport
 } from "../store/reportSlice"
-import commonReportSaleScreen from "../screens/Reports/Sales/CommonReportSaleScreen";
-import ClientListReportScreen from "../screens/Reports/Client Reports/ClientListReportScreen";
 import {useSelector} from "react-redux";
 import {useLayoutEffect} from "react";
-import {loadLeadStatusesFromDb} from "../store/leadManagementSlice";
+import {Text, View} from "react-native";
+import AttendanceReportDatePicker from "../components/ReportScreen/AttendanceReportDatePicker";
+import moment from "moment";
 
 const globalState = {staffs: []};
 
@@ -2224,7 +2201,96 @@ const businessStaffSelection = [
                 ],
                 appendingFilterItems: [],
             },
-        ]
+        ],
+        rowComponents: [{
+            "index": 8, "component": (data) => {
+                if (data === "Expired") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#fce6eb",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}>
+                        <Text style={[{
+                            textAlign: 'left',
+                            fontWeight: "bold",
+                            paddingVertical: 5,
+                            fontSize: 14,
+                            color: "#a43e44"
+                        }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+                } else if (data === "redeemed") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#efe9fd",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}><Text style={[{
+                        textAlign: 'left',
+                        fontWeight: "bold",
+                        paddingVertical: 5,
+                        fontSize: 14,
+                        color: "#815fbe",
+                    }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+
+                } else if (data === "Cancelled") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#fdf3e8",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}>
+                        <Text style={[{
+                            textAlign: 'left',
+                            fontWeight: "bold",
+                            paddingVertical: 5,
+                            color: "#daa352",
+                            fontSize: 14,
+                        }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+
+                } else if (data === "Active") {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#ecf7f1",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}><Text style={[{
+                        textAlign: 'left',
+                        fontWeight: "bold",
+                        paddingVertical: 5,
+                        fontSize: 14,
+                        color: "#6daa97"
+                    }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+
+                } else {
+                    return <View style={{
+                        alignSelf: "center",
+                        minWidth: 80,
+                        paddingHorizontal: 5,
+                        backgroundColor: "#fdf3e8",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}><Text style={[{
+                        textAlign: 'left',
+                        fontWeight: "bold",
+                        paddingVertical: 5,
+                        fontSize: 14,
+                    }, {paddingHorizontal: 10}]}>{data}</Text>
+                    </View>
+                }
+            }
+        }]
     },
     {
         title: "Reward points",
@@ -2278,13 +2344,166 @@ const businessStaffSelection = [
         tableHeader: feedbackListWithSort,
         transformTableData: formatfeedbackListTableData,
     },
+    // {
+    //     title: "Attendance Report",
+    //     component: AttendanceReportScreen
+    // },
 ].map((item, index) => ({
     ...item,
     id: index + 1,
     navigation: camelCase(item.title),
     headerTitle: toPascalCase(item.title)
 }));
-export const titleToDisplay = ["SALES", "APPOINTMENTS", "TAX", "STAFF REPORTS", "MEMBERSHIP", "CLIENT REPORTS", "BUSINESS"]
+
+const dailyAttendanceHeader = [
+    "STAFF NAME",
+    "SHIFT TIME",
+    "FIRST CHECK-IN",
+    "LAST CHECK-OUT",
+    "TOTAL HOURS",
+    "STATUS",
+]
+
+const dailyAttendanceKey = [
+    {
+        key: "r.name",
+        sortKey: "r.name",
+    },
+    {
+        key: "shift",
+        sortKey: "shift",
+    },
+    {
+        key: "firstCheckinTime",
+        sortKey: "firstCheckinTime",
+    },
+    {
+        key: "lastCheckoutTime",
+        sortKey: "lastCheckoutTime",
+    },
+    {
+        key: "duration",
+        sortKey: "duration",
+    },
+    {
+        key: "status",
+        sortKey: "",
+    },
+]
+
+const dailyAttendanceWithSort = dailyAttendanceKey.map((item, index) => ({
+    ...item,
+    title: dailyAttendanceHeader[index]
+}))
+
+const formatDailyAttendanceListTableData = (dataList) => {
+    return dataList.map((item) => [
+        item.staffName,
+        item.shiftDetails,
+        item.firstCheckIn,
+        item.lastCheckOut,
+        item.totalHours,
+        item.status,
+    ])
+};
+
+const monthlyAttendanceHeader = [
+    "STAFF NAME",
+    "WORKING DAYS",
+    "NON-WORKING DAYS",
+    "TOTAL WORKING HOURS",
+]
+
+const monthlyAttendanceKey = [
+    {
+        key: "r.name",
+        sortKey: "r.name",
+    },
+    {
+        key: "working_days",
+        sortKey: "working_days",
+    },
+    {
+        key: "non_working_days",
+        sortKey: "non_working_days",
+    },
+    {
+        key: "total_duration",
+        sortKey: "total_duration",
+    },
+]
+
+const monthlyAttendanceWithSort = monthlyAttendanceKey.map((item, index) => ({
+    ...item,
+    title: monthlyAttendanceHeader[index]
+}))
+
+const formatMonthlyAttendanceListTableData = (dataList) => {
+    return dataList.map((item) => [
+        item.staffName,
+        item.workingDays,
+        item.nonWorkingDays,
+        item.totalDuration,
+    ])
+};
+
+
+const attendanceSelection = [
+    {
+        title: "Daily Attendance",
+        component: CommonReportSaleScreen,
+        listName: "attendance_summary_data",
+        searchEnabled: false,
+        searchPlaceholder: "",
+        apiFunction: fetchDailyAttendanceReport,
+        apiCountName: "total_count",
+        salesListWidthHeader: dailyAttendanceHeader,
+        tableHeader: dailyAttendanceWithSort,
+        transformTableData: formatDailyAttendanceListTableData,
+        disableDate: true,
+        CustomDateComponent: (props) => {
+            return <AttendanceReportDatePicker {...props} range={"day"}/>
+        },
+        formatCustomFromDate: (date) => {
+            return moment(date).format("YYYY-MM-DD")
+        },
+        formatCustomToDate: (date) => {
+            return moment(date).format("YYYY-MM-DD")
+        },
+        headerText: "Shows staffs daily attendance report"
+    },
+    {
+        title: "Monthly Attendance",
+        component: CommonReportSaleScreen,
+        listName: "attendance_summary_report",
+        searchEnabled: false,
+        searchPlaceholder: "",
+        apiFunction: fetchMonthlyAttendanceReport,
+        apiCountName: "total_count",
+        salesListWidthHeader: monthlyAttendanceHeader,
+        tableHeader: monthlyAttendanceWithSort,
+        transformTableData: formatMonthlyAttendanceListTableData,
+        disableDate: true,
+        CustomDateComponent: (props) => {
+            return <AttendanceReportDatePicker {...props} range={"month"}/>
+        },
+        formatCustomFromDate: (date) => {
+
+            return moment(new Date(date.toDate().setDate(0))).format("YYYY-MM-DD")
+        },
+        formatCustomToDate: (date) => {
+            return moment(date.toDate()).endOf('month').format("YYYY-MM-DD")
+        },
+        headerText: "Shows staffs monthly attendance report"
+    },
+].map((item, index) => ({
+    ...item,
+    id: index + 1,
+    navigation: camelCase(item.title),
+    headerTitle: toPascalCase(item.title)
+}));
+
+export const titleToDisplay = ["SALES", "APPOINTMENTS", "TAX", "STAFF REPORTS", "MEMBERSHIP", "CLIENT REPORTS", "BUSINESS", "ATTENDANCE"]
 
 export const cardTitleData = [
     {
@@ -2333,6 +2552,11 @@ export const reportStackDisplay = [
         icon: businessIcon,
         title: "BUSINESS",
         data: businessStaffSelection
+    },
+    {
+        icon: attendance,
+        title: "ATTENDANCE",
+        data: attendanceSelection
     },
 ]
 

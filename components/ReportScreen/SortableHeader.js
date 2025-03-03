@@ -19,7 +19,8 @@ const SortableHeader = ({
     onChangeData,
     setGetSortOrderKey,
     sortOrderKey,
-    onChangeFunction
+    onChangeFunction,
+    filterData
 }) => {
     // const [sortOrderKey, setSortOrderKey] = useState(1);
     const [sortComponentOrderKey, setComponentSortOrderKey] = useState(1);
@@ -41,7 +42,8 @@ const SortableHeader = ({
                             toDate,
                             query,
                             sortKey,
-                            sortOrder
+                            sortOrder,
+                            filterData
                         )
                     ).then((res) => {
                         onChangeData(res)
@@ -60,7 +62,7 @@ const SortableHeader = ({
             <View style={styles.headerContainer}>
                 <Text
                     style={[
-                        TextTheme.bodyMedium,
+                        TextTheme.bodySmall,
                         {
                             color: currentSortKey === sortKey ? sortComponentOrderKey !== 1 ? Colors.highlight : Colors.black : Colors.black,
                             textAlign: 'start',

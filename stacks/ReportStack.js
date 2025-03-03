@@ -44,6 +44,7 @@ const ReportStack = ({navigation}) => {
             <Stack.Screen name='ReportScreen' component={SalesListReport} options={{
                 headerTitle: 'Reports',
                 headerTitleAlign: 'center',
+                headerTitleStyle: {fontFamily: "Inter_600SemiBold", fontSize: 16},
                 headerShown: true, headerLeft: () => <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
                     <Image
                         source={require('../assets/icons/drawerIcons/drawer.png')}
@@ -53,7 +54,8 @@ const ReportStack = ({navigation}) => {
             }}/>
             {
                 reportStackDisplay.map((item) => item.data.map((dataItem, index) => (
-                    <Stack.Screen name={dataItem.navigation} key={index} component={withReportBackHandler(dataItem.component)} options={{
+                    <Stack.Screen name={dataItem.navigation} key={index}
+                                  component={withReportBackHandler(dataItem.component)} options={{
                         headerTitle: dataItem.title,
                         headerTitleAlign: 'center',
                         headerShown: true,
@@ -101,6 +103,11 @@ const ReportStack = ({navigation}) => {
                                       useEffectFunction: dataItem?.useEffectFunction,
                                       isFilterEnabled: dataItem?.isFilterEnabled,
                                       disableDate: dataItem?.disableDate,
+                                      CustomDateComponent: dataItem?.CustomDateComponent,
+                                      rowComponents: dataItem?.rowComponents,
+                                      formatCustomFromDate: dataItem?.formatCustomFromDate,
+                                      formatCustomToDate: dataItem?.formatCustomToDate,
+                                      headerText: dataItem?.headerText
                                   }}
                     />
                 )))

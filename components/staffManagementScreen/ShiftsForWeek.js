@@ -175,7 +175,7 @@ export default function ShiftsForWeek(props) {
             ).flat()
         };
 
-        console.log(props.create)
+        // console.log(props.create)
 
         if(props.create) {
             const response =  createSchedulePatternAPI(payload).then((response) => {
@@ -199,6 +199,8 @@ export default function ShiftsForWeek(props) {
                 }
             });
         }
+
+        props.setOnUpdate(prev => !prev);
 
 
 
