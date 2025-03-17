@@ -32,6 +32,7 @@ import Expenses from "../screens/expenses/Expenses";
 import staffs_icon from "../assets/icons/drawerIcons/staffs.png";
 import reports_icon from "../assets/icons/drawerIcons/reports.png"
 import expenses_icon from "../assets/icons/drawerIcons/expenses.png";
+import marketing_icon from "../assets/icons/drawerIcons/marketing.png";
 import ListOfBusinessesScreen from "../screens/ListOfBusinessesScreen";
 import list_of_businesses_icon from "../assets/icons/drawerIcons/list_of_businesses.png";
 import signOutScreen from "../screens/Auth/signOutScreen";
@@ -53,6 +54,8 @@ import ReportStack from "../stacks/ReportStack";
 import StaffCalendar from "../screens/AppointmentsScreen";
 import BookingHistory from "../screens/appointments/BookingHistory";
 import ActiveBookings from "../screens/appointments/ActiveBookings";
+import Campaigns from "../screens/marketing/Campaigns";
+import CampaignStack from "../stacks/CampaignStack";
 
 function CustomDrawerIcon({navigation}) {
     return (
@@ -328,10 +331,11 @@ const MainDrawerNavigator = (props) => {
                                                headerTitleAlign: 'center',
                                                headerShown: currentRoute !== "Lead Profile",
                                            }}/>
-                            {/*<Drawer.Screen name="Marketing" component={CheckoutStack} options={{*/}
-                            {/*    drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}*/}
-                            {/*                             width={25} height={25} style={{resizeMode: "contain"}}/>*/}
-                            {/*}}/>*/}
+                            <Drawer.Screen name="Marketing" component={CampaignStack} options={{
+                                headerShown: false,
+                                drawerIcon: () => <Image source={{uri: Image.resolveAssetSource(marketing_icon).uri}}
+                                                         width={25} height={25} style={{resizeMode: "contain"}}/>
+                            }}/>
                             <Drawer.Screen name="Expenses" component={Expenses}
                                            options={{
                                                headerTitleStyle: [textTheme.titleLarge, {letterSpacing: -0.5}],
