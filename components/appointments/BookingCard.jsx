@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text, Pressable, Image} from "react-native";
+import {View, StyleSheet, Text, Pressable, Image, TouchableOpacity, Linking} from "react-native";
 import PrimaryButton from "../../ui/PrimaryButton";
 import textTheme from "../../constants/TextTheme";
 import Colors from "../../constants/Colors";
@@ -6,9 +6,16 @@ import userIcon from "../../assets/icons/appointments/user.png"
 import callIcon from "../../assets/icons/appointments/call.png"
 import calendarIcon from "../../assets/icons/appointments/calendar.png"
 import {Feather} from "@expo/vector-icons";
+import AddBookingsModal from "./AddBookingsModal";
+import React, {useState} from "react";
+import ViewBookingModal from "../../apis/appointmentsAPIs/ViewBookingModal";
+import {loadFutureBookingsFromDB} from "../../store/appointmentsSlice";
+import {useDispatch} from "react-redux";
 
 const BookingCard = (props) => {
+    const [isViewBookingModalVisible, setIsViewBookingModalVisible] = useState(false);
     let statusColor;
+    const dispatch = useDispatch();
     if (props.data.status === "COMPLETED") {
         statusColor = "#D4D4D4"
     } else if (props.data.status === "BOOKED") {
@@ -23,7 +30,18 @@ const BookingCard = (props) => {
         statusColor = "#D1373F"
     }
 
-    return <Pressable android_ripple={{color: Colors.ripple}} style={styles.bookingCard}>
+    return <Pressable onPress={() => {
+        setIsViewBookingModalVisible(true);
+    }} android_ripple={{color: Colors.ripple}} style={styles.bookingCard}>
+
+        {isViewBookingModalVisible && <ViewBookingModal
+            data={props.data}
+            isVisible={isViewBookingModalVisible}
+            onClose={() => {
+                dispatch(loadFutureBookingsFromDB())
+                setIsViewBookingModalVisible(false);
+            }}/>}
+
         <View style={{
             paddingHorizontal: 20,
             borderBottomWidth: 1,
@@ -44,6 +62,15 @@ const BookingCard = (props) => {
                     width: 18
                 }}/>
                 <Text style={[textTheme.bodyMedium, {fontSize: 15,}]}>{props.data.user_contact}</Text>
+                <TouchableOpacity
+                    style={{flexDirection: "row", gap: 5, marginLeft: 10, alignItems: "center"}}
+                    onPress={() => {
+                        const url = `tel:${props.data.user_contact}`;
+                        Linking.openURL(url).catch(err => console.error("Couldn't open dialer", err));
+                    }}>
+                    <Feather name="phone" size={18} color={Colors.highlight}/>
+                    <Text style={{fontWeight: 600, color: Colors.highlight}}>CALL</Text>
+                </TouchableOpacity>
             </View>
             <View style={{flexDirection: "row", justifyContent: "space-between", marginBottom: 15}}>
                 <View style={{marginBottom: 10, flexDirection: "row", alignItems: "center", gap: 10}}>
@@ -54,9 +81,9 @@ const BookingCard = (props) => {
                     <Text style={[textTheme.bodyMedium, {fontSize: 15,}]}>Date: {props.data.appointment_date}</Text>
                 </View>
                 <View style={{
-                    flexDirection:"row", alignItems:"center", gap:5
+                    flexDirection: "row", alignItems: "center", gap: 5
                 }}>
-                    <Feather name="clock" size={18} color="black" />
+                    <Feather name="clock" size={18} color="black"/>
                     <Text style={[textTheme.bodyMedium, {fontSize: 15,}]}>{props.data.start_time}</Text>
                 </View>
             </View>
@@ -80,7 +107,7 @@ const BookingCard = (props) => {
                 backgroundColor: statusColor,
                 borderRadius: 6,
                 paddingVertical: 3,
-                fontWeight:"bold",
+                fontWeight: "bold",
                 paddingHorizontal: 8
             }}>
                 <Text style={[textTheme.bodyMedium, {fontSize: 14}]}>{props.data.status}</Text>
@@ -95,7 +122,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderRadius: 6,
         marginBottom: 20,
-        borderColor:Colors.grey400,
+        borderColor: Colors.grey400,
     }
 })
 

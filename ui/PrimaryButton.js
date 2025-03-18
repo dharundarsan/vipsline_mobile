@@ -78,6 +78,7 @@ const PrimaryButton = (props) => {
                     props.pressableStyle,
                     Platform.select({
                         ios: props.disableRipple ? {} : {opacity: pressed ? 0.3 : 1},
+
                     }),
                 ]}
                 onPress={async () => {

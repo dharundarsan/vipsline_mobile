@@ -1,0 +1,241 @@
+import {FlatList, Modal, Platform, StyleSheet, Text, View} from "react-native";
+import PrimaryButton from "../../ui/PrimaryButton";
+import {Ionicons} from "@expo/vector-icons";
+import textTheme from "../../constants/TextTheme";
+import React, {useCallback, useEffect, useState, useRef} from "react";
+import Colors from "../../constants/Colors";
+// import Divider from "../../ui/Divider";
+import SearchBar from "../../ui/SearchBar";
+import Feather from '@expo/vector-icons/Feather';
+import {useSelector, useDispatch} from "react-redux";
+import ClientCard from "../clientSegmentScreen/ClientCard";
+import {loadClientsFromDb} from "../../store/clientSlice";
+import {
+    getRewardPointBalance,
+    loadAnalyticsClientDetailsFromDb,
+    loadClientInfoFromDb,
+    updateClientId
+} from "../../store/clientInfoSlice";
+import axios from "axios";
+import {shadowStyling} from "../../util/Helpers";
+import * as Haptics from "expo-haptics";
+import * as SecureStore from 'expo-secure-store';
+import Toast from "react-native-toast-message";
+import {Divider} from "react-native-paper";
+import {loadBusinessNotificationDetails} from "../../store/listOfBusinessSlice";
+import CreateClientModal from "../checkoutScreen/CreateClientModal";
+import {modifyValue} from "../../store/newBookingSlice";
+
+const NewBookingAddClientModal = (props) => {
+    // const pageNo = useSelector(state => state.client.pageNo);
+    const clientsList = useSelector(state => state.client.clients);
+    const [isCreateClientModalVisible, setIsCreateClientModalVisible] = useState(false);
+    const dispatch = useDispatch();
+    const [searchClientQuery, setSearchClientQuery] = useState("");
+    const [searchedClients, setSearchedClients] = useState([]);
+    const [searchClientPageNo, setSearchClientPageNo] = useState(0);
+    const queryRef = useRef("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const searchClientFromDB = useCallback(async (query, pageNo) => {
+        if (isLoading) return; // Prevent initiating another request if one is already ongoing
+
+
+        let authToken = ""
+        try {
+            // const value = await AsyncStorage.getItem('authKey');
+            const value = await SecureStore.getItemAsync('authKey');
+
+            if (value !== null) {
+                authToken = value;
+            }
+        } catch (e) {
+            console.log("auth token fetching error. (inside calculateCartPriceAPI)" + e);
+        }
+
+        let businessId = ""
+        try {
+            // const value = await AsyncStorage.getItem('businessId');
+            const value = await SecureStore.getItemAsync('businessId');
+            if (value !== null) {
+                businessId = value;
+            }
+        } catch (e) {
+            console.log("business token fetching error." + e);
+        }
+
+
+        setIsLoading(true);
+        try {
+            const response = await axios.post(
+                `${process.env.EXPO_PUBLIC_API_URI}/business/searchCustomersOfBusiness?pageSize=50&pageNo=${pageNo}`,
+                {
+                    business_id: businessId,
+                    query,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`
+                    }
+                }
+            );
+            setSearchedClients(prev => [...prev, ...response.data.data]);
+            setIsLoading(false);
+        } catch (e) {
+            console.error("Error fetching clients:", e);
+            setIsLoading(false);
+        } finally {
+            setIsLoading(false); // Ensure loading state is reset after completion or failure
+        }
+    }, [isLoading]);
+
+    useEffect(() => {
+        // if (props.searchClientQuery !== queryRef.current) {
+        queryRef.current = searchClientQuery;
+        setSearchedClients([]);
+        setSearchClientPageNo(0);
+        searchClientFromDB(searchClientQuery, 0).then(r => null);
+        // }
+    }, [searchClientQuery]);
+
+    const loadMoreClients = () => {
+        const newPageNo = searchClientPageNo + 1;
+        setSearchClientPageNo(newPageNo);
+        searchClientFromDB(searchClientQuery, newPageNo).then(r => null);
+    };
+
+    return (
+        <Modal visible={props.isVisible} animationType={"slide"}
+               presentationStyle="pageSheet" onRequestClose={props.closeModal}>
+            <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
+                dispatch(loadClientsFromDb());
+                setIsCreateClientModalVisible(false);
+            }} closeAddClientModal={props.closeModal}
+            />
+            <View style={[styles.closeAndHeadingContainer, shadowStyling]}>
+                <Text style={[textTheme.titleLarge, styles.selectClientText]}>Select Client</Text>
+                <PrimaryButton
+                    buttonStyle={styles.closeButton}
+                    pressableStyle={styles.closeButtonPressable}
+                    onPress={() => {
+                        setSearchClientQuery("");
+                        props.closeModal()
+                    }}
+                >
+                    <Ionicons name="close" size={25} color="black"/>
+                </PrimaryButton>
+            </View>
+            <View style={styles.modalContent}>
+                <SearchBar placeholder={"Search by email or mobile"} onChangeText={(text) => {
+                    setSearchClientQuery(text);
+                }}
+                           searchContainerStyle={styles.searchContainerStyle}/>
+                <Divider/>
+                <PrimaryButton buttonStyle={styles.createClientButton} pressableStyle={styles.createClientPressable}
+                               onPress={() => {
+
+                                   setIsCreateClientModalVisible(true);
+                               }}>
+                    <Feather name="plus" size={24} color={Colors.highlight}/>
+                    <Text style={[textTheme.titleMedium, styles.createClientText]}>Create new client</Text>
+                </PrimaryButton>
+                <Divider/>
+                {searchClientQuery === "" ? (
+                    searchedClients.length === 0 ?
+                        <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                            <Text style={textTheme.titleMedium}>No Clients available</Text>
+                        </View> :
+                        <FlatList
+                            data={searchedClients}
+                            keyExtractor={(item) => item.id.toString()}
+                            // onEndReachedThreshold={0.7}
+                            ItemSeparatorComponent={<Divider/>}
+                            renderItem={({item}) => (
+                                <ClientCard
+                                    clientId={item.id}
+                                    name={item.name}
+                                    phone={item.mobile_1}
+                                    email={item.username}
+                                    // divider={true}
+                                    onPress={(clientId) => {
+                                        props.onSelect(searchedClients.find(org => org.id === clientId))
+                                        props.closeModal();
+                                    }}
+                                />
+                            )}
+                        />
+                ) : (
+                    searchedClients.length === 0 ?
+                        <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                            <Text style={textTheme.titleMedium}>No Clients available</Text>
+                        </View> :
+                        <FlatList
+                            data={searchedClients}
+                            keyExtractor={(item) => item.id.toString()}
+                            onEndReachedThreshold={0.7}
+                            onEndReached={loadMoreClients}
+                            renderItem={({item}) => (
+                                <ClientCard
+                                    clientId={item.id}
+                                    name={item.name}
+                                    phone={item.mobile_1}
+                                    email={item.username}
+                                    divider={true}
+                                    onPress={(clientId) => {
+                                        props.onSelect(searchedClients.find(org => org.id === clientId))
+                                        props.closeModal();
+                                    }}
+                                />
+                            )}
+                        />
+                )}
+            </View>
+            <Toast/>
+        </Modal>
+    );
+};
+
+const styles = StyleSheet.create({
+    closeAndHeadingContainer: {
+        // marginTop: Platform.OS === "ios" ? 50 : 0,
+        justifyContent: "center",
+        alignItems: "center",
+        height: 60,
+        flexDirection: "row",
+    },
+    closeButton: {
+        position: "absolute",
+        right: 0,
+        backgroundColor: Colors.white,
+    },
+    closeButtonPressable: {
+        alignItems: "flex-end",
+    },
+    selectClientText: {
+        fontWeight: "500",
+        flex: 1,
+        justifyContent: "center",
+        textAlign: "center",
+    },
+    modalContent: {
+        flex: 1,
+    },
+    searchContainerStyle: {
+        marginVertical: 15,
+        marginHorizontal: 15,
+    },
+    createClientButton: {
+        backgroundColor: Colors.background,
+    },
+    createClientPressable: {
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 10,
+        paddingVertical: 15,
+    },
+    createClientText: {
+        color: Colors.highlight,
+    },
+});
+
+export default NewBookingAddClientModal;

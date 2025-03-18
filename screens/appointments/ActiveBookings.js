@@ -1,5 +1,5 @@
 import {ActivityIndicator, FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import React, {useCallback, useEffect, useLayoutEffect, useState} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {
     decrementFutureBookingsPageNumber, incrementBookingsHistoryPageNumber,
     incrementFutureBookingsPageNumber, loadBookingsHistoryFromDB,
@@ -24,6 +24,11 @@ import LazyLoader from "../../ui/LazyLoader";
 import moment from "moment";
 import {useFocusEffect} from "@react-navigation/native";
 import InfiniteScrollerList from "../../ui/InfiniteScrollerList";
+import {FAB} from "react-native-paper";
+import AddBookingsModal from "../../components/appointments/AddBookingsModal";
+import {useModal} from "../../ModalProvider";
+import Toast from "../../ui/Toast";
+import ViewBookingModal from "../../apis/appointmentsAPIs/ViewBookingModal";
 
 const ActiveBookings = () => {
     const futureBookings = useSelector(state => state.appointments.futureBookings);
@@ -34,7 +39,8 @@ const ActiveBookings = () => {
     const futureBookingsPageNo = useSelector(state => state.appointments.futureBookingsPageNo);
     const dispatch = useDispatch()
     const [isEntryModalVisible, setIsEntryModalVisible] = useState(false);
-
+    const [isAddBookingsModalVisible, setIsAddBookingsModalVisible] = useState(false);
+    const toastRef = useRef(null);
 
     useLayoutEffect(() => {
         const apiCall = async () => {
@@ -50,7 +56,18 @@ const ActiveBookings = () => {
         }, [dispatch])
     );
 
+    const {showModal} = useModal();
+
     return <View style={{flex: 1, backgroundColor: "white"}}>
+        {isAddBookingsModalVisible && <AddBookingsModal isVisible={isAddBookingsModalVisible}
+                                                        onClose={() => {
+                                                            setIsAddBookingsModalVisible(false);
+                                                        }}
+                                                        showToast={(message, error) => {
+                                                            dispatch(loadFutureBookingsFromDB())
+                                                            toastRef.current.show(message, error)
+                                                        }}/>}
+
         {isEntryModalVisible && (
             <EntryPicker
                 setIsModalVisible={setIsEntryModalVisible}
@@ -103,6 +120,20 @@ const ActiveBookings = () => {
                     renderItem={({item}) => <BookingCard data={item}/>}
                 />}
         </ScrollView>
+        <FAB
+            icon={"plus"}
+            style={{
+                backgroundColor: Colors.highlight,
+                position: 'absolute',
+                bottom: 32,
+                right: 32,
+            }}
+            color={Colors.white}
+            onPress={() => {
+                setIsAddBookingsModalVisible(true);
+            }}
+        />
+        <Toast ref={toastRef}/>
     </View>
 };
 

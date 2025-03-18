@@ -217,7 +217,7 @@ export const updateCalculatedPrice = (clientId, prepaid, prepaidAmount,splitUpSt
                         type: "AMOUNT",
                         valid_from: "",
                         valid_till: "",
-                        wallet_amount: 0,
+                        wallet_amount: 0,z
                     }
                 else if (item.gender === "prepaid")
                     return {

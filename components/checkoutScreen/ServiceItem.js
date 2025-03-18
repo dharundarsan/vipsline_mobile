@@ -51,11 +51,10 @@ const ServiceItem = (props) => {
 
     return <PrimaryButton buttonStyle={styles.selectServiceItemButton}
                           pressableStyle={styles.selectServiceItemPressable}
-                          onPress={async () => {
-
+                          onPress={(props.overrideOnPress === null || props.overrideOnPress === undefined) ? async () => {
                               props.closeOverallModal();
                               dispatch(addItemToCart({resource_category: props.data.id, resource_id: ""}))
-                          }}
+                          } : props.overrideOnPress}
     >
         <View style={styles.leftBar}></View>
         <View style={styles.nameAndPriceContainer}>

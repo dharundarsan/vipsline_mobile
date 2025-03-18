@@ -24,7 +24,10 @@ import dropdown from "react-native-element-dropdown/src/components/Dropdown";
  * @param {string} [props.label] - Label text to display above the input.
  * @param {Object} [props.textInputStyle] - Custom style for text input.
  * @param {Object} [props.labelTextStyle] - Custom style for label text.
+ * @param {string} [props.overrideDisplayText] - Override the text shown in the dropdown
+ * @param {string} [props.disableOnPress] - Disable interactivity in dropdown
  * @param {boolean} [props.readOnly] - Makes the text input read only.
+ * @param {boolean} [props.showDropdownArrowIcon] - Controls the visibility of arrow icon in dropdown container.
  * @param {Array} [props.dropdownItems] - Items to be listed in the dropdown option.
  * @param {function} [props.validator] - Function to validate the input value.
  * @param {function} props.onChangeText - Function to call when the text input value changes.
@@ -37,7 +40,7 @@ import dropdown from "react-native-element-dropdown/src/components/Dropdown";
  * @returns {React.ReactElement} A styled custom text input component.
  *
  */
-const CustomTextInput = (props) => {
+const CustomTextInput = ({showDropdownArrowIcon = true, ...props}) => {
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [countryCode, setCountryCode] = useState("+91");
@@ -231,7 +234,6 @@ const CustomTextInput = (props) => {
                         keyboardType="number-pad"
 
 
-
                     />
                 </View>
             </>
@@ -252,24 +254,26 @@ const CustomTextInput = (props) => {
                     dropdownItems={props.dropdownItems}
                 />
                 <PrimaryButton
+                    disableRipple={props.disableOnPress}
                     buttonStyle={[styles.dropdownButton, props.dropdownButton]}
                     pressableStyle={[styles.dropdownButtonPressable, props.dropdownPressable]}
-                    onPress={() => (props.dropdownOnPress !== undefined ?
+                    onPress={() => (props.disableOnPress ? null : props.dropdownOnPress !== undefined ?
                         props.dropdownOnPress ?
                             setIsDropdownModalVisible(true) :
                             setIsDropdownModalVisible(false) :
                         setIsDropdownModalVisible(true))
 
-                }
+                    }
                 >
 
-                    {props.object ? <Text style={[textTheme.bodyLarge]}>
-
-                        {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value.name}
-                    </Text> : <Text style={[textTheme.bodyLarge, props.dropdownLabelTextStyle]} {...props.dropdownLabelTextProps} >
-                        {props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value}
+                    {props.object ? <Text
+                        style={[textTheme.bodyLarge, props.dropdownLabelTextStyle]} {...props.dropdownLabelTextProps} >
+                        {props.overrideDisplayText ? props.overrideDisplayText : props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value[props.objectName]}
+                    </Text> : <Text
+                        style={[textTheme.bodyLarge, props.dropdownLabelTextStyle]} {...props.dropdownLabelTextProps} >
+                        {props.overrideDisplayText ? props.overrideDisplayText : props.value === undefined || props.value === null || props.value === "" ? props.placeholder ? props.placeholder : "Select " + props.label : props.value}
                     </Text>}
-                    <FontAwesome name="angle-down" size={24} color="black"/>
+                    {showDropdownArrowIcon && <FontAwesome name="angle-down" size={24} color="black"/>}
                 </PrimaryButton>
                 {props.children}
             </>
@@ -311,7 +315,8 @@ const CustomTextInput = (props) => {
                     buttonStyle={[styles.dateTimeButtom, props.dateInputContainer, error ? {borderColor: Colors.error} : {}]}
                     pressableStyle={styles.dateTimeButtonPressable}
                     disableRipple={props.readOnly}
-                    onPress={ props.readOnly ? () => {} : () => setIsDateTimePickerVisible(true)}
+                    onPress={props.readOnly ? () => {
+                    } : () => setIsDateTimePickerVisible(true)}
                     onLongPress={props.onLongPress}
                 >
                     <Text
@@ -362,7 +367,8 @@ const CustomTextInput = (props) => {
                     buttonStyle={[styles.dateTimeButtom, props.dateInputContainer, error ? {borderColor: Colors.error} : {}]}
                     pressableStyle={[styles.dateTimeButtonPressable]}
                     disableRipple={props.readOnly}
-                    onPress={props.readOnly ? () => {} : () => setIsDateTimePickerVisible(true)}
+                    onPress={props.readOnly ? () => {
+                    } : () => setIsDateTimePickerVisible(true)}
                 >
                     <Text
                         style={[textTheme.bodyLarge, styles.dateTimeButtonText, props.readOnly ? {color: Colors.grey400} : {}, props.labelTextStyle]}>
@@ -382,11 +388,11 @@ const CustomTextInput = (props) => {
     return (
         <View style={[styles.commonContainer, props.flex !== undefined ? {flex: 1} : {}, props.container]}>
             {
-                !checkNullUndefined(props.labelEnabled) &&
+                checkNullUndefined(props.labelEnabled) &&
                 <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}{
                     checkNullUndefined(props.required) && props.required ?
-                    <RequiredSymbol/> :
-                ""}</Text>
+                        <RequiredSymbol/> :
+                        ""}</Text>
             }
             {content}
             {error && <Text style={[textTheme.bodyMedium, styles.errorText, props.errorStyle]}>{errorMessage}</Text>}

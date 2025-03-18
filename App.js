@@ -24,6 +24,7 @@ import {
     Inter_800ExtraBold,
     Inter_900Black,
 } from '@expo-google-fonts/inter';
+import {ModalProvider} from "./ModalProvider";
 
 SplashScreen.preventAutoHideAsync();
 enableScreens();
@@ -130,7 +131,9 @@ const AppNavigator = (props) => {
                 {/* {isAuth ? */}
                 <LocationProvider>
                     <DataProvider>
-                        <MainDrawerNavigator auth={props.auth}/>
+                        <ModalProvider>
+                            <MainDrawerNavigator auth={props.auth}/>
+                        </ModalProvider>
                     </DataProvider>
                 </LocationProvider>
                 {/* : <AuthNavigator/>} */}

@@ -5,8 +5,8 @@ import colors from "../constants/Colors";
 import textTheme from "../constants/TextTheme";
 import {useState} from "react";
 import Divider from "./Divider";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Platform } from "react-native";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {Platform} from "react-native";
 import {checkNullUndefined} from "../util/Helpers";
 
 /**
@@ -42,7 +42,7 @@ const DropdownModal = (props) => {
             <TouchableOpacity style={[styles.modalContent, {
                 paddingTop: Platform.OS === "ios" ? insets.top : null,
                 paddingBottom: Platform.OS === "ios" ? insets.bottom : null
-          }, props.modelContent]} onPress={props.onCloseModal} activeOpacity={1}>
+            }, props.modelContent]} onPress={props.onCloseModal} activeOpacity={1}>
                 {
                     checkNullUndefined(props.children) &&
                     props.children
@@ -63,7 +63,7 @@ const DropdownModal = (props) => {
                                 textStyle={[
                                     textTheme.bodyLarge,
                                     styles.closeButtonText,
-                                    props.selectedValue === item ? {
+                                    JSON.stringify(props.selectedValue) === JSON.stringify(item) ? {
                                         color: Colors.highlight,
                                         fontWeight: 500,
                                     } : {}
@@ -102,7 +102,7 @@ const DropdownModal = (props) => {
                 <PrimaryButton
                     label={"Close"}
                     onPress={props.onCloseModal}
-                    buttonStyle={styles.closeButton}
+                    buttonStyle={[styles.closeButton, {borderRadius: 5}]}
                     textStyle={[textTheme.bodyLarge, styles.closeButtonText]}
                 />
             </TouchableOpacity>
@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#D9D9D999",
     },
     dropdownList: {
-        backgroundColor: Colors.white,
         flexGrow: 0,
         borderRadius: 5,
     },

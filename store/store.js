@@ -18,6 +18,7 @@ import ExpensesReducer from './ExpensesSlice';
 import navigationReducer from "./NavigationSlice";
 import reportReducer from "./reportSlice";
 import appointmentsReducer from "./appointmentsSlice";
+import newBookingReducer from "./newBookingSlice";
 
 const store = configureStore({
     reducer: {
@@ -31,15 +32,16 @@ const store = configureStore({
         loginUser: loginUserReducer,
         authDetails: authReducer,
         invoice: invoiceReducer,
-        checkoutAction:checkoutActionReducer,
+        checkoutAction: checkoutActionReducer,
         businessDetail: businessDetailReducer,
         toast: toastReducer,
         leads: leadManagementReducer,
         expenses: ExpensesReducer,
-        dashboardDetails:dashboardReducer,
+        dashboardDetails: dashboardReducer,
         navigation: navigationReducer,
         report: reportReducer,
-        appointments: appointmentsReducer
+        appointments: appointmentsReducer,
+        newBooking: newBookingReducer
     },
 });
 

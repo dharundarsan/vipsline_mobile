@@ -24,41 +24,41 @@ const ServicesList = React.memo((props) => {
     const [filteredGeneralServicesData, setFilteredGeneralServicesData] = useState(generalServicesData);
 
 
-    const filterServicesData = useCallback((filterValue) => {
-        const lowerCaseFilterValue = filterValue.toLowerCase();
+        const filterServicesData = useCallback((filterValue) => {
+            const lowerCaseFilterValue = filterValue.toLowerCase();
 
-        // Filter function to apply on each category
-        const filterCategory = (categoryData) => {
-            return categoryData.reduce((acc, item) => {
-                const filteredResourceCategories = item.resource_categories.filter((category) => {
-                    return category.name.toLowerCase().includes(lowerCaseFilterValue) ||
-                        category.price.toString().includes(filterValue);
-                });
-
-                if (filteredResourceCategories.length > 0) {
-                    acc.push({
-                        ...item,
-                        resource_categories: filteredResourceCategories
+            // Filter function to apply on each category
+            const filterCategory = (categoryData) => {
+                return categoryData.reduce((acc, item) => {
+                    const filteredResourceCategories = item.resource_categories.filter((category) => {
+                        return category.name.toLowerCase().includes(lowerCaseFilterValue) ||
+                            category.price.toString().includes(filterValue);
                     });
-                }
 
-                return acc;
-            }, []);
-        };
+                    if (filteredResourceCategories.length > 0) {
+                        acc.push({
+                            ...item,
+                            resource_categories: filteredResourceCategories
+                        });
+                    }
 
-        // Apply filtering to each category's data
-        const filteredWomen = filterCategory(womenServicesData);
-        const filteredMen = filterCategory(menServicesData);
-        const filteredKids = filterCategory(kidsServicesData);
-        const filteredGeneral = filterCategory(generalServicesData);
+                    return acc;
+                }, []);
+            };
 
-        // Batch state updates to avoid multiple re-renders
-        setFilteredWomenServicesData(filteredWomen);
-        setFilteredMenServicesData(filteredMen);
-        setFilteredKidsServicesData(filteredKids);
-        setFilteredGeneralServicesData(filteredGeneral);
+            // Apply filtering to each category's data
+            const filteredWomen = filterCategory(womenServicesData);
+            const filteredMen = filterCategory(menServicesData);
+            const filteredKids = filterCategory(kidsServicesData);
+            const filteredGeneral = filterCategory(generalServicesData);
 
-    }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
+            // Batch state updates to avoid multiple re-renders
+            setFilteredWomenServicesData(filteredWomen);
+            setFilteredMenServicesData(filteredMen);
+            setFilteredKidsServicesData(filteredKids);
+            setFilteredGeneralServicesData(filteredGeneral);
+
+        }, [womenServicesData, menServicesData, kidsServicesData, generalServicesData]);
 
 
     return (
