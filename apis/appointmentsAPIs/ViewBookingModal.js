@@ -23,10 +23,24 @@ import NewBookingAddClientModal from "../../components/appointments/NewBookingAd
 import SelectServiceModal from "../../components/appointments/SelectServiceModal";
 import NewBookingCard from "../../components/appointments/NewBookingCard";
 import getClientDetailsByIdAPI from "./getClientDetails";
-import {shallowEqual, useSelector} from "react-redux";
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import EditBookingCard from "../../components/appointments/editBookingCard";
 import editAppointmentDetailsAPI from "./editAppointmentDetailsAPI";
 import uuid from "react-native-uuid";
+import servicesList from "../../components/checkoutScreen/ServicesList";
+import {loadFutureBookingsFromDB} from "../../store/appointmentsSlice";
+import BottomActionCard from "../../ui/BottomActionCard";
+import cancelAppointmentsAPI from "./cancelAppointmentsAPI";
+import {durationToMinutes, formatDuration, getAppointmentWithOldestStartTime} from "../../util/appointmentsHelper";
+import {addItemToCart, clearLocalCart} from "../../store/cartSlice";
+import {
+    getRewardPointBalance,
+    loadAnalyticsClientDetailsFromDb,
+    loadClientInfoFromDb,
+    updateClientId
+} from "../../store/clientInfoSlice";
+import {useNavigation} from "@react-navigation/native";
+import clearCartAPI from "../checkoutAPIs/clearCartAPI";
 
 const ViewBookingModal = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -38,8 +52,8 @@ const ViewBookingModal = (props) => {
     const toastRef = useRef();
     const servicesData = useSelector(state => state.catalogue.services, shallowEqual);
     const staffs = useSelector((state) => state.staff.staffs);
+    const [isCancelReasonModalVisible, setIsCancelReasonModalVisible] = useState(false)
 
-    console.log(servicesData)
 
     const [currentAppointmentState, setCurrentAppointmentState] = useState(props?.data?.status);
     const [isEditingAllowed, setIsEditingAllowed] = useState(false);
@@ -51,7 +65,8 @@ const ViewBookingModal = (props) => {
     const [currentNotes, setCurrentNotes] = useState()
     const [currentAppointmentDate, setCurrentAppointmentDate] = useState()
     const [currentAppointmentStartTime, setCurrentAppointmentStartTime] = useState(moment(props.data.start_time, "HH:mm:ss").format("hh:mm A"))
-
+    const [cancelReason, setCancelReason] = useState();
+    const dispatch = useDispatch();
 
     const getStatusColorAndText = (status) => {
         if (status === "COMPLETED") {
@@ -71,7 +86,6 @@ const ViewBookingModal = (props) => {
 
     const appointmentStatuses = [
         {label: "Booked", value: "BOOKED"},
-        {label: "Completed", value: "COMPLETED"},
         {label: "Confirmed", value: "CONFIRMED"},
         {label: "No Show", value: "NO_SHOW"},
         {label: "In Service", value: "IN_SERVICE"},
@@ -88,6 +102,7 @@ const ViewBookingModal = (props) => {
             console.log(data)
 
             setViewAppointmentDetails(data)
+            console.log("ViewAppointmentDetails")
             setCurrentAppointmentDate(moment(data?.appointment_date, "YYYY-MM-DD"))
             setCurrentNotes(data?.apptList[0]?.notes)
 
@@ -96,15 +111,7 @@ const ViewBookingModal = (props) => {
 
             const mapped = data?.apptList.map(selService => {
                 const found = allCategoryServices.find(all => all.id === selService.service_id)
-                const parts = selService.duration.split(" ")
-                let duration = selService.duration;
-
-                if (parts.length > 2) {
-                    if (parts[2].toString() === "0")
-                        duration = parts[0].toString() + " " + "h";
-                    else if (parts[0].toString() === "0")
-                        duration = parts[2].toString() + " " + "mins";
-                }
+                let duration = formatDuration(selService.duration);
 
                 return {
                     ...selService, ...found,
@@ -120,9 +127,6 @@ const ViewBookingModal = (props) => {
 
             setCurrentServicesList(mapped);
 
-            console.log("mapped")
-            console.log(mapped[0])
-
             const clientDetailResp = await getClientDetailsByIdAPI({
                 "client_id": data?.apptList[0]?.client_id,
             })
@@ -131,25 +135,48 @@ const ViewBookingModal = (props) => {
         apiCall()
     }, []);
 
-    console.log({"isEditingAllowed": isEditingAllowed})
+    useEffect(() => {
+        calculatePriceForServiceAPI({
+            "services_list": currentServicesList.filter(service => service.type !== "remove").map(service => {
+                return {
+                    duration: service.currentDuration,
+                    end_time: service.end_time,
+                    res_cat_id: service.id,
+                    resource_id: service.currentSelectedStaff?.id,
+                    start_time: service.currentStartTime,
+                }
+            })
+        }).then(response => {
+            setFinalData(response.data.data[0]);
+        })
+    }, [currentServicesList]);
+
 
     const modifyCurrentServiceData = (temp_id, field, value) => {
-        if (field === "currentStartTime" && temp_id === currentServicesList[0].temp_id) {
-            setCurrentAppointmentStartTime(value);
-        }
+        let newList = [];
         setCurrentServicesList(prev => {
-            return prev.map(service => {
+            newList = prev.map(service => {
+                if (field === "type" && service.type === "add" && value !== "remove") {
+                    return service;
+                }
                 if (service.temp_id === temp_id) {
                     return {
                         ...service,
                         [field]: value,
-                        type: "edit",
                     }
                 }
                 return service
             })
+
+            return newList;
         })
+
+        if (field === "currentStartTime" && getAppointmentWithOldestStartTime(newList.filter(n => n.type !== "remove")).temp_id === temp_id) {
+            setCurrentAppointmentStartTime(value);
+        }
     }
+
+    const navigation = useNavigation()
 
     return <Modal style={{flex: 1}}
                   visible={props.isVisible}
@@ -172,6 +199,82 @@ const ViewBookingModal = (props) => {
             style={{}}
         />}
 
+        {isCancelReasonModalVisible && <BottomActionCard isVisible={isCancelReasonModalVisible}
+                                                         onClose={() => setIsCancelReasonModalVisible(false)}
+                                                         header={"Cancellation Reason"}
+        >
+            <View style={{marginHorizontal: 15, marginBottom: 20, marginTop: 10}}>
+                <Text style={{fontSize: 14, fontWeight: "600"}}>Enter the reason to cancel</Text>
+                <CustomTextInput type={"multiLine"}
+                                 placeholder="Cancellation Reason"
+                                 value={cancelReason}
+                                 onChangeText={setCancelReason}
+                />
+                <View style={{
+                    flexDirection: "row",
+                    gap: 15
+                }}>
+                    <PrimaryButton
+                        label={"Dismiss"}
+                        buttonStyle={{
+                            backgroundColor: Colors.white,
+                            borderColor: Colors.grey250,
+                            borderWidth: 1,
+                            flex: 1,
+                        }}
+                        textStyle={[textTheme.titleSmall, {
+                            color: Colors.black,
+                        }]}
+                        onPress={() => {
+                            setIsCancelReasonModalVisible(false)
+                        }}
+                    />
+                    <PrimaryButton
+                        label={"Cancel Appointment"}
+                        buttonStyle={{
+                            backgroundColor: Colors.error,
+                            flex: 1,
+                        }}
+                        textStyle={[textTheme.titleSmall]}
+                        onPress={() => {
+                            if (!cancelReason) {
+                                toastRef.current.show("Please enter cancel reason")
+                                return;
+                            }
+
+                            // editAppointmentDetailsAPI({
+                            //     "booking_id": props.data.booking_id,
+                            //     "status": "CANCELLED"
+                            // }).then(res => {
+                            //     if (res.data.status_code === 200) {
+                            //         setCurrentAppointmentStatus("CANCELLED")
+                            //         toastRef.current.show("Appointment Cancelled Successfully")
+                            //         dispatch(loadFutureBookingsFromDB())
+                            //     } else {
+                            //         console.log(res.data.other_message)
+                            //         toastRef.current.show(res.data.other_message, true)
+                            //     }
+                            // })
+
+                            cancelAppointmentsAPI({
+                                "booking_id": props.data.booking_id,
+                                reason: cancelReason,
+                            }).then(res => {
+                                if (res.data.status_code === 200) {
+                                    setCurrentAppointmentStatus("CANCELLED")
+                                    toastRef.current.show("Appointment Cancelled Successfully")
+                                    props.onClose()
+                                } else {
+                                    console.log(res.data.other_message)
+                                    toastRef.current.show(res.data.other_message, true)
+                                }
+                            })
+                        }}
+                    />
+                </View>
+            </View>
+        </BottomActionCard>}
+
         {isAddClientModalVisible && <NewBookingAddClientModal
             onSelect={(staff) => {
                 setCurrentSelectedClient(staff)
@@ -184,11 +287,26 @@ const ViewBookingModal = (props) => {
         {isSelectServiceModalVisible && <SelectServiceModal
             isVisible={isSelectServiceModalVisible}
             onPress={(item) => {
-                console.log(item)
-                // setCurrentServicesList(prev => [...prev, {
-                //     temp_id: uuid.v4(),
-                //     service_name: item.name
-                // }])
+                console.log("filter")
+                console.log(currentServicesList.filter(c => c.type !== "remove").at(-1).currentDuration)
+                console.log(item.duration)
+
+                let totalMinutes = durationToMinutes(currentServicesList.filter(c => c.type !== "remove").at(-1).currentDuration)
+                let currentTotalMinutes = durationToMinutes(item.duration)
+
+                setCurrentServicesList(prev => [...prev, {
+                    ...item,
+                    temp_id: uuid.v4(),
+                    service_name: item.name,
+                    appointment_date: currentAppointmentDate.format("YYYY-MM-DD"),
+                    currentAppointmentDate: currentAppointmentDate.format("YYYY-MM-DD"),
+                    currentDuration: item.duration,
+                    start_time: moment(currentServicesList.filter(c => c.type !== "remove").at(-1).currentStartTime, "hh:mm A").add(totalMinutes, "minute").format("hh:mm A"),
+                    currentStartTime: moment(currentServicesList.filter(c => c.type !== "remove").at(-1).currentStartTime, "hh:mm A").add(totalMinutes, "minute").format("hh:mm A"),
+                    currentSelectedStaff: null,
+                    end_time: moment(currentServicesList.filter(c => c.type !== "remove").at(-1).currentStartTime, "hh:mm A").add(totalMinutes, "minute").add(currentTotalMinutes, "minute").format("hh:mm A"),
+                    type: "add"
+                }])
             }}
             onClose={() => {
                 setIsSelectServiceModalVisible(false);
@@ -227,16 +345,19 @@ const ViewBookingModal = (props) => {
                                      }}
                                      overrideDisplayText={"Change"}
                                      onChangeValue={(status) => {
-                                         console.log(status)
+                                         if (status.value === "CANCELLED") {
+                                             setIsCancelReasonModalVisible(true);
+                                             return;
+                                         }
+
                                          editAppointmentDetailsAPI({
                                              "status": status.value,
                                              "booking_id": props.data.booking_id
                                          }).then(res => {
-                                             console.log("res.data")
-                                             console.log(res.data)
                                              if (res.data.status_code === 200) {
                                                  setCurrentAppointmentStatus(status.value)
                                                  toastRef.current.show("Status updated successfully")
+                                                 dispatch(loadFutureBookingsFromDB())
                                              } else {
                                                  console.log(res.data.other_message)
                                                  toastRef.current.show(res.data.other_message, true)
@@ -307,8 +428,10 @@ const ViewBookingModal = (props) => {
                     </PrimaryButton>
                     <View style={{height: "100%", width: 1, backgroundColor: Colors.grey300}}/>
                     <CustomTextInput type="dropdown"
-                                     showDropdownArrowIcon={isEditingAllowed}
-                                     disableOnPress={!isEditingAllowed}
+                        // showDropdownArrowIcon={isEditingAllowed}
+                        // disableOnPress={!isEditingAllowed}
+                                     showDropdownArrowIcon={false}
+                                     disableOnPress={true}
                                      container={{
                                          marginVertical: 10,
                                          marginBottom: 10,
@@ -335,6 +458,7 @@ const ViewBookingModal = (props) => {
                                      onChangeValue={(date) => {
                                          setCurrentAppointmentStartTime(date);
                                          modifyCurrentServiceData(currentServicesList[0].temp_id, "currentStartTime", date)
+                                         modifyCurrentServiceData(currentServicesList[0].temp_id, "type", "edit")
                                      }}
                                      dropdownItems={clockDropdownData}>
                         <Text style={{color: Colors.grey500, fontWeight: "700"}}>AT</Text>
@@ -466,7 +590,7 @@ const ViewBookingModal = (props) => {
                     <View style={{flex: 1, marginHorizontal: 15,}}>
                         <FlatList style={{flex: 1}} scrollEnabled={false}
                                   keyExtractor={(item) => item.temp_id}
-                                  data={currentServicesList}
+                                  data={currentServicesList.filter(service => service.type !== "remove")}
                                   renderItem={({item}) => <EditBookingCard
                                       modifyValue={modifyCurrentServiceData}
                                       isEditingAllowed={isEditingAllowed}
@@ -531,45 +655,88 @@ const ViewBookingModal = (props) => {
                     })
 
                     if (isEditingAllowed) {
-                        setIsSaveEditAppointmentLoading(true)
                         const editedServices = currentServicesList.filter(service => service.type === "edit")
                         const addedServices = currentServicesList.filter(service => service.type === "add")
+                        const deletedServices = currentServicesList.filter(service => service.type === "remove")
 
+                        console.log("addedServices")
+                        console.log(addedServices)
+                        console.log("editedServices")
+                        console.log(editedServices)
+
+                        if (editedServices.some(e => e.currentSelectedStaff === null) || addedServices.some(a => a.currentSelectedStaff === null)) {
+                            toastRef.current.show("Please assign staff", true);
+                            return;
+                        }
+
+                        setIsSaveEditAppointmentLoading(true)
                         editAppointmentDetailsAPI({
                             appointment_date: currentAppointmentDate.format("YYYY-MM-DD"),
                             booking_id: props.data.booking_id,
                             client_id: currentSelectedClient.id,
                             notes: currentNotes,
-                            services_list: editedServices.map(editedService => {
-                                const parts = editedService.currentDuration.split(" ");
-                                let totalMinutes = 0;
-                                if (parts.length > 2) {
-                                    totalMinutes += parseInt(parts[0]) * 60; // Add hours as minutes
-                                    totalMinutes += parseInt(parts[2]); // Add minutes
-                                } else {
-                                    totalMinutes += parseInt(parts[0]); // Add minutes only
+                            services_list: [...addedServices.map(addedService => {
+                                return {
+                                    appointment_id: viewAppointmentDetails.apptList[0].appt_id,
+                                    res_cat_id: addedService.id,
+                                    resource_id: addedService.currentSelectedStaff.id,
+                                    date: addedService.currentAppointmentDate,
+                                    duration: addedService.currentDuration,
+                                    start_time: addedService.currentStartTime,
+                                    end_time: addedService.end_time,
+                                    mode: "add"
                                 }
+                            }), ...editedServices.map(editedService => {
+                                let totalMinutes = durationToMinutes(editedService.currentDuration)
 
                                 return {
-                                    appointment_id: editedService.appt_id,
+                                    appointment_id: viewAppointmentDetails.apptList[0].appt_id,
                                     resource_id: editedService.currentSelectedStaff.id,
                                     duration: editedService.currentDuration,
                                     start_time: editedService.currentStartTime,
                                     end_time: moment(editedService.currentStartTime, "hh:mm A").add(totalMinutes, "minute").format("hh:mm A"),
-                                    mode:"edit"
+                                    mode: "edit"
                                 }
-                            }),
+                            }), ...deletedServices.map(deletedService => {
+                                return {
+                                    appointment_id: deletedService.appt_id,
+                                    mode: "remove"
+                                }
+                            })],
                             type: "reschedule"
                         }).then((res) => {
                             console.log("HHHHHH")
+                            console.log("resres")
+                            console.log(res.data)
                             setIsSaveEditAppointmentLoading(false)
                         }).finally(() => {
                             console.log("AAAAAA")
                             setIsSaveEditAppointmentLoading(false)
                         })
+                        props.onClose();
                     } else {
+                        setIsSaveEditAppointmentLoading(true);
+
+                        await clearCartAPI();
+                        await dispatch(clearLocalCart());
+                        await dispatch(loadClientInfoFromDb(currentSelectedClient.id));
+                        await dispatch(loadAnalyticsClientDetailsFromDb(currentSelectedClient.id));
+                        await dispatch(updateClientId(currentSelectedClient.id));
+                        await dispatch(getRewardPointBalance(currentSelectedClient.id));
+
+                        await Promise.all(currentServicesList.map(async (service) => {
+                            await dispatch(addItemToCart({
+                                resource_category: service.id,
+                                resource_id: service.currentSelectedStaff.id,
+                                service_time: durationToMinutes(service.currentDuration),
+                                start_time: service.currentStartTime,
+                            }));
+                        }));
+
+                        setIsSaveEditAppointmentLoading(false);
+                        props.onClose();
+                        navigation.navigate("Checkout");
                     }
-                    props.onClose();
                 }}
                 buttonStyle={{alignSelf: "stretch"}}>
                 {isSaveAppointmentLoading ? <View style={{

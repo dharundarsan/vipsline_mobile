@@ -25,6 +25,9 @@ import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
 import Toast from "../../ui/Toast";
 import clockDropdownData from "../../data/clockDropdownData";
 import getAppointmentDetailsAPI from "../../apis/appointmentsAPIs/getAppointmentDetailsAPI";
+import {modifyClientId} from "../../store/cartSlice";
+import {clearClientInfo} from "../../store/clientInfoSlice";
+import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 
 const AddBookingsModal = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -40,9 +43,14 @@ const AddBookingsModal = (props) => {
     const [finalData, setFinalData] = useState({amount: 0, duration: "0 h 0 mins"})
     const [isCreateBookingLoading, setIsCreateBookingLoading] = useState(false);
     const toastRef = useRef();
+    const [isClientInfoModalVisible, setIsClientInfoModalVisible] = useState(false)
+    
+    //Client
+    const [clientSelectedOption, setClientSelectedOption] = useState()
+    const [clientFilterPressed, setClientFilterPressed] = useState()
+    const [clientSearchClientQuery, setClientSearchClientQuery] = useState()
+    const [isEditClientModalVisible, setIsEditClientModalVisible] = useState()
 
-
-    console.log(props.data)
     const getFirstBookingStartDate = (servicesList) => {
         let min = Infinity;
         let minIndex = 0
@@ -113,6 +121,31 @@ const AddBookingsModal = (props) => {
             }}
             themeVariant="light"
             style={{}}
+        />}
+        {isClientInfoModalVisible && <ClientInfoModal
+            selectedOption={clientSelectedOption} //c
+            setSelectedOption={setClientSelectedOption} //c
+            setFilterPressed={setClientFilterPressed} //c 
+            searchClientQuery={clientSearchClientQuery}//c
+            setSearchQuery={setClientSearchClientQuery}//c
+            modalVisibility={isClientInfoModalVisible}
+            setModalVisibility={setIsClientInfoModalVisible}
+            setEditClientModalVisibility={isEditClientModalVisible}
+            editClientOption={() => {}}
+            visible={isClientInfoModalVisible}
+            setVisible={setIsClientInfoModalVisible}
+            closeModal={() => {
+                setIsClientInfoModalVisible(false);
+            }}
+            onClose={() => {
+                setIsClientInfoModalVisible(false);
+            }}
+            phone={selectedClient.mobile_1}
+            name={selectedClient.firstName}
+            id={selectedClient.id}
+            deleteClientToast={() => {
+
+            }}
         />}
 
         {isAddClientModalVisible && <NewBookingAddClientModal
@@ -260,6 +293,9 @@ const AddBookingsModal = (props) => {
                         </View>
                         <View style={{borderRadius: 1000, overflow: "hidden"}}>
                             <Pressable
+                                onPress={() => {
+                                    setIsClientInfoModalVisible(true)
+                                }}
                                 android_ripple={{
                                     color: 'rgba(0, 0, 0, 0.1)',
                                     borderless: false

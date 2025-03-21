@@ -52,19 +52,21 @@ const NewBookingCard = (props) => {
 
             <View style={{flexDirection: "row", justifyContent: "space-between", margin: 15, alignItems: "center"}}>
                 <Text>{props.data.name}</Text>
-                <Text style={{fontWeight: 500}}>₹ {props.data.discounted_price}</Text>
-                <PrimaryButton
-                    buttonStyle={{backgroundColor: Colors.transparent}}
-                    pressableStyle={{
-                        paddingVertical: 5,
-                        paddingHorizontal: 5,
-                    }}
-                    onPress={() => {
-                        dispatch(removeBooking(props.data.temp_id))
-                    }}
-                >
-                    <Ionicons name="close" size={25} color="black"/>
-                </PrimaryButton>
+                <View style={{flexDirection: "row", alignItems: "center", gap: 30}}>
+                    <Text style={{fontWeight: 500}}>₹ {props.data.price}</Text>
+                    <PrimaryButton
+                        buttonStyle={{backgroundColor: Colors.transparent}}
+                        pressableStyle={{
+                            paddingVertical: 5,
+                            paddingHorizontal: 5,
+                        }}
+                        onPress={() => {
+                            dispatch(removeBooking(props.data.temp_id))
+                        }}
+                    >
+                        <Ionicons name="close" size={25} color="black"/>
+                    </PrimaryButton>
+                </View>
             </View>
 
             <View

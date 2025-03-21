@@ -23,40 +23,30 @@ const EditBookingCard = (props) => {
     const date = useSelector(state => state.newBooking.date)
     const [staffAvailable, setStaffAvailable] = useState(true);
 
-    console.log("Edited Card")
-    console.log(props.data)
-
-    useEffect(() => {
-        // checkStaffAvailabilityAPI({
-        //     resource_id: props.data.currentSelectedStaff.id,
-        //     start_time: props.data.currentStartTime,
-        //     appointment_date: moment(props.data.currentAppointmentDate).format("YYYY-MM-DD")
-        // }).then((response => {
-        //     setStaffAvailable(response.data.status_code < 399)
-        // }))
-    }, []);
 
     return (
         <View style={{borderWidth: 1, borderColor: Colors.grey300, borderRadius: 8, marginTop: 10, overflow: "hidden"}}>
             <View style={{flexDirection: "row", justifyContent: "space-between", margin: 15, alignItems: "center"}}>
                 <Text>{props.data.service_name}</Text>
-                <Text style={{fontWeight: 500}}>₹ {props.data.discounted_price}</Text>
-                <PrimaryButton
-                    buttonStyle={{backgroundColor: Colors.transparent, height: 40, width: 40}}
-                    pressableStyle={{
-                        paddingVertical: 5,
-                        paddingHorizontal: 5,
-                    }}
-                    disableRipple={!props.isEditingAllowed}
-                    onPress={() => {
-                        if (props.isEditingAllowed) {
-
-                        }
-                        return;
-                    }}
-                >
-                    {props.isEditingAllowed && <Ionicons name="close" size={25} color="black"/>}
-                </PrimaryButton>
+                <View style={{flexDirection: "row", alignItems: "center", gap: 30}}>
+                    <Text style={{fontWeight: 500}}>₹ {props.data.price}</Text>
+                    <PrimaryButton
+                        buttonStyle={{backgroundColor: Colors.transparent, height: 40, width: 40}}
+                        pressableStyle={{
+                            paddingVertical: 5,
+                            paddingHorizontal: 5,
+                        }}
+                        disableRipple={!props.isEditingAllowed}
+                        onPress={() => {
+                            if (props.isEditingAllowed) {
+                                props.modifyValue(props.data.temp_id, "type", "remove")
+                            }
+                            return;
+                        }}
+                    >
+                        {props.isEditingAllowed && <Ionicons name="close" size={25} color="black"/>}
+                    </PrimaryButton>
+                </View>
             </View>
 
             <View
@@ -84,6 +74,7 @@ const EditBookingCard = (props) => {
                                      onChangeValue={(date) => {
                                          if (props.isEditingAllowed) {
                                              props.modifyValue(props.data.temp_id, "currentStartTime", date)
+                                             props.modifyValue(props.data.temp_id, "type", "edit")
                                          }
                                          return;
                                      }}
@@ -117,6 +108,7 @@ const EditBookingCard = (props) => {
                                      onChangeValue={(duration) => {
                                          if (props.isEditingAllowed) {
                                              props.modifyValue(props.data.temp_id, "currentDuration", duration.label)
+                                             props.modifyValue(props.data.temp_id, "type", "edit")
                                          }
                                          return;
                                      }}
@@ -146,6 +138,8 @@ const EditBookingCard = (props) => {
                                          }).then((response => {
                                              setStaffAvailable(response.data.status_code < 399);
                                              props.modifyValue(props.data.temp_id, "currentSelectedStaff", staff)
+                                             props.modifyValue(props.data.temp_id, "type", "edit")
+
                                          }))
                                      }
                                      return;

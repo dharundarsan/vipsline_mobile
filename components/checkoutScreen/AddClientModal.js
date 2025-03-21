@@ -151,7 +151,10 @@ const AddClientModal = (props) => {
                                     email={item.username}
                                     // divider={true}
                                     onPress={(clientId) => {
-
+                                        console.log("item.id")
+                                        console.log(item.id)
+                                        console.log("clientId")
+                                        console.log(clientId)
 
                                         props.closeModal();
                                         dispatch(loadClientInfoFromDb(item.id));

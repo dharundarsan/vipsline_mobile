@@ -28,6 +28,7 @@ const BottomActionCard = ({
                               onConfirm,
                               onCancel,
                               headerTextStyle,
+                              children,
                               ...modalProps
                           }: BottomActionCardProps) => {
     // Only render the Modal if isVisible is true
@@ -60,26 +61,31 @@ const BottomActionCard = ({
                         <Ionicons name="close" size={25} color="black"/>
                     </PrimaryButton>
                 </View>
-                <View style={styles.deleteClientCardContainer}>
-                    <Text style={[textTheme.bodyLarge]}>{content}</Text>
-                    <View style={styles.deleteClientCardButtonContainer}>
-                        <PrimaryButton
-                            label={cancelLabel}
-                            buttonStyle={styles.cancelButton}
-                            pressableStyle={styles.cancelButtonPressable}
-                            textStyle={[textTheme.titleMedium, styles.cancelButtonText]}
-                            onPress={() => {
-                                onCancel();
-                            }}
-                        />
-                        <PrimaryButton
-                            label={confirmLabel}
-                            buttonStyle={styles.deleteButton}
-                            textStyle={[textTheme.titleMedium]}
-                            onPress={onConfirm}
-                        />
+                {(children === null || children === undefined) ? <View style={styles.deleteClientCardContainer}>
+                        <Text style={[textTheme.bodyLarge]}>{content}</Text>
+                        <View style={styles.deleteClientCardButtonContainer}>
+                            <PrimaryButton
+                                label={cancelLabel}
+                                buttonStyle={styles.cancelButton}
+                                pressableStyle={styles.cancelButtonPressable}
+                                textStyle={[textTheme.titleMedium, styles.cancelButtonText]}
+                                onPress={() => {
+                                    onCancel();
+                                }}
+                            />
+                            <PrimaryButton
+                                label={confirmLabel}
+                                buttonStyle={styles.deleteButton}
+                                textStyle={[textTheme.titleMedium]}
+                                onPress={onConfirm}
+                            />
+                        </View>
+                    </View> :
+                    <View style={{backgroundColor: Colors.white}}>
+                        {children}
                     </View>
-                </View>
+                }
+
             </TouchableOpacity>
         </Modal>
     );

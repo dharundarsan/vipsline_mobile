@@ -4,6 +4,7 @@ import {EXPO_PUBLIC_API_URI, EXPO_PUBLIC_BUSINESS_ID, EXPO_PUBLIC_AUTH_KEY} from
 import * as SecureStore from "expo-secure-store";
 import moment from "moment";
 import uuid from "react-native-uuid";
+import {adjustServicesTimings, durationToMinutes, sortAppointments} from "../util/appointmentsHelper";
 
 export const initialNewBookingState = {
     selectedClient: null,
@@ -26,19 +27,11 @@ export const newBookingSlice = createSlice({
             }
         },
         addBooking(state, action) {
-            const parseTimeToMoment = (timeStr) => {
-                return moment(timeStr, "hh:mm A");
-            };
-
-            const formatMomentToTime = (time) => {
-                return time.format("hh:mm A");
-            };
-
             const getLatestBookingEndDate = (servicesList) => {
                 // let max = parseTimeToMoment("12:00 AM").valueOf();
                 let max = 0;
                 servicesList.forEach((item) => {
-                    const itemTime = splitAndAdd(parseTimeToMoment(item.preferred_date), item.preferred_duration.label).valueOf();
+                    const itemTime = splitAndAdd(moment(item.preferred_date, "hh:mm A"), item.preferred_duration.label).valueOf();
                     if (itemTime > max) {
                         max = itemTime;
                     }
@@ -50,14 +43,7 @@ export const newBookingSlice = createSlice({
             let endTime;
 
             const splitAndAdd = (time, duration) => {
-                const parts = duration.split(" ");
-                let totalMinutes = 0;
-                if (parts.length > 2) {
-                    totalMinutes += parseInt(parts[0]) * 60; // Add hours as minutes
-                    totalMinutes += parseInt(parts[2]); // Add minutes
-                } else {
-                    totalMinutes += parseInt(parts[0]); // Add minutes only
-                }
+                let totalMinutes = durationToMinutes(duration)
                 return time.add(totalMinutes, "minutes");
             };
 
@@ -67,34 +53,73 @@ export const newBookingSlice = createSlice({
                 const newPreferredMoment = latestBookingEndTime.clone();
 
                 // Format the start time as preferred date
-                newPreferredDate = formatMomentToTime(newPreferredMoment);
+                newPreferredDate = moment(newPreferredMoment).format("hh:mm A");
 
                 // Calculate end time by adding duration to the preferred start time
-                endTime = formatMomentToTime(splitAndAdd(newPreferredMoment, action.payload.preferred_duration.label));
+                endTime = moment(splitAndAdd(newPreferredMoment, action.payload.preferred_duration.label)).format("hh:mm A");
             } else {
                 // If no existing services, start with 12:00 AM
-                newPreferredDate = "12:00 AM";
-                endTime = formatMomentToTime(splitAndAdd(parseTimeToMoment("12:00 AM"), action.payload.preferred_duration.label));
+                newPreferredDate = moment().minutes(Math.round(moment().minutes() / 5) * 5).seconds(0).format("hh:mm A");
+                endTime = moment(splitAndAdd(moment(newPreferredDate, "hh:mm A"), action.payload.preferred_duration.label)).format("hh:mm A");
             }
 
-            state.servicesList = [
+            state.servicesList = sortAppointments([
                 ...state.servicesList,
                 {
                     ...action.payload,
                     temp_id: uuid.v4(),
                     preferred_date: newPreferredDate,
                     preferred_staff: "",
-                    preferred_duration: { label: action.payload.preferred_duration.label },
+                    preferred_duration: {label: action.payload.preferred_duration.label},
                     staff_available: null,
                     end_time: endTime,
                 },
-            ];
+            ]);
         },
+        // updateBooking(state, action) {
+        //     const {temp_id, field, value} = action.payload;
+        //     const index = state.servicesList.findIndex(service => service.temp_id === temp_id);
+        //     if (index !== -1) {
+        //         state.servicesList[index][field] = value;
+        //     }
+        //     console.log("index")
+        //     console.log(index)
+        //     console.log(state.servicesList[index])
+        //     if (index === 0) {
+        //         if (field === "preferred_date") {
+        //             state.appointmentStartTime = value;
+        //         }
+        //
+        //         console.log(field)
+        //         console.log(field === "preferred_date" || field === "preferred_duration")
+        //
+        //         if (field === "preferred_date" || field === "preferred_duration") {
+        //             state.servicesList = adjustServicesTimings(state.servicesList);
+        //         }
+        //     }
+        // },
         updateBooking(state, action) {
             const {temp_id, field, value} = action.payload;
-            const index = state.servicesList.findIndex(service => service.temp_id === temp_id);
-            if (index !== -1) {
-                state.servicesList[index][field] = value;
+
+            const newList = state.servicesList.map((service, index) => {
+                if (service.temp_id === temp_id) {
+                    let updatedService = {...service, [field]: value};
+
+                    if (index === 0 && field === "preferred_date") {
+                        state.appointmentStartTime = value;
+                    }
+
+                    return updatedService;
+                }
+                return service;
+            });
+
+            state.servicesList = newList;
+
+            if (field === "preferred_date" || field === "preferred_duration") {
+                console.log("newwwww")
+                console.log(newList.filter(n => n.type !== "remove"))
+                state.servicesList = adjustServicesTimings(newList.filter(n => n.type !== "remove"));
             }
         },
         removeBooking(state, action) {
