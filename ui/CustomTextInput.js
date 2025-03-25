@@ -88,7 +88,7 @@ const CustomTextInput = ({showDropdownArrowIcon = true, ...props}) => {
 
     let content;
     if (props.type === "text" || props.type === "multiLine" || props.type === "number") {
-        content = (
+        content = ( <>
             <TextInput
                 onEndEditing={props.onEndEditing !== undefined ? (event) => props.onEndEditing(event.nativeEvent.text) : () => {
                 }}
@@ -121,8 +121,12 @@ const CustomTextInput = ({showDropdownArrowIcon = true, ...props}) => {
                 editable={props.editable}
                 selectTextOnFocus={props.selectTextOnFocus}
                 onPress={props.onPress}
+                maxLength={props.maxLength}
 
             />
+
+            </>
+
         );
     } else if (props.type === "email") {
         content = (
@@ -395,7 +399,19 @@ const CustomTextInput = ({showDropdownArrowIcon = true, ...props}) => {
                         ""}</Text>
             }
             {content}
-            {error && <Text style={[textTheme.bodyMedium, styles.errorText, props.errorStyle]}>{errorMessage}</Text>}
+            {
+                props.maxLength ?
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                        {error &&
+                            <Text style={[textTheme.bodyMedium, styles.errorText, props.errorStyle]}>{errorMessage}</Text>}
+                        <Text style={[textTheme.bodyMedium, {alignSelf: 'flex-end', color: Colors.grey500}]}>{(checkNullUndefined(props.value) ?
+                            props.value.length : 0) + " / " + props.maxLength} </Text>
+
+                    </View>
+                 :
+                    error && <Text style={[textTheme.bodyMedium, styles.errorText, props.errorStyle]}>{errorMessage}</Text>
+            }
+
         </View>
     );
 };
