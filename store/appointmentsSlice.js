@@ -52,6 +52,12 @@ export const initialAppointmentsState = {
     bookingsHistoryCount: 0,
     bookingsHistoryIsFetching: false,
     bookingsHistoryFilterDate: moment().toISOString(),
+
+    // cart
+    cartBookingId:"",
+    cartGroupingId:"",
+    isBookingCheckout: false,
+
 };
 
 export const appointmentsSlice = createSlice({
@@ -126,6 +132,14 @@ export const appointmentsSlice = createSlice({
             state.bookingsHistoryPageNo = 0;
             // loadBookingsHistoryFromDB()
         },
+        modifyAppointmentSliceValue(state, action) {
+            const {field, value} = action.payload;
+            if (field in state) {
+                state[field] = value;
+            } else {
+                console.warn(`Field "${field}" does not exist in appointment slide state.`);
+            }
+        }
     }
 });
 
@@ -148,7 +162,8 @@ export const {
     incrementBookingsHistoryPageNumber,
     resetBookingsHistoryPageNo,
     decrementBookingsHistoryPageNumber,
-    setBookingsHistoryFilterDate
+    setBookingsHistoryFilterDate,
+    modifyAppointmentSliceValue
 } = appointmentsSlice.actions;
 
 export default appointmentsSlice.reducer;

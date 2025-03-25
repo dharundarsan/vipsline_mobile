@@ -1,9 +1,20 @@
-import { FlatList, Image, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View } from "react-native";
+import {
+    FlatList,
+    Image,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    ToastAndroid,
+    View
+} from "react-native";
 import textTheme from "../../constants/TextTheme";
 import PrimaryButton from "../../ui/PrimaryButton";
 import {AntDesign, Feather, Ionicons} from "@expo/vector-icons";
 import Divider from "../../ui/Divider";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import Colors from "../../constants/Colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CustomTextInput from "../../ui/CustomTextInput";
@@ -42,7 +53,9 @@ import Toast from "../../ui/Toast";
 import {MaterialIcons} from '@expo/vector-icons';
 import BottomActionCard from "../../ui/BottomActionCard";
 import RewardPointModal from "./RewardPointModal";
-import { useFirstRender } from "../../hooks/useFirstRender";
+import {useFirstRender} from "../../hooks/useFirstRender";
+import appointmentForExistingBookingAPI from "../../apis/appointmentsAPIs/appointmentForExistingBookingAPI";
+import {modifyAppointmentSliceValue} from "../../store/appointmentsSlice";
 
 const PaymentModal = (props) => {
     const dispatch = useDispatch();
@@ -58,10 +71,10 @@ const PaymentModal = (props) => {
     console.log(clientInfo.wallet_balance);
     console.log("isPrepaidInCart");
     console.log(isPrepaidInCart);
-    
+
     console.log("isPrepaidAvailable");
     console.log(isPrepaidAvailable);
-    
+
     // const [selectedPaymentOption, setSelectedPaymentOption] = useState(isPrepaidAvailable ? isZeroPayment ? null : clientInfo.wallet_balance > props.price ? "prepaid" : "split_payment" : null);
     const [selectedPaymentOption, setSelectedPaymentOption] = useState();
     const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
@@ -88,6 +101,11 @@ const PaymentModal = (props) => {
     const isRewardActive = (businessDetails?.data[0]?.rewardsEnabled !== undefined && businessDetails?.data[0]?.rewardsEnabled && clientInfo.reward_balance !== 0)
     const [rewardValue, setRewardValue] = useState(0);
     const [rewardValueToggle, setRewardValueToggle] = useState(0);
+    const isBookingCheckout = useSelector(state => state.appointments.isBookingCheckout);
+    const cartBookingId = useSelector(state => state.appointments.cartBookingId);
+    const cartGroupingId = useSelector(state => state.appointments.cartGroupingId);
+
+
     const [initialSplitChange, setInitialSplitChange] = useState([
         {
             mode: "cash",
@@ -140,33 +158,33 @@ const PaymentModal = (props) => {
 
 
     const [splitUpState, setSplitUpState] = useState([
-        {
-            mode: "cash",
-            shown: true,
-            amount: 0,
-            name: "Cash"
-        }, {
-            mode: "card",
-            shown: true,
-            amount: 0,
-            name: "Credit / Debit Card"
-        }, {
-            mode: "digital payments",
-            shown: false,
-            amount: 0,
-            name: "Digital payment"
-        }, {
-            mode: "prepaid",
-            shown: false,
-            amount: 0,
-            name: "Prepaid"
-        }, {
-            mode: "Rewards",
-            shown: false,
-            amount: 0,
-            name: "Reward Points"
-        }
-    ]
+            {
+                mode: "cash",
+                shown: true,
+                amount: 0,
+                name: "Cash"
+            }, {
+                mode: "card",
+                shown: true,
+                amount: 0,
+                name: "Credit / Debit Card"
+            }, {
+                mode: "digital payments",
+                shown: false,
+                amount: 0,
+                name: "Digital payment"
+            }, {
+                mode: "prepaid",
+                shown: false,
+                amount: 0,
+                name: "Prepaid"
+            }, {
+                mode: "Rewards",
+                shown: false,
+                amount: 0,
+                name: "Reward Points"
+            }
+        ]
     )
     // const [splitUpState, setSplitUpState] = useState(47)
     const [initialSplit, setInitialSplit] = useState(47);
@@ -175,7 +193,7 @@ const PaymentModal = (props) => {
     const prepaidWallet = useSelector((state) => state.cart.prepaid_wallet);
     const details = useSelector(state => state.clientInfo.details);
     const rewardDetails = useSelector((state) => state.clientInfo.customerRewardDetails);
-    const rewardMinValue =  cartSliceState?.calculatedPrice[0]?.reward_details?.minValue ?? 0;
+    const rewardMinValue = cartSliceState?.calculatedPrice[0]?.reward_details?.minValue ?? 0;
     // cartSliceState?.calculatedPrice[0]?.reward_details?.minValue
     const toastRef = useRef(null)
 
@@ -185,20 +203,20 @@ const PaymentModal = (props) => {
             setShownCount(prev.reduce((acc, item) => {
                 return item.shown ? acc + 1 : acc;
             }, 0))
-                if (split.name === addedSplitPayment) {
-                    if (shownCount === 0) {
-                        return ({
-                            ...split,
-                            amount: props.price,
-                            shown: true
-                        })
-                    } else {
-                        return ({
-                            ...split,
-                            shown: true
-                        })
-                    }
+            if (split.name === addedSplitPayment) {
+                if (shownCount === 0) {
+                    return ({
+                        ...split,
+                        amount: props.price,
+                        shown: true
+                    })
+                } else {
+                    return ({
+                        ...split,
+                        shown: true
+                    })
                 }
+            }
             return split;
         }))
         setAddedSplitPayment(null);
@@ -316,8 +334,7 @@ const PaymentModal = (props) => {
                     },
                 ])
             }
-        }
-        else if (isRewardActive) {
+        } else if (isRewardActive) {
             setInitialSplitChange([
                 {
                     mode: "Rewards",
@@ -341,8 +358,7 @@ const PaymentModal = (props) => {
                     name: "Digital payment"
                 }
             ])
-        }
-        else {
+        } else {
             setInitialSplitChange([
                 {
                     mode: "cash",
@@ -568,7 +584,7 @@ const PaymentModal = (props) => {
                     paid_amount: [{mode: "CASH", amount: totalPrice}]
                 });
                 setSplitResponse(response);
-            } else if (selectedPaymentOption === "split_payment") { 
+            } else if (selectedPaymentOption === "split_payment") {
                 const response = await splitPaymentAPI({
                     booking_amount: props.price,
                     paid_amount: [{mode: "CASH", amount: totalPrice}]
@@ -587,13 +603,18 @@ const PaymentModal = (props) => {
             setSelectedPaymentOption("split_payment")
             const splitApi = async () => {
                 // if (selectedPaymentOption === "split_payment") {
-                const checkSplitActive = splitUpState.filter(e => e.shown).reduce((acc, item) => { return item.amount + acc }, 0);
-                let splitState = splitUpState.map(item => ({ mode: item.mode, amount: item.amount, shown: item.shown }));
-                const removedZeroSplitState = splitState.filter(e => e.shown).map(item => ({ mode: (item.mode).toUpperCase(), amount: item.amount }));
+                const checkSplitActive = splitUpState.filter(e => e.shown).reduce((acc, item) => {
+                    return item.amount + acc
+                }, 0);
+                let splitState = splitUpState.map(item => ({mode: item.mode, amount: item.amount, shown: item.shown}));
+                const removedZeroSplitState = splitState.filter(e => e.shown).map(item => ({
+                    mode: (item.mode).toUpperCase(),
+                    amount: item.amount
+                }));
                 let validatedSplitState = removedZeroSplitState;
                 console.log(validatedSplitState);
                 console.log(checkSplitActive);
-                
+
                 // const isGreaterSplit = removedZeroSplitState.reduce((acc,item) => { return item.amount + acc },0) >= props.price;
                 // if(isGreaterSplit){
                 //     let len = validatedSplitState.length;
@@ -614,7 +635,10 @@ const PaymentModal = (props) => {
                     setIsSplitRewardActive(true);
                     await splitPaymentAPI({
                         booking_amount: props.price,
-                        paid_amount: checkSplitActive === 0 ? [{ mode: "REWARDS", amount: rewardValue }, { mode: "CASH", amount: 0 }] : undefined
+                        paid_amount: checkSplitActive === 0 ? [{mode: "REWARDS", amount: rewardValue}, {
+                            mode: "CASH",
+                            amount: 0
+                        }] : undefined
                     }).then(res => {
                         setSplitResponse(res);
                         if (res[0] !== undefined) {
@@ -626,7 +650,7 @@ const PaymentModal = (props) => {
                                 const matchingSplit = splitState.find(splitItem => splitItem.mode === item.mode);
                                 return {
                                     ...item,
-                                    ...(matchingSplit ? { amount: matchingSplit.amount } : {}),
+                                    ...(matchingSplit ? {amount: matchingSplit.amount} : {}),
                                 };
                             });
 
@@ -642,14 +666,14 @@ const PaymentModal = (props) => {
 
                         }
                     });
-                } else if(isSplitRewardActive){
+                } else if (isSplitRewardActive) {
                     let isPrepaidChosen;
 
                     isPrepaidChosen = splitUpState.filter(e => e.shown).some(e => e.shown && e.mode === "prepaid")
                     let prepaidValue = isPrepaidChosen ? splitUpState.filter(e => e.shown).find(e => e.mode === "prepaid")?.amount : 0;
                     const updatedSplitState = splitUpState.map(item =>
                         item.mode.toLowerCase() === "rewards"
-                            ? { ...item, shown: true, amount: rewardValue }
+                            ? {...item, shown: true, amount: rewardValue}
                             : item
                     );
                     dispatch(updateCalculatedPrice(details.id, isPrepaidChosen ? prepaidValue === 0 ? false : true : false, isPrepaidChosen ? prepaidValue : 0, updatedSplitState));
@@ -661,7 +685,7 @@ const PaymentModal = (props) => {
 
                     await splitPaymentAPI({
                         booking_amount: props.price,
-                        paid_amount: [{ mode: "REWARDS", amount: rewardValue }, { mode: "CASH", amount: 0 }]
+                        paid_amount: [{mode: "REWARDS", amount: rewardValue}, {mode: "CASH", amount: 0}]
                     }).then(res => {
                         setSplitResponse(res);
                         if (res[0] !== undefined) {
@@ -673,7 +697,7 @@ const PaymentModal = (props) => {
                                 const matchingSplit = splitState.find(splitItem => splitItem.mode === item.mode);
                                 return {
                                     ...item,
-                                    ...(matchingSplit ? { amount: matchingSplit.amount } : {}),
+                                    ...(matchingSplit ? {amount: matchingSplit.amount} : {}),
                                 };
                             });
 
@@ -705,39 +729,39 @@ const PaymentModal = (props) => {
     // },[isSplitRewardActive,splitUpState])
     console.log("paymentOrder");
     console.log(paymentOrder);
-    
-    function onRewardValueChange(value){
+
+    function onRewardValueChange(value) {
         setRewardValue(value);
         setRewardValueToggle(prev => !prev);
     }
 
     console.log("shownCount");
     console.log(shownCount);
-    
+
 
     return <Modal style={styles.paymentModal} visible={props.isVisible} animationType={"slide"}
-    // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
+        // presentationStyle="pageSheet" onRequestClose={props.onCloseModal}
     >
-        <Toast ref={toastRef} />
+        <Toast ref={toastRef}/>
 
         {
             isSplitPaymentDropdownVisible &&
             <DropdownModal isVisible={isSplitPaymentDropdownVisible}
                            onCloseModal={() => {
 
-                    setIsSplitPaymentDropdownVisible(false)
-                }}
-                dropdownItems={isPrepaidAvailable && isRewardActive && clientInfo.reward_balance >= rewardMinValue ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
-                    : isPrepaidAvailable && !isRewardActive && clientInfo.reward_balance <= rewardMinValue ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
-                        : isRewardActive && clientInfo.reward_balance >= rewardMinValue? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
-                            : ["Cash", "Credit / Debit card", "Digital payment"]}
-                onChangeValue={(value) => {
-                    setAddedSplitPayment(value)
-                    if (value === "Reward Points") {
-                        setIsRewardModalVisible(true);
-                        setIsSplitRewardActive(true);
-                    }
-                }} />
+                               setIsSplitPaymentDropdownVisible(false)
+                           }}
+                           dropdownItems={isPrepaidAvailable && isRewardActive && clientInfo.reward_balance >= rewardMinValue ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                               : isPrepaidAvailable && !isRewardActive && clientInfo.reward_balance <= rewardMinValue ? ["Prepaid", "Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                                   : isRewardActive && clientInfo.reward_balance >= rewardMinValue ? ["Cash", "Credit / Debit card", "Digital payment", "Reward Points"]
+                                       : ["Cash", "Credit / Debit card", "Digital payment"]}
+                           onChangeValue={(value) => {
+                               setAddedSplitPayment(value)
+                               if (value === "Reward Points") {
+                                   setIsRewardModalVisible(true);
+                                   setIsSplitRewardActive(true);
+                               }
+                           }}/>
         }
         <BottomActionCard isVisible={isCancelSalesModalVisible}
                           header={"Cancel Sale"}
@@ -767,7 +791,7 @@ const PaymentModal = (props) => {
             rewardValue={rewardValue}
             setSplitUpState={setSplitUpState}
             onRewardValueChange={onRewardValueChange}
-            setSelectedPaymentOption={setSelectedPaymentOption} />
+            setSelectedPaymentOption={setSelectedPaymentOption}/>
         }
         {
             isOptionsDropdownModalVisible && <DropdownModal isVisible={isOptionsDropdownModalVisible}
@@ -862,10 +886,11 @@ const PaymentModal = (props) => {
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "cash" ? styles.paymentOptionSelected : {}]}
-                            onPress={isZeroPayment ? () => {} :
+                            onPress={isZeroPayment ? () => {
+                                } :
                                 () => {
-                                setSelectedPaymentOption("cash")
-                            }}
+                                    setSelectedPaymentOption("cash")
+                                }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "cash" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
@@ -878,10 +903,11 @@ const PaymentModal = (props) => {
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "card" ? styles.paymentOptionSelected : {}]}
-                            onPress={isZeroPayment ? () => {} :
+                            onPress={isZeroPayment ? () => {
+                                } :
                                 () => {
-                                setSelectedPaymentOption("card")
-                            }}
+                                    setSelectedPaymentOption("card")
+                                }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "card" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
@@ -896,10 +922,11 @@ const PaymentModal = (props) => {
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "digital payments" ? styles.paymentOptionSelected : {}]}
-                            onPress={isZeroPayment ? () => {} :
+                            onPress={isZeroPayment ? () => {
+                                } :
                                 () => {
-                                setSelectedPaymentOption("digital payments")
-                            }}
+                                    setSelectedPaymentOption("digital payments")
+                                }}
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "digital payments" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
@@ -912,7 +939,8 @@ const PaymentModal = (props) => {
                         <PrimaryButton
                             disableRipple={isZeroPayment}
                             buttonStyle={[styles.paymentOptionButton, selectedPaymentOption === "split_payment" ? styles.paymentOptionSelected : {}]}
-                            onPress={isZeroPayment ? () => { } : () => {
+                            onPress={isZeroPayment ? () => {
+                            } : () => {
                                 setIsSplitRewardActive(false);
                                 setSplitUpState(initialSplit)
                                 dispatch(updateRewardAmount(0))
@@ -934,16 +962,17 @@ const PaymentModal = (props) => {
                             buttonStyle={[
                                 styles.paymentOptionRewardButton,
                                 isRewardActive && isPrepaidAvailable
-                                    ? { flex: 0.5 }
+                                    ? {flex: 0.5}
                                     : isRewardActive
-                                        ? { flex: 1 }
+                                        ? {flex: 1}
                                         : {}, // Default to an empty object if no condition is met
                                 selectedPaymentOption === "reward points"
                                     ? styles.paymentOptionSelected
                                     : {}
                             ]}
 
-                            onPress={isZeroPayment ? () => { } : () => {
+                            onPress={isZeroPayment ? () => {
+                            } : () => {
                                 dispatch(updateRewardAmount(0));
                                 setSelectedPaymentOption("reward points")
                                 setSplitUpState(initialSplit)
@@ -953,16 +982,21 @@ const PaymentModal = (props) => {
                             pressableStyle={styles.paymentOptionButtonPressable}>
                             {selectedPaymentOption === "reward points" ? <View style={styles.tickContainer}>
                                 <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                    color={Colors.highlight} />
+                                                        color={Colors.highlight}/>
                             </View> : null}
-                            <Image source={require("../../assets/icons/checkout/payment/rewardIcon.png")} style={{ width: 30, height: 30 }} />
+                            <Image source={require("../../assets/icons/checkout/payment/rewardIcon.png")}
+                                   style={{width: 30, height: 30}}/>
                             <Text>Reward Points {fullClientData.rewardPointBalance} </Text>
                         </PrimaryButton>}
                         {(isPrepaidAvailable) &&
                             <PrimaryButton
                                 disableRipple={isZeroPayment}
-                                buttonStyle={[styles.paymentOptionButton, isRewardActive && clientInfo.reward_balance >= rewardMinValue && isPrepaidAvailable ? { flex: 0.5 } : isPrepaidAvailable ? { flex: 1, marginBottom: 20 } : {}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
-                                onPress={isZeroPayment ? () => { } : () => {
+                                buttonStyle={[styles.paymentOptionButton, isRewardActive && clientInfo.reward_balance >= rewardMinValue && isPrepaidAvailable ? {flex: 0.5} : isPrepaidAvailable ? {
+                                    flex: 1,
+                                    marginBottom: 20
+                                } : {}, selectedPaymentOption === "prepaid" ? styles.paymentOptionSelected : {}]}
+                                onPress={isZeroPayment ? () => {
+                                } : () => {
 
                                     if (clientInfo.wallet_balance < props.price) {
                                         setSelectedPaymentOption("split_payment")
@@ -973,9 +1007,10 @@ const PaymentModal = (props) => {
                                 pressableStyle={styles.paymentOptionButtonPressable}>
                                 {selectedPaymentOption === "prepaid" ? <View style={styles.tickContainer}>
                                     <MaterialCommunityIcons name="checkbox-marked-circle" size={24}
-                                        color={Colors.highlight} />
+                                                            color={Colors.highlight}/>
                                 </View> : null}
-                                <FontAwesome6 name="indian-rupee-sign" size={24} color={isZeroPayment ? Colors.grey400 : Colors.green} />
+                                <FontAwesome6 name="indian-rupee-sign" size={24}
+                                              color={isZeroPayment ? Colors.grey400 : Colors.green}/>
                                 <Text>Prepaid <Text
                                     style={{
                                         color: isZeroPayment ? Colors.grey400 : Colors.highlight,
@@ -1024,7 +1059,7 @@ const PaymentModal = (props) => {
                                             setIsRewardModalVisible(true);
                                         }
                                     }}
-                                    textInputStyle={isError ? { borderColor: Colors.error } : { borderColor: Colors.green }}
+                                    textInputStyle={isError ? {borderColor: Colors.error} : {borderColor: Colors.green}}
                                     type={"number"} label={item.name} value={item.amount.toString()} flex={1}
                                     readOnly={shownCount === 4 && item.name === paymentOrder.at(-1)}
                                     onChangeText={(text) => {
@@ -1048,9 +1083,9 @@ const PaymentModal = (props) => {
                                         }))
                                         setStopAPI(false);
                                         setRecentlyChanged(prev => {
-                                            if (prev.at(-1) === item.mode) return prev
-                                            else return [...prev, item.mode]
-                                        }
+                                                if (prev.at(-1) === item.mode) return prev
+                                                else return [...prev, item.mode]
+                                            }
                                         );
                                     }}
                                     onEndEditing={(text) => {
@@ -1059,46 +1094,46 @@ const PaymentModal = (props) => {
                                                 // ToastAndroid.show("Prepaid split amount is greater than the prepaid balance", ToastAndroid.LONG);
                                                 // TODO
 
-                                                    // Toast.show("Prepaid split amount is greater than the prepaid balance", {
-                                                    //     duration: Toast.durations.LONG,
-                                                    //     position: Toast.positions.BOTTOM,
-                                                    //     shadow: false,
-                                                    //     backgroundColor: "black",
-                                                    //     opacity: 1
-                                                    // })
-                                                    toastRef.current.show("Prepaid split amount is greater than the prepaid balance", 2000);
-                                                    return;
-                                                }
-                                            }
-                                            const totalValue = splitUpState.reduce((acc, ele) => {
-                                                if (ele.shown) {
-                                                    if (ele.mode === item.mode) return acc + parseFloat(text)
-                                                    return acc + ele.amount;
-                                                }
-                                                return acc;
-                                            }, 0)
-
-                                            if (totalValue > props.price) {
-                                                setIsError(true);
-                                                // ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
-                                                // TODO
-
-                                                // Toast.show("Split Payments are not summing upto transaction total. Please check.", {
-                                                //     duration: Toast.durations.SHORT,
+                                                // Toast.show("Prepaid split amount is greater than the prepaid balance", {
+                                                //     duration: Toast.durations.LONG,
                                                 //     position: Toast.positions.BOTTOM,
                                                 //     shadow: false,
                                                 //     backgroundColor: "black",
                                                 //     opacity: 1
                                                 // })
-                                                toastRef.current.show("Split Payments are not summing upto transaction total. Please check.", 2000);
+                                                toastRef.current.show("Prepaid split amount is greater than the prepaid balance", 2000);
                                                 return;
-                                            } else if (totalValue === props.price) {
-                                                setIsError(false);
                                             }
+                                        }
+                                        const totalValue = splitUpState.reduce((acc, ele) => {
+                                            if (ele.shown) {
+                                                if (ele.mode === item.mode) return acc + parseFloat(text)
+                                                return acc + ele.amount;
+                                            }
+                                            return acc;
+                                        }, 0)
 
-                                            callSplitAPI();
-                                        }}
-                                    />
+                                        if (totalValue > props.price) {
+                                            setIsError(true);
+                                            // ToastAndroid.show("Split Payments are not summing upto transaction total. Please check.", ToastAndroid.SHORT);
+                                            // TODO
+
+                                            // Toast.show("Split Payments are not summing upto transaction total. Please check.", {
+                                            //     duration: Toast.durations.SHORT,
+                                            //     position: Toast.positions.BOTTOM,
+                                            //     shadow: false,
+                                            //     backgroundColor: "black",
+                                            //     opacity: 1
+                                            // })
+                                            toastRef.current.show("Split Payments are not summing upto transaction total. Please check.", 2000);
+                                            return;
+                                        } else if (totalValue === props.price) {
+                                            setIsError(false);
+                                        }
+
+                                        callSplitAPI();
+                                    }}
+                                />
                                 <PrimaryButton buttonStyle={styles.splitInputCloseButton} onPress={() => {
                                     if (item.name === "Reward Points") {
                                         dispatch(updateRewardAmount(0));
@@ -1151,15 +1186,15 @@ const PaymentModal = (props) => {
                             <View style={styles.addPaymentButtonContainer}>
                                 <PrimaryButton onPress={() => {
 
-                                setIsSplitPaymentDropdownVisible(true)
-                            }}
-                                buttonStyle={styles.addPaymentButton}
-                                pressableStyle={styles.addPaymentButtonPressable}>
-                                <Entypo name="plus" size={15} color="black" />
-                                <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
-                            </PrimaryButton>
-                        </View> :
-                        null :
+                                    setIsSplitPaymentDropdownVisible(true)
+                                }}
+                                               buttonStyle={styles.addPaymentButton}
+                                               pressableStyle={styles.addPaymentButtonPressable}>
+                                    <Entypo name="plus" size={15} color="black"/>
+                                    <Text style={[textTheme.bodyMedium]}>Add payment method</Text>
+                                </PrimaryButton>
+                            </View> :
+                            null :
                         shownCount !== 4 ?
                             <View style={styles.addPaymentButtonContainer}>
                                 <PrimaryButton onPress={() => {
@@ -1183,218 +1218,309 @@ const PaymentModal = (props) => {
                 <Entypo name="dots-three-horizontal" size={24} color="black"/>
             </PrimaryButton>
             <PrimaryButton buttonStyle={styles.checkoutButton}
-                pressableStyle={[styles.checkoutButtonPressable, isLoading ? {
-                    justifyContent: "center",
-                    paddingVertical: 0,
-                    paddingHorizontal: 0
-                } : null]}
-                onPress={async () => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                    if (!isZeroPayment && (selectedPaymentOption === null || selectedPaymentOption === undefined || selectedPaymentOption === "")) {
-                        toastRef.current.show("Please select any payment method", 2000);
-                        return;
-                    }
-                    setIsLoading(true);
-                    if (isZeroPayment) {
-                        await checkoutBookingAPI(details, cartSliceState, undefined, undefined, splitUpState).then(response => {
-                            if (response.data === null || response.message === "Something went wrong") {
-                                toastRef.current.show(response.other_message, 2000);
-                                return;
-                            } else {
-                                props.setIsInvoiceModalVisible(true);
-                                setTimeout(() => {
-                                    props.onCloseModal();
-                                }, 100)
-                            }
-                            console.log(11);
-                            console.log(response.data[0]);
-                            
-                            updateAPI(response.data[0], "NIL", splitUpState, clientInfo);
-                            setTimeout(() => {
-                                updateLiveStatusAPI(response.data[0].booking_id);
-                                dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
-                                dispatch(updateBookingId(response.data[0].booking_id));
-                                dispatch(loadWalletPriceFromDb(details.id));
-                                dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
-                            }, 500);
-                        });
-                        return;
-                    }
-                    if (selectedPaymentOption === "prepaid" || (selectedPaymentOption === "split_payment" && splitUpState.some(item => (item.mode === "prepaid" && item.shown)))) {
-                        if (selectedPaymentOption === "prepaid") {
-                            dispatch(updateCalculatedPrice(details.id, true, props.price, splitUpState));
-                            try {
-                                await checkoutBookingAPI(details, cartSliceState, true, props.price, splitUpState).then(response => {
-                                    if (response.data === null || response.message === "Something went wrong") {
-                                        // TODO
+                           pressableStyle={[styles.checkoutButtonPressable, isLoading ? {
+                               justifyContent: "center",
+                               paddingVertical: 0,
+                               paddingHorizontal: 0
+                           } : null]}
+                           onPress={async () => {
+                               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                               if (!isZeroPayment && (selectedPaymentOption === null || selectedPaymentOption === undefined || selectedPaymentOption === "")) {
+                                   toastRef.current.show("Please select any payment method", 2000);
+                                   return;
+                               }
+                               setIsLoading(true);
+                               if (isZeroPayment) {
+                                   if (isBookingCheckout) {
+                                       await appointmentForExistingBookingAPI(details, cartSliceState, undefined, undefined, splitUpState, cartGroupingId, cartBookingId).then(response => {
+                                           if (response.data === null || response.message === "Something went wrong") {
+                                               toastRef.current.show(response.other_message, 2000);
+                                               return;
+                                           } else {
+                                               props.setIsInvoiceModalVisible(true);
+                                               setTimeout(() => {
+                                                   props.onCloseModal();
+                                               }, 100)
+                                           }
+                                           updateAPI(response.data.data[0], "NIL", splitUpState, clientInfo);
+                                           setTimeout(() => {
+                                               updateLiveStatusAPI(response.data.data[0].booking_id);
+                                               dispatch(loadInvoiceDetailsFromDb(response.data.data[0].booking_id))
+                                               dispatch(updateBookingId(response.data.data[0].booking_id));
+                                               dispatch(loadWalletPriceFromDb(details.id));
+                                               dispatch(loadBookingDetailsFromDb(response.data.data[0].booking_id));
+                                               dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                                               dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                                               dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
+                                           }, 500);
+                                           setIsLoading(false);
+                                           return;
+                                       })
+                                   }
+                                   await checkoutBookingAPI(details, cartSliceState, undefined, undefined, splitUpState).then(response => {
+                                       if (response.data === null || response.message === "Something went wrong") {
+                                           toastRef.current.show(response.other_message, 2000);
+                                           return;
+                                       } else {
+                                           props.setIsInvoiceModalVisible(true);
+                                           setTimeout(() => {
+                                               props.onCloseModal();
+                                           }, 100)
+                                       }
 
-                                        // Toast.show({
-                                        //     type: ALERT_TYPE.DANGER,
-                                        //     title: "Something went wrong",
-                                        //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
-                                        // autoClose: 1500,
-                                        // });
-                                        toastRef.current.show("Something went wrong", 2000);
-                                        return;
-                                    } else {
-                                        props.setIsInvoiceModalVisible(true);
-                                        setTimeout(() => {
-                                            props.onCloseModal();
-                                        }, 100)
-                                    }
-                                    console.log(22);
-                                    console.log(response.data[0]);
-                            
-                                    updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo).then(res =>
-                                        setTimeout(() => {
-                                            updateLiveStatusAPI(response.data[0].booking_id);
-                                            dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
-                                            dispatch(updateBookingId(response.data[0].booking_id));
-                                            dispatch(loadWalletPriceFromDb(details.id));
-                                            dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
-                                        }, 500)
+                                       updateAPI(response.data[0], "NIL", splitUpState, clientInfo);
+                                       setTimeout(() => {
+                                           updateLiveStatusAPI(response.data[0].booking_id);
+                                           dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                           dispatch(updateBookingId(response.data[0].booking_id));
+                                           dispatch(loadWalletPriceFromDb(details.id));
+                                           dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                       }, 500);
+                                   });
+                                   return;
+                               }
+                               if (selectedPaymentOption === "prepaid" || (selectedPaymentOption === "split_payment" && splitUpState.some(item => (item.mode === "prepaid" && item.shown)))) {
+                                   if (selectedPaymentOption === "prepaid") {
+                                       dispatch(updateCalculatedPrice(details.id, true, props.price, splitUpState));
+                                       try {
+                                           if (isBookingCheckout) {
+                                               await appointmentForExistingBookingAPI(details, cartSliceState, true, props.price, splitUpState, cartGroupingId, cartBookingId).then(response => {
+                                                   if (response.data === null || response.message === "Something went wrong") {
+                                                       toastRef.current.show("Something went wrong", 2000);
+                                                       return;
+                                                   } else {
+                                                       props.setIsInvoiceModalVisible(true);
+                                                       setTimeout(() => {
+                                                           props.onCloseModal();
+                                                       }, 100)
+                                                   }
 
-                                    );
-                                });
-                                return;
-                            } catch (error) {
-                                console.error("An error occurred:", error);
-                            }
-                        } else if (selectedPaymentOption === "split_payment") {
-                            if (splitUpState.some(state => {
-                                if (state.mode === "prepaid" && state.shown) {
-                                    return state.amount > clientInfo.wallet_balance;
-                                }
-                                return false;
-                            })) {
-                                //TODO
-                                toastRef.current.show("Entered prepaid value is greater than prepaid balance", 2000);
-                                setIsLoading(false);
-                                return;
-                            }
-                            let totalPrice = splitUpState.reduce((acc, item) => {
-                                if (item.shown) {
-                                    return Number(Number(item.amount) + Number(acc));
-                                }
-                                return Number(acc);
-                            }, 0)
-                            const price = Math.round(totalPrice * 100) / 100
-                            if (price < props.price || price > props.price) {
-                                //TODO
+                                                   updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo).then(res =>
+                                                       setTimeout(() => {
+                                                           updateLiveStatusAPI(response.data.data[0].booking_id);
+                                                           dispatch(loadInvoiceDetailsFromDb(response.data.data[0].booking_id))
+                                                           dispatch(updateBookingId(response.data.data[0].booking_id));
+                                                           dispatch(loadWalletPriceFromDb(details.id));
+                                                           dispatch(loadBookingDetailsFromDb(response.data.data[0].booking_id));
+                                                           dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                                                           dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                                                           dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
+                                                       }, 500)
+                                                   );
+                                                   setIsLoading(false);
+                                               })
+                                               return;
+                                           }
+                                           await checkoutBookingAPI(details, cartSliceState, true, props.price, splitUpState).then(response => {
+                                               if (response.data === null || response.message === "Something went wrong") {
+                                                   toastRef.current.show("Something went wrong", 2000);
+                                                   return;
+                                               } else {
+                                                   props.setIsInvoiceModalVisible(true);
+                                                   setTimeout(() => {
+                                                       props.onCloseModal();
+                                                   }, 100)
+                                               }
 
-                                toastRef.current.show("Split up not summing to the price", 2000);
-                                setIsLoading(false)
-                                return;
-                            }
-                            dispatch(updateCalculatedPrice(details.id, true, splitUpState.filter(item => {
-                                if (item.mode === "prepaid") return true;
-                            })[0].amount
-                            ), splitUpState);
-                            try {
-                                await checkoutBookingAPI(details, cartSliceState, true, splitUpState.filter(item => {
-                                    if (item.mode === "prepaid") return true;
-                                })[0].amount, splitUpState).then(response => {
-                                    if (response.data === null || response.message === "Something went wrong") {
-                                        // TODO
-                                        toastRef.current.show("Something went wrong", 2000);
+                                               updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo).then(res =>
+                                                   setTimeout(() => {
+                                                       updateLiveStatusAPI(response.data[0].booking_id);
+                                                       dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                                       dispatch(updateBookingId(response.data[0].booking_id));
+                                                       dispatch(loadWalletPriceFromDb(details.id));
+                                                       dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                                   }, 500)
+                                               );
+                                           });
+                                           return;
+                                       } catch (error) {
+                                           console.error("An error occurred:", error);
+                                       }
+                                   } else if (selectedPaymentOption === "split_payment") {
+                                       if (splitUpState.some(state => {
+                                           if (state.mode === "prepaid" && state.shown) {
+                                               return state.amount > clientInfo.wallet_balance;
+                                           }
+                                           return false;
+                                       })) {
+                                           //TODO
+                                           toastRef.current.show("Entered prepaid value is greater than prepaid balance", 2000);
+                                           setIsLoading(false);
+                                           return;
+                                       }
+                                       let totalPrice = splitUpState.reduce((acc, item) => {
+                                           if (item.shown) {
+                                               return Number(Number(item.amount) + Number(acc));
+                                           }
+                                           return Number(acc);
+                                       }, 0)
+                                       const price = Math.round(totalPrice * 100) / 100
+                                       if (price < props.price || price > props.price) {
+                                           //TODO
 
-                                        // Toast.show({
-                                        //     type: ALERT_TYPE.DANGER,
-                                        //     title: "Something went wrong",
-                                        //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
-                                        // autoClose: 1500,
-                                        // });
-                                        return;
-                                    } else {
-                                        props.setIsInvoiceModalVisible(true);
-                                        setTimeout(() => {
-                                            props.onCloseModal();
-                                        }, 100)
-                                    }
-                                    console.log(33);
+                                           toastRef.current.show("Split up not summing to the price", 2000);
+                                           setIsLoading(false)
+                                           return;
+                                       }
+                                       dispatch(updateCalculatedPrice(details.id, true, splitUpState.filter(item => {
+                                               if (item.mode === "prepaid") return true;
+                                           })[0].amount
+                                       ), splitUpState);
+                                       try {
+                                           if (isBookingCheckout) {
+                                               await appointmentForExistingBookingAPI(details, cartSliceState, true, splitUpState.filter(item => {
+                                                   if (item.mode === "prepaid") return true;
+                                               })[0].amount, splitUpState, cartGroupingId, cartBookingId).then(response => {
+                                                   if (response.data === null || response.message === "Something went wrong") {
+                                                       toastRef.current.show("Something went wrong", 2000);
+                                                       return;
+                                                   } else {
+                                                       props.setIsInvoiceModalVisible(true);
+                                                       setTimeout(() => {
+                                                           props.onCloseModal();
+                                                       }, 100)
+                                                   }
+                                                   updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+                                                   setTimeout(() => {
+                                                       updateLiveStatusAPI(response.data.data[0].booking_id);
+                                                       dispatch(loadInvoiceDetailsFromDb(response.data.data[0].booking_id))
+                                                       dispatch(updateBookingId(response.data.data[0].booking_id));
+                                                       dispatch(loadWalletPriceFromDb(details.id));
+                                                       dispatch(loadBookingDetailsFromDb(response.data.data[0].booking_id));
+                                                       dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                                                       dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                                                       dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
+                                                   }, 500);
+                                                   setIsLoading(false);
+                                               })
+                                               return;
+                                           }
+                                           await checkoutBookingAPI(details, cartSliceState, true, splitUpState.filter(item => {
+                                               if (item.mode === "prepaid") return true;
+                                           })[0].amount, splitUpState).then(response => {
+                                               if (response.data === null || response.message === "Something went wrong") {
+                                                   // TODO
+                                                   toastRef.current.show("Something went wrong", 2000);
 
-                                    console.log(response.data[0]);
-                            
-                                    updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
-                                    setTimeout(() => {
-                                        updateLiveStatusAPI(response.data[0].booking_id);
-                                        dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
-                                        dispatch(updateBookingId(response.data[0].booking_id));
-                                        dispatch(loadWalletPriceFromDb(details.id));
-                                        dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
-                                    }, 500);
-                                    return;
-                                });
-                            } catch (error) {
-                                console.error("An error occurred:", error);
-                            }
-                        }
-                    }
-                    try {
-                        if (selectedPaymentOption === "split_payment") {
-                            // let totalPrice = splitUpState.reduce((acc, item) => {
-                            //     if (item.shown) {
-                            //         return item.amount + acc;
-                            //     }
-                            //     return acc;
-                            // }, 0)
-                            let totalCount = 0;
-                            splitUpState.map((prev => {
-                                if (prev.shown) {
-                                    totalCount += Number(prev.amount);
-                                }
-                            }))
-                            const count = Math.round(totalCount * 100) / 100
-                            if (count < props.price || count > props.price) {
-                                //TODO
-                                toastRef.current.show("Split up not summing to the price", 2000);
-                                // Toast.show({
-                                //     type: ALERT_TYPE.WARNING,
-                                //     title: "The split amounts do not add up to the total price",
-                                //     autoClose: 1500,
-                                // });
-                                setIsLoading(false)
-                                return;
-                            }
-                        }
-                        await checkoutBookingAPI(details, cartSliceState, undefined, undefined, splitUpState).then(response => {
-                            if (response.data === null || response.message === "Something went wrong") {
-                                // TODO
+                                                   // Toast.show({
+                                                   //     type: ALERT_TYPE.DANGER,
+                                                   //     title: "Something went wrong",
+                                                   //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                                   // autoClose: 1500,
+                                                   // });
+                                                   return;
+                                               } else {
+                                                   props.setIsInvoiceModalVisible(true);
+                                                   setTimeout(() => {
+                                                       props.onCloseModal();
+                                                   }, 100)
+                                               }
 
-                                // Toast.show({
-                                //     type: ALERT_TYPE.DANGER,
-                                //     title: "Something went wrong",
-                                //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
-                                // autoClose: 1500,
-                                // });
-                                toastRef.current.show(response.other_message, 2000);
+                                               updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+                                               setTimeout(() => {
+                                                   updateLiveStatusAPI(response.data[0].booking_id);
+                                                   dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                                   dispatch(updateBookingId(response.data[0].booking_id));
+                                                   dispatch(loadWalletPriceFromDb(details.id));
+                                                   dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                               }, 500);
+                                               return;
+                                           });
+                                       } catch (error) {
+                                           console.error("An error occurred:", error);
+                                       }
+                                   }
+                               }
+                               try {
+                                   if (selectedPaymentOption === "split_payment") {
+                                       // let totalPrice = splitUpState.reduce((acc, item) => {
+                                       //     if (item.shown) {
+                                       //         return item.amount + acc;
+                                       //     }
+                                       //     return acc;
+                                       // }, 0)
+                                       let totalCount = 0;
+                                       splitUpState.map((prev => {
+                                           if (prev.shown) {
+                                               totalCount += Number(prev.amount);
+                                           }
+                                       }))
+                                       const count = Math.round(totalCount * 100) / 100
+                                       if (count < props.price || count > props.price) {
+                                           //TODO
+                                           toastRef.current.show("Split up not summing to the price", 2000);
+                                           // Toast.show({
+                                           //     type: ALERT_TYPE.WARNING,
+                                           //     title: "The split amounts do not add up to the total price",
+                                           //     autoClose: 1500,
+                                           // });
+                                           setIsLoading(false)
+                                           return;
+                                       }
+                                   }
+                                   if (isBookingCheckout) {
+                                       await appointmentForExistingBookingAPI(details, cartSliceState, undefined, undefined, splitUpState, cartGroupingId, cartBookingId).then(response => {
+                                           if (response.data === null || response.message === "Something went wrong") {
+                                               toastRef.current.show(response.other_message, 2000);
+                                               return;
+                                           } else {
+                                               props.setIsInvoiceModalVisible(true);
+                                               setTimeout(() => {
+                                                   props.onCloseModal();
+                                               }, 100)
+                                           }
 
-                                return;
-                            } else {
-                                props.setIsInvoiceModalVisible(true);
-                                setTimeout(() => {
-                                    props.onCloseModal();
-                                }, 100)
-                            }
-                            console.log(44);
-                            console.log(response.data[0]);
-                            
-                            updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
-                            setTimeout(() => {
-                                updateLiveStatusAPI(response.data[0].booking_id);
-                                dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
-                                dispatch(updateBookingId(response.data[0].booking_id));
-                                dispatch(loadWalletPriceFromDb(details.id));
-                                dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
-                            }, 500);
-                            return;
-                        });
-                    } catch (error) {
-                        console.error("An error occurred:", error);
-                    }
-                    setIsLoading(false);
-                }
-                }
+                                           updateAPI(response.data.data[0], selectedPaymentOption, splitUpState, clientInfo);
+                                           setTimeout(() => {
+                                               updateLiveStatusAPI(response.data.data[0].booking_id);
+                                               dispatch(loadInvoiceDetailsFromDb(response.data.data[0].booking_id))
+                                               dispatch(updateBookingId(response.data.data[0].booking_id));
+                                               dispatch(loadWalletPriceFromDb(details.id));
+                                               dispatch(loadBookingDetailsFromDb(response.data.data[0].booking_id));
+                                               dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                                               dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                                               dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
+                                           }, 500);
+                                           setIsLoading(false);
+                                       })
+                                       return;
+                                   }
+                                   await checkoutBookingAPI(details, cartSliceState, undefined, undefined, splitUpState).then(response => {
+                                       if (response.data === null || response.message === "Something went wrong") {
+                                           // TODO
+
+                                           // Toast.show({
+                                           //     type: ALERT_TYPE.DANGER,
+                                           //     title: "Something went wrong",
+                                           //     textBody: "Adjust the stock quantity on the products page to make it available for sale",
+                                           // autoClose: 1500,
+                                           // });
+                                           toastRef.current.show(response.other_message, 2000);
+
+                                           return;
+                                       } else {
+                                           props.setIsInvoiceModalVisible(true);
+                                           setTimeout(() => {
+                                               props.onCloseModal();
+                                           }, 100)
+                                       }
+
+                                       updateAPI(response.data[0], selectedPaymentOption, splitUpState, clientInfo);
+                                       setTimeout(() => {
+                                           updateLiveStatusAPI(response.data[0].booking_id);
+                                           dispatch(loadInvoiceDetailsFromDb(response.data[0].booking_id))
+                                           dispatch(updateBookingId(response.data[0].booking_id));
+                                           dispatch(loadWalletPriceFromDb(details.id));
+                                           dispatch(loadBookingDetailsFromDb(response.data[0].booking_id));
+                                       }, 500);
+                                       return;
+                                   });
+                               } catch (error) {
+                                   console.error("An error occurred:", error);
+                               }
+                               setIsLoading(false);
+                           }
+                           }
             >
                 {
                     isLoading ?

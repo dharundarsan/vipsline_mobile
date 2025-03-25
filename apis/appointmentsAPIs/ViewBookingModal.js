@@ -28,7 +28,7 @@ import EditBookingCard from "../../components/appointments/editBookingCard";
 import editAppointmentDetailsAPI from "./editAppointmentDetailsAPI";
 import uuid from "react-native-uuid";
 import servicesList from "../../components/checkoutScreen/ServicesList";
-import {loadFutureBookingsFromDB} from "../../store/appointmentsSlice";
+import {loadFutureBookingsFromDB, modifyAppointmentSliceValue} from "../../store/appointmentsSlice";
 import BottomActionCard from "../../ui/BottomActionCard";
 import cancelAppointmentsAPI from "./cancelAppointmentsAPI";
 import {durationToMinutes, formatDuration, getAppointmentWithOldestStartTime} from "../../util/appointmentsHelper";
@@ -732,6 +732,13 @@ const ViewBookingModal = (props) => {
                                 start_time: service.currentStartTime,
                             }));
                         }));
+
+                        dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: true}))
+                        dispatch(modifyAppointmentSliceValue({
+                            field: "cartGroupingId",
+                            value: viewAppointmentDetails.apptList[0].grouping_id
+                        }))
+                        dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: props.data.booking_id}))
 
                         setIsSaveEditAppointmentLoading(false);
                         props.onClose();

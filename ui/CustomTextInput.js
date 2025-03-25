@@ -388,7 +388,7 @@ const CustomTextInput = ({showDropdownArrowIcon = true, ...props}) => {
     return (
         <View style={[styles.commonContainer, props.flex !== undefined ? {flex: 1} : {}, props.container]}>
             {
-                checkNullUndefined(props.labelEnabled) &&
+                !checkNullUndefined(props.labelEnabled) &&
                 <Text style={[textTheme.bodyMedium, styles.labelText, props.labelTextStyle]}>{props.label}{
                     checkNullUndefined(props.required) && props.required ?
                         <RequiredSymbol/> :
