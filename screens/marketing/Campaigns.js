@@ -15,11 +15,13 @@ export default function Campaigns(props) {
             title: "Service Reminders",
             content: "Schedule and manage automated service reminders",
             source: require("../../assets/icons/marketingIcons/service_remainders.png"),
+            onPress: () => props.navigation.navigate("Service Reminders"),
         },
         {
             title: "Greetings",
             content: "Manage birthday and anniversary greetings",
             source: require("../../assets/icons/marketingIcons/greetings.png"),
+            onPress: () => props.navigation.navigate("Greetings")
         }
     ]
 

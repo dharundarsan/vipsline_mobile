@@ -30,7 +30,8 @@ export default function CreateSMSCampaignModal(props) {
         template_list: "",
         credit_per_sms: 0,
         sms_char_count: 0,
-        total_sms_credit: 0
+        total_sms_credit: 0,
+        type: "campaign",
     });
     const [edit, setEdit] = useState(false);
     const [segmentSubCategories, setSegmentSubCategories] = useState([]);
@@ -487,7 +488,7 @@ const styles = StyleSheet.create({
         paddingTop: 16,
         overflow: 'hidden',
         marginBottom: 32,
-        marginTop: 8
+        marginTop: 8,
 
     }
 

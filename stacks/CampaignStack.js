@@ -23,6 +23,19 @@ import Campaigns from "../screens/marketing/Campaigns";
 import SMSCampaign from "../screens/marketing/SMSCampaign";
 import SMSCampaignLandingPage from "../screens/marketing/SMSCampaignLandingpage";
 import Dashboard from "../screens/marketing/Dashboard";
+import ServiceRemaindersLandingPage from "../screens/marketing/ServiceRemaindersLandingPage";
+import ServiceRemindersLandingPage from "../screens/marketing/ServiceRemaindersLandingPage";
+import Reminders from "../screens/marketing/Reminders";
+import ServiceReminders from "../screens/marketing/ServiceReminders";
+import GreetingsLandingPage from "../components/marketing/greetings/GreetingsLandingPage";
+import Greetings from "../components/marketing/greetings/Greetings";
+import GreetingsList from "../components/marketing/greetings/GreetingsList";
+import WhatsAppReminderReport from "../screens/marketing/WhatsAppReminderReport";
+import SMSReminderReport from "../screens/marketing/SMSReminderReport";
+import {ServiceReminderReports} from "../screens/marketing/Reports";
+import {GreetingsReport} from "../screens/marketing/GreetingsReport";
+import GreetingSMSReport from "../screens/marketing/GreetingSMSReport";
+
 
 export const BackButton = (props) => {
     const navigation = useNavigation();
@@ -160,88 +173,170 @@ const CampaignStack = () => {
             })}
 
         />
-        {/*<Stack.Screen*/}
-        {/*    name="Commission Profile"*/}
-        {/*    component={staffBackHandler(CommissionProfileScreen)}*/}
-        {/*    options={({navigation, route}) => ({*/}
-        {/*        headerShown: true,*/}
-        {/*        headerTitleAlign: "center",*/}
-        {/*        headerLeft: () => <BackButton currentRouteName={route.name}/>,*/}
-        {/*        // animation:'ios_from_right'*/}
-        {/*        headerTitleStyle: {*/}
-        {/*            ...textTheme.titleMedium,*/}
-        {/*            fontSize: 20,*/}
+        <Stack.Screen
+            name="Service Reminders Landing Page"
+            component={staffBackHandler(ServiceRemindersLandingPage)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
 
-        {/*        }*/}
+                }
 
-        {/*    })}*/}
+            })}
 
-        {/*/>*/}
-        {/*<Stack.Screen*/}
-        {/*    name="Staff Commission"*/}
-        {/*    component={staffBackHandler(StaffCommissionScreen)}*/}
-        {/*    options={({navigation, route}) => ({*/}
-        {/*        headerShown: true,*/}
-        {/*        headerTitleAlign: "center",*/}
-        {/*        headerLeft: () => <BackButton currentRouteName={route.name}/>,*/}
-        {/*        // animation:'ios_from_right'*/}
-        {/*        headerTitleStyle: {*/}
-        {/*            ...textTheme.titleMedium,*/}
-        {/*            fontSize: 20,*/}
+        />
+        <Stack.Screen
+            name="Reminders"
+            component={staffBackHandler(Reminders)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+                }
 
-        {/*        }*/}
+            })}
 
-        {/*    })}*/}
+        />
+        <Stack.Screen
+            name="Service Reminders"
+            component={staffBackHandler(ServiceReminders)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
 
-        {/*/>*/}
-        {/*<Stack.Screen*/}
-        {/*    name="Business Closed Dates"*/}
-        {/*    component={staffBackHandler(BusinessClosedDates)}*/}
-        {/*    options={({navigation, route}) => ({*/}
-        {/*        headerShown: true,*/}
-        {/*        headerTitleAlign: "center",*/}
-        {/*        headerLeft: () => <BackButton currentRouteName={route.name}/>,*/}
-        {/*        // animation:'ios_from_right'*/}
-        {/*        headerTitleStyle: {*/}
-        {/*            ...textTheme.titleMedium,*/}
-        {/*            fontSize: 20,*/}
+                }
 
-        {/*        }*/}
+            })}
 
-        {/*    })}*/}
+        />
+        <Stack.Screen
+            name="Greetings Landing Page"
+            component={staffBackHandler(GreetingsLandingPage)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                // animation:'ios_from_right'
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+                }
+            })}
 
-        {/*/>*/}
-        {/*<Stack.Screen*/}
-        {/*    name="Time Off Type"*/}
-        {/*    component={staffBackHandler(StaffTimeOffTypeScreen)}*/}
-        {/*    options={({navigation, route}) => ({*/}
-        {/*        headerShown: true,*/}
-        {/*        headerTitleAlign: "center",*/}
-        {/*        headerLeft: () => <BackButton currentRouteName={route.name}/>,*/}
-        {/*        // animation:'ios_from_right'*/}
-        {/*        headerTitleStyle: {*/}
-        {/*            ...textTheme.titleMedium,*/}
-        {/*            fontSize: 20,*/}
+        />
+        <Stack.Screen
+            name="Greetings"
+            component={staffBackHandler(Greetings)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
 
-        {/*        }*/}
+                }
+            })}
+        />
+        <Stack.Screen
+            name="Greetings List"
+            component={staffBackHandler(GreetingsList)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
 
-        {/*    })}*/}
+                }
+            })}
+        />
 
-        {/*/>*/}
-        {/*<Stack.Screen*/}
-        {/*    name="Staff Name"*/}
-        {/*    component={staffBackHandler(StaffInfo)}*/}
-        {/*    options={({navigation, route}) => ({*/}
-        {/*        headerShown: true,*/}
-        {/*        headerTitleAlign: "center",*/}
-        {/*        headerLeft: () => <BackButton currentRouteName={route.name}/>,*/}
-        {/*        headerTitleStyle: {*/}
-        {/*            ...textTheme.titleMedium,*/}
-        {/*            fontSize: 20,*/}
+        <Stack.Screen
+            name="Service Reminders Reports"
+            component={staffBackHandler(ServiceReminderReports)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
 
-        {/*        }*/}
-        {/*    })}*/}
-        {/*/>*/}
+                }
+            })}
+        />
+        <Stack.Screen
+            name="Whatsapp Reminder"
+            component={staffBackHandler(WhatsAppReminderReport)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
+            })}
+        />
+        <Stack.Screen
+            name="SMS Reminder"
+            component={staffBackHandler(SMSReminderReport)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
+            })}
+        />
+        <Stack.Screen
+            name="Greetings Report"
+            component={staffBackHandler(GreetingsReport)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
+            })}
+        />
+        <Stack.Screen
+            name="Greeting SMS Report"
+            component={staffBackHandler(GreetingSMSReport)}
+            options={({navigation, route}) => ({
+                headerShown: true,
+                headerTitleAlign: "center",
+                headerLeft: () => <BackButton currentRouteName={route.name}/>,
+                headerTitleStyle: {
+                    ...textTheme.titleMedium,
+                    fontSize: 20,
+
+                }
+            })}
+        />
     </Stack.Navigator>)
 }
 

@@ -15,26 +15,32 @@ import {DynamicBoldText} from "./DynamicBoldText";
 export default function ChooseTemplateModal(props) {
     const toastRef = useRef(null);
     const [templateNames, setTemplateNames] = useState([]);
-    const [templateName, setTemplateName] = useState(props.edit ? props.templateData.template_name : "My Template");
-    const [listOfSMSTemplates, setListOfSMSTemplates] = useState(props.edit ? props.templateData.template_list : []);
-    const [isLoading, setIsLoading] = useState(false)
+    const [templateName, setTemplateName] = useState(
+        props.edit ?
+            props.templateData.template_name :
+            props.templateData.type === "campaign" ?
+                "My Template" : props.templateData.type === "service_reminder" ?
+                "service_reminder" : props.greetingType.split(" ")[0]
+
+    );
+    const [listOfSMSTemplates, setListOfSMSTemplates] = useState(props.type === "greetings" ? props.templateList : props.edit ?  props.templateData.template_list : []);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     useEffect(() => {
         if(!props.edit) {
-            getListOfSMSTemplatesByType(7).then((response) => {
+            getListOfSMSTemplatesByType(
+                props.templateData.type === "campaign" ?
+                7 : props.templateData.type === "service_reminder" ? 10 : props.templateTypeId
+            ).then((response) => {
                 setListOfSMSTemplates(response.data.data);
             })
         }
-        getListOfPromotionTypesAPI().then((response) => {
+        getListOfPromotionTypesAPI(props.templateData.type).then((response) => {
             setTemplateNames(response.data.data);
-        });
-
+        })
 
     }, []);
-
-
-
-
 
     function renderItem({item}) {
         return <View style={styles.templateCard}>
@@ -46,13 +52,12 @@ export default function ChooseTemplateModal(props) {
                 textStyle={[textTheme.bodyMedium]}
                 onPress={() => {
                     setIsLoading(true);
+
                     const updated = listOfSMSTemplates.map((template) => ({
                         ...template,
-                        is_assigned: item === template,
+                        is_assigned: item === template
                     }))
-                    //
-
-
+                    setListOfSMSTemplates(updated);
 
                     calculatePricingForSMSCampaign(item.sample_template).then((response) => {
                         const res = response.data.data[0];
@@ -67,14 +72,12 @@ export default function ChooseTemplateModal(props) {
                             })),
                             credit_per_sms: res.credit_per_sms,
                             sms_char_count: res.sms_character_count,
-                            total_sms_credit: res.total_sms_credit
+                            total_sms_credit: res.total_sms_credit,
+                            variables: item.variables
                         }));
                         setIsLoading(false);
                         props.onClose();
                     })
-                    setListOfSMSTemplates(updated);
-
-
                 }}
             >
                 {
@@ -93,8 +96,6 @@ export default function ChooseTemplateModal(props) {
             </PrimaryButton>
         </View>
     }
-
-
 
     return <Modal
         visible={props.visible}
