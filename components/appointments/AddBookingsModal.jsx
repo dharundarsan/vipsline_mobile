@@ -26,8 +26,9 @@ import Toast from "../../ui/Toast";
 import clockDropdownData from "../../data/clockDropdownData";
 import getAppointmentDetailsAPI from "../../apis/appointmentsAPIs/getAppointmentDetailsAPI";
 import {modifyClientId} from "../../store/cartSlice";
-import {clearClientInfo} from "../../store/clientInfoSlice";
+import {clearClientInfo, loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
+import MoreOptionDropDownModal from "../clientSegmentScreen/MoreOptionDropDownModal";
 
 const AddBookingsModal = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -44,12 +45,13 @@ const AddBookingsModal = (props) => {
     const [isCreateBookingLoading, setIsCreateBookingLoading] = useState(false);
     const toastRef = useRef();
     const [isClientInfoModalVisible, setIsClientInfoModalVisible] = useState(false)
-    
+
+    const [modalVisibility, setModalVisibility] = useState(false)
     //Client
     const [clientSelectedOption, setClientSelectedOption] = useState()
     const [clientFilterPressed, setClientFilterPressed] = useState()
     const [clientSearchClientQuery, setClientSearchClientQuery] = useState()
-    const [isEditClientModalVisible, setIsEditClientModalVisible] = useState()
+    const [isEditClientModalVisible, setIsEditClientModalVisible] = useState(false)
 
     const getFirstBookingStartDate = (servicesList) => {
         let min = Infinity;
@@ -128,10 +130,11 @@ const AddBookingsModal = (props) => {
             setFilterPressed={setClientFilterPressed} //c 
             searchClientQuery={clientSearchClientQuery}//c
             setSearchQuery={setClientSearchClientQuery}//c
-            modalVisibility={isClientInfoModalVisible}
-            setModalVisibility={setIsClientInfoModalVisible}
-            setEditClientModalVisibility={isEditClientModalVisible}
-            editClientOption={() => {}}
+            modalVisibility={modalVisibility}
+            setModalVisibility={setModalVisibility}
+            setEditClientModalVisibility={setIsEditClientModalVisible}
+            editClientOption={() => {
+            }}
             visible={isClientInfoModalVisible}
             setVisible={setIsClientInfoModalVisible}
             closeModal={() => {
@@ -147,6 +150,21 @@ const AddBookingsModal = (props) => {
 
             }}
         />}
+        {
+            modalVisibility &&
+            <MoreOptionDropDownModal
+                selectedOption={clientSelectedOption}
+                setSelectedOption={setClientSelectedOption}
+                isVisible={modalVisibility}
+                onCloseModal={() => setModalVisibility(false)}
+                dropdownItems={[
+                    "Edit client",
+                    "Delete client",
+                ]}
+                setOption={setClientSelectedOption}
+                setModalVisibility={setModalVisibility}
+            />
+        }
 
         {isAddClientModalVisible && <NewBookingAddClientModal
             onSelect={(staff) => {
@@ -294,6 +312,8 @@ const AddBookingsModal = (props) => {
                         <View style={{borderRadius: 1000, overflow: "hidden"}}>
                             <Pressable
                                 onPress={() => {
+                                    dispatch(loadClientInfoFromDb(selectedClient.id));
+                                    dispatch(loadAnalyticsClientDetailsFromDb(selectedClient.id));
                                     setIsClientInfoModalVisible(true)
                                 }}
                                 android_ripple={{

@@ -55,14 +55,21 @@ const EditBookingCard = (props) => {
                     <Text style={{color: Colors.grey500, fontWeight: "700", fontSize: 12}}>START TIME</Text>
                     <CustomTextInput type="dropdown"
                                      container={{
-                                         marginVertical: 10,
-                                         marginBottom: 10,
+                                         // marginVertical: 10,
+                                         // marginBottom: 10,
                                          marginRight: 10,
-                                         alignSelf: "flex-start",
+                                         // alignSelf: "flex-start",
                                          flex: 1,
                                      }}
                                      showDropdownArrowIcon={false}
-                                     dropdownButton={{borderRadius: 5, marginVertical: 0}}
+                                     dropdownButton={{
+                                         borderWidth: 0,
+                                         borderBottomWidth: 2,
+                                         borderRadius: 0,
+                                         marginVertical: 0,
+                                         backgroundColor: "#F8F8FB",
+                                         borderColor: Colors.highlight,
+                                     }}
                                      dropdownPressable={{
                                          paddingVertical: 5,
                                          paddingHorizontal: 0,
@@ -90,14 +97,21 @@ const EditBookingCard = (props) => {
                     <Text style={{color: Colors.grey500, fontWeight: "700", fontSize: 12}}>DURATION</Text>
                     <CustomTextInput type="dropdown"
                                      container={{
-                                         marginVertical: 10,
-                                         marginBottom: 10,
+                                         // marginVertical: 10,
+                                         // marginBottom: 10,
                                          marginRight: 10,
-                                         alignSelf: "flex-start",
+                                         // alignSelf: "flex-start",
                                          flex: 1,
                                      }}
                                      showDropdownArrowIcon={false}
-                                     dropdownButton={{borderRadius: 5, marginVertical: 0}}
+                                     dropdownButton={{
+                                         borderWidth: 0,
+                                         borderBottomWidth: 2,
+                                         borderRadius: 0,
+                                         marginVertical: 0,
+                                         backgroundColor: "#F8F8FB",
+                                         borderColor: Colors.highlight,
+                                     }}
                                      dropdownPressable={{
                                          paddingVertical: 5,
                                          paddingHorizontal: 0,
@@ -123,7 +137,7 @@ const EditBookingCard = (props) => {
 
             <View style={{alignSelf: "flex-end"}}>
                 <CustomTextInput type="dropdown"
-                                 container={{marginVertical: 10, marginBottom: 10, marginRight: 10}}
+                                 container={{marginBottom: 10, marginRight: 10}}
                                  dropdownButton={{width: 200, borderRadius: 1000, marginVertical: 0}}
                                  dropdownPressable={{paddingVertical: 5, paddingHorizontal: 20}}
                                  dropdownLabelTextStyle={{fontSize: 14}}

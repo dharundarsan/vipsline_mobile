@@ -5,7 +5,7 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {updateNavigationState} from "../../store/NavigationSlice";
 import {AntDesign, Feather, Ionicons, MaterialIcons, Octicons} from "@expo/vector-icons";
 import React, {useEffect, useRef, useState} from "react";
-import {shadowStyling, showToast} from "../../util/Helpers";
+import {checkAPIError, shadowStyling, showToast} from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import CustomTextInput from "../../ui/CustomTextInput";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
@@ -333,10 +333,24 @@ const ViewBookingModal = (props) => {
                         fontSize: 18
                     }}>{getStatusColorAndText(currentAppointmentStatus)?.text}</Text>
                 </View>
-                <View style={{flexDirection: "row"}}>
+                <View style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                }}>
                     <CustomTextInput type="dropdown"
-                                     container={{marginVertical: 10, marginBottom: 10, marginRight: 10}}
-                                     dropdownButton={{width: 125, borderRadius: 1000, marginVertical: 0}}
+                                     container={{
+                                         marginRight: 10,
+                                         marginBottom: 0,
+                                         marginVertical: 0,
+                                         paddingVertical: 0,
+                                     }}
+                                     labelEnabled={false}
+                                     dropdownButton={{
+                                         width: 125,
+                                         borderRadius: 1000,
+                                         marginVertical: 0,
+                                         paddingVertical: 0
+                                     }}
                                      dropdownPressable={{paddingVertical: 5, paddingHorizontal: 15}}
                                      dropdownLabelTextStyle={{fontSize: 14}}
                                      value={{
@@ -370,6 +384,8 @@ const ViewBookingModal = (props) => {
                                      dropdownItems={appointmentStatuses}/>
                     <PrimaryButton
                         buttonStyle={{
+                            marginVertical: 0,
+                            paddingVertical: 0,
                             backgroundColor: Colors.white,
                         }}
                         pressableStyle={styles.closeButtonPressable}
@@ -659,11 +675,6 @@ const ViewBookingModal = (props) => {
                         const addedServices = currentServicesList.filter(service => service.type === "add")
                         const deletedServices = currentServicesList.filter(service => service.type === "remove")
 
-                        console.log("addedServices")
-                        console.log(addedServices)
-                        console.log("editedServices")
-                        console.log(editedServices)
-
                         if (editedServices.some(e => e.currentSelectedStaff === null) || addedServices.some(a => a.currentSelectedStaff === null)) {
                             toastRef.current.show("Please assign staff", true);
                             return;
@@ -708,12 +719,15 @@ const ViewBookingModal = (props) => {
                             console.log("HHHHHH")
                             console.log("resres")
                             console.log(res.data)
+                            checkAPIError(res)
                             setIsSaveEditAppointmentLoading(false)
-                        }).finally(() => {
-                            console.log("AAAAAA")
+                            props.onClose();
+                        }).catch((err) => {
                             setIsSaveEditAppointmentLoading(false)
+                            console.log(err.data.other_message)
+                            toastRef.current.show(err.data.other_message, true);
+                            return;
                         })
-                        props.onClose();
                     } else {
                         setIsSaveEditAppointmentLoading(true);
 
