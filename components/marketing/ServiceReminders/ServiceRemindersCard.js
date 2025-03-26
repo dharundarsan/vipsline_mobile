@@ -43,7 +43,10 @@ export default function ServiceRemindersCard(props) {
                     <Image source={require("../../../assets/icons/marketingIcons/smsCampaign/contact.png")} style={styles.image}/>
                     <Text style={[textTheme.bodyMedium]}>{props.type}</Text>
                 </View>
-                <Text style={[textTheme.bodyMedium]}>Total Services Selected</Text>
+                {
+                    props.count &&
+                    <Text style={[textTheme.bodyMedium]}>Total Services Selected</Text>
+                }
             </View>
             <View style={styles.rightContainer}>
                 <View style={styles.dateContainer}>
@@ -66,9 +69,9 @@ export default function ServiceRemindersCard(props) {
             </View>
             <View style={{marginRight: 32, alignItems: "center", justifyContent: 'center'}}>
                 <CustomSwitch
-                    isOn={props.active_status}
+                    isOn={props.toggleStatus}
                     color={Colors.highlight}
-                    onToggle={() => setToggle(!toggle)}
+                    onToggle={() => props.onToggle()}
 
                 />
             </View>
