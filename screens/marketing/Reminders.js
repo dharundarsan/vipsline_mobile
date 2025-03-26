@@ -7,6 +7,7 @@ import {useEffect, useRef, useState} from "react";
 import ConfigureReminderModal from "../../components/marketing/ServiceReminders/ConfigureReminderModal";
 import getListOfServiceRemindersAPI from "../../apis/marketingAPI/serviceRemindersAPI/getListOfServiceRemindersAPI";
 import Toast from "../../ui/Toast";
+import updateServiceReminderAPI from "../../apis/marketingAPI/serviceRemindersAPI/updateServiceReminderAPI";
 
 export default function Reminders(props) {
     const [configureReminderVisibility, setConfigureReminderVisibility] = useState(false);
@@ -36,6 +37,24 @@ export default function Reminders(props) {
                 setEdit(true);
                 setConfigureReminderVisibility(true);
             }}
+            onToggle={() => {
+                updateServiceReminderAPI({
+                    id: item.id,
+                    sms_status: item.notification_type === "sms" ? !item.sms_status : undefined,
+                    whatsapp_status: item.notification_type === "whatsapp" ? !item.whatsapp_status : undefined,
+                }).then((res) => {
+                    getListOfServiceRemindersAPI().then((response) => {
+                        setListOfServiceReminders(response.data.data[0].campaign_list);
+                        if (response.data.data[0].campaign_list.length === 0) {
+                            setIsCampaignListEmpty(true);
+                        }
+                        else {
+                            setIsCampaignListEmpty(false);
+                        }
+                    })
+                })
+            }}
+            toggleStatus={item.notification_type === "sms" ? item.sms_status : item.whatsapp_status}
 
         />
     }
