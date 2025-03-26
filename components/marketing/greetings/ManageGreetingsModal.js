@@ -104,7 +104,7 @@ export default function ManageGreetingsModal(props) {
                     template,
                     templateStringWithBoldChar: selected_template,
                     template_message: selected_template,
-                    send_days_before: parseInt(send_days_before.split(" ")[0]),
+                    send_days_before: send_days_before === `On ${greetingType?.split(" ")[0]}` ? 0 : parseInt(send_days_before.split(" ")[0]),
                     delivery_time,
                     template_id,
                     credits_per_sms : credit_per_sms,
@@ -120,7 +120,7 @@ export default function ManageGreetingsModal(props) {
 
         }
         else {
-            toastRef.current.show(response.data.message);
+            toastRef.current.show(response.data.other_message);
         }
     }
     async function onUpdate() {
@@ -151,7 +151,7 @@ export default function ManageGreetingsModal(props) {
                     templateMappingId: addMore ? undefined : templateMappingId,
                     templateStringWithBoldChar: selected_template,
                     template_message: selected_template,
-                    send_days_before: parseInt(send_days_before.split(" ")[0]),
+                    send_days_before: send_days_before === `On ${greetingType?.split(" ")[0]}` ? 0 : parseInt(send_days_before.split(" ")[0]),
                     delivery_time,
                     template_id,
                     credits_per_sms : credit_per_sms,
@@ -168,7 +168,7 @@ export default function ManageGreetingsModal(props) {
 
         }
         else {
-            toastRef.current.show(response.data.message);
+            toastRef.current.show(response.data.other_message);
         }
 
     }
@@ -188,7 +188,7 @@ export default function ManageGreetingsModal(props) {
                     addMore: false,
                     editTemplate: false,
                     templateStringWithBoldChar: item.templateStringWithBoldChar || "",
-                    send_days_before: item.send_days_before + " day before" || "",
+                    send_days_before: item.send_days_before === 0 ? `On ${greetingType?.split(" ")[0]}` : item.send_days_before + " day before" || "",
                     template: "", // Assuming this is the mapping value
                     delivery_time: item.delivery_time || "",
                     mode: "",

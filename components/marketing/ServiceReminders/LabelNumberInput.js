@@ -4,7 +4,7 @@ import Colors from "../../../constants/Colors";
 import textTheme from "../../../constants/TextTheme";
 
 export default function LabelNumberInput({ reminder_no, days, updateReminder }) {
-    const [inputValue, setInputValue] = useState(days === 0 ? "" : days.toString());
+    const [inputValue, setInputValue] = useState(days === 0 ? "" : days?.toString());
 
     const handleChange = (text) => {
         const value = text.replace(/[^0-9]/g, ""); // Allow only numbers

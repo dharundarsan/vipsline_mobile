@@ -9,6 +9,7 @@ import getListOfGreetingsAPI from "../../../apis/marketingAPI/greetingsAPI/getLi
 import ManageGreetingsModal from "./ManageGreetingsModal";
 import GreetingsLandingPage from "./GreetingsLandingPage";
 import ThreeDotActionIndicator from "../../../ui/ThreeDotActionIndicator";
+import updateGreetingsAPI from "../../../apis/marketingAPI/greetingsAPI/updateGreetingsAPI";
 
 export default function GreetingsList(props) {
     const [getGreetingsList, setGetGreetingsList] = useState([]);
@@ -38,6 +39,27 @@ export default function GreetingsList(props) {
                 setSelectedGreetingsData(item)
                 setManageGreetingsVisibility(true);
             }}
+            onToggle={() => {
+                updateGreetingsAPI({
+                    id: item.id,
+                    sms_status: !item.sms_status
+                }).then(() => {
+                    // setIsLoading(true);
+                    getListOfGreetingsAPI().then((response) => {
+                        setGetGreetingsList(response.data.data[0].campaign_list);
+                        if (response.data.data[0].campaign_list.length === 0) {
+                            setIsCampaignListEmpty(true);
+                            props.navigation.setOptions({ title: 'Greetings Landing Page' });
+                        }
+                        else {
+                            setIsCampaignListEmpty(false);
+                            props.navigation.setOptions({ title: 'Greetings List' });
+                        }
+                        // setIsLoading(false);
+                    })
+                })
+            }}
+            toggleStatus={item.sms_status}
         />
     }
     useEffect(() => {

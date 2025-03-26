@@ -5,7 +5,7 @@ import textTheme from "../../../constants/TextTheme";
 import PrimaryButton from "../../../ui/PrimaryButton";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import Divider from "../../../ui/Divider";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import Colors from "../../../constants/Colors";
 import CustomTextInput from "../../../ui/CustomTextInput";
 import {RadioButton} from "react-native-paper";
@@ -49,6 +49,7 @@ export default function ConfigureReminderModal(props) {
                 reminder_no: 1,
                 days: 0,
                 id: null,
+                edited: false,
             },
             {
                 name: "subsequent reminders",
@@ -56,6 +57,7 @@ export default function ConfigureReminderModal(props) {
                 reminder_no: 2,
                 days: 0,
                 id: null,
+                edited: false,
             }
         ],
         "Custom Interval": [
@@ -65,6 +67,7 @@ export default function ConfigureReminderModal(props) {
                 reminder_no: 1,
                 days: 0,
                 id: null,
+                edited: false,
 
             },
             {
@@ -73,6 +76,7 @@ export default function ConfigureReminderModal(props) {
                 reminder_no: 2,
                 days: 0,
                 id: null,
+                edited: false,
 
             },
             {
@@ -81,6 +85,7 @@ export default function ConfigureReminderModal(props) {
                 reminder_no: 3,
                 days: 0,
                 id: null,
+                edited: false,
 
             },
             {
@@ -89,6 +94,7 @@ export default function ConfigureReminderModal(props) {
                 reminder_no: 4,
                 days: 0,
                 id: null,
+                edited: false,
 
             },
             {
@@ -97,6 +103,7 @@ export default function ConfigureReminderModal(props) {
                 reminder_no: 5,
                 days: 0,
                 id: null,
+                edited: false,
 
             },
 
@@ -114,34 +121,88 @@ export default function ConfigureReminderModal(props) {
     const reminderDeliveryTimeRef = useRef(null);
 
 
+    const hasErrors = useMemo(() => {
+        return (reminderInterval !== "" && reminderCount !== "" && reminderInterval === "Custom Interval" ?
+            automatedReminderRulesData[reminderInterval].slice(0, reminderCount) :
+            reminderInterval === "Fixed Interval" && reminderCount === 1 ?
+                [automatedReminderRulesData[reminderInterval][0]] : automatedReminderRulesData[reminderInterval])?.some((item, index) => {
+            if (reminderInterval === "Fixed Interval" && item.edited && item.days <= 0) {
+                return true;
+            }
+            else if (reminderInterval === "Custom Interval" && index === 0 && item.edited && item.days <= 0) {
+                return true;
+            }
+            else if (reminderInterval === "Custom Interval" && index > 0 && item.edited && automatedReminderRulesData[reminderInterval][index - 1].days > item.days) {
+                return true;
+            }
+            return false;
+        });
+    }, [automatedReminderRulesData, reminderInterval]);
+
+
 
 
     const updateReminderDays = (reminder_no, days) => {
         setAutomatedReminderRulesData((prevData) => ({
             ...prevData,
             [reminderInterval]: prevData[reminderInterval].map((item) =>
-                item.reminder_no === reminder_no ? { ...item, days } : item
+                item.reminder_no === reminder_no ? { ...item, days, edited: true } : item
             ),
         }));
     };
 
-    const renderItem = ({ item }) => (
+    const renderItem = ({ item, index }) => {
+        const current_list = reminderInterval === "Custom Interval" ?
+            automatedReminderRulesData[reminderInterval].slice(0, reminderCount) :
+            reminderInterval === "Fixed Interval" && reminderCount === 1 ?
+                [automatedReminderRulesData[reminderInterval][0]] : automatedReminderRulesData[reminderInterval];
+        console.log(reminderInterval)
+        const errorMessage =
+            reminderInterval === "Fixed Interval" && item.edited && item.days <= 0 ?
+                "Reminder days should be greater than 0" :
+                reminderInterval === "Custom Interval" && index === 0 && item.edited && item.days <= 0 ?
+                    "Reminder days should be greater than 0" :
+                    reminderInterval === "Custom Interval" && index > 0 && item.edited && current_list[index - 1].days >= item.days ?
+                        `Enter the reminder days greater than Reminder ${index}` :
+                        null;
 
-        <View style={styles.automatedReminderRuleItemContainer}>
-            <Text style={[textTheme.bodyMedium, { color: Colors.highlight, width: "30%", paddingLeft: 8 }]}>
-                {item.name}
-            </Text>
-            <View style={{ gap: 12, paddingVertical: 8, flex: 1, width: "70%" }}>
-                <Text style={[textTheme.bodyMedium, { flex: 1 }]} numberOfLines={3} ellipsizeMode={"tail"}>
-                    {item.first_line}
+        return <>
+            <View style={styles.automatedReminderRuleItemContainer}>
+                <Text style={[textTheme.bodyMedium, {color: Colors.highlight, width: "30%", paddingLeft: 8}]}>
+                    {item.name}
                 </Text>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    {item.name !== "subsequent reminders" && <Text>After</Text>}
-                    <LabelNumberInput reminder_no={item.reminder_no} days={item.days} updateReminder={updateReminderDays} />
+                <View style={{gap: 12, paddingVertical: 8, flex: 1, width: "70%"}}>
+                    <Text style={[textTheme.bodyMedium, {flex: 1}]} numberOfLines={3} ellipsizeMode={"tail"}>
+                        {item.first_line}
+                    </Text>
+                    <View style={{flexDirection: "row", alignItems: "center", gap: 12}}>
+                        {item.name !== "subsequent reminders" && <Text>After</Text>}
+                        <LabelNumberInput reminder_no={item.reminder_no} days={item.days}
+                                          updateReminder={updateReminderDays}/>
+
+                    </View>
+                    {/*{*/}
+                    {/*    reminderInterval === "Fixed Interval" ?*/}
+                    {/*        item.edited && item.days <= 0 &&*/}
+                    {/*        <Text style={[textTheme.bodyMedium, {color: Colors.error, fontSize: 12}]}>Reminder days should be greater than 0</Text> :*/}
+                    {/*        index === 0 ?*/}
+                    {/*            item.edited && item.days <= 0 &&*/}
+                    {/*            <Text style={[textTheme.bodyMedium, {color: Colors.error, fontSize: 12}]}>Reminder days should be greater than 0</Text> :*/}
+                    {/*            item.edited && current_list[index - 1].days > item.days ?*/}
+                    {/*                <Text style={[textTheme.bodyMedium, {color: Colors.error, fontSize: 12}]}>Enter the reminder days greater than Reminder {index}</Text> :*/}
+                    {/*                <></>*/}
+                    {/*}*/}
+
+                    {errorMessage && <Text style={[textTheme.bodyMedium, {color: Colors.error, fontSize: 12}]}>{errorMessage}</Text>}
+
+
                 </View>
+
             </View>
-        </View>
-    );
+
+            <Divider />
+        </>
+    }
 
     // console.log(automatedReminderRulesData[reminderInterval].splice(0))
 
@@ -153,10 +214,10 @@ export default function ConfigureReminderModal(props) {
         const reminderCountValid = reminderCountRef.current();
         const reminderDeliveryTimeValid = templateData.selected_template === "" ? true : reminderDeliveryTimeRef.current();
 
-        const isAutomatedReminderRulesEmpty = reminderInterval === "Custom Interval" ?
+        const isAutomatedReminderRulesEmpty = (reminderInterval === "Custom Interval" ?
             automatedReminderRulesData[reminderInterval].slice(0, reminderCount) :
             reminderInterval === "Fixed Interval" && reminderCount === 1 ?
-                [automatedReminderRulesData[reminderInterval][0]] : automatedReminderRulesData[reminderInterval].filter((item) => item.days === 0 || item.days === "").length > 0;
+                [automatedReminderRulesData[reminderInterval][0]] : automatedReminderRulesData[reminderInterval]).filter((item) => item.days === 0 || item.days === "").length > 0;
 
 
 
@@ -165,13 +226,17 @@ export default function ConfigureReminderModal(props) {
         }
 
         if (templateData.selected_template === "") {
-            toastRef.current.show("please select any template to proceed", true);
+            toastRef.current.show("please select any template to proceed");
             return;
         }
 
-        console.log(isAutomatedReminderRulesEmpty);
+        // console.log(JSON.stringify(automatedReminderRulesData, null, 2));
         if (isAutomatedReminderRulesEmpty) {
-            toastRef.current.show("Number of days should not be empty", true);
+            toastRef.current.show("Number of days should not be empty");
+            return;
+        }
+
+        if (hasErrors) {
             return;
         }
 
@@ -211,6 +276,38 @@ export default function ConfigureReminderModal(props) {
     }
 
     async function onUpdate() {
+
+        const ruleNameValid = reminderRuleNameRef.current();
+        const selectServicesValid = selectServicesRef.current();
+        const reminderIntervalValid = reminderIntervalRef.current();
+        const reminderCountValid = reminderCountRef.current();
+        const reminderDeliveryTimeValid = templateData.selected_template === "" ? true : reminderDeliveryTimeRef.current();
+
+        const isAutomatedReminderRulesEmpty = (reminderInterval === "Custom Interval" ?
+            automatedReminderRulesData[reminderInterval].slice(0, reminderCount) :
+            reminderInterval === "Fixed Interval" && reminderCount === 1 ?
+                [automatedReminderRulesData[reminderInterval][0]] : automatedReminderRulesData[reminderInterval]).filter((item) => item.days === 0 || item.days === "").length > 0;
+
+
+
+        if (!ruleNameValid || !reminderIntervalValid || !reminderCountValid || !selectServicesValid || !reminderDeliveryTimeValid) {
+            return;
+        }
+
+        if (templateData.selected_template === "") {
+            toastRef.current.show("please select any template to proceed");
+            return;
+        }
+
+        // console.log(JSON.stringify(automatedReminderRulesData, null, 2));
+        if (isAutomatedReminderRulesEmpty) {
+            toastRef.current.show("Number of days should not be empty");
+            return;
+        }
+
+        if (hasErrors) {
+            return;
+        }
 
         const response = await updateServiceReminderAPI(
             {
@@ -281,13 +378,16 @@ export default function ConfigureReminderModal(props) {
             const reminder_rules = props.selectedReminderData.reminder_rules.filter((item) => item.id !== null)
 
             const updated_reminder_rules = automatedReminderRulesData[reminderInterval].map((item) => {
-                console.log((reminder_rules.filter((innerItem) => innerItem.reminder_no === item.reminder_no)[0]))
+                const days = (reminder_rules.filter((innerItem) => innerItem.reminder_no === item.reminder_no)[0])?.days
+                const id = reminder_rules.filter((innerItem) => innerItem.reminder_no === item.reminder_no)[0]?.id;
                 return {
                     ...item,
-                    days: (reminder_rules.filter((innerItem) => innerItem.reminder_no === item.reminder_no)[0])?.days,
-                    id: reminder_rules.filter((innerItem) => innerItem.reminder_no === item.reminder_no)[0]?.id
+                    days: days === undefined ? 0 : days,
+                    id: id === undefined ? null : id,
+                    edited: true
                 }
             });
+
 
             setAutomatedReminderRulesData(prevState => ({
                 ...prevState,
