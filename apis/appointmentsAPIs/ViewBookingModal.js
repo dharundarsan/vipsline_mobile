@@ -32,8 +32,9 @@ import {loadFutureBookingsFromDB, modifyAppointmentSliceValue} from "../../store
 import BottomActionCard from "../../ui/BottomActionCard";
 import cancelAppointmentsAPI from "./cancelAppointmentsAPI";
 import {durationToMinutes, formatDuration, getAppointmentWithOldestStartTime} from "../../util/appointmentsHelper";
-import {addItemToCart, clearLocalCart} from "../../store/cartSlice";
+import {addItemToCart, clearLocalCart, modifyClientMembershipId} from "../../store/cartSlice";
 import {
+    clearClientInfo,
     getRewardPointBalance,
     loadAnalyticsClientDetailsFromDb,
     loadClientInfoFromDb,
@@ -41,6 +42,9 @@ import {
 } from "../../store/clientInfoSlice";
 import {useNavigation} from "@react-navigation/native";
 import clearCartAPI from "../checkoutAPIs/clearCartAPI";
+import ClientInfoModal from "../../components/clientSegmentScreen/ClientInfoModal";
+import MoreOptionDropDownModal from "../../components/clientSegmentScreen/MoreOptionDropDownModal";
+import {modifyValue} from "../../store/newBookingSlice";
 
 const ViewBookingModal = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -53,7 +57,13 @@ const ViewBookingModal = (props) => {
     const servicesData = useSelector(state => state.catalogue.services, shallowEqual);
     const staffs = useSelector((state) => state.staff.staffs);
     const [isCancelReasonModalVisible, setIsCancelReasonModalVisible] = useState(false)
-
+    const [isClientInfoModalVisible, setIsClientInfoModalVisible] = useState(false)
+    //Client
+    const [modalVisibility, setModalVisibility] = useState(false)
+    const [clientSelectedOption, setClientSelectedOption] = useState()
+    const [clientFilterPressed, setClientFilterPressed] = useState()
+    const [clientSearchClientQuery, setClientSearchClientQuery] = useState()
+    const [isEditClientModalVisible, setIsEditClientModalVisible] = useState(false)
 
     const [currentAppointmentState, setCurrentAppointmentState] = useState(props?.data?.status);
     const [isEditingAllowed, setIsEditingAllowed] = useState(false);
@@ -70,17 +80,19 @@ const ViewBookingModal = (props) => {
 
     const getStatusColorAndText = (status) => {
         if (status === "COMPLETED") {
-            return {color: "#D4D4D4", text: "Completed"}
+            return {color: "#8bd0fe", text: "Completed"}
         } else if (status === "BOOKED") {
             return {color: "#9DDDE0", text: "Booked"}
         } else if (status === "CONFIRMED") {
-            return {color: "#D5C6F5", text: "Confirmed"}
+            return {color: "#fce171", text: "Confirmed"}
+        } else if (status === "ARRIVED") {
+            return {color: "#e4a4fe", text: "Arrived"}
         } else if (status === "NO_SHOW") {
-            return {color: "#F67A6F", text: "No Show"}
+            return {color: "#e7766d", text: "No Show"}
         } else if (status === "IN_SERVICE") {
-            return {color: "#FAC5DC", text: "In Service"}
+            return {color: "#88f1a7", text: "In Service"}
         } else if (status === "CANCELLED") {
-            return {color: "#D1373F", text: "Cancelled"}
+            return {color: "#d0403c", text: "Cancelled"}
         }
     }
 
@@ -88,6 +100,7 @@ const ViewBookingModal = (props) => {
         {label: "Booked", value: "BOOKED"},
         {label: "Confirmed", value: "CONFIRMED"},
         {label: "No Show", value: "NO_SHOW"},
+        {label: "Arrived", value: "ARRIVED"},
         {label: "In Service", value: "IN_SERVICE"},
         {label: "Cancelled", value: "CANCELLED"},
     ]
@@ -98,11 +111,8 @@ const ViewBookingModal = (props) => {
                 booking_id: props.data.booking_id
             })
             const data = response.data.data[0];
-            console.log("data")
-            console.log(data)
 
             setViewAppointmentDetails(data)
-            console.log("ViewAppointmentDetails")
             setCurrentAppointmentDate(moment(data?.appointment_date, "YYYY-MM-DD"))
             setCurrentNotes(data?.apptList[0]?.notes)
 
@@ -130,6 +140,7 @@ const ViewBookingModal = (props) => {
             const clientDetailResp = await getClientDetailsByIdAPI({
                 "client_id": data?.apptList[0]?.client_id,
             })
+            console.log(clientDetailResp.data.data[0])
             setCurrentSelectedClient(clientDetailResp.data.data[0]);
         }
         apiCall()
@@ -150,6 +161,10 @@ const ViewBookingModal = (props) => {
             setFinalData(response.data.data[0]);
         })
     }, [currentServicesList]);
+
+    useEffect(() => {
+        console.log(currentAppointmentStatus)
+    }, [currentAppointmentStatus]);
 
 
     const modifyCurrentServiceData = (temp_id, field, value) => {
@@ -197,6 +212,64 @@ const ViewBookingModal = (props) => {
             }}
             themeVariant="light"
             style={{}}
+        />}
+
+        {isClientInfoModalVisible && <ClientInfoModal
+            selectedOption={clientSelectedOption} //c
+            setSelectedOption={setClientSelectedOption} //c
+            setFilterPressed={setClientFilterPressed} //c
+            searchClientQuery={clientSearchClientQuery}//c
+            setSearchQuery={setClientSearchClientQuery}//c
+            modalVisibility={modalVisibility}
+            setModalVisibility={setModalVisibility}
+            setEditClientModalVisibility={setIsEditClientModalVisible}
+            editClientOption={() => {
+            }}
+            visible={isClientInfoModalVisible}
+            setVisible={setIsClientInfoModalVisible}
+            closeModal={() => {
+                setIsClientInfoModalVisible(false);
+                // dispatch(modifyClientMembershipId({type: "clear"}));
+                // dispatch(clearClientInfo())
+            }}
+            onClose={() => {
+                setIsClientInfoModalVisible(false);
+                // dispatch(modifyClientMembershipId({type: "clear"}));
+                // dispatch(clearClientInfo())
+            }}
+            phone={currentSelectedClient.mobile_1}
+            name={currentSelectedClient.firstName}
+            id={currentSelectedClient.id}
+            deleteClientToast={() => {
+
+            }}
+        />}
+        {
+            modalVisibility &&
+            <MoreOptionDropDownModal
+                selectedOption={clientSelectedOption}
+                setSelectedOption={setClientSelectedOption}
+                isVisible={modalVisibility}
+                onCloseModal={() => setModalVisibility(false)}
+                dropdownItems={[
+                    "Edit client",
+                    "Delete client",
+                ]}
+                setOption={setClientSelectedOption}
+                setModalVisibility={setModalVisibility}
+            />
+        }
+
+        {isAddClientModalVisible && <NewBookingAddClientModal
+            onSelect={(staff) => {
+                dispatch(modifyValue({
+                    field: "selectedClient",
+                    value: staff
+                }))
+            }}
+            closeModal={() => {
+                setIsAddClientModalVisible(false);
+            }}
         />}
 
         {isCancelReasonModalVisible && <BottomActionCard isVisible={isCancelReasonModalVisible}
@@ -337,52 +410,53 @@ const ViewBookingModal = (props) => {
                     flexDirection: "row",
                     alignItems: "center",
                 }}>
-                    <CustomTextInput type="dropdown"
-                                     container={{
-                                         marginRight: 10,
-                                         marginBottom: 0,
-                                         marginVertical: 0,
-                                         paddingVertical: 0,
-                                     }}
-                                     labelEnabled={false}
-                                     dropdownButton={{
-                                         width: 125,
-                                         borderRadius: 1000,
-                                         marginVertical: 0,
-                                         paddingVertical: 0
-                                     }}
-                                     dropdownPressable={{paddingVertical: 5, paddingHorizontal: 15}}
-                                     dropdownLabelTextStyle={{fontSize: 14}}
-                                     value={{
-                                         label: getStatusColorAndText(currentAppointmentState).text,
-                                         value: currentAppointmentState
-                                     }}
-                                     overrideDisplayText={"Change"}
-                                     onChangeValue={(status) => {
-                                         if (status.value === "CANCELLED") {
-                                             setIsCancelReasonModalVisible(true);
-                                             return;
-                                         }
-
-                                         editAppointmentDetailsAPI({
-                                             "status": status.value,
-                                             "booking_id": props.data.booking_id
-                                         }).then(res => {
-                                             if (res.data.status_code === 200) {
-                                                 setCurrentAppointmentStatus(status.value)
-                                                 toastRef.current.show("Status updated successfully")
-                                                 dispatch(loadFutureBookingsFromDB())
-                                             } else {
-                                                 console.log(res.data.other_message)
-                                                 toastRef.current.show(res.data.other_message, true)
+                    {(props.data.status !== "CANCELLED" && props.data.status !== "COMPLETED") &&
+                        <CustomTextInput type="dropdown"
+                                         container={{
+                                             marginRight: 10,
+                                             marginBottom: 0,
+                                             marginVertical: 0,
+                                             paddingVertical: 0,
+                                         }}
+                                         labelEnabled={false}
+                                         dropdownButton={{
+                                             width: 125,
+                                             borderRadius: 1000,
+                                             marginVertical: 0,
+                                             paddingVertical: 0
+                                         }}
+                                         dropdownPressable={{paddingVertical: 5, paddingHorizontal: 15}}
+                                         dropdownLabelTextStyle={{fontSize: 14}}
+                                         value={{
+                                             label: getStatusColorAndText(currentAppointmentStatus).text,
+                                             value: currentAppointmentStatus
+                                         }}
+                                         overrideDisplayText={"Change"}
+                                         onChangeValue={(status) => {
+                                             if (status.value === "CANCELLED") {
+                                                 setIsCancelReasonModalVisible(true);
+                                                 return;
                                              }
-                                         })
-                                     }}
-                                     placeholder={"Change"}
-                                     object={true}
-                                     objectName="label"
-                                     dropdownItems={appointmentStatuses}/>
-                    <PrimaryButton
+
+                                             editAppointmentDetailsAPI({
+                                                 "status": status.value,
+                                                 "booking_id": props.data.booking_id
+                                             }).then(res => {
+                                                 if (res.data.status_code === 200) {
+                                                     setCurrentAppointmentStatus(status.value)
+                                                     toastRef.current.show("Status updated successfully")
+                                                     dispatch(loadFutureBookingsFromDB())
+                                                 } else {
+                                                     console.log(res.data.other_message)
+                                                     toastRef.current.show(res.data.other_message, true)
+                                                 }
+                                             })
+                                         }}
+                                         placeholder={"Change"}
+                                         object={true}
+                                         objectName="label"
+                                         dropdownItems={appointmentStatuses}/>}
+                    {(props.data.status !== "CANCELLED" && props.data.status !== "COMPLETED") && <PrimaryButton
                         buttonStyle={{
                             marginVertical: 0,
                             paddingVertical: 0,
@@ -394,7 +468,7 @@ const ViewBookingModal = (props) => {
                         }}
                     >
                         <Feather name="edit" size={24} color="black"/>
-                    </PrimaryButton>
+                    </PrimaryButton>}
                 </View>
             </View>
 
@@ -528,6 +602,11 @@ const ViewBookingModal = (props) => {
                         </View>
                         <View style={{borderRadius: 1000, overflow: "hidden"}}>
                             <Pressable
+                                onPress={() => {
+                                    dispatch(loadClientInfoFromDb(currentSelectedClient.id));
+                                    dispatch(loadAnalyticsClientDetailsFromDb(currentSelectedClient.id));
+                                    setIsClientInfoModalVisible(true)
+                                }}
                                 android_ripple={{
                                     color: 'rgba(0, 0, 0, 0.1)',
                                     borderless: false
@@ -659,7 +738,7 @@ const ViewBookingModal = (props) => {
         <View style={[shadowStyling, {alignItems: "center", padding: 15}]}>
             <Text
                 style={[textTheme.titleMedium, {marginBottom: 10}]}>{`Total Amount       ₹${finalData.amount}    (${finalData.duration})`}</Text>
-            <PrimaryButton
+            {(props.data.status !== "CANCELLED" && props.data.status !== "COMPLETED") && < PrimaryButton
                 onPress={isSaveAppointmentLoading ? null : async () => {
                     console.log({
                         appointment_date: currentAppointmentDate.format("YYYY-MM-DD"),
@@ -767,6 +846,7 @@ const ViewBookingModal = (props) => {
                     <Text
                         style={[textTheme.titleSmall, {color: Colors.onButton}]}>{isEditingAllowed ? "Save Changes" : "Checkout"}</Text>}
             </PrimaryButton>
+            }
         </View>
         <Toast ref={toastRef}/>
     </Modal>

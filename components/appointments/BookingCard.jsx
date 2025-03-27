@@ -15,6 +15,7 @@ import {useDispatch} from "react-redux";
 const BookingCard = (props) => {
     const [isViewBookingModalVisible, setIsViewBookingModalVisible] = useState(false);
     let statusColor;
+
     const dispatch = useDispatch();
     if (props.data.status === "COMPLETED") {
         statusColor = "#D4D4D4"
