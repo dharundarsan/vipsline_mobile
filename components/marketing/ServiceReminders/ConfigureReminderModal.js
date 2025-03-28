@@ -18,6 +18,7 @@ import calculatePricingForSMSCampaign from "../../../apis/marketingAPI/SMSCampai
 import updateServiceReminderAPI from "../../../apis/marketingAPI/serviceRemindersAPI/updateServiceReminderAPI";
 import BottomActionCard from "../../../ui/BottomActionCard";
 import deleteServiceReminderAPI from "../../../apis/marketingAPI/serviceRemindersAPI/deleteServiceReminderAPI";
+import ReminderTemplateModal from "./ReminderTemplateModal";
 
 export default function ConfigureReminderModal(props) {
     const [chooseTemplateModalVisibility, setChooseTemplateModalVisibility] = useState(false);
@@ -44,7 +45,7 @@ export default function ConfigureReminderModal(props) {
     const [automatedReminderRulesData, setAutomatedReminderRulesData] = useState({
         "Fixed Interval": [
             {
-                name: "reminder 1",
+                name: "First Reminder",
                 first_line: "Send first reminder from the date of the last service taken.",
                 reminder_no: 1,
                 days: 0,
@@ -52,7 +53,7 @@ export default function ConfigureReminderModal(props) {
                 edited: false,
             },
             {
-                name: "subsequent reminders",
+                name: "Subsequent Reminders",
                 first_line: "Specify the interval at which subsequent reminders will be sent after the first reminder.",
                 reminder_no: 2,
                 days: 0,
@@ -62,7 +63,7 @@ export default function ConfigureReminderModal(props) {
         ],
         "Custom Interval": [
             {
-                name: "reminder 1",
+                name: "First Reminder",
                 first_line: "Send first reminder from the date of the last service taken.",
                 reminder_no: 1,
                 days: 0,
@@ -71,7 +72,7 @@ export default function ConfigureReminderModal(props) {
 
             },
             {
-                name: "reminder 2",
+                name: "Second Reminder",
                 first_line: "Send second reminder from the date of the last service taken.",
                 reminder_no: 2,
                 days: 0,
@@ -80,7 +81,7 @@ export default function ConfigureReminderModal(props) {
 
             },
             {
-                name: "reminder 3",
+                name: "Third Reminder",
                 first_line: "Send third reminder from the date of the last service taken.",
                 reminder_no: 3,
                 days: 0,
@@ -89,7 +90,7 @@ export default function ConfigureReminderModal(props) {
 
             },
             {
-                name: "reminder 4",
+                name: "Fourth Reminder",
                 first_line: "Send fourth reminder from the date of the last service taken.",
                 reminder_no: 4,
                 days: 0,
@@ -98,7 +99,7 @@ export default function ConfigureReminderModal(props) {
 
             },
             {
-                name: "reminder 5",
+                name: "Fifth Reminder",
                 first_line: "Send fifth reminder from the date of the last service taken.",
                 reminder_no: 5,
                 days: 0,
@@ -156,7 +157,7 @@ export default function ConfigureReminderModal(props) {
             automatedReminderRulesData[reminderInterval].slice(0, reminderCount) :
             reminderInterval === "Fixed Interval" && reminderCount === 1 ?
                 [automatedReminderRulesData[reminderInterval][0]] : automatedReminderRulesData[reminderInterval];
-        console.log(reminderInterval)
+        // console.log(reminderInterval)
         const errorMessage =
             reminderInterval === "Fixed Interval" && item.edited && item.days <= 0 ?
                 "Reminder days should be greater than 0" :
@@ -168,14 +169,14 @@ export default function ConfigureReminderModal(props) {
 
         return <>
             <View style={styles.automatedReminderRuleItemContainer}>
-                <Text style={[textTheme.bodyMedium, {color: Colors.highlight, width: "30%", paddingLeft: 8}]}>
+                <Text style={[textTheme.titleMedium]}>
                     {item.name}
                 </Text>
-                <View style={{gap: 12, paddingVertical: 8, flex: 1, width: "70%"}}>
-                    <Text style={[textTheme.bodyMedium, {flex: 1}]} numberOfLines={3} ellipsizeMode={"tail"}>
+                <View style={{gap: 12, paddingVertical: 8, flex: 1}}>
+                    <Text style={[textTheme.bodyMedium, {flex: 1, color: Colors.grey500}]} numberOfLines={3} ellipsizeMode={"tail"}>
                         {item.first_line}
                     </Text>
-                    <View style={{flexDirection: "row", alignItems: "center", gap: 12}}>
+                    <View style={{flexDirection: "row", alignItems: "center", gap: 12, flex: 1}}>
                         {item.name !== "subsequent reminders" && <Text>After</Text>}
                         <LabelNumberInput reminder_no={item.reminder_no} days={item.days}
                                           updateReminder={updateReminderDays}/>
@@ -200,7 +201,6 @@ export default function ConfigureReminderModal(props) {
 
             </View>
 
-            <Divider />
         </>
     }
 
@@ -345,6 +345,54 @@ export default function ConfigureReminderModal(props) {
 
     }
 
+    function onReset() {
+        setRuleName("");
+        setServiceType("");
+        setNotificationType("whatsapp");
+        setTemplateData({
+            template_id: "",
+            template_name: "",
+            selected_template: "",
+            template_list: "",
+            credit_per_sms: 0,
+            sms_char_count: 0,
+            total_sms_credit: 0,
+            type: "service_reminder",
+            variables: "",
+        });
+        setReminderInterval("");
+        setReminderCount("");
+    }
+
+    function ReminderDeliveryTime() {
+        return <View style={{paddingHorizontal: 24}}>
+            <Text style={[textTheme.titleMedium]}>
+                Reminder delivery time
+            </Text>
+            <Text style={[textTheme.bodyMedium, {flex: 1, color: Colors.grey500, paddingVertical: 8}]} numberOfLines={3} ellipsizeMode={"tail"}>
+                Specify the time of day when the reminder should be sent
+            </Text>
+            <CustomTextInput
+                labelTextStyle={{...textTheme.titleMedium}}
+                labelEnabled={false}
+                type={"dropdown"}
+                dropdownItems={timeArray}
+                label={"Reminder delivery time"}
+                container={{marginTop: 12}}
+                placeholder={"Select any time"}
+                value={reminderDeliveryTime}
+                onChangeValue={setReminderDeliveryTime}
+                validator={(text) => {
+                    if (text === "" || text === null || text === undefined) {
+                        return "reminder delivery time is required";
+                    }
+                    else return true;
+                }}
+                onSave={(callback) => reminderDeliveryTimeRef.current = callback}
+            />
+        </View>
+    }
+
 
     useEffect(() => {
         if (props.edit) {
@@ -412,7 +460,7 @@ export default function ConfigureReminderModal(props) {
         <Toast ref={toastRef}/>
         {
             chooseTemplateModalVisibility &&
-            <ChooseTemplateModal
+            <ReminderTemplateModal
                 visible={chooseTemplateModalVisibility}
                 onClose={() => {
                     setChooseTemplateModalVisibility(false);
@@ -477,13 +525,12 @@ export default function ConfigureReminderModal(props) {
                 </View>
 
                 <Text style={[textTheme.titleMedium, {marginVertical: 16}]}>
-                    Enter the service reminder details
+                    Enter Service Reminder Details
                 </Text>
 
                 <CustomTextInput
                     type={"text"}
                     label={"Reminder rule name"}
-                    maxLength={200}
                     value={ruleName}
                     onChangeText={setRuleName}
                     validator={(text) => {
@@ -493,6 +540,7 @@ export default function ConfigureReminderModal(props) {
                         else return true;
                     }}
                     onSave={(callback) => reminderRuleNameRef.current = callback}
+                    placeholder={"Enter reminder rule"}
                 />
                 <CustomTextInput
                     type={"dropdown"}
@@ -500,7 +548,7 @@ export default function ConfigureReminderModal(props) {
                     label={"Select services"}
                     value={serviceType}
                     onChangeValue={setServiceType}
-                    placeholder={"Select type"}
+                    placeholder={"Select services"}
                     validator={(text) => {
                         if (text === "" || text === null || text === undefined) {
                             return "Select the services";
@@ -510,12 +558,12 @@ export default function ConfigureReminderModal(props) {
                     onSave={(callback) => selectServicesRef.current = callback}
                 />
 
-                <View>
-                    <Text style={[textTheme.bodyMedium]}>Notification type</Text>
+                <Text style={[textTheme.bodyMedium, {color: Colors.grey500}]}>Notification type</Text>
+                <View style={{flexDirection: "row"}}>
                     <PrimaryButton
                         pressableStyle={styles.radioButtonPressable}
                         buttonStyle={styles.radioButton}
-                        onPress={() => setNotificationType("Whatsapp")}
+                        onPress={() => setNotificationType("whatsapp")}
                     >
                         <RadioButton
                             value={notificationType}
@@ -549,7 +597,7 @@ export default function ConfigureReminderModal(props) {
                     templateData.template_name === "" ?
                         <>
                             <PrimaryButton
-                                label={"Add a service reminder Template"}
+                                label={"Select message template"}
                                 buttonStyle={styles.selectTemplateButton}
                                 pressableStyle={styles.selectTemplatePressable}
                                 textStyle={styles.selectTemplateButtonText}
@@ -649,10 +697,10 @@ export default function ConfigureReminderModal(props) {
                         <Text style={[textTheme.bodyMedium]}>Automated reminder rules</Text>
 
                         <View style={styles.automatedReminderRuleContainer}>
-                            <View style={styles.automatedReminderRuleHeader}>
-                                <Text style={[textTheme.bodyMedium, {width: "30%"}]}>NAME</Text>
-                                <Text style={[textTheme.bodyMedium, {width: "70%"}]}>SCHEDULE</Text>
-                            </View>
+                            {/*<View style={styles.automatedReminderRuleHeader}>*/}
+                            {/*    <Text style={[textTheme.bodyMedium, {width: "30%"}]}>NAME</Text>*/}
+                            {/*    <Text style={[textTheme.bodyMedium, {width: "70%"}]}>SCHEDULE</Text>*/}
+                            {/*</View>*/}
                             <FlatList
                                 data={
                                 reminderInterval === "Custom Interval" ?
@@ -662,25 +710,11 @@ export default function ConfigureReminderModal(props) {
                             }
                                 renderItem={renderItem}
                                 scrollEnabled={false}
+                                style={{marginVertical: 24}}
+                                contentContainerStyle={{gap: 24}}
+                                ListFooterComponent={ReminderDeliveryTime}
                             />
                         </View>
-
-                        <CustomTextInput
-                            type={"dropdown"}
-                            dropdownItems={timeArray}
-                            label={"Reminder delivery time"}
-                            container={{marginTop: 12}}
-                            placeholder={"Select any time"}
-                            value={reminderDeliveryTime}
-                            onChangeValue={setReminderDeliveryTime}
-                            validator={(text) => {
-                                if (text === "" || text === null || text === undefined) {
-                                    return "reminder delivery time is required";
-                                }
-                                else return true;
-                            }}
-                            onSave={(callback) => reminderDeliveryTimeRef.current = callback}
-                        />
 
                     </>
                 }
@@ -702,6 +736,13 @@ export default function ConfigureReminderModal(props) {
                             <MaterialIcons name="delete-outline" size={28} color={Colors.error}/>
                         </PrimaryButton>  : <></>
                 }
+                <PrimaryButton
+                    label={"Reset"}
+                    buttonStyle={styles.resetButton}
+                    pressableStyle={styles.resetButtonPressable}
+                    textStyle={[textTheme.titleMedium, styles.resetText]}
+                    onPress={onReset}
+                />
 
                 <PrimaryButton
                     label={props.edit ? "Update" : "Configure"}
@@ -753,7 +794,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 16,
         gap: 12,
-        backgroundColor: Colors.grey150
+        backgroundColor: Colors.grey150,
+        marginTop: 16
     },
     TRAIHeaderContainer: {
         flexDirection: "row",
@@ -817,7 +859,9 @@ const styles = StyleSheet.create({
     automatedReminderRuleContainer: {
         borderWidth: 1,
         borderColor: Colors.grey400,
-        marginTop: 8
+        marginTop: 8,
+        borderRadius: 8,
+        overflow: "hidden"
     },
     automatedReminderRuleHeader: {
         backgroundColor: Colors.grey150,
@@ -826,7 +870,19 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     automatedReminderRuleItemContainer: {
-        flexDirection: "row",
-        alignItems: "center",
+        paddingHorizontal: 24,
+        // flexDirection: "row",
+    },
+    resetButtonPressable: {
+        paddingHorizontal: 24
+    },
+    resetButton: {
+        backgroundColor: Colors.white,
+        borderWidth: 1,
+        borderColor: Colors.grey400,
+    },
+    resetText: {
+        color: Colors.grey500,
+
     }
 })
