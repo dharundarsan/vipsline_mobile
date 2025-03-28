@@ -5,7 +5,7 @@ import PrimaryButton from "../../ui/PrimaryButton";
 import {updateNavigationState} from "../../store/NavigationSlice";
 import {AntDesign, Feather, Ionicons, MaterialIcons, Octicons} from "@expo/vector-icons";
 import React, {useEffect, useRef, useState} from "react";
-import {checkAPIError, shadowStyling, showToast} from "../../util/Helpers";
+import {checkAPIError, shadowStyling, shadowStylingTop, showToast} from "../../util/Helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import CustomTextInput from "../../ui/CustomTextInput";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
@@ -31,7 +31,12 @@ import servicesList from "../../components/checkoutScreen/ServicesList";
 import {loadFutureBookingsFromDB, modifyAppointmentSliceValue} from "../../store/appointmentsSlice";
 import BottomActionCard from "../../ui/BottomActionCard";
 import cancelAppointmentsAPI from "./cancelAppointmentsAPI";
-import {durationToMinutes, formatDuration, getAppointmentWithOldestStartTime} from "../../util/appointmentsHelper";
+import {
+    durationToMinutes,
+    formatDuration,
+    getAppointmentWithOldestStartTime,
+    getStatusColorAndText
+} from "../../util/appointmentsHelper";
 import {addItemToCart, clearLocalCart, modifyClientMembershipId} from "../../store/cartSlice";
 import {
     clearClientInfo,
@@ -45,6 +50,8 @@ import clearCartAPI from "../checkoutAPIs/clearCartAPI";
 import ClientInfoModal from "../../components/clientSegmentScreen/ClientInfoModal";
 import MoreOptionDropDownModal from "../../components/clientSegmentScreen/MoreOptionDropDownModal";
 import {modifyValue} from "../../store/newBookingSlice";
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
 
 const ViewBookingModal = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -78,30 +85,12 @@ const ViewBookingModal = (props) => {
     const [cancelReason, setCancelReason] = useState();
     const dispatch = useDispatch();
 
-    const getStatusColorAndText = (status) => {
-        if (status === "COMPLETED") {
-            return {color: "#8bd0fe", text: "Completed"}
-        } else if (status === "BOOKED") {
-            return {color: "#9DDDE0", text: "Booked"}
-        } else if (status === "CONFIRMED") {
-            return {color: "#fce171", text: "Confirmed"}
-        } else if (status === "ARRIVED") {
-            return {color: "#e4a4fe", text: "Arrived"}
-        } else if (status === "NO_SHOW") {
-            return {color: "#e7766d", text: "No Show"}
-        } else if (status === "IN_SERVICE") {
-            return {color: "#88f1a7", text: "In Service"}
-        } else if (status === "CANCELLED") {
-            return {color: "#d0403c", text: "Cancelled"}
-        }
-    }
-
     const appointmentStatuses = [
         {label: "Booked", value: "BOOKED"},
         {label: "Confirmed", value: "CONFIRMED"},
-        {label: "No Show", value: "NO_SHOW"},
         {label: "Arrived", value: "ARRIVED"},
         {label: "In Service", value: "IN_SERVICE"},
+        {label: "No Show", value: "NO_SHOW"},
         {label: "Cancelled", value: "CANCELLED"},
     ]
 
@@ -220,6 +209,7 @@ const ViewBookingModal = (props) => {
             setFilterPressed={setClientFilterPressed} //c
             searchClientQuery={clientSearchClientQuery}//c
             setSearchQuery={setClientSearchClientQuery}//c
+            isAppointment={true}
             modalVisibility={modalVisibility}
             setModalVisibility={setModalVisibility}
             setEditClientModalVisibility={setIsEditClientModalVisible}
@@ -244,33 +234,7 @@ const ViewBookingModal = (props) => {
 
             }}
         />}
-        {
-            modalVisibility &&
-            <MoreOptionDropDownModal
-                selectedOption={clientSelectedOption}
-                setSelectedOption={setClientSelectedOption}
-                isVisible={modalVisibility}
-                onCloseModal={() => setModalVisibility(false)}
-                dropdownItems={[
-                    "Edit client",
-                    "Delete client",
-                ]}
-                setOption={setClientSelectedOption}
-                setModalVisibility={setModalVisibility}
-            />
-        }
 
-        {isAddClientModalVisible && <NewBookingAddClientModal
-            onSelect={(staff) => {
-                dispatch(modifyValue({
-                    field: "selectedClient",
-                    value: staff
-                }))
-            }}
-            closeModal={() => {
-                setIsAddClientModalVisible(false);
-            }}
-        />}
 
         {isCancelReasonModalVisible && <BottomActionCard isVisible={isCancelReasonModalVisible}
                                                          onClose={() => setIsCancelReasonModalVisible(false)}
@@ -352,6 +316,22 @@ const ViewBookingModal = (props) => {
             onSelect={(staff) => {
                 setCurrentSelectedClient(staff)
             }}
+            onAddClient={async (phoneNo) => {
+                const response = await axios.post(
+                    `${process.env.EXPO_PUBLIC_API_URI}/business/searchCustomersOfBusiness?pageSize=50&pageNo=0`,
+                    {
+                        business_id: await SecureStore.getItemAsync('businessId'),
+                        query: phoneNo
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${await SecureStore.getItemAsync('authKey')}`
+                        }
+                    }
+                );
+                setCurrentSelectedClient(response.data.data[0])
+
+            }}
             closeModal={() => {
                 setIsAddClientModalVisible(false);
             }}
@@ -401,16 +381,6 @@ const ViewBookingModal = (props) => {
                         backgroundColor: getStatusColorAndText(currentAppointmentStatus).color,
                         borderRadius: 1000,
                     }}/>
-                    <Text style={{
-                        fontWeight: "700",
-                        fontSize: 18
-                    }}>{getStatusColorAndText(currentAppointmentStatus)?.text}</Text>
-                </View>
-                <View style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                }}>
-                    {(props.data.status !== "CANCELLED" && props.data.status !== "COMPLETED") &&
                         <CustomTextInput type="dropdown"
                                          container={{
                                              marginRight: 10,
@@ -418,20 +388,26 @@ const ViewBookingModal = (props) => {
                                              marginVertical: 0,
                                              paddingVertical: 0,
                                          }}
-                                         labelEnabled={false}
+                                         showDropdownArrowIcon={!(props.data.status === "CANCELLED" || props.data.status === "COMPLETED")}
+                                         disableOnPress={(props.data.status === "CANCELLED" || props.data.status === "COMPLETED")}
+                                         labelEnabled={true}
+                                         dropdownLabelTextStyle={{
+                                             fontWeight: "700",
+                                             fontSize: 18
+                                         }}
                                          dropdownButton={{
-                                             width: 125,
+                                             width: 150,
                                              borderRadius: 1000,
+                                             borderWidth:0,
                                              marginVertical: 0,
                                              paddingVertical: 0
                                          }}
                                          dropdownPressable={{paddingVertical: 5, paddingHorizontal: 15}}
-                                         dropdownLabelTextStyle={{fontSize: 14}}
                                          value={{
                                              label: getStatusColorAndText(currentAppointmentStatus).text,
                                              value: currentAppointmentStatus
                                          }}
-                                         overrideDisplayText={"Change"}
+                            // overrideDisplayText={"Change"}
                                          onChangeValue={(status) => {
                                              if (status.value === "CANCELLED") {
                                                  setIsCancelReasonModalVisible(true);
@@ -452,10 +428,18 @@ const ViewBookingModal = (props) => {
                                                  }
                                              })
                                          }}
-                                         placeholder={"Change"}
                                          object={true}
                                          objectName="label"
-                                         dropdownItems={appointmentStatuses}/>}
+                                         dropdownItems={appointmentStatuses}/>
+                    {/*<Text style={{*/}
+                    {/*    fontWeight: "700",*/}
+                    {/*    fontSize: 18*/}
+                    {/*}}>{getStatusColorAndText(currentAppointmentStatus)?.text}</Text>*/}
+                </View>
+                <View style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                }}>
                     {(props.data.status !== "CANCELLED" && props.data.status !== "COMPLETED") && <PrimaryButton
                         buttonStyle={{
                             marginVertical: 0,
@@ -735,7 +719,7 @@ const ViewBookingModal = (props) => {
                                  }}/>
             </ScrollView>
         </View>
-        <View style={[shadowStyling, {alignItems: "center", padding: 15}]}>
+        <View style={[shadowStylingTop, {alignItems: "center", padding: 15}]}>
             <Text
                 style={[textTheme.titleMedium, {marginBottom: 10}]}>{`Total Amount       ₹${finalData.amount}    (${finalData.duration})`}</Text>
             {(props.data.status !== "CANCELLED" && props.data.status !== "COMPLETED") && < PrimaryButton
@@ -784,7 +768,8 @@ const ViewBookingModal = (props) => {
                                     resource_id: editedService.currentSelectedStaff.id,
                                     duration: editedService.currentDuration,
                                     start_time: editedService.currentStartTime,
-                                    end_time: moment(editedService.currentStartTime, "hh:mm A").add(totalMinutes, "minute").format("hh:mm A"),
+                                    end_time: moment(editedService.currentStartTime, "hh:mm A").add(totalMinutes, "minute").format("h:mm A"),
+                                    // end_time: editedService.end_time,
                                     mode: "edit"
                                 }
                             }), ...deletedServices.map(deletedService => {
@@ -799,6 +784,7 @@ const ViewBookingModal = (props) => {
                             console.log("resres")
                             console.log(res.data)
                             checkAPIError(res)
+                            props.activeBookingToastRef.current.show("Appointment updated")
                             setIsSaveEditAppointmentLoading(false)
                             props.onClose();
                         }).catch((err) => {

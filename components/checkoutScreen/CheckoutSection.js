@@ -38,6 +38,7 @@ import Toast from "../../ui/Toast";
 import { updateToastRef } from "../../store/toastSlice";
 import { checkoutScreenToast } from "../../screens/CheckoutScreen";
 import BottomActionCard from "../../ui/BottomActionCard";
+import {modifyAppointmentSliceValue} from "../../store/appointmentsSlice";
 // import Toast from 'react-native-root-toast';
 
 
@@ -313,6 +314,9 @@ const CheckoutSection = (props) => {
                               dispatch(clearLocalCart());
                               dispatch(clearClientInfo());
                               dispatch(clearCalculatedPrice())
+                              dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                              dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                              dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
                               props.checkoutScreenToast("sale cancelled", 2000);
                               setIsDelete(false)
                           }}

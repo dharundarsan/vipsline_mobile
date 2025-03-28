@@ -11,25 +11,14 @@ import React, {useState} from "react";
 import ViewBookingModal from "../../apis/appointmentsAPIs/ViewBookingModal";
 import {loadFutureBookingsFromDB} from "../../store/appointmentsSlice";
 import {useDispatch} from "react-redux";
+import moment from "moment";
+import {getStatusColorAndText} from "../../util/appointmentsHelper";
 
 const BookingCard = (props) => {
     const [isViewBookingModalVisible, setIsViewBookingModalVisible] = useState(false);
-    let statusColor;
+    let statusColor = getStatusColorAndText(props.data.status).color;
 
     const dispatch = useDispatch();
-    if (props.data.status === "COMPLETED") {
-        statusColor = "#D4D4D4"
-    } else if (props.data.status === "BOOKED") {
-        statusColor = "#9DDDE0"
-    } else if (props.data.status === "CONFIRMED") {
-        statusColor = "#D5C6F5"
-    } else if (props.data.status === "NO_SHOW") {
-        statusColor = "#F67A6F"
-    } else if (props.data.status === "IN_SERVICE") {
-        statusColor = "#FAC5DC"
-    } else if (props.data.status === "CANCELLED") {
-        statusColor = "#D1373F"
-    }
 
     return <Pressable onPress={() => {
         setIsViewBookingModalVisible(true);
@@ -37,6 +26,7 @@ const BookingCard = (props) => {
 
         {isViewBookingModalVisible && <ViewBookingModal
             data={props.data}
+            activeBookingToastRef={props.activeBookingToastRef}
             isVisible={isViewBookingModalVisible}
             onClose={() => {
                 dispatch(loadFutureBookingsFromDB())
@@ -57,20 +47,19 @@ const BookingCard = (props) => {
                 }}/>
                 <Text style={[textTheme.bodyMedium, {fontSize: 15, fontWeight: "700"}]}>{props.data.user_name}</Text>
             </View>
-            <View style={{marginBottom: 10, flexDirection: "row", alignItems: "center", gap: 10}}>
-                <Image source={callIcon} style={{
-                    height: 18,
-                    width: 18
-                }}/>
-                <Text style={[textTheme.bodyMedium, {fontSize: 15,}]}>{props.data.user_contact}</Text>
+            <View style={{marginBottom: 10, alignSelf: "flex-start"}}>
                 <TouchableOpacity
-                    style={{flexDirection: "row", gap: 5, marginLeft: 10, alignItems: "center"}}
+                    style={{flexDirection: "row", gap: 5, alignItems: "center"}}
                     onPress={() => {
                         const url = `tel:${props.data.user_contact}`;
                         Linking.openURL(url).catch(err => console.error("Couldn't open dialer", err));
                     }}>
                     <Feather name="phone" size={18} color={Colors.highlight}/>
-                    <Text style={{fontWeight: 600, color: Colors.highlight}}>CALL</Text>
+                    <Text style={[textTheme.bodyMedium, {
+                        fontSize: 15,
+                        color: Colors.highlight
+                    }]}>{props.data.user_contact}</Text>
+                    {/*<Text style={{fontWeight: 600, color: Colors.highlight}}>CALL</Text>*/}
                 </TouchableOpacity>
             </View>
             <View style={{flexDirection: "row", justifyContent: "space-between", marginBottom: 15}}>
@@ -79,13 +68,15 @@ const BookingCard = (props) => {
                         height: 18,
                         width: 17
                     }}/>
-                    <Text style={[textTheme.bodyMedium, {fontSize: 15,}]}>Date: {props.data.appointment_date}</Text>
+                    <Text
+                        style={[textTheme.bodyMedium, {fontSize: 15,}]}>Date: {moment(props.data.appointment_date, "YYYY-MM-DD").format("DD MMM YYYY")}</Text>
                 </View>
                 <View style={{
                     flexDirection: "row", alignItems: "center", gap: 5
                 }}>
                     <Feather name="clock" size={18} color="black"/>
-                    <Text style={[textTheme.bodyMedium, {fontSize: 15,}]}>{props.data.start_time}</Text>
+                    <Text
+                        style={[textTheme.bodyMedium, {fontSize: 15,}]}>{moment(props.data.start_time, "hh:mm:ss").format("hh:mm A")}</Text>
                 </View>
             </View>
             <View style={{flexDirection: "row", justifyContent: "space-between"}}>

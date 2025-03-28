@@ -126,7 +126,7 @@ const InvoiceModal = (props) => {
         //     autoClose: 1500,
         // });
 
-        toastRef.current.show("Updated successfully", 2000);
+        toastRef.current.show("Updated successfully", false, 2000);
     }, []);
 
     useEffect(() => {
@@ -266,7 +266,7 @@ const InvoiceModal = (props) => {
                         let msg = await sendEmailAPI(email, bookingId);
                         setEmailModalVisibility(false);
                         if (msg === "success") {
-                            toastRef.current.show("email send successfully", 1000);
+                            toastRef.current.show("email sent successfully", false, 1000);
                         }
                     }
                 }}

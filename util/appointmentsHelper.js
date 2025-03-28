@@ -82,3 +82,21 @@ export const getAppointmentWithOldestStartTime = (servicesList) => {
 
     return found;
 };
+
+export const getStatusColorAndText = (status) => {
+    if (status === "COMPLETED") {
+        return {color: "#8bd0fe", text: "Completed"}
+    } else if (status === "BOOKED") {
+        return {color: "#9DDDE0", text: "Booked"}
+    } else if (status === "CONFIRMED") {
+        return {color: "#fce171", text: "Confirmed"}
+    } else if (status === "ARRIVED") {
+        return {color: "#e4a4fe", text: "Arrived"}
+    } else if (status === "NO_SHOW") {
+        return {color: "#e7766d", text: "No Show"}
+    } else if (status === "IN_SERVICE") {
+        return {color: "#88f1a7", text: "In Service"}
+    } else if (status === "CANCELLED") {
+        return {color: "#d0403c", text: "Cancelled"}
+    }
+}

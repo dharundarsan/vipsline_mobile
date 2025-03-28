@@ -107,7 +107,10 @@ const NewBookingAddClientModal = (props) => {
     return (
         <Modal visible={props.isVisible} animationType={"slide"}
                presentationStyle="pageSheet" onRequestClose={props.closeModal}>
-            <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={() => {
+            <CreateClientModal isVisible={isCreateClientModalVisible} onCloseModal={(phoneNo) => {
+                if(phoneNo) {
+                    props.onAddClient(phoneNo)
+                }
                 dispatch(loadClientsFromDb());
                 setIsCreateClientModalVisible(false);
             }} closeAddClientModal={props.closeModal}

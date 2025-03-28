@@ -126,7 +126,7 @@ const CreateClientModal = (props) => {
                 await dispatch(loadClientInfoFromDb(response))
                 clearForm();
                 await dispatch(loadClientCountFromDb());
-                props.onCloseModal();
+                props.onCloseModal(phoneNo[1]);
                 props.closeAddClientModal();
             }
 

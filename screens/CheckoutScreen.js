@@ -60,9 +60,6 @@ const CheckoutScreen = ({ navigation, route }) => {
     const { getLocation, reload, setReload } = useLocationContext();
 
     useFocusEffect(useCallback(() => {
-        console.log("hello")
-        dispatch(modifyClientMembershipId({type: "clear"}));
-        dispatch(clearClientInfo())
         getLocation("CheckoutScreen");
     }, []))
 

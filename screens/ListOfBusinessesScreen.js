@@ -26,6 +26,7 @@ import * as Haptics from "expo-haptics";
 import {useLocationContext} from '../context/LocationContext';
 import Toast from "../ui/Toast";
 import BottomActionCard from "../ui/BottomActionCard";
+import {modifyAppointmentSliceValue} from "../store/appointmentsSlice";
 
 
 export default function ListOfBusinessesScreen({navigation}) {
@@ -188,6 +189,9 @@ export default function ListOfBusinessesScreen({navigation}) {
                                     dispatch(clearLocalCart());
                                     dispatch(clearClientInfo());
                                     dispatch(clearCalculatedPrice());
+                                    dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                                    dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                                    dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
                                     setTimeout(() => {
                                         // navigation.navigate("Checkout", { screen: "CheckoutScreen" });
                                         setReload(false);

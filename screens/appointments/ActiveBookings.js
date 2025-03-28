@@ -83,6 +83,7 @@ const ActiveBookings = () => {
 
         <ScrollView style={{flex: 1, padding: 20, marginBottom: 30}}>
             <AppointmentsDatePicker date={new Date(futureBookingsFilterDate)}
+                                    type={"calendar"}
                                     minimumDate={new Date()}
                                     onRightArrowPress={() => {
                                         const nextDate = moment(futureBookingsFilterDate).toDate();
@@ -117,7 +118,7 @@ const ActiveBookings = () => {
                     totalLength={futureBookingsCount}
                     data={futureBookings}
                     isLoading={isFetching}
-                    renderItem={({item}) => <BookingCard data={item}/>}
+                    renderItem={({item}) => <BookingCard data={item} activeBookingToastRef={toastRef}/>}
                 />}
         </ScrollView>
         <FAB

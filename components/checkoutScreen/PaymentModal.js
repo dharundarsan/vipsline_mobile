@@ -776,6 +776,9 @@ const PaymentModal = (props) => {
                               dispatch(clearLocalCart());
                               dispatch(clearClientInfo());
                               dispatch(clearCalculatedPrice())
+                              dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                              dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                              dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
                               props.checkoutScreenToast("sale cancelled", 2000);
                               setIsCancelSalesModalVisible(false)
                           }}

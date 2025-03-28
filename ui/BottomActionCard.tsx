@@ -62,7 +62,7 @@ const BottomActionCard = ({
                     </PrimaryButton>
                 </View>
                 {(children === null || children === undefined) ? <View style={styles.deleteClientCardContainer}>
-                        <Text style={[textTheme.bodyLarge]}>{content}</Text>
+                        <Text style={[{marginHorizontal: 30, fontSize: 14}]}>{content}</Text>
                         <View style={styles.deleteClientCardButtonContainer}>
                             <PrimaryButton
                                 label={cancelLabel}
@@ -97,9 +97,9 @@ const styles = StyleSheet.create({
         height: "100%",
     },
     closeButton: {
-        position: "absolute",
-        right: 10,
-        top: 5,
+        // position: "absolute",
+        // right: 10,
+        // top: 5,
         backgroundColor: Colors.white,
     },
     closeButtonPressable: {
@@ -118,9 +118,13 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         backgroundColor: Colors.background,
         alignItems: "center",
+        flexDirection: "row",
         elevation: 0.5,
     },
     deleteClientText: {
+        textAlign: "center",
+        fontWeight: 700,
+        flex: 1,
         paddingVertical: 10,
     },
     deleteClientCardContainer: {
@@ -130,8 +134,11 @@ const styles = StyleSheet.create({
     },
     deleteClientCardButtonContainer: {
         flexDirection: "row",
-        width: "70%",
-        marginVertical: 32,
+        // width: "70%",
+        gap:20,
+        marginHorizontal:20,
+        marginVertical: 20,
+        marginTop:30,
         justifyContent: "space-between",
     },
     cancelButton: {

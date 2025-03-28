@@ -7,7 +7,7 @@ import ClientCard from "./ClientCard";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import ClientSaleInfo from "./ClientSalesInfo";
 import ClientInfoCategories from "./ClientInfoCategories";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import Divider from "../../ui/Divider";
 import ClientStatistics from "./ClientStatistics";
 import ClientDetails from "./ClientDetails";
@@ -15,7 +15,13 @@ import MoreOptionDropDownModal from "./MoreOptionDropDownModal";
 import UpdateClientModal from "./UpdateClientModal";
 import {useDispatch, useSelector} from "react-redux";
 import {checkNullUndefined, dateFormatter} from "../../util/Helpers";
-import {clearClientInfo, loadClientInfoFromDb, resetRewardPageNo, updateCustomerRewards, updateRewardsPointBalance} from "../../store/clientInfoSlice";
+import {
+    clearClientInfo,
+    loadClientInfoFromDb,
+    resetRewardPageNo,
+    updateCustomerRewards,
+    updateRewardsPointBalance
+} from "../../store/clientInfoSlice";
 import {loadClientFiltersFromDb, loadSearchClientFiltersFromDb} from "../../store/clientFilterSlice";
 import ContentLoader from "../../ui/ContentLoader";
 import {loadClientCountFromDb, loadClientsFromDb} from "../../store/clientSlice";
@@ -90,6 +96,18 @@ export default function clientInfoModal(props) {
 
     const toastRef = useRef(null)
 
+
+    const [isLoading, setIsLoading] = useState(false)
+
+    useLayoutEffect(() => {
+        if (props.isAppointment) {
+            setIsLoading(true)
+            setTimeout(() => {
+                setIsLoading(false)
+            }, 2000)
+        }
+    }, [])
+
     useEffect(() => {
         setTotalSales(analyticDetails.total_sales === undefined ? "" : analyticDetails.total_sales);
         setLastVisit(
@@ -106,7 +124,6 @@ export default function clientInfoModal(props) {
         setPhone(details.mobile_1);
 
     }, [analyticDetails, details]);
-
 
 
     const [clientMoreDetails, setClientMoreDetails] = useState(null);
@@ -218,7 +235,7 @@ export default function clientInfoModal(props) {
                     rippleColor={Colors.transparent}
                 />
                 <View style={styles.optionsContainer}>
-                    <PrimaryButton
+                    {!props.isAppointment && <PrimaryButton
                         buttonStyle={styles.updateOrDeleteOption}
                         onPress={() => {
                             props.setModalVisibility(true);
@@ -226,7 +243,7 @@ export default function clientInfoModal(props) {
                         pressableStyle={[styles.pressable, {paddingHorizontal: 12}]}
                     >
                         <SimpleLineIcons name="options" size={24} color="black"/>
-                    </PrimaryButton>
+                    </PrimaryButton>}
                     <PrimaryButton buttonStyle={styles.callButton}
                                    onPress={() => {
                                        if (checkNullUndefined(details.mobile_1)) {
@@ -343,12 +360,10 @@ export default function clientInfoModal(props) {
                 <Text style={textTheme.bodyMedium}>This client doesn’t have any prepaid.</Text>
             </View>
 
-    }
-        else if (clientMoreDetails === "rewardpoints") {
-            content =
-                <ClientRewardPoints details={details} />
-    }
-    else {
+    } else if (clientMoreDetails === "rewardpoints") {
+        content =
+            <ClientRewardPoints details={details}/>
+    } else {
         content =
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}><Text style={textTheme.titleMedium}>Coming
                 Soons</Text></View>
@@ -362,8 +377,7 @@ export default function clientInfoModal(props) {
                onRequestClose={() => {
                    if (clientMoreDetails === null) {
                        props.onClose();
-                   }
-                   else {
+                   } else {
                        setClientMoreDetails(null);
                    }
                }}
@@ -378,13 +392,13 @@ export default function clientInfoModal(props) {
                         <PrimaryButton
                             buttonStyle={styles.backButton}
                             onPress={() => {
-                                if(clientMoreDetails === "rewardpoints"){
+                                if (clientMoreDetails === "rewardpoints") {
                                     dispatch(resetRewardPageNo());
-                                    dispatch(updateCustomerRewards({customerRewardList:[],count:0}))
+                                    dispatch(updateCustomerRewards({customerRewardList: [], count: 0}))
                                     dispatch(updateRewardsPointBalance(0))
                                 }
                                 setClientMoreDetails(null);
-                                
+
                             }}
                         >
                             <AntDesign name="arrowleft" size={24} color="black"/>
@@ -431,7 +445,7 @@ export default function clientInfoModal(props) {
 
                 {
                     // checkNullUndefined(details.length) &&
-                    details === undefined || analyticDetails === undefined || membershipData === undefined || packageData === undefined ||
+                    details === undefined || analyticDetails === undefined || membershipData === undefined || packageData === undefined || isLoading ||
                     Object.keys(details).length === 0 ?
                         <View style={{alignItems: 'center', width: "100%",}}>
 

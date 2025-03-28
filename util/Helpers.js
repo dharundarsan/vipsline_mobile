@@ -124,14 +124,16 @@ export const shadowStyling = StyleSheet.create({
 });
 
 export const shadowStylingTop = StyleSheet.create({
-    backgroundColor: '#fff',    // Background color
-    shadowColor: '#000',        // Shadow color
-    shadowOffset: {width: 0, height: -10}, // Move shadow to the top (negative height)
-    shadowOpacity: 0.1,         // Shadow opacity
-    shadowRadius: 3.84,         // Shadow blur radius
-    borderColor: 'rgba(0,0,0,0.1)',  // Subtle color to simulate the shadow effect
+    backgroundColor: "#fff", // Background color
+    shadowColor: "#000", // Shadow color
+    shadowOffset: { width: 0, height: -5 }, // Moves shadow to the top
+    shadowOpacity: 0.1, // Subtle opacity
+    shadowRadius: 3.84, // Blur radius
+    borderTopWidth: 1, // Ensures a subtle top border (Android fallback)
+    borderColor: "rgba(0,0,0,0.1)", // Light border to enhance top shadow
+    position: 'relative',
+    zIndex: 978,
 });
-
 
 
 export const formatDateWithAddedMonths = (monthsToAdd) => {

@@ -25,10 +25,21 @@ import ThreeDotActionIndicator from "../../ui/ThreeDotActionIndicator";
 import Toast from "../../ui/Toast";
 import clockDropdownData from "../../data/clockDropdownData";
 import getAppointmentDetailsAPI from "../../apis/appointmentsAPIs/getAppointmentDetailsAPI";
-import {modifyClientId} from "../../store/cartSlice";
+import {
+    clearCalculatedPrice,
+    clearLocalCart,
+    clearSalesNotes,
+    modifyClientId,
+    modifyClientMembershipId
+} from "../../store/cartSlice";
 import {clearClientInfo, loadAnalyticsClientDetailsFromDb, loadClientInfoFromDb} from "../../store/clientInfoSlice";
 import ClientInfoModal from "../clientSegmentScreen/ClientInfoModal";
 import MoreOptionDropDownModal from "../clientSegmentScreen/MoreOptionDropDownModal";
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import clearCartAPI from "../../apis/checkoutAPIs/clearCartAPI";
+import {modifyAppointmentSliceValue} from "../../store/appointmentsSlice";
+import BottomActionCard from "../../ui/BottomActionCard";
 
 const AddBookingsModal = (props) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -52,6 +63,7 @@ const AddBookingsModal = (props) => {
     const [clientFilterPressed, setClientFilterPressed] = useState()
     const [clientSearchClientQuery, setClientSearchClientQuery] = useState()
     const [isEditClientModalVisible, setIsEditClientModalVisible] = useState(false)
+    const [isCancelAppointmentModalVisible, setIsCancelAppointmentModalVisible] = useState(false)
 
     const getFirstBookingStartDate = (servicesList) => {
         let min = Infinity;
@@ -66,6 +78,13 @@ const AddBookingsModal = (props) => {
 
         return servicesList[minIndex];
     }
+
+    useEffect(() => {
+        dispatch(modifyValue({
+            field: "appointmentStartTime",
+            value: moment().minutes(Math.round(moment().minutes() / 5) * 5).seconds(0).format("hh:mm A")
+        }));
+    }, []);
 
     useEffect(() => {
         const firstBooking = getFirstBookingStartDate(servicesList);
@@ -124,12 +143,37 @@ const AddBookingsModal = (props) => {
             themeVariant="light"
             style={{}}
         />}
+        <BottomActionCard isVisible={isCancelAppointmentModalVisible}
+                          headerTextStyle={{fontSize: 17}}
+                          header={"Appointment has unsaved changes !"}
+                          content={"Your changes will not be saved if you exit. Are you sure you want to exit this appointment?."}
+                          onClose={() => {
+                              setIsCancelAppointmentModalVisible(false)
+                          }}
+                          onConfirm={async () => {
+                              await clearCartAPI();
+                              dispatch(modifyClientMembershipId({type: "clear"}))
+                              dispatch(clearSalesNotes());
+                              dispatch(clearLocalCart());
+                              dispatch(clearClientInfo());
+                              dispatch(clearCalculatedPrice())
+                              dispatch(modifyAppointmentSliceValue({field: "isBookingCheckout", value: false}))
+                              dispatch(modifyAppointmentSliceValue({field: "cartBookingId", value: ""}))
+                              dispatch(modifyAppointmentSliceValue({field: "cartGroupingId", value: ""}))
+                              setIsCancelAppointmentModalVisible(false)
+                              dispatch(clearBookingData());
+                              props.onClose()
+                          }}
+                          onCancel={() => setIsCancelAppointmentModalVisible(false)}
+                          confirmLabel={"Yes, Exit"}
+                          cancelLabel={"Go back"}/>
         {isClientInfoModalVisible && <ClientInfoModal
             selectedOption={clientSelectedOption} //c
             setSelectedOption={setClientSelectedOption} //c
             setFilterPressed={setClientFilterPressed} //c 
             searchClientQuery={clientSearchClientQuery}//c
             setSearchQuery={setClientSearchClientQuery}//c
+            isAppointment={true}
             modalVisibility={modalVisibility}
             setModalVisibility={setModalVisibility}
             setEditClientModalVisibility={setIsEditClientModalVisible}
@@ -150,21 +194,6 @@ const AddBookingsModal = (props) => {
 
             }}
         />}
-        {
-            modalVisibility &&
-            <MoreOptionDropDownModal
-                selectedOption={clientSelectedOption}
-                setSelectedOption={setClientSelectedOption}
-                isVisible={modalVisibility}
-                onCloseModal={() => setModalVisibility(false)}
-                dropdownItems={[
-                    "Edit client",
-                    "Delete client",
-                ]}
-                setOption={setClientSelectedOption}
-                setModalVisibility={setModalVisibility}
-            />
-        }
 
         {isAddClientModalVisible && <NewBookingAddClientModal
             onSelect={(staff) => {
@@ -172,6 +201,26 @@ const AddBookingsModal = (props) => {
                     field: "selectedClient",
                     value: staff
                 }))
+            }}
+            onAddClient={async (phoneNo) => {
+                console.log(process.env.EXPO_PUBLIC_API_URI)
+                const response = await axios.post(
+                    `${process.env.EXPO_PUBLIC_API_URI}/business/searchCustomersOfBusiness?pageSize=50&pageNo=0`,
+                    {
+                        business_id: await SecureStore.getItemAsync('businessId'),
+                        query: phoneNo
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${await SecureStore.getItemAsync('authKey')}`
+                        }
+                    }
+                );
+                dispatch(modifyValue({
+                    field: "selectedClient",
+                    value: response.data.data[0]
+                }))
+
             }}
             closeModal={() => {
                 setIsAddClientModalVisible(false);
@@ -198,6 +247,10 @@ const AddBookingsModal = (props) => {
                 buttonStyle={styles.closeButton}
                 pressableStyle={styles.closeButtonPressable}
                 onPress={() => {
+                    if (servicesList.length !== 0 || selectedClient !== null) {
+                        setIsCancelAppointmentModalVisible(true);
+                        return
+                    }
                     dispatch(clearBookingData());
                     props.onClose()
                 }}

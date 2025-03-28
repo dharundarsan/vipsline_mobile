@@ -17,8 +17,6 @@ import getLeadCampaignsAPI from "../../apis/leadManagementAPIs/getLeadCampaignsA
 import deleteLeadAPI from "../../apis/leadManagementAPIs/deleteLeadAPI";
 import {useNavigation} from "@react-navigation/native";
 import {updateNavigationState} from "../../store/NavigationSlice";
-import MiniActionTextModal from "../checkoutScreen/MiniActionTextModal";
-import ConfirmDeleteLeadModal from "./ConfirmDeleteLeadModal";
 import BottomActionCard from "../../ui/BottomActionCard";
 
 const CreateLeadModal = (props) => {

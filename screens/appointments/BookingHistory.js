@@ -69,6 +69,7 @@ const BookingHistory = () => {
         <View style={{paddingHorizontal: 15}}>
             <AppointmentsDatePicker date={new Date(bookingsHistoryFilterDate)}
                                     maximumDate={new Date()}
+                                    type={"calendar"}
                 // minimumDate={new Date(new Date().setDate(16))}
                                     onRightArrowPress={() => {
                                         const nextDate = moment(bookingsHistoryFilterDate).toDate();

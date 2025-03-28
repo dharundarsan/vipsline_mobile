@@ -54,12 +54,14 @@ export const newBookingSlice = createSlice({
 
                 // Format the start time as preferred date
                 newPreferredDate = moment(newPreferredMoment).format("hh:mm A");
+                // newPreferredDate = state.appointmentStartTime;
 
                 // Calculate end time by adding duration to the preferred start time
                 endTime = moment(splitAndAdd(newPreferredMoment, action.payload.preferred_duration.label)).format("hh:mm A");
             } else {
                 // If no existing services, start with 12:00 AM
-                newPreferredDate = moment().minutes(Math.round(moment().minutes() / 5) * 5).seconds(0).format("hh:mm A");
+                // newPreferredDate = moment().minutes(Math.round(moment().minutes() / 5) * 5).seconds(0).format("hh:mm A");
+                newPreferredDate = state.appointmentStartTime;
                 endTime = moment(splitAndAdd(moment(newPreferredDate, "hh:mm A"), action.payload.preferred_duration.label)).format("hh:mm A");
             }
 

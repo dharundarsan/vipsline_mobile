@@ -113,6 +113,7 @@ const AppointmentsDatePicker = (props) => {
         </View>
         <Pressable
             onPress={() => {
+                console.log(props.type)
                 if (props.type === undefined || props.type === "display") {
                     return null
                 } else {
