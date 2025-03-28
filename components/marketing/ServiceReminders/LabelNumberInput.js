@@ -35,18 +35,21 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         overflow: "hidden",
+        flex: 1,
     },
     input: {
         paddingHorizontal: 12,
         paddingVertical: 6,
+        flex: 1,
     },
     labelContainer: {
         backgroundColor: Colors.grey150,
-        alignItems: "center",
-        justifyContent: "center",
+        // alignItems: "center",
+        // justifyContent: "center",
         paddingHorizontal: 8,
         paddingVertical: 8,
         borderLeftWidth: 1,
         borderLeftColor: Colors.grey400,
+
     },
 });
