@@ -51,7 +51,7 @@ const NewBookingCard = (props) => {
             )}
 
             <View style={{flexDirection: "row", justifyContent: "space-between", margin: 15, alignItems: "center"}}>
-                <Text>{props.data.name}</Text>
+                <Text style={{flex:1, marginRight:15,}}>{props.data.name}</Text>
                 <View style={{flexDirection: "row", alignItems: "center", gap: 30}}>
                     <Text style={{fontWeight: 500}}>₹ {props.data.price}</Text>
                     <PrimaryButton

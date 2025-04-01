@@ -56,6 +56,7 @@ import BookingHistory from "../screens/appointments/BookingHistory";
 import ActiveBookings from "../screens/appointments/ActiveBookings";
 import Campaigns from "../screens/marketing/Campaigns";
 import CampaignStack from "../stacks/CampaignStack";
+import CalendarScreen from "../screens/appointments/CalendarScreen";
 
 function CustomDrawerIcon({navigation}) {
     return (
@@ -258,6 +259,23 @@ const MainDrawerNavigator = (props) => {
                                 )
                             })}
                         >
+                            {/*<Drawer.Screen*/}
+                            {/*    name="Calendar"*/}
+                            {/*    component={CalendarScreen}*/}
+                            {/*    options={({navigation, route}) => ({*/}
+                            {/*        // headerLeft: currentLocation !== "Dashboard" ? () => <BackButton/> : () =>*/}
+                            {/*        //     <CustomDrawerIcon navigation={navigation}/>,*/}
+                            {/*        // headerTitle: `${currentLocation}`,*/}
+                            {/*        // headerTitleAlign: "center",*/}
+                            {/*        swipeEnabled: currentLocation !== "CalendarScreen" ? false : true,*/}
+                            {/*        // headerShown: isDashboardPage,*/}
+                            {/*        drawerIcon: () => <Image*/}
+                            {/*            source={{uri: Image.resolveAssetSource(dashboard_icon).uri}} width={25}*/}
+                            {/*            height={25}*/}
+                            {/*            style={{resizeMode: "contain"}}/>,*/}
+                            {/*        headerShown: false*/}
+                            {/*    })}*/}
+                            {/*/>*/}
                             <Drawer.Screen
                                 name="Dashboard"
                                 component={DashboardStack}
