@@ -54,6 +54,12 @@ export default function ChooseTemplateForGreetings(props) {
 
                     let updated = ""
 
+                    if (props.greetingTemplateData.selected_template_ids.includes(item.template_id)) {
+                        toastRef.current.show("This template is already selected.");
+                        setIsLoading(-1)
+                        return;
+                    }
+
                     if (props.changeTemplateIndex !== -1)
                     {
                         props.setGreetingTemplateData((prev) => {

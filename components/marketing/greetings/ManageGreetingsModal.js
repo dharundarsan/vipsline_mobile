@@ -58,22 +58,31 @@ export default function ManageGreetingsModal(props) {
     const greetingTypeRef = useRef(null);
     const customerSegmentRef = useRef(null);
     const messageGroupNameRef = useRef(null);
-    const greetingDeliveryTimeRef = useRef(null);
-    const sendMessageBeforeRef = useRef(null);
+    const sendMessageBeforeRefs = useRef([]);
+    const greetingDeliveryTimeRefs = useRef([]);
 
     async function onSave() {
         const greetingTypeValid = greetingTypeRef.current();
         const customerSegmentValid = customerSegmentRef.current();
         const messageGroupNameValid = messageGroupNameRef.current();
-        const sendMessageBeforeValid = greetingTemplateData.selected_template_ids.length !== 0 ? sendMessageBeforeRef.current() : true;
-        const greetingDeliveryTimeValid = greetingTemplateData.selected_template_ids.length !== 0 ? greetingDeliveryTimeRef.current() : true;
+        // const sendMessageBeforeValid = greetingTemplateData.selected_template_ids.length !== 0 ? sendMessageBeforeRef.current() : true;
+        // const greetingDeliveryTimeValid = greetingTemplateData.selected_template_ids.length !== 0 ? greetingDeliveryTimeRef.current() : true;
+
+        const sendMessageBeforeValid = greetingTemplateData.selected_template_ids.length !== 0
+            ? sendMessageBeforeRefs.current.every(ref => ref ? ref() === true : true)
+            : true;
+
+        // Validate all delivery time inputs
+        const greetingDeliveryTimeValid = greetingTemplateData.selected_template_ids.length !== 0
+            ? greetingDeliveryTimeRefs.current.every(ref => ref ? ref() === true : true)
+            : true;
 
         if (!greetingTypeValid || !customerSegmentValid || !messageGroupNameValid || !sendMessageBeforeValid || !greetingDeliveryTimeValid) {
             return;
         }
 
         if(greetingTemplateData.selected_template_ids.length === 0) {
-            toastRef.current.show("Please select a template name to proceed");
+            toastRef.current.show("Please select a template to proceed");
             return;
         }
 
@@ -125,8 +134,17 @@ export default function ManageGreetingsModal(props) {
         const greetingTypeValid = greetingTypeRef.current();
         const customerSegmentValid = customerSegmentRef.current();
         const messageGroupNameValid = messageGroupNameRef.current();
-        const sendMessageBeforeValid = greetingTemplateData.selected_template_ids.length !== 0 ? sendMessageBeforeRef.current() : true;
-        const greetingDeliveryTimeValid = greetingTemplateData.selected_template_ids.length !== 0 ? greetingDeliveryTimeRef.current() : true;
+        // const sendMessageBeforeValid = greetingTemplateData.selected_template_ids.length !== 0 ? sendMessageBeforeRef.current() : true;
+        // const greetingDeliveryTimeValid = greetingTemplateData.selected_template_ids.length !== 0 ? greetingDeliveryTimeRef.current() : true;
+
+        const sendMessageBeforeValid = greetingTemplateData.selected_template_ids.length !== 0
+            ? sendMessageBeforeRefs.current.every(ref => ref ? ref() === true : true)
+            : true;
+
+        // Validate all delivery time inputs
+        const greetingDeliveryTimeValid = greetingTemplateData.selected_template_ids.length !== 0
+            ? greetingDeliveryTimeRefs.current.every(ref => ref ? ref() === true : true)
+            : true;
 
         if (!greetingTypeValid || !customerSegmentValid || !messageGroupNameValid || !sendMessageBeforeValid || !greetingDeliveryTimeValid) {
             return;
@@ -218,6 +236,11 @@ export default function ManageGreetingsModal(props) {
         }
 
     }, []);
+
+    useEffect(() => {
+        sendMessageBeforeRefs.current = sendMessageBeforeRefs.current.slice(0, templateData.length);
+        greetingDeliveryTimeRefs.current = greetingDeliveryTimeRefs.current.slice(0, templateData.length);
+    }, [templateData]);
 
     return <Modal
         visible={props.visible}
@@ -518,7 +541,7 @@ export default function ManageGreetingsModal(props) {
                                                 );
 
                                                 setTimeout(() => {
-                                                    sendMessageBeforeRef.current();
+                                                    sendMessageBeforeRefs.current[index]();
                                                 }, 100)
                                             }}
                                             flex
@@ -541,7 +564,9 @@ export default function ManageGreetingsModal(props) {
                                                 else return true;
 
                                             }}
-                                            onSave={(callback) => sendMessageBeforeRef.current = callback}
+                                            onSave={(callback) => {
+                                                sendMessageBeforeRefs.current[index] = callback;
+                                            }}
                                         />
                                         <CustomTextInput
                                             type={"dropdown"}
@@ -553,6 +578,10 @@ export default function ManageGreetingsModal(props) {
                                                         i === index ? { ...item, delivery_time: text } : item
                                                     )
                                                 );
+
+                                                setTimeout(() => {
+                                                    greetingDeliveryTimeRefs.current[index]();
+                                                }, 100)
                                             }}
                                             flex
                                             placeholder={"select delivery time"}
@@ -564,7 +593,9 @@ export default function ManageGreetingsModal(props) {
                                                 }
                                                 else return true
                                             }}
-                                            onSave={(callback) => greetingDeliveryTimeRef.current = callback}
+                                            onSave={(callback) => {
+                                                greetingDeliveryTimeRefs.current[index] = callback;
+                                            }}
                                         />
                                     </View>
                                 </>

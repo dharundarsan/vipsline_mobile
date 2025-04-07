@@ -12,7 +12,7 @@ import CustomPagination from "../../components/common/CustomPagination";
 import SMSReminderAPI from "../../apis/marketingAPI/serviceRemindersAPI/SMSReminderAPI";
 
 export default function SMSReminderReport() {
-    const whatsAppListHeader = ["SENT DATE & TIME", "CUSTOMER  ", "MATCHING SERVICES", "REMINDER SEQUENCE", "CHANNEL", "DELIVERY STATUS", "WHATSAPP DEDUCTED"];
+    const whatsAppListHeader = ["SENT DATE & TIME", "CUSTOMER  ", "MATCHING SERVICES", "REMINDER SEQUENCE", "CHANNEL", "DELIVERY STATUS", "SMS DEDUCTED"];
 
     const tableHeaderList = [
         {key: "r.name", sortKey: "r.name", title: "SENT DATE & TIME"},
@@ -21,7 +21,7 @@ export default function SMSReminderReport() {
         {key: "lastCheckoutTime", sortKey: "lastCheckoutTime", title: "REMINDER SEQUENCE"},
         {key: "duration", sortKey: "duration", title: "CHANNEL"},
         {key: "status", sortKey: "", title: "DELIVERY STATUS"},
-        {key: "lk,ominujbhytg", sortKey: "", title: "WHATSAPP DEDUCTED"},
+        {key: "lk,ominujbhytg", sortKey: "", title: "SMS DEDUCTED"},
     ]
 
     const [dataList, setDataList] = useState([]);
